@@ -17,12 +17,14 @@ import * as path from "path";
 /* ── Firebase Admin init ────────────────────────────── */
 
 const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+const envProjectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+
 if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
   const sa = JSON.parse(fs.readFileSync(serviceAccountPath, "utf-8")) as ServiceAccount;
   initializeApp({ credential: cert(sa) });
 } else {
-  // Fallback: Application Default Credentials (gcloud auth)
-  initializeApp({ projectId: "irregular-pearl-dev" });
+  // Fallback: Use environment project ID or default
+  initializeApp({ projectId: envProjectId || "irregular-pearl-dev" });
 }
 
 const db = getFirestore();
