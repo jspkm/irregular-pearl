@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Tracks: anyone can read, no client writes
+    match /tracks/{trackId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Playlists: master playlist (ownerId == null) readable by all,
+    // user playlists readable/writable only by their owner
+    match /playlists/{playlistId} {
+      allow read: if resource.data.ownerId == null
+                  || (request.auth != null && resource.data.ownerId == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                            && resource.data.ownerId == request.auth.uid;
+    }
+  }
+}

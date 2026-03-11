@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: -apple-system; padding: 50px; background: pink; }
+.floating-player__timeline {
+  display: flex;
+  align-items: center;
+  clear: both;
+  gap: 8px;
+  margin-top: 10px;
+  width: 100%;
+  background: white;
+}
+.floating-player__time {
+  font-size: 10px;
+  color: #8d5a85;
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+}
+.floating-player__time:first-child { text-align: left; background: #e0e0e0; }
+.floating-player__time:last-child { text-align: right; background: #e0e0e0; }
+.floating-player__progress-bg {
+  flex: 1;
+  height: 4px;
+  background: red;
+}
+</style>
+</head>
+<body>
+<div style="width: 300px; padding: 12px; border: 1px solid black; background: #fff;">
+  <div class="floating-player__timeline">
+    <span class="floating-player__time">0:00</span>
+    <div class="floating-player__progress-bg"></div>
+    <span class="floating-player__time">3:18</span>
+  </div>
+</div>
+</body>
+</html>
