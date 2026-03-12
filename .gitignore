@@ -32,6 +32,13 @@ yarn-error.log*
 .env*
 !.env.example
 
+# claude
+.claude/
+
+# firebase functions
+functions/lib/
+functions/node_modules/
+
 # vercel
 .vercel
 
