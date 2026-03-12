@@ -206,6 +206,7 @@ export default function Home() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [authPosition, setAuthPosition] = useState({ x: 0, y: 0 });
   const [minimized, setMinimized] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Playback state
   const [muted, setMuted] = useState(true);
@@ -292,10 +293,6 @@ export default function Home() {
       } else {
         // Clear user state on logout
         setUserPlaylists([]);
-        if (activePlaylistId !== masterPlaylist?.id) {
-            setActivePlaylistId(masterPlaylist?.id || null);
-            setExpandedPlaylistId(null);
-        }
       }
     } catch (err) {
       console.error("Failed to load tracks:", err);
@@ -344,23 +341,36 @@ export default function Home() {
 
   /* ── Position ───────────────────────────────────── */
 
-  useEffect(() => {
-    const panelWidth = 547;
-    const panelHeight = 330;
+  const computePositions = useCallback(() => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const mobile = w <= 640;
+    setIsMobile(mobile);
+    const isMobile = mobile;
+    const panelWidth = isMobile ? w - 16 : Math.min(547, w - 24);
+    const panelHeight = isMobile ? 280 : 330;
     setPosition({
-      x: Math.max(12, (window.innerWidth - panelWidth) / 2),
-      y: Math.max(12, (window.innerHeight - panelHeight) / 2),
+      x: isMobile ? 8 : Math.max(12, (w - panelWidth) / 2),
+      y: isMobile ? 32 : Math.max(12, (h - panelHeight) / 2),
     });
     setAuthPosition({
-      x: Math.max(12, window.innerWidth - 324 - 16),
-      y: 38,
+      x: isMobile ? 12 : Math.max(12, w - 324 - 16),
+      y: isMobile ? 50 : 38,
     });
     setProfilePosition({
-      x: Math.max(12, Math.min(window.innerWidth - 276, window.innerWidth - 276)),
-      y: 38,
+      x: isMobile ? 12 : Math.max(12, w - 276),
+      y: isMobile ? 50 : 38,
     });
-    setReady(true);
   }, []);
+
+  useEffect(() => {
+    computePositions();
+    setReady(true);
+
+    const handleResize = () => computePositions();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [computePositions]);
 
   // Load profile photo from Firestore
   useEffect(() => {
@@ -422,34 +432,28 @@ export default function Home() {
     }
   }, [user, currentTracks, radioAdvance, activePlaylistId, masterPlaylist?.id]);
 
-  // Auto-expand active playlist when sidebar is opened
+  // Scroll to active track when playlist sidebar opens
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (playlistOpen && activePlaylistId) {
-      setExpandedPlaylistId(activePlaylistId);
-    }
-  }, [playlistOpen, activePlaylistId]);
+    if (playlistOpen) {
+      // Clear any pending scroll
+      if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      scrollTimerRef.current = setTimeout(() => {
+        const element = activeTrackRef.current;
+        const container = sidebarScrollRef.current;
+        if (!element || !container) return;
 
-  // Scroll to active track when playlist is expanded while sidebar is open
-  useEffect(() => {
-    if (playlistOpen && expandedPlaylistId === activePlaylistId && activeTrackRef.current && sidebarScrollRef.current) {
-        // Wait a tick for DOM to settle
-        requestAnimationFrame(() => {
-            if (activeTrackRef.current && sidebarScrollRef.current) {
-                const container = sidebarScrollRef.current;
-                const element = activeTrackRef.current;
-                const elementTop = element.offsetTop;
-                const elementHeight = element.offsetHeight;
-                const containerHeight = container.offsetHeight;
-                
-                // Center the element
-                container.scrollTo({
-                    top: elementTop - (containerHeight / 2) + (elementHeight / 2),
-                    behavior: 'smooth'
-                });
-            }
-        });
+        const containerRect = container.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        const relativeTop = elementRect.top - containerRect.top + container.scrollTop;
+        const scrollTarget = relativeTop - (container.clientHeight / 2) + (elementRect.height / 2);
+
+        container.scrollTop = scrollTarget;
+      }, 400);
     }
-  }, [playlistOpen, expandedPlaylistId, activePlaylistId, trackIndex]);
+    // Only re-trigger on sidebar open, not on trackIndex changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playlistOpen]);
 
   /* ── Drag ───────────────────────────────────────── */
 
@@ -1012,7 +1016,14 @@ export default function Home() {
                   <button
                     type="button"
                     className="floating-player__btn-slide"
-                    onClick={() => setPlaylistOpen((v) => !v)}
+                    onClick={() => {
+                      const opening = !playlistOpen;
+                      setPlaylistOpen(opening);
+                      // Reset expandedPlaylistId so active playlist auto-expands via fallback
+                      if (opening) {
+                        setExpandedPlaylistId(null);
+                      }
+                    }}
                     aria-label={playlistOpen ? "Hide playlists" : "Show playlists"}
                     title="Playlists"
                   >
@@ -1028,20 +1039,30 @@ export default function Home() {
 
           <aside
             className={`floating-player__sidebar ${playlistOpen ? "is-open" : ""}`}
-            style={{
-              left: position.x + (panelRef.current?.offsetWidth ?? 547) + 8,
-              top: 60,
-              bottom: 60,
-            }}
+            style={
+              isMobile
+                ? {}
+                : (() => {
+                    const w = window.innerWidth;
+                    const sidebarWidth = w <= 960 ? Math.min(300, w - 24) : 340;
+                    const sidebarLeft = position.x + (panelRef.current?.offsetWidth ?? 547) + 8;
+                    const maxLeft = w - sidebarWidth - 8;
+                    return {
+                      left: Math.min(sidebarLeft, Math.max(8, maxLeft)),
+                      top: 60,
+                      bottom: 60,
+                    };
+                  })()
+            }
           >
             <div className="floating-player__sidebar-inner" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div className="floating-player__sidebar-titlebar">
                 <span>PLAYLISTS</span>
                 <div className="floating-player__titlebar-actions">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="floating-player__sidebar-close"
-                    onClick={() => setPlaylistOpen(false)}
+                    onClick={() => { setPlaylistOpen(false); setExpandedPlaylistId(null); }}
                   >
                     ✕
                   </button>
@@ -1058,8 +1079,8 @@ export default function Home() {
                     const timeB = b.updatedAt ? (typeof b.updatedAt === 'number' ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
                     return timeB - timeA;
                   })].filter(Boolean).map((pl) => {
-                    const isExpanded = expandedPlaylistId === pl!.id;
                     const isActive = activePlaylistId === pl!.id;
+                    const isExpanded = expandedPlaylistId !== null ? expandedPlaylistId === pl!.id : isActive;
                     
                     return (
                       <li key={pl!.id} style={{ marginBottom: '8px', padding: 0, background: 'transparent' }}>

@@ -1440,3 +1440,172 @@ button.playlist-manager__item small {
     opacity: 1;
   }
 }
+
+/* ── Responsive: Small screens ────────────────────── */
+
+@media (max-width: 640px) {
+  .floating-player {
+    width: calc(100vw - 16px) !important;
+    left: 8px !important;
+    height: auto !important;
+    min-height: 0;
+    max-height: calc(100vh - 80px);
+    border-radius: 10px;
+  }
+
+  .floating-player__titlebar {
+    border-radius: 8px 8px 0 0;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .floating-player__body {
+    padding: 8px 10px;
+  }
+
+  .floating-player__content-top {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .floating-player__track {
+    font-size: 15px;
+  }
+
+  .floating-player__composer {
+    font-size: 12px !important;
+    margin: -6px 0 2px 8px !important;
+  }
+
+  .floating-player__performer {
+    font-size: 11px !important;
+  }
+
+  .floating-player__insight-container {
+    height: 50px;
+    margin-top: 6px;
+    padding-bottom: 12px;
+  }
+
+  .floating-player__insight {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+  }
+
+  .floating-player__cover {
+    width: 48px;
+    height: 48px;
+  }
+
+  .floating-player__timeline {
+    margin-top: 6px;
+  }
+
+  .floating-player__actions {
+    margin-top: 6px;
+  }
+
+  .floating-player__actions button {
+    width: 30px;
+    height: 26px;
+  }
+
+  .floating-player__sidebar {
+    width: calc(100vw - 16px) !important;
+    left: 8px !important;
+    top: auto !important;
+    bottom: 8px !important;
+    height: 45vh;
+    max-height: 360px;
+  }
+
+  .floating-player__sidebar-inner {
+    border-radius: 10px;
+  }
+
+  .floating-player__sidebar-titlebar {
+    border-radius: 8px 8px 0 0;
+  }
+
+  .membership-header__text {
+    width: auto;
+    max-width: 140px;
+    font-size: 10px;
+    padding: 0 6px;
+  }
+
+  .membership-header {
+    height: 24px;
+  }
+
+  .membership-header__icon-box {
+    padding: 0 6px;
+  }
+
+  .floating-auth {
+    width: calc(100vw - 24px) !important;
+    left: 12px !important;
+    top: 40px !important;
+  }
+
+  .profile-panel {
+    width: calc(100vw - 24px) !important;
+    max-width: 280px;
+    left: 12px !important;
+    top: 40px !important;
+  }
+
+  .player-dock {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+
+  .retro-player-icon {
+    width: 50px;
+  }
+
+  .playlist-manager,
+  .browse-panel {
+    width: calc(100vw - 16px) !important;
+    left: 8px !important;
+  }
+}
+
+/* ── Responsive: Very small screens ──────────────── */
+
+@media (max-width: 380px) {
+  .floating-player__track {
+    font-size: 14px;
+  }
+
+  .floating-player__cover {
+    width: 40px;
+    height: 40px;
+  }
+
+  .floating-player__insight-container {
+    height: 40px;
+  }
+
+  .membership-header__text {
+    max-width: 100px;
+    font-size: 9px;
+  }
+}
+
+/* ── Responsive: Medium screens ───────────────────── */
+
+@media (min-width: 641px) and (max-width: 960px) {
+  .floating-player__sidebar {
+    width: min(300px, calc(100vw - 24px));
+  }
+
+  .floating-player__cover {
+    width: 64px;
+    height: 64px;
+  }
+
+  .floating-player__insight-container {
+    height: 80px;
+  }
+}
