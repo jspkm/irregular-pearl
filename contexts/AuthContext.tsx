@@ -14,6 +14,7 @@ import {
   signInWithEmail,
   signUpWithEmail,
   signOut,
+  updateUserProfile,
 } from "@/lib/auth";
 
 interface AuthContextValue {
@@ -22,8 +23,9 @@ interface AuthContextValue {
   authError: string | null;
   signInGoogle: () => Promise<void>;
   signInEmail: (email: string, password: string) => Promise<void>;
-  signUpEmail: (email: string, password: string) => Promise<void>;
+  signUpEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (updates: { displayName?: string; photoURL?: string }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -35,6 +37,7 @@ const AuthContext = createContext<AuthContextValue>({
   signInEmail: async () => {},
   signUpEmail: async () => {},
   signOut: async () => {},
+  updateProfile: async () => {},
   clearError: () => {},
 });
 
@@ -71,10 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleSignUpEmail = async (email: string, password: string) => {
+  const handleSignUpEmail = async (email: string, password: string, displayName?: string) => {
     setAuthError(null);
     try {
-      await signUpWithEmail(email, password);
+      await signUpWithEmail(email, password, displayName);
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : "Sign-up failed";
       setAuthError(msg);
@@ -91,6 +94,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleUpdateProfile = async (updates: { displayName?: string; photoURL?: string }) => {
+    setAuthError(null);
+    try {
+      await updateUserProfile(updates);
+      // Force re-render with updated user data
+      if (user) {
+        setUser({ ...user } as User);
+      }
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : "Profile update failed";
+      setAuthError(msg);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -101,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInEmail: handleSignInEmail,
         signUpEmail: handleSignUpEmail,
         signOut: handleSignOut,
+        updateProfile: handleUpdateProfile,
         clearError: () => setAuthError(null),
       }}
     >
@@ -112,3 +130,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

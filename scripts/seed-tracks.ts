@@ -79,7 +79,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 480,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("Beethoven Symphony 5, first movement.ogg"),
+    audioUrl: wm("Ludwig van Beethoven - symphony no. 5 in c minor, op. 67 - i. allegro con brio.ogg"),
     license: "CC BY-SA 4.0",
   },
   {
@@ -120,7 +120,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 312,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("Beethoven - Sonata Pathetique, 2nd movement.ogg"),
+    audioUrl: wm("Beethoven, Sonata No. 8 in C Minor Pathetique, Op. 13 - II. Adagio cantabile.ogg"),
     license: "Public Domain",
   },
   {
@@ -140,7 +140,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 480,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("USAB-Beethoven-PianoConcerto5-2.ogg"),
+    audioUrl: wm("Beethoven Piano Concerto No 5 Movement 1.ogg"),
     license: "Public Domain",
   },
   {
@@ -172,7 +172,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 570,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Chopin Ballade 1.ogg"),
+    audioUrl: wm("Frederic Chopin - ballade no. 1 in g minor, op. 23.ogg"),
     license: "Public Domain",
   },
   {
@@ -192,7 +192,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 110,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Chopin waltz op 64 no 1.ogg"),
+    audioUrl: wm("Chopin Minute Waltz.ogg"),
     license: "Public Domain",
   },
   {
@@ -222,7 +222,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 300,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Chopin Fantaisie Impromptu.ogg"),
+    audioUrl: wm("Frederic Chopin - Fantasy Impromptu Opus 66.ogg"),
     license: "Public Domain",
   },
   {
@@ -232,7 +232,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 250,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Chopin nocturne in c-sharp minor.ogg"),
+    audioUrl: wm("Chopin, Nocturne in C-sharp minor, Op. Posth.ogg"),
     license: "Public Domain",
   },
   {
@@ -242,7 +242,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 600,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Chopin - Scherzo No. 2, Op. 31.ogg"),
+    audioUrl: wm("Frederic Chopin - scherzo no. 2 in b flat minor, op. 31.ogg"),
     license: "Public Domain",
   },
   {
@@ -284,7 +284,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 264,
     epoch: "Impressionist",
     source: "wikimedia",
-    audioUrl: wm("Debussy – Rêverie.ogg"),
+    audioUrl: wm("Reverie.ogg"),
     license: "Public Domain",
   },
   {
@@ -318,7 +318,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 330,
     epoch: "Baroque",
     source: "wikimedia",
-    audioUrl: wm("Johann Sebastian Bach - Air.ogg"),
+    audioUrl: wm("Air (Bach).ogg"),
     license: "Public Domain",
   },
   {
@@ -328,7 +328,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 165,
     epoch: "Baroque",
     source: "wikimedia",
-    audioUrl: wm("Bach - Cello Suite No.1 - Prelude.ogg"),
+    audioUrl: wm("Bach - Cello Suite no. 1 in G major, BWV 1007 - I. Prélude.ogg"),
     license: "Public Domain",
   },
   {
@@ -338,7 +338,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 360,
     epoch: "Baroque",
     source: "wikimedia",
-    audioUrl: wm("Johann Sebastian Bach - Brandenburg Concerto No. 3, first movement - Allegro.ogg"),
+    audioUrl: wm("Bach - Brandenburg Concerto No. 3 - 1. Allegro.ogg"),
     license: "Public Domain",
   },
   {
@@ -348,7 +348,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 138,
     epoch: "Baroque",
     source: "wikimedia",
-    audioUrl: wm("Johann Sebastian Bach - The Well-Tempered Clavier - Book 1 - 01 Prelude in C major - Kimiko Ishizaka.ogg"),
+    audioUrl: wm("Kimiko Ishizaka - Bach - Well-Tempered Clavier, Book 1 - 01 Prelude No. 1 in C major, BWV 846.ogg"),
     license: "CC0",
   },
   {
@@ -410,7 +410,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 210,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("Mozart - Turkish March.ogg"),
+    audioUrl: wm("Mozart - Piano Sonata No. 11 in A major - III. Allegro (Turkish March).ogg"),
     license: "Public Domain",
   },
   {
@@ -430,7 +430,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 210,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("Mozart - Lacrimosa.ogg"),
+    audioUrl: wm("W. A. Mozart - Requiem - 8. Lacrimosa (Herbert von Karajan, Wiener Philharmoniker, Wiener Singverein, 1960).ogg"),
     license: "Public Domain",
   },
   {
@@ -470,7 +470,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 240,
     epoch: "Classical",
     source: "wikimedia",
-    audioUrl: wm("Mozart Piano Sonata No 16 in C Major, K 545 - I. Allegro.ogg"),
+    audioUrl: wm("Mozart - Piano Sonata No. 16 in C major - I. Allegro.ogg"),
     license: "Public Domain",
   },
 
@@ -512,7 +512,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 900,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("1812 Overture.ogg"),
+    audioUrl: wm("Pyotr Ilyich Tchaikovsky - 1812 overture.ogg"),
     license: "Public Domain",
   },
   {
@@ -596,7 +596,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 600,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Franz Liszt - Hungarian Rhapsody No. 2.ogg"),
+    audioUrl: wm("Hungarian Rhapsody No 2.ogg"),
     license: "Public Domain",
   },
   {
@@ -606,7 +606,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 270,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Liebestraum.ogg"),
+    audioUrl: wm("Franz Liszt - Liebestraum, Ab Major.ogg"),
     license: "Public Domain",
   },
   {
@@ -616,7 +616,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 300,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Liszt - La Campanella.ogg"),
+    audioUrl: wm("Liszt-La Campanella-Greiss.ogg"),
     license: "Public Domain",
   },
   {
@@ -648,7 +648,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 270,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Schubert - Serenade.ogg"),
+    audioUrl: wm("Ständchen (Schubert)-Serenade D957 No.4, Player Jason, Han.ogg"),
     license: "Public Domain",
   },
   {
@@ -690,7 +690,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 240,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Rachmaninoff - Prelude in C-sharp minor.ogg"),
+    audioUrl: wm("Sergei Rachmaninoff performs Rachmaninoff's Prelude in C sharp minor, Op. 3.ogg"),
     license: "Public Domain",
   },
   {
@@ -732,7 +732,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 720,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Dvorak - Symphony No.9 - 4 - Allegro con fuoco.ogg"),
+    audioUrl: wm("Antonin Dvorak - symphony no. 9 in e minor 'from the new world', op. 95 - iv. allegro con fuoco.ogg"),
     license: "Public Domain",
   },
   {
@@ -742,7 +742,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 180,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Dvorak humoresque.ogg"),
+    audioUrl: wm("Dvořák - Humoresque Op. 101 No. 7.ogg"),
     license: "Public Domain",
   },
 
@@ -754,7 +754,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 240,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Grieg - Morning Mood.ogg"),
+    audioUrl: wm("Henrik Ibsen, Edvard Grieg - Morgenstemning (Morning Mood).ogg"),
     license: "Public Domain",
   },
   {
@@ -764,7 +764,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 150,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Grieg - In the Hall of the Mountain King.ogg"),
+    audioUrl: wm("In the Hall of the Mountain King.ogg"),
     license: "Public Domain",
   },
   {
@@ -774,7 +774,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 720,
     epoch: "Romantic",
     source: "wikimedia",
-    audioUrl: wm("Grieg Piano Concerto in A minor, Op. 16 - I. Allegro molto moderato.ogg"),
+    audioUrl: wm("Edvard Grieg - piano concerto in a minor, op. 16 - i. allegro molto moderato.ogg"),
     license: "Public Domain",
   },
 
@@ -786,7 +786,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 195,
     epoch: "Impressionist",
     source: "wikimedia",
-    audioUrl: wm("Erik Satie - Gymnopédie No.1.ogg"),
+    audioUrl: wm("Erik Satie - gymnopedies - la 1 ere. lent et douloureux.ogg"),
     license: "Public Domain",
   },
   {
@@ -796,7 +796,7 @@ const TRACKS: SeedTrack[] = [
     durationSeconds: 168,
     epoch: "Impressionist",
     source: "wikimedia",
-    audioUrl: wm("Erik Satie - Gymnopédie No.3.ogg"),
+    audioUrl: wm("Gymnopédie no.3.ogg"),
     license: "Public Domain",
   },
   {

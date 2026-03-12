@@ -11,7 +11,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import type { Track, Playlist } from "./types";
+import type { Track, Playlist, UserProfile } from "./types";
 
 /* ── Tracks ─────────────────────────────────────────── */
 
@@ -101,4 +101,24 @@ export async function getPlaylistById(playlistId: string): Promise<Playlist | nu
   const d = await getDoc(doc(db, "playlists", playlistId));
   if (!d.exists()) return null;
   return { id: d.id, ...d.data() } as Playlist;
+}
+
+/* ── User Profiles ─────────────────────────────────── */
+
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+  const d = await getDoc(doc(db, "userProfiles", uid));
+  if (!d.exists()) return null;
+  return d.data() as UserProfile;
+}
+
+export async function setUserProfile(
+  uid: string,
+  data: { displayName?: string; photoURL?: string }
+): Promise<void> {
+  const { setDoc } = await import("firebase/firestore");
+  await setDoc(
+    doc(db, "userProfiles", uid),
+    { ...data, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
 }

@@ -25,3 +25,9 @@ export interface Playlist {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
+
+export interface UserProfile {
+  displayName: string;
+  photoURL?: string;
+  updatedAt: Timestamp;
+}

@@ -10,8 +10,11 @@ import {
   updatePlaylistTracks,
   renamePlaylist,
   deletePlaylist,
+  getUserProfile,
+  setUserProfile,
 } from "@/lib/firestore";
 import type { Track, Playlist } from "@/lib/types";
+
 
 /* ── Helpers ────────────────────────────────────────── */
 
@@ -44,10 +47,53 @@ function PlayerIcon() {
   );
 }
 
+/* ── Track Title Component ────────────────────────── */
+
+function TrackTitle({ title, trackId }: { title: string; trackId: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const [scrollDist, setScrollDist] = useState("0px");
+  const [hasScrolledOnce, setHasScrolledOnce] = useState(false);
+
+  useEffect(() => {
+    setHasScrolledOnce(false);
+    setIsOverflowing(false);
+
+    const detect = () => {
+      if (textRef.current && containerRef.current) {
+        // Use a small buffer (2px) to trigger scrolling if very close
+        const ov = textRef.current.scrollWidth > (containerRef.current.clientWidth - 2);
+        setIsOverflowing(ov);
+        if (ov) {
+          const dist = containerRef.current.clientWidth - textRef.current.scrollWidth;
+          setScrollDist(`${dist}px`);
+        }
+      }
+    };
+
+    const rafId = requestAnimationFrame(() => setTimeout(detect, 50));
+    return () => cancelAnimationFrame(rafId);
+  }, [title, trackId]);
+
+  return (
+    <div className="floating-player__track-container" ref={containerRef}>
+      <p
+        ref={textRef}
+        className={`floating-player__track ${isOverflowing && !hasScrolledOnce ? "is-scrolling" : ""}`}
+        style={{ "--scroll-dist": scrollDist } as React.CSSProperties}
+        onAnimationEnd={() => setHasScrolledOnce(true)}
+      >
+        {title}
+      </p>
+    </div>
+  );
+}
+
 /* ── Main Component ─────────────────────────────────── */
 
 export default function Home() {
-  const { user, loading: authLoading, signInGoogle, signInEmail, signUpEmail, signOut, authError, clearError } = useAuth();
+  const { user, loading: authLoading, signInGoogle, signInEmail, signUpEmail, signOut, updateProfile, authError, clearError } = useAuth();
 
   const panelRef = useRef<HTMLDivElement>(null);
   const authPanelRef = useRef<HTMLElement>(null);
@@ -96,7 +142,16 @@ export default function Home() {
   const [authPanelOpen, setAuthPanelOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
+  const [authDisplayName, setAuthDisplayName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+
+  // Profile panel state
+  const [profilePanelOpen, setProfilePanelOpen] = useState(false);
+  const [profilePhotoURL, setProfilePhotoURL] = useState<string | null>(null);
+  const profileDragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
+  const profilePanelRef = useRef<HTMLElement>(null);
+  const [profilePosition, setProfilePosition] = useState({ x: 0, y: 0 });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* ── Data Loading ───────────────────────────────── */
 
@@ -150,18 +205,41 @@ export default function Home() {
   /* ── Position ───────────────────────────────────── */
 
   useEffect(() => {
-    const panelWidth = 360;
-    const panelHeight = 260;
+    const panelWidth = 547;
+    const panelHeight = 290;
     setPosition({
       x: Math.max(12, (window.innerWidth - panelWidth) / 2),
       y: Math.max(12, (window.innerHeight - panelHeight) / 2),
     });
     setAuthPosition({
-      x: window.innerWidth - 320 - 12,
+      x: Math.max(12, window.innerWidth - 324 - 16),
+      y: 38,
+    });
+    setProfilePosition({
+      x: Math.max(12, Math.min(window.innerWidth - 276, window.innerWidth - 276)),
       y: 38,
     });
     setReady(true);
   }, []);
+
+  // Load profile photo from Firestore
+  useEffect(() => {
+    if (!user) {
+      setProfilePhotoURL(null);
+      setProfilePanelOpen(false);
+      return;
+    }
+    // Use Firebase Auth photoURL first
+    if (user.photoURL) {
+      setProfilePhotoURL(user.photoURL);
+    }
+    // Then check Firestore for custom avatar
+    getUserProfile(user.uid).then((profile) => {
+      if (profile?.photoURL) {
+        setProfilePhotoURL(profile.photoURL);
+      }
+    }).catch(() => {});
+  }, [user]);
 
   /* ── Audio ──────────────────────────────────────── */
 
@@ -169,10 +247,11 @@ export default function Home() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.muted = muted;
-    if (!isPlaying) return;
+    if (!isPlaying) { audio.pause(); return; }
+    // Only needed for play/mute toggles — track changes are handled by key+autoPlay
     const playback = audio.play();
     if (playback) playback.catch(() => { });
-  }, [isPlaying, muted, trackIndex]);
+  }, [isPlaying, muted]);
 
   useEffect(() => {
     setPlayedOrder((current) => {
@@ -249,17 +328,96 @@ export default function Home() {
     }
   };
 
+  /* ── Profile Drag ────────────────────────────── */
+
+  const handleProfilePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if ((event.target as HTMLElement).closest("button, input")) return;
+    const panel = profilePanelRef.current;
+    if (!panel) return;
+    const bounds = panel.getBoundingClientRect();
+    profileDragRef.current = {
+      id: event.pointerId,
+      offsetX: event.clientX - bounds.left,
+      offsetY: event.clientY - bounds.top,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleProfilePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const dragState = profileDragRef.current;
+    const panel = profilePanelRef.current;
+    if (!dragState || dragState.id !== event.pointerId || !panel) return;
+    const maxX = window.innerWidth - panel.offsetWidth;
+    const maxY = window.innerHeight - panel.offsetHeight;
+    setProfilePosition({
+      x: Math.min(Math.max(0, event.clientX - dragState.offsetX), Math.max(0, maxX)),
+      y: Math.min(Math.max(0, event.clientY - dragState.offsetY), Math.max(0, maxY)),
+    });
+  };
+
+  const handleProfilePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (profileDragRef.current?.id === event.pointerId) {
+      profileDragRef.current = null;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  /* ── Profile Photo Upload ─────────────────────── */
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Read as base64 data URI
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const dataUri = ev.target?.result as string;
+      if (!dataUri) return;
+
+      // Resize to 128x128 to keep Firestore doc small
+      const canvas = document.createElement("canvas");
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const img = new Image();
+      img.onload = async () => {
+        const size = Math.min(img.width, img.height);
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 128, 128);
+        const resized = canvas.toDataURL("image/jpeg", 0.8);
+
+        setProfilePhotoURL(resized);
+        try {
+          await setUserProfile(user.uid, { photoURL: resized });
+          await updateProfile({ photoURL: resized });
+        } catch (err) {
+          console.error("Failed to save profile photo:", err);
+        }
+      };
+      img.src = dataUri;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  /* ── Derived: user display info ──────────────── */
+
+  const userFirstName = user?.displayName
+    ? user.displayName.split(" ")[0]
+    : null;
+
   /* ── Playback Controls ──────────────────────────── */
 
-  const playNextTrack = () => {
+  const playNextTrack = useCallback(() => {
     setCurrentTime(0);
     setTrackIndex((i) => (i + 1) % currentTracks.length);
-  };
+  }, [currentTracks.length]);
 
-  const playPreviousTrack = () => {
+  const playPreviousTrack = useCallback(() => {
     setCurrentTime(0);
     setTrackIndex((i) => (i - 1 + currentTracks.length) % currentTracks.length);
-  };
+  }, [currentTracks.length]);
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
     const track = currentTracks[trackIndex];
@@ -271,7 +429,7 @@ export default function Home() {
     setCurrentTime(newTime);
   };
 
-  const handleMuteToggle = async () => {
+  const handleMuteToggle = useCallback(async () => {
     const audio = audioRef.current;
     const nextMuted = !muted;
     setMuted(nextMuted);
@@ -280,9 +438,9 @@ export default function Home() {
     if (!nextMuted) {
       try { await audio.play(); } catch { }
     }
-  };
+  }, [muted]);
 
-  const handlePlayStopToggle = async () => {
+  const handlePlayStopToggle = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
     if (isPlaying) {
@@ -294,7 +452,7 @@ export default function Home() {
       await audio.play();
       setIsPlaying(true);
     } catch { }
-  };
+  }, [isPlaying]);
 
   /* ── Playlist Actions ───────────────────────────── */
 
@@ -447,13 +605,13 @@ export default function Home() {
     <main className="min-h-screen w-full bg-cotton-candy">
       {currentTrack && (
         <audio
+          key={currentTrack.id}
           ref={audioRef}
           src={currentTrack.audioUrl}
           autoPlay
           muted={muted}
           playsInline
           onEnded={playNextTrack}
-          onError={playNextTrack}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -479,6 +637,25 @@ export default function Home() {
           </div>
           <div className="membership-header__text">
             BECOME A MEMBER / LOG IN
+          </div>
+        </div>
+      )}
+
+      {user && (
+        <div 
+          className="membership-header membership-header--logged-in" 
+          onClick={() => setProfilePanelOpen((v) => !v)}
+          title="My Profile"
+        >
+          <div className="membership-header__icon-box">
+            <img 
+              src="/piano-keys.png" 
+              alt="Logo" 
+              style={{ width: '14px', height: '14px', objectFit: 'contain' }}
+            />
+          </div>
+          <div className="membership-header__text">
+            {userFirstName || "Member"}
           </div>
         </div>
       )}
@@ -514,121 +691,133 @@ export default function Home() {
 
             {/* Body */}
             <div className="floating-player__body">
-              {/* Album Cover */}
-              {currentTrack?.albumCover && (
-                <img
-                  className="floating-player__cover"
-                  src={currentTrack.albumCover}
-                  alt={`${currentTrack.title} cover`}
-                />
-              )}
-
-              {/* Track Info */}
-              <p className="floating-player__track">{currentTrack?.title}</p>
-              <p className="floating-player__composer">{currentTrack?.composer}</p>
-              <p className="floating-player__performer">
-                {currentTrack?.performers.join(", ")}
-                {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
-              </p>
-              <div className="floating-player__timeline">
-                <span className="floating-player__time">
-                  {formatDuration(currentTime)}
-                </span>
-                <div className="floating-player__progress-bg" onClick={handleSeek}>
-                  <div
-                    className="floating-player__progress-fill"
-                    style={{
-                      width: `${currentTrack ? (currentTime / currentTrack.durationSeconds) * 100 : 0}%`
-                    }}
-                  >
-                    <div className="floating-player__progress-tick" />
-                  </div>
+              <div className="floating-player__content-top">
+                <div className="floating-player__track-info">
+                  {/* Track Info (Isolated Component) */}
+                  {currentTrack && (
+                    <TrackTitle 
+                      title={currentTrack.title} 
+                      trackId={currentTrack.id} 
+                    />
+                  )}
+                  <p className="floating-player__composer">{currentTrack?.composer}</p>
+                  <p className="floating-player__performer">
+                    {currentTrack?.performers.join(", ")}
+                    {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
+                  </p>
                 </div>
-                <span className="floating-player__time">
-                  {currentTrack ? formatDuration(currentTrack.durationSeconds) : "0:00"}
-                </span>
+
+                {/* Album Cover */}
+                {currentTrack?.albumCover && (
+                  <img
+                    className="floating-player__cover"
+                    src={currentTrack.albumCover}
+                    alt={`${currentTrack.title} cover`}
+                  />
+                )}
               </div>
 
-              {/* Controls */}
-              <div className="floating-player__actions">
-                <button type="button" className="floating-player__btn-mute" onClick={handleMuteToggle} aria-label={muted ? "Unmute" : "Mute"}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path className="icon-stroke" d="M5 9H9L13 5V19L9 15H5Z" />
-                    {muted ? (
-                      <path className="icon-stroke" d="M16 9L22 15M22 9L16 15" />
-                    ) : (
-                      <path className="icon-stroke" d="M16 9C17.5 10.4 17.5 13.6 16 15M18.5 7C21.8 10 21.8 14 18.5 17" />
-                    )}
-                  </svg>
-                </button>
-                <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path className="icon-stroke" d="M7 6V18" />
-                    <path className="icon-fill" d="M19 6L10 12L19 18Z" />
-                  </svg>
-                </button>
-                <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    {isPlaying ? (
-                      <rect className="icon-fill" x="7" y="7" width="10" height="10" />
-                    ) : (
-                      <path className="icon-fill" d="M8 6L18 12L8 18Z" />
-                    )}
-                  </svg>
-                </button>
-                <button type="button" onClick={playNextTrack} aria-label="Next track">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path className="icon-stroke" d="M17 6V18" />
-                    <path className="icon-fill" d="M5 6L14 12L5 18Z" />
-                  </svg>
-                </button>
+              <div className="floating-player__controls-bottom">
+                <div className="floating-player__timeline">
+                  <span className="floating-player__time">
+                    {formatDuration(currentTime)}
+                  </span>
+                  <div className="floating-player__progress-bg" onClick={handleSeek}>
+                    <div
+                      className="floating-player__progress-fill"
+                      style={{
+                        width: `${currentTrack ? (currentTime / currentTrack.durationSeconds) * 100 : 0}%`
+                      }}
+                    >
+                      <div className="floating-player__progress-tick" />
+                    </div>
+                  </div>
+                  <span className="floating-player__time">
+                    {currentTrack ? formatDuration(currentTrack.durationSeconds) : "0:00"}
+                  </span>
+                </div>
 
-                {/* Playlist Manager Toggle (user only) */}
-                {user && (
-                  <button
-                    type="button"
-                    className="floating-player__btn-playlists"
-                    onClick={() => setPlaylistPanelOpen((v) => !v)}
-                    aria-label="Manage playlists"
-                    title="My Playlists"
-                  >
+                {/* Controls */}
+                <div className="floating-player__actions">
+                  <button type="button" className="floating-player__btn-mute" onClick={handleMuteToggle} aria-label={muted ? "Unmute" : "Mute"}>
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path className="icon-stroke" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
-                      <path className="icon-stroke" d="M19 14v6M16 17h6" />
+                      <path className="icon-stroke" d="M5 9H9L13 5V19L9 15H5Z" />
+                      {muted ? (
+                        <path className="icon-stroke" d="M16 9L22 15M22 9L16 15" />
+                      ) : (
+                        <path className="icon-stroke" d="M16 9C17.5 10.4 17.5 13.6 16 15M18.5 7C21.8 10 21.8 14 18.5 17" />
+                      )}
                     </svg>
                   </button>
-                )}
-
-                {/* Browse Track DB */}
-                {user && (
-                  <button
-                    type="button"
-                    className="floating-player__btn-browse"
-                    onClick={() => setBrowseOpen((v) => !v)}
-                    aria-label="Browse all tracks"
-                    title="Browse All"
-                  >
+                  <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <circle className="icon-stroke" cx="11" cy="11" r="7" />
-                      <path className="icon-stroke" d="M21 21L16.65 16.65" />
+                      <path className="icon-stroke" d="M7 6V18" />
+                      <path className="icon-fill" d="M19 6L10 12L19 18Z" />
                     </svg>
                   </button>
-                )}
+                  <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      {isPlaying ? (
+                        <rect className="icon-fill" x="7" y="7" width="10" height="10" />
+                      ) : (
+                        <path className="icon-fill" d="M8 6L18 12L8 18Z" />
+                      )}
+                    </svg>
+                  </button>
+                  <button type="button" onClick={playNextTrack} aria-label="Next track">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path className="icon-stroke" d="M17 6V18" />
+                      <path className="icon-fill" d="M5 6L14 12L5 18Z" />
+                    </svg>
+                  </button>
 
-                <button
-                  type="button"
-                  className="floating-player__btn-slide"
-                  onClick={() => setPlaylistOpen((v) => !v)}
-                  aria-label={playlistOpen ? "Hide queue" : "Show queue"}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    {playlistOpen ? (
-                      <path className="icon-stroke" d="M15 6L9 12L15 18" />
-                    ) : (
-                      <path className="icon-stroke" d="M9 6L15 12L9 18" />
-                    )}
-                  </svg>
-                </button>
+                  {/* Playlist Manager Toggle (user only) */}
+                  {user && (
+                    <button
+                      type="button"
+                      className="floating-player__btn-playlists"
+                      onClick={() => setPlaylistPanelOpen((v) => !v)}
+                      aria-label="Manage playlists"
+                      title="My Playlists"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path className="icon-stroke" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
+                        <path className="icon-stroke" d="M19 14v6M16 17h6" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {/* Browse Track DB */}
+                  {user && (
+                    <button
+                      type="button"
+                      className="floating-player__btn-browse"
+                      onClick={() => setBrowseOpen((v) => !v)}
+                      aria-label="Browse all tracks"
+                      title="Browse All"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle className="icon-stroke" cx="11" cy="11" r="7" />
+                        <path className="icon-stroke" d="M21 21L16.65 16.65" />
+                      </svg>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="floating-player__btn-slide"
+                    onClick={() => setPlaylistOpen((v) => !v)}
+                    aria-label={playlistOpen ? "Hide queue" : "Show queue"}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      {playlistOpen ? (
+                        <path className="icon-stroke" d="M15 6L9 12L15 18" />
+                      ) : (
+                        <path className="icon-stroke" d="M9 6L15 12L9 18" />
+                      )}
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -901,7 +1090,7 @@ export default function Home() {
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (isSignUp) {
-                      await signUpEmail(authEmail, authPassword);
+                      await signUpEmail(authEmail, authPassword, authDisplayName.trim() || undefined);
                     } else {
                       await signInEmail(authEmail, authPassword);
                     }
@@ -909,9 +1098,21 @@ export default function Home() {
                       setAuthPanelOpen(false);
                       setAuthEmail("");
                       setAuthPassword("");
+                      setAuthDisplayName("");
                     }
                   }}
                 >
+                  {isSignUp && (
+                    <input
+                      className="auth-panel__input"
+                      type="text"
+                      placeholder="Display Name"
+                      value={authDisplayName}
+                      onChange={(e) => setAuthDisplayName(e.target.value)}
+                      required
+                      autoComplete="name"
+                    />
+                  )}
                   <input
                     className="auth-panel__input"
                     type="email"
@@ -942,6 +1143,79 @@ export default function Home() {
                   onClick={() => { setIsSignUp((v) => !v); clearError(); }}
                 >
                   {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+                </button>
+              </div>
+            </aside>
+          )}
+
+          {/* Profile Panel (logged-in) */}
+          {user && profilePanelOpen && (
+            <aside
+              ref={profilePanelRef}
+              className="profile-panel"
+              style={{ left: profilePosition.x, top: profilePosition.y }}
+            >
+              <div
+                className="profile-panel__titlebar"
+                onPointerDown={handleProfilePointerDown}
+                onPointerMove={handleProfilePointerMove}
+                onPointerUp={handleProfilePointerUp}
+              >
+                <span>My Profile</span>
+                <button
+                  type="button"
+                  className="profile-panel__close"
+                  onClick={() => setProfilePanelOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="profile-panel__body">
+                {/* Avatar */}
+                <div
+                  className="profile-panel__avatar-wrapper"
+                  onClick={() => fileInputRef.current?.click()}
+                  title="Click to change photo"
+                >
+                  {profilePhotoURL ? (
+                    <img
+                      src={profilePhotoURL}
+                      alt="Profile"
+                      className="profile-panel__avatar"
+                    />
+                  ) : (
+                    <div className="profile-panel__avatar-placeholder">
+                      {userFirstName ? userFirstName[0].toUpperCase() : "?"}
+                    </div>
+                  )}
+                  <div className="profile-panel__avatar-overlay">📷</div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handlePhotoUpload}
+                  />
+                </div>
+
+                {/* Name */}
+                <p className="profile-panel__name">
+                  {user.displayName || user.email || "Member"}
+                </p>
+                <p className="profile-panel__email">
+                  {user.email}
+                </p>
+
+                {/* Sign Out */}
+                <button
+                  type="button"
+                  className="profile-panel__signout-btn"
+                  onClick={async () => {
+                    await signOut();
+                    setProfilePanelOpen(false);
+                  }}
+                >
+                  Sign Out
                 </button>
               </div>
             </aside>
