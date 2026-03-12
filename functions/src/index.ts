@@ -2,7 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 
 const geminiApiKey = defineSecret("GEMINI_API_KEY");
-const geminiModel = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 export const musicalInsight = onRequest(
   { secrets: [geminiApiKey], cors: true },

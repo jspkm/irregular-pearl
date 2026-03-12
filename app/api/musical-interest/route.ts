@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   try {
     const { title, composer, performers } = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
-    const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
     if (!apiKey) {
       return NextResponse.json({ error: "API key not configured" }, { status: 500 });
