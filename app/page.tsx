@@ -25,6 +25,25 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/* ── Radio Clock ───────────────────────────────────── */
+
+const RADIO_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
+
+function computeRadioPosition(tracks: Track[]): { trackIndex: number; position: number } {
+  if (tracks.length === 0) return { trackIndex: 0, position: 0 };
+  const totalDuration = tracks.reduce((sum, t) => sum + t.durationSeconds, 0);
+  if (totalDuration <= 0) return { trackIndex: 0, position: 0 };
+  const elapsed = (Date.now() - RADIO_EPOCH) / 1000;
+  let posInPlaylist = ((elapsed % totalDuration) + totalDuration) % totalDuration;
+  for (let i = 0; i < tracks.length; i++) {
+    if (posInPlaylist < tracks[i].durationSeconds) {
+      return { trackIndex: i, position: posInPlaylist };
+    }
+    posInPlaylist -= tracks[i].durationSeconds;
+  }
+  return { trackIndex: 0, position: 0 };
+}
+
 /* ── Player Icon ────────────────────────────────────── */
 
 function PlayerIcon() {
@@ -260,6 +279,25 @@ export default function Home() {
     });
   }, [trackIndex]);
 
+  /* ── Radio Sync (non-logged-in) ────────────────── */
+
+  const radioAdvance = useCallback(() => {
+    const { trackIndex: rIdx, position: rPos } = computeRadioPosition(currentTracks);
+    setTrackIndex(rIdx);
+    setCurrentTime(rPos);
+    // Seek will happen once <audio> mounts for new track or immediately if same track
+    requestAnimationFrame(() => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = rPos;
+      }
+    });
+  }, [currentTracks]);
+
+  useEffect(() => {
+    if (user || currentTracks.length === 0) return;
+    radioAdvance();
+  }, [user, currentTracks, radioAdvance]);
+
   /* ── Drag ───────────────────────────────────────── */
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
@@ -448,11 +486,15 @@ export default function Home() {
       setIsPlaying(false);
       return;
     }
+    // Radio mode: re-sync to live position on resume
+    if (!user) {
+      radioAdvance();
+    }
     try {
       await audio.play();
       setIsPlaying(true);
     } catch { }
-  }, [isPlaying]);
+  }, [isPlaying, user, radioAdvance]);
 
   /* ── Playlist Actions ───────────────────────────── */
 
@@ -611,7 +653,7 @@ export default function Home() {
           autoPlay
           muted={muted}
           playsInline
-          onEnded={playNextTrack}
+          onEnded={user ? playNextTrack : radioAdvance}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -722,7 +764,7 @@ export default function Home() {
                   <span className="floating-player__time">
                     {formatDuration(currentTime)}
                   </span>
-                  <div className="floating-player__progress-bg" onClick={handleSeek}>
+                  <div className="floating-player__progress-bg" onClick={user ? handleSeek : undefined} style={{ cursor: user ? 'pointer' : 'default' }}>
                     <div
                       className="floating-player__progress-fill"
                       style={{
@@ -749,12 +791,6 @@ export default function Home() {
                       )}
                     </svg>
                   </button>
-                  <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path className="icon-stroke" d="M7 6V18" />
-                      <path className="icon-fill" d="M19 6L10 12L19 18Z" />
-                    </svg>
-                  </button>
                   <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       {isPlaying ? (
@@ -764,12 +800,22 @@ export default function Home() {
                       )}
                     </svg>
                   </button>
-                  <button type="button" onClick={playNextTrack} aria-label="Next track">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path className="icon-stroke" d="M17 6V18" />
-                      <path className="icon-fill" d="M5 6L14 12L5 18Z" />
-                    </svg>
-                  </button>
+                  {user && (
+                    <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path className="icon-stroke" d="M7 6V18" />
+                        <path className="icon-fill" d="M19 6L10 12L19 18Z" />
+                      </svg>
+                    </button>
+                  )}
+                  {user && (
+                    <button type="button" onClick={playNextTrack} aria-label="Next track">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path className="icon-stroke" d="M17 6V18" />
+                        <path className="icon-fill" d="M5 6L14 12L5 18Z" />
+                      </svg>
+                    </button>
+                  )}
 
                   {/* Playlist Manager Toggle (user only) */}
                   {user && (
