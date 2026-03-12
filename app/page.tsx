@@ -839,6 +839,11 @@ export default function Home() {
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+          onError={() => {
+            console.warn(`Audio failed to load: ${currentTrack?.title}`);
+            if (user) playNextTrack();
+            else radioAdvance();
+          }}
         />
       )}
 
