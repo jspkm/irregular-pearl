@@ -100,12 +100,90 @@ function TrackTitle({ title, trackId }: { title: string; trackId: string }) {
       <p
         ref={textRef}
         className={`floating-player__track ${isOverflowing && !hasScrolledOnce ? "is-scrolling" : ""}`}
-        style={{ "--scroll-dist": scrollDist } as React.CSSProperties}
+        style={{ "--scroll-dist": scrollDist, lineHeight: 1.1 } as React.CSSProperties}
         onAnimationEnd={() => setHasScrolledOnce(true)}
       >
         {title}
       </p>
     </div>
+  );
+}
+
+/* ── Typewriter Effect ───────────────────────────── */
+
+function TypewriterText({ text, speed = 40, fullInfoToCopy }: { text: string; speed?: number; fullInfoToCopy?: string }) {
+  const [displayed, setDisplayed] = useState("");
+  const [index, setIndex] = useState(0);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const scrollRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    setDisplayed("");
+    setIndex(0);
+  }, [text]);
+
+  useEffect(() => {
+    if (index < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayed((prev) => prev + text[index]);
+        setIndex((prev) => prev + 1);
+      }, speed);
+      return () => clearTimeout(timeout);
+    }
+  }, [index, text, speed]);
+
+  // Auto-scroll to bottom of insights container as it types
+  useEffect(() => {
+    if (scrollRef.current?.parentElement) {
+      scrollRef.current.parentElement.scrollTop = scrollRef.current.parentElement.scrollHeight;
+    }
+  }, [displayed]);
+
+  const isDone = index >= text.length && text.length > 0;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(fullInfoToCopy || text);
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 1500);
+    } catch (err) {
+      console.error("Failed to copy insight:", err);
+    }
+  };
+
+  return (
+    <p 
+      className="floating-player__insight" 
+      ref={scrollRef}
+      style={{ fontSize: '14px', fontWeight: 550, position: 'relative' }}
+    >
+      {displayed}
+      {isDone ? (
+        <span style={{ display: 'inline-block', marginLeft: '4px' }}>
+          <button 
+            className="insight-copy-btn" 
+            onClick={handleCopy}
+            title="Copy to clipboard"
+          >
+            {showTooltip && <span className="insight-tooltip">Copied!</span>}
+            <svg 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{ width: '14px', height: '14px' }}
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </span>
+      ) : (
+        <span className="typewriter-cursor">_</span>
+      )}
+    </p>
   );
 }
 
@@ -115,8 +193,11 @@ export default function Home() {
   const { user, loading: authLoading, signInGoogle, signInEmail, signUpEmail, signOut, updateProfile, authError, clearError } = useAuth();
 
   const panelRef = useRef<HTMLDivElement>(null);
-  const authPanelRef = useRef<HTMLElement>(null);
+  const authPanelRef = useRef<HTMLDivElement>(null);
+  const sidebarScrollRef = useRef<HTMLDivElement>(null);
+  const activeTrackRef = useRef<HTMLLIElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const pendingRadioSeek = useRef<number | null>(null);
   const dragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
   const authDragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
 
@@ -133,6 +214,8 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [playlistOpen, setPlaylistOpen] = useState(false);
   const [playedOrder, setPlayedOrder] = useState<number[]>([0]);
+  const [isPlaylistCollapsed, setIsPlaylistCollapsed] = useState(false);
+  const [insight, setInsight] = useState("");
 
   // Data state
   const [allTracks, setAllTracks] = useState<Track[]>([]);
@@ -143,10 +226,9 @@ export default function Home() {
   const [masterPlaylist, setMasterPlaylist] = useState<Playlist | null>(null);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
   const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
-  const [playlistPanelOpen, setPlaylistPanelOpen] = useState(false);
-
+  const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null>(null);
+  const [trackDropdownOpenId, setTrackDropdownOpenId] = useState<string | null>(null);
   // Browse/add state
-  const [browseOpen, setBrowseOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   // New playlist dialog
@@ -207,6 +289,13 @@ export default function Home() {
         } catch (err) {
           console.error("Failed to load user playlists:", err);
         }
+      } else {
+        // Clear user state on logout
+        setUserPlaylists([]);
+        if (activePlaylistId !== masterPlaylist?.id) {
+            setActivePlaylistId(masterPlaylist?.id || null);
+            setExpandedPlaylistId(null);
+        }
       }
     } catch (err) {
       console.error("Failed to load tracks:", err);
@@ -221,11 +310,43 @@ export default function Home() {
     }
   }, [authLoading, loadData]);
 
+  /* ── Musical Insight ────────────────────────────── */
+
+  useEffect(() => {
+    const track = currentTracks[trackIndex];
+    if (!track) return;
+
+    let isMounted = true;
+    const getInsight = async () => {
+      setInsight("");
+      try {
+        const res = await fetch("/api/musical-interest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: track.title,
+            composer: track.composer,
+            performers: track.performers
+          })
+        });
+        const data = await res.json();
+        if (isMounted) {
+          setInsight(data.insight || "Musical history in every note.");
+        }
+      } catch (err) {
+        if (isMounted) setInsight("Distilled musical elegance.");
+      }
+    };
+
+    getInsight();
+    return () => { isMounted = false; };
+  }, [trackIndex, currentTracks]);
+
   /* ── Position ───────────────────────────────────── */
 
   useEffect(() => {
     const panelWidth = 547;
-    const panelHeight = 290;
+    const panelHeight = 330;
     setPosition({
       x: Math.max(12, (window.innerWidth - panelWidth) / 2),
       y: Math.max(12, (window.innerHeight - panelHeight) / 2),
@@ -283,20 +404,52 @@ export default function Home() {
 
   const radioAdvance = useCallback(() => {
     const { trackIndex: rIdx, position: rPos } = computeRadioPosition(currentTracks);
+    pendingRadioSeek.current = rPos;
     setTrackIndex(rIdx);
     setCurrentTime(rPos);
-    // Seek will happen once <audio> mounts for new track or immediately if same track
-    requestAnimationFrame(() => {
-      if (audioRef.current) {
-        audioRef.current.currentTime = rPos;
-      }
-    });
+    // If same track (audio element stays), seek immediately
+    if (audioRef.current) {
+      audioRef.current.currentTime = rPos;
+    }
+    // If track changes, onLoadedMetadata will apply pendingRadioSeek
   }, [currentTracks]);
 
   useEffect(() => {
-    if (user || currentTracks.length === 0) return;
-    radioAdvance();
-  }, [user, currentTracks, radioAdvance]);
+    // Sync to radio if not logged in OR if the active playlist is the Master Playlist
+    const isMasterPlaylist = activePlaylistId === masterPlaylist?.id;
+    if ((!user || isMasterPlaylist) && currentTracks.length > 0) {
+      radioAdvance();
+    }
+  }, [user, currentTracks, radioAdvance, activePlaylistId, masterPlaylist?.id]);
+
+  // Auto-expand active playlist when sidebar is opened
+  useEffect(() => {
+    if (playlistOpen && activePlaylistId) {
+      setExpandedPlaylistId(activePlaylistId);
+    }
+  }, [playlistOpen, activePlaylistId]);
+
+  // Scroll to active track when playlist is expanded while sidebar is open
+  useEffect(() => {
+    if (playlistOpen && expandedPlaylistId === activePlaylistId && activeTrackRef.current && sidebarScrollRef.current) {
+        // Wait a tick for DOM to settle
+        requestAnimationFrame(() => {
+            if (activeTrackRef.current && sidebarScrollRef.current) {
+                const container = sidebarScrollRef.current;
+                const element = activeTrackRef.current;
+                const elementTop = element.offsetTop;
+                const elementHeight = element.offsetHeight;
+                const containerHeight = container.offsetHeight;
+                
+                // Center the element
+                container.scrollTo({
+                    top: elementTop - (containerHeight / 2) + (elementHeight / 2),
+                    behavior: 'smooth'
+                });
+            }
+        });
+    }
+  }, [playlistOpen, expandedPlaylistId, activePlaylistId, trackIndex]);
 
   /* ── Drag ───────────────────────────────────────── */
 
@@ -447,17 +600,25 @@ export default function Home() {
 
   /* ── Playback Controls ──────────────────────────── */
 
-  const playNextTrack = useCallback(() => {
-    setCurrentTime(0);
-    setTrackIndex((i) => (i + 1) % currentTracks.length);
-  }, [currentTracks.length]);
+  const playPreviousTrack = () => {
+    if (activePlaylistId === masterPlaylist?.id) return;
+    if (!user) return;
+    setTrackIndex((prev) => (prev - 1 + currentTracks.length) % currentTracks.length);
+  };
 
-  const playPreviousTrack = useCallback(() => {
-    setCurrentTime(0);
-    setTrackIndex((i) => (i - 1 + currentTracks.length) % currentTracks.length);
-  }, [currentTracks.length]);
+  const playNextTrack = () => {
+    if (activePlaylistId === masterPlaylist?.id) {
+      radioAdvance();
+      return;
+    }
+    if (!user) return;
+    setTrackIndex((prev) => (prev + 1) % currentTracks.length);
+  };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Disable seeking if Master Playlist (radio) is active
+    if (activePlaylistId === masterPlaylist?.id) return;
+
     const track = currentTracks[trackIndex];
     if (!audioRef.current || !track) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -487,14 +648,29 @@ export default function Home() {
       return;
     }
     // Radio mode: re-sync to live position on resume
-    if (!user) {
+    if (!user || activePlaylistId === masterPlaylist?.id) {
       radioAdvance();
+      // radioAdvance sets trackIndex + pendingRadioSeek.
+      // If track changes, new <audio> mounts with autoPlay + onLoadedMetadata seeks.
+      // If same track, we seeked immediately above — just resume playback.
+      try { await audio.play(); } catch { }
+      setIsPlaying(true);
+      return;
     }
     try {
       await audio.play();
       setIsPlaying(true);
     } catch { }
-  }, [isPlaying, user, radioAdvance]);
+  }, [isPlaying, user, radioAdvance, activePlaylistId, masterPlaylist?.id]);
+
+  useEffect(() => {
+    const radioInterval = setInterval(() => {
+      if (isPlaying && (activePlaylistId === masterPlaylist?.id || !user)) {
+        radioAdvance();
+      }
+    }, 1000);
+    return () => clearInterval(radioInterval);
+  }, [isPlaying, user, radioAdvance, activePlaylistId, masterPlaylist?.id]);
 
   /* ── Playlist Actions ───────────────────────────── */
 
@@ -502,17 +678,17 @@ export default function Home() {
     const ordered = playlist.trackIds
       .map((id) => allTracks.find((t) => t.id === id))
       .filter(Boolean) as Track[];
-    setCurrentTracks(ordered.length > 0 ? ordered : allTracks);
+    setCurrentTracks(ordered);
     setActivePlaylistId(playlist.id);
     setTrackIndex(0);
     setPlayedOrder([0]);
-    setPlaylistPanelOpen(false);
   };
 
   const handleCreatePlaylist = async () => {
     if (!user || !newPlaylistName.trim()) return;
     try {
-      await createPlaylist(user.uid, newPlaylistName.trim());
+      const trackIds = currentTracks.map((t) => t.id);
+      await createPlaylist(user.uid, newPlaylistName.trim(), trackIds);
       const playlists = await getUserPlaylists(user.uid);
       setUserPlaylists(playlists);
       setNewPlaylistName("");
@@ -632,7 +808,7 @@ export default function Home() {
     );
   }
 
-  if (currentTracks.length === 0) {
+  if (allTracks.length === 0) {
     return (
       <main className="min-h-screen w-full bg-cotton-candy">
         <div className="loading-overlay">
@@ -654,6 +830,12 @@ export default function Home() {
           muted={muted}
           playsInline
           onEnded={user ? playNextTrack : radioAdvance}
+          onLoadedMetadata={() => {
+            if (pendingRadioSeek.current !== null && audioRef.current) {
+              audioRef.current.currentTime = pendingRadioSeek.current;
+              pendingRadioSeek.current = null;
+            }
+          }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -742,11 +924,20 @@ export default function Home() {
                       trackId={currentTrack.id} 
                     />
                   )}
-                  <p className="floating-player__composer">{currentTrack?.composer}</p>
-                  <p className="floating-player__performer">
+                  <p className="floating-player__composer" style={{ margin: '-8px 0 4px 12px', fontWeight: 400 }}>{currentTrack?.composer}</p>
+                  <p className="floating-player__performer" style={{ margin: '0', fontSize: '16px', fontWeight: 500 }}>
                     {currentTrack?.performers.join(", ")}
                     {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
                   </p>
+                  
+                  {/* Dynamic Insight */}
+                  <div className="floating-player__insight-container">
+                    <TypewriterText 
+                      text={insight} 
+                      speed={180} 
+                      fullInfoToCopy={currentTrack ? `${currentTrack.title}\nComposer: ${currentTrack.composer}\nPerformer: ${currentTrack.performers.join(", ")}${currentTrack.conductor ? `\nConductor: ${currentTrack.conductor}` : ""}\nDuration: ${formatDuration(currentTrack.durationSeconds)}\nVenue: ${masterPlaylist?.id === activePlaylistId ? "European Archive" : (userPlaylists.find(pl => pl.id === activePlaylistId)?.name || "Irregular Pearl")}\n\nInsight:\n${insight}\n\n© 2026 Irregular Pearl` : insight}
+                    />
+                  </div>
                 </div>
 
                 {/* Album Cover */}
@@ -775,7 +966,7 @@ export default function Home() {
                     </div>
                   </div>
                   <span className="floating-player__time">
-                    {currentTrack ? formatDuration(currentTrack.durationSeconds) : "0:00"}
+                    {currentTrack ? `-${formatDuration(Math.max(0, currentTrack.durationSeconds - currentTime))}` : "0:00"}
                   </span>
                 </div>
 
@@ -817,50 +1008,17 @@ export default function Home() {
                     </button>
                   )}
 
-                  {/* Playlist Manager Toggle (user only) */}
-                  {user && (
-                    <button
-                      type="button"
-                      className="floating-player__btn-playlists"
-                      onClick={() => setPlaylistPanelOpen((v) => !v)}
-                      aria-label="Manage playlists"
-                      title="My Playlists"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path className="icon-stroke" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
-                        <path className="icon-stroke" d="M19 14v6M16 17h6" />
-                      </svg>
-                    </button>
-                  )}
-
-                  {/* Browse Track DB */}
-                  {user && (
-                    <button
-                      type="button"
-                      className="floating-player__btn-browse"
-                      onClick={() => setBrowseOpen((v) => !v)}
-                      aria-label="Browse all tracks"
-                      title="Browse All"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <circle className="icon-stroke" cx="11" cy="11" r="7" />
-                        <path className="icon-stroke" d="M21 21L16.65 16.65" />
-                      </svg>
-                    </button>
-                  )}
-
+                  {/* Playlist Manager Toggle */}
                   <button
                     type="button"
                     className="floating-player__btn-slide"
                     onClick={() => setPlaylistOpen((v) => !v)}
-                    aria-label={playlistOpen ? "Hide queue" : "Show queue"}
+                    aria-label={playlistOpen ? "Hide playlists" : "Show playlists"}
+                    title="Playlists"
                   >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      {playlistOpen ? (
-                        <path className="icon-stroke" d="M15 6L9 12L15 18" />
-                      ) : (
-                        <path className="icon-stroke" d="M9 6L15 12L9 18" />
-                      )}
+                      <path className="icon-stroke" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
+                      <path className="icon-stroke" d="M19 14v6M16 17h6" />
                     </svg>
                   </button>
                 </div>
@@ -868,230 +1026,188 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Queue Sidebar */}
           <aside
-            className={`floating-player__queue ${playlistOpen ? "is-open" : ""}`}
+            className={`floating-player__sidebar ${playlistOpen ? "is-open" : ""}`}
             style={{
-              left: position.x + (panelRef.current?.offsetWidth ?? 360) + 8,
-              top: position.y,
+              left: position.x + (panelRef.current?.offsetWidth ?? 547) + 8,
+              top: 60,
+              bottom: 60,
             }}
           >
-            <div className="floating-player__queue-inner">
-              <p className="floating-player__queue-label">
-                {activePlaylist?.name ?? "Playlist"}
-              </p>
-
-              <p className="floating-player__queue-sublabel">Played</p>
-              <ul className="floating-player__queue-list">
-                {playedIndexes.length === 0 ? (
-                  <li className="floating-player__queue-empty">No tracks played yet</li>
-                ) : (
-                  playedIndexes.slice(-5).map((index, entry) => (
-                    <li key={`${index}-${entry}`}>
-                      <span>{currentTracks[index]?.title}</span>
-                      <small>{currentTracks[index]?.composer}</small>
-                    </li>
-                  ))
-                )}
-              </ul>
-
-              <p className="floating-player__queue-sublabel">Now Playing</p>
-              <div className="floating-player__queue-current">
-                <span>{currentTrack?.title}</span>
-                <small>
-                  {currentTrack?.composer} · {currentTrack?.performers.join(", ")}
-                </small>
-              </div>
-
-              <p className="floating-player__queue-sublabel">Up Next</p>
-              <ul className="floating-player__queue-list">
-                {upcomingIndexes.slice(0, 8).map((index) => (
-                  <li key={`next-${index}`}>
-                    <span>{currentTracks[index]?.title}</span>
-                    <small>{currentTracks[index]?.composer}</small>
-                  </li>
-                ))}
-                {upcomingIndexes.length > 8 && (
-                  <li className="floating-player__queue-empty">
-                    +{upcomingIndexes.length - 8} more…
-                  </li>
-                )}
-              </ul>
-            </div>
-          </aside>
-
-          {/* Playlist Manager Panel */}
-          {user && playlistPanelOpen && (
-            <aside
-              className="playlist-manager"
-              style={{
-                left: position.x,
-                top: position.y + (panelRef.current?.offsetHeight ?? 280) + 8,
-              }}
-            >
-              <div className="playlist-manager__inner">
-                <p className="playlist-manager__title">My Playlists</p>
-
-                {/* Master Playlist */}
-                <button
-                  type="button"
-                  className={`playlist-manager__item ${activePlaylistId === masterPlaylist?.id ? "is-active" : ""}`}
-                  onClick={() => masterPlaylist && switchPlaylist(masterPlaylist)}
-                >
-                  <span>♫ {masterPlaylist?.name ?? "Master Playlist"}</span>
-                  <small>{masterPlaylist?.trackIds.length ?? 0} tracks</small>
-                </button>
-
-                {/* User Playlists */}
-                {userPlaylists.map((pl) => (
-                  <div
-                    key={pl.id}
-                    className={`playlist-manager__item ${activePlaylistId === pl.id ? "is-active" : ""}`}
+            <div className="floating-player__sidebar-inner" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div className="floating-player__sidebar-titlebar">
+                <span>PLAYLISTS</span>
+                <div className="floating-player__titlebar-actions">
+                  <button 
+                    type="button" 
+                    className="floating-player__sidebar-close"
+                    onClick={() => setPlaylistOpen(false)}
                   >
-                    {renamingId === pl.id ? (
-                      <div className="playlist-manager__rename-row">
-                        <input
-                          className="playlist-manager__input"
-                          value={renameValue}
-                          onChange={(e) => setRenameValue(e.target.value)}
-                          onKeyDown={(e) => e.key === "Enter" && handleRenamePlaylist()}
-                          autoFocus
-                        />
-                        <button type="button" onClick={handleRenamePlaylist}>✓</button>
-                        <button type="button" onClick={() => setRenamingId(null)}>✕</button>
-                      </div>
-                    ) : (
-                      <>
-                        <button type="button" className="playlist-manager__play-btn" onClick={() => switchPlaylist(pl)}>
-                          <span>{pl.name}</span>
-                          <small>{pl.trackIds.length} tracks</small>
-                        </button>
-                        <div className="playlist-manager__item-actions">
-                          <button
-                            type="button"
-                            onClick={() => { setRenamingId(pl.id); setRenameValue(pl.name); }}
-                            title="Rename"
-                          >
-                            ✎
-                          </button>
-                          <button type="button" onClick={() => handleDeletePlaylist(pl.id)} title="Delete">
-                            ✕
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-
-                {/* New Playlist */}
-                {showNewPlaylist ? (
-                  <div className="playlist-manager__new-row">
-                    <input
-                      className="playlist-manager__input"
-                      placeholder="Playlist name"
-                      value={newPlaylistName}
-                      onChange={(e) => setNewPlaylistName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleCreatePlaylist()}
-                      autoFocus
-                    />
-                    <button type="button" onClick={handleCreatePlaylist}>✓</button>
-                    <button type="button" onClick={() => { setShowNewPlaylist(false); setNewPlaylistName(""); }}>✕</button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    className="playlist-manager__add-btn"
-                    onClick={() => setShowNewPlaylist(true)}
-                  >
-                    + New Playlist
+                    ✕
                   </button>
-                )}
+                </div>
               </div>
-            </aside>
-          )}
 
-          {/* Browse / Search Panel */}
-          {user && browseOpen && (
-            <aside
-              className="browse-panel"
-              style={{
-                left: position.x + (panelRef.current?.offsetWidth ?? 360) + 8,
-                top: position.y + (panelRef.current?.offsetHeight ?? 280) + 8,
-              }}
-            >
-              <div className="browse-panel__inner">
-                <p className="browse-panel__title">Browse All Tracks</p>
-                <input
-                  className="browse-panel__search"
-                  placeholder="Search by title, composer, performer…"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <ul className="browse-panel__list">
-                  {filteredBrowseTracks.slice(0, 30).map((track) => {
-                    const inActive = activePlaylist?.trackIds.includes(track.id);
+              <div 
+                ref={sidebarScrollRef}
+                style={{ flex: 1, overflowY: 'auto', padding: '12px', minHeight: 0 }}
+              >
+                <ul className="floating-player__sidebar-list">
+                  {[masterPlaylist, ...userPlaylists.slice().sort((a,b) => {
+                    const timeA = a.updatedAt ? (typeof a.updatedAt === 'number' ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
+                    const timeB = b.updatedAt ? (typeof b.updatedAt === 'number' ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
+                    return timeB - timeA;
+                  })].filter(Boolean).map((pl) => {
+                    const isExpanded = expandedPlaylistId === pl!.id;
+                    const isActive = activePlaylistId === pl!.id;
+                    
                     return (
-                      <li key={track.id} className="browse-panel__track">
-                        <div className="browse-panel__track-info">
-                          <span>{track.title}</span>
-                          <small>
-                            {track.composer} · {track.performers.join(", ")} ·{" "}
-                            {formatDuration(track.durationSeconds)}
-                          </small>
+                      <li key={pl!.id} style={{ marginBottom: '8px', padding: 0, background: 'transparent' }}>
+                        <div 
+                          onClick={() => {
+                            setExpandedPlaylistId(isExpanded ? null : pl!.id);
+                          }}
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '8px', 
+                            cursor: 'pointer',
+                            padding: '4px 0',
+                            fontWeight: isActive ? 'bold' : 'normal',
+                            color: isActive ? '#855081' : '#be70a6'
+                          }}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', color: '#855081' }}>
+                            <path d="M6 9l6 6 6-6" />
+                          </svg>
+                          <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            {pl!.name === "Master Playlist" ? "Classical Masterworks" : pl!.name}
+                          </span>
                         </div>
-                        <div className="browse-panel__track-actions">
-                          {/* Play now */}
-                          <button
-                            type="button"
-                            title="Play now"
-                            onClick={() => {
-                              const idx = currentTracks.findIndex((t) => t.id === track.id);
-                              if (idx >= 0) {
-                                setTrackIndex(idx);
-                              } else {
-                                setCurrentTracks((prev) => [...prev, track]);
-                                setTrackIndex(currentTracks.length);
+
+                        {isExpanded && (
+                          <ul className="floating-player__sidebar-list" style={{ marginTop: '0', marginLeft: '0' }}>
+                            {(() => {
+                              const plTracks = pl!.trackIds
+                                .map(id => allTracks.find(t => t.id === id))
+                                .filter(Boolean) as Track[];
+                                
+                              if (plTracks.length === 0) {
+                                return <li className="floating-player__sidebar-empty" style={{ fontSize: '11px', padding: '4px 0', marginLeft: '22px' }}>No tracks</li>;
                               }
-                            }}
-                          >
-                            ▶
-                          </button>
-                          {/* Add to active user playlist */}
-                          {activePlaylist &&
-                            activePlaylist.ownerId === user.uid &&
-                            !inActive && (
-                              <button
-                                type="button"
-                                title={`Add to ${activePlaylist.name}`}
-                                onClick={() => handleAddTrackToPlaylist(activePlaylist.id, track.id)}
-                              >
-                                +
-                              </button>
-                            )}
-                          {activePlaylist &&
-                            activePlaylist.ownerId === user.uid &&
-                            inActive && (
-                              <button
-                                type="button"
-                                title={`Remove from ${activePlaylist.name}`}
-                                onClick={() => handleRemoveTrackFromPlaylist(activePlaylist.id, track.id)}
-                              >
-                                −
-                              </button>
-                            )}
-                        </div>
+                              
+                              return plTracks.map((track, index) => {
+                                const isPlaying = isActive && index === trackIndex;
+                                return (
+                                  <li 
+                                    key={`${track.id}-${index}`} 
+                                    ref={isPlaying ? activeTrackRef : null}
+                                    className={isPlaying ? "currently-playing" : ""}
+                                    style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', padding: '4px 0' }}
+                                  >
+                                    {user && (
+                                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTrackDropdownOpenId(trackDropdownOpenId === track.id ? null : track.id);
+                                          }}
+                                          style={{ background: 'none', border: 'none', color: '#855081', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', padding: '0' }}
+                                          title="Add to playlist"
+                                        >
+                                          +
+                                        </button>
+                                        
+                                        {trackDropdownOpenId === track.id && (
+                                          <div style={{ position: 'absolute', left: '0', top: '100%', marginTop: '4px', background: '#fff4fc', border: '1px solid #d79bc1', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 10, width: '160px', maxHeight: '200px', overflowY: 'auto', padding: '4px 0' }}>
+                                            <div style={{ padding: '4px 8px', fontSize: '10px', color: '#916088', borderBottom: '1px solid #f2cde6', marginBottom: '4px' }}>Add to playlist:</div>
+                                            {userPlaylists
+                                              .slice()
+                                              .sort((a, b) => {
+                                                const timeA = a.updatedAt ? (typeof a.updatedAt === 'number' ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
+                                                const timeB = b.updatedAt ? (typeof b.updatedAt === 'number' ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
+                                                return timeB - timeA;
+                                              })
+                                              .map(upl => {
+                                                const hasTrack = upl.trackIds.includes(track.id);
+                                                return (
+                                                  <button
+                                                    key={upl.id}
+                                                    type="button"
+                                                    onClick={async (e) => {
+                                                      e.stopPropagation();
+                                                      if (hasTrack) await handleRemoveTrackFromPlaylist(upl.id, track.id);
+                                                      else await handleAddTrackToPlaylist(upl.id, track.id);
+                                                      setTrackDropdownOpenId(null);
+                                                    }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '6px 12px', border: 'none', background: 'transparent', color: '#855081', fontSize: '11px', textAlign: 'left', cursor: 'pointer' }}
+                                                  >
+                                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{upl.name}</span>
+                                                    {hasTrack && <span style={{ color: '#be70a6', marginLeft: '4px' }}>✓</span>}
+                                                  </button>
+                                                );
+                                              })}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                    <div 
+                                      style={{ flex: 1, minWidth: 0, cursor: pl!.id === masterPlaylist?.id ? 'default' : 'pointer' }}
+                                      onClick={() => {
+                                        if (pl!.id === masterPlaylist?.id) return;
+                                        switchPlaylist(pl!);
+                                        setTrackIndex(index);
+                                        setPlayedOrder([index]);
+                                        if (muted) setMuted(false);
+                                        setIsPlaying(true);
+                                      }}
+                                    >
+                                      <div className="track-title" style={{ fontSize: '12px', color: isPlaying ? '#855081' : '#be70a6', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: isPlaying ? 'bold' : 'normal' }}>{track.title}</div>
+                                      <div className="track-composer" style={{ fontSize: '10px', color: isPlaying ? '#916088' : '#d79bc1', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.composer}</div>
+                                    </div>
+                                  </li>
+                                );
+                              });
+                            })()}
+                          </ul>
+                        )}
                       </li>
                     );
                   })}
-                  {filteredBrowseTracks.length > 30 && (
-                    <li className="browse-panel__more">
-                      Showing 30 of {filteredBrowseTracks.length}. Refine your search.
-                    </li>
-                  )}
                 </ul>
               </div>
-            </aside>
-          )}
+
+              {user && (
+                <div style={{ padding: '12px', borderTop: '1px solid #f2cde6', background: '#ffeefa' }}>
+                  {showNewPlaylist ? (
+                    <div className="playlist-manager__new-row">
+                      <input
+                        className="playlist-manager__input"
+                        placeholder="Save current queue as..."
+                        value={newPlaylistName}
+                        onChange={(e) => setNewPlaylistName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleCreatePlaylist()}
+                        autoFocus
+                        style={{ padding: '6px', fontSize: '12px', border: '1px solid #d79bc1', borderRadius: '4px', flex: 1 }}
+                      />
+                      <button type="button" onClick={handleCreatePlaylist} style={{ padding: '6px 10px', border: '1px solid #be70a6', background: '#eab8d9', color: '#fff', borderRadius: '4px', cursor: 'pointer', marginLeft: '4px' }}>✓</button>
+                      <button type="button" onClick={() => { setShowNewPlaylist(false); setNewPlaylistName(""); }} style={{ padding: '6px 10px', border: '1px solid #eab8d9', background: '#fff', color: '#be70a6', borderRadius: '4px', cursor: 'pointer', marginLeft: '4px' }}>✕</button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="playlist-manager__add-btn"
+                      onClick={() => setShowNewPlaylist(true)}
+                      style={{ padding: '8px', width: '100%', border: '1px dashed #d79bc1', background: 'transparent', color: '#855081', fontSize: '12px', cursor: 'pointer', textAlign: 'center', fontWeight: 'bold', borderRadius: '4px' }}
+                    >
+                      + Save Queue as Playlist
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </aside>
           {/* Independent Auth Panel */}
           {!user && authPanelOpen && (
             <aside 
