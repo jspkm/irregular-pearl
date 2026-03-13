@@ -1115,31 +1115,29 @@ export default function Home() {
                     </svg>
                   </button>
                   {user && activePlaylistId && masterPlaylist && activePlaylistId !== masterPlaylist.id && (
-                    <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        {isPlaying ? (
-                          <rect className="icon-fill" x="7" y="7" width="10" height="10" />
-                        ) : (
-                          <path className="icon-fill" d="M8 6L18 12L8 18Z" />
-                        )}
-                      </svg>
-                    </button>
-                  )}
-                  {user && (
-                    <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path className="icon-stroke" d="M7 6V18" />
-                        <path className="icon-fill" d="M19 6L10 12L19 18Z" />
-                      </svg>
-                    </button>
-                  )}
-                  {user && (
-                    <button type="button" onClick={playNextTrack} aria-label="Next track">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path className="icon-stroke" d="M17 6V18" />
-                        <path className="icon-fill" d="M5 6L14 12L5 18Z" />
-                      </svg>
-                    </button>
+                    <>
+                      <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          {isPlaying ? (
+                            <rect className="icon-fill" x="7" y="7" width="10" height="10" />
+                          ) : (
+                            <path className="icon-fill" d="M8 6L18 12L8 18Z" />
+                          )}
+                        </svg>
+                      </button>
+                      <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path className="icon-stroke" d="M7 6V18" />
+                          <path className="icon-fill" d="M19 6L10 12L19 18Z" />
+                        </svg>
+                      </button>
+                      <button type="button" onClick={playNextTrack} aria-label="Next track">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path className="icon-stroke" d="M17 6V18" />
+                          <path className="icon-fill" d="M5 6L14 12L5 18Z" />
+                        </svg>
+                      </button>
+                    </>
                   )}
 
                   {/* Playlist Manager Toggle */}
