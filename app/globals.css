@@ -516,7 +516,7 @@ body {
 
 .floating-player__insight-container {
   margin-top: 14px;
-  max-height: 90px;
+  max-height: 100px;
   overflow-y: auto;
   padding-right: 4px;
   padding-bottom: 8px;
@@ -1606,6 +1606,6 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
-    max-height: 80px;
+    max-height: 100px;
   }
 }
