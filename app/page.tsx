@@ -377,7 +377,7 @@ export default function Home() {
     return () => { cancelled = true; };
   }, [allTracks.length]); // Only re-run when track count changes
 
-  /* ── Musical Insight (server-generated, cached in Firestore) ── */
+  /* ──Track Insight (server-generated, cached in Firestore) ── */
 
   useEffect(() => {
     const track = currentTracks[trackIndex];
@@ -396,10 +396,11 @@ export default function Home() {
         }
       } catch { }
 
-      // Cache not ready yet — poll briefly (server may still be generating)
-      let retries = 3;
-      while (retries > 0 && isMounted) {
-        await new Promise((r) => setTimeout(r, 2000));
+      // Cache not ready yet — poll with backoff (server may still be generating)
+      const delays = [2000, 3000, 5000, 8000, 12000];
+      for (const delay of delays) {
+        if (!isMounted) return;
+        await new Promise((r) => setTimeout(r, delay));
         try {
           const cached = await getTrackInsight(track.id);
           if (cached && isMounted) {
@@ -407,7 +408,6 @@ export default function Home() {
             return;
           }
         } catch { }
-        retries--;
       }
 
       if (isMounted) setInsight("");
