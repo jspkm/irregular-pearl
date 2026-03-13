@@ -378,9 +378,9 @@ export default function Home() {
 
   /* ──Track Insight (server-generated, cached in Firestore) ── */
 
+  const currentTrackId = currentTracks[trackIndex]?.id;
   useEffect(() => {
-    const track = currentTracks[trackIndex];
-    if (!track) return;
+    if (!currentTrackId) return;
 
     let isMounted = true;
     const fetchInsight = async () => {
@@ -388,7 +388,7 @@ export default function Home() {
 
       // Read cached insight from Firestore (server generates it on track change)
       try {
-        const cached = await getTrackInsight(track.id);
+        const cached = await getTrackInsight(currentTrackId);
         if (cached && isMounted) {
           setInsight(cached);
           return;
@@ -401,7 +401,7 @@ export default function Home() {
         if (!isMounted) return;
         await new Promise((r) => setTimeout(r, delay));
         try {
-          const cached = await getTrackInsight(track.id);
+          const cached = await getTrackInsight(currentTrackId);
           if (cached && isMounted) {
             setInsight(cached);
             return;
@@ -414,7 +414,7 @@ export default function Home() {
 
     fetchInsight();
     return () => { isMounted = false; };
-  }, [trackIndex, currentTracks]);
+  }, [currentTrackId]);
 
   /* ── Position ───────────────────────────────────── */
 
