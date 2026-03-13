@@ -12,8 +12,14 @@ import {
   deletePlaylist,
   getUserProfile,
   setUserProfile,
+  onRadioStateChange,
+  initRadioState,
+  advanceRadioTrack,
+  getTrackInsight,
+  setTrackInsight,
 } from "@/lib/firestore";
-import type { Track, Playlist } from "@/lib/types";
+import { computeCurrentRadioPosition } from "@/lib/radio";
+import type { Track, Playlist, RadioState } from "@/lib/types";
 
 
 /* ── Helpers ────────────────────────────────────────── */
@@ -42,24 +48,6 @@ function probeAudioDuration(url: string): Promise<number | null> {
   });
 }
 
-/* ── Radio Clock ───────────────────────────────────── */
-
-const RADIO_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
-
-function computeRadioPosition(tracks: Track[]): { trackIndex: number; position: number } {
-  if (tracks.length === 0) return { trackIndex: 0, position: 0 };
-  const totalDuration = tracks.reduce((sum, t) => sum + t.durationSeconds, 0);
-  if (totalDuration <= 0) return { trackIndex: 0, position: 0 };
-  const elapsed = (Date.now() - RADIO_EPOCH) / 1000;
-  let posInPlaylist = ((elapsed % totalDuration) + totalDuration) % totalDuration;
-  for (let i = 0; i < tracks.length; i++) {
-    if (posInPlaylist < tracks[i].durationSeconds) {
-      return { trackIndex: i, position: posInPlaylist };
-    }
-    posInPlaylist -= tracks[i].durationSeconds;
-  }
-  return { trackIndex: 0, position: 0 };
-}
 
 /* ── Player Icon ────────────────────────────────────── */
 
@@ -214,8 +202,7 @@ export default function Home() {
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
   const activeTrackRef = useRef<HTMLLIElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const pendingRadioSeek = useRef<number | null>(null);
-  const advancedAt = useRef<number>(0);
+  const radioStateRef = useRef<RadioState | null>(null);
   const dragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
   const authDragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
 
@@ -391,15 +378,26 @@ export default function Home() {
     return () => { cancelled = true; };
   }, [allTracks.length]); // Only re-run when track count changes
 
-  /* ── Musical Insight ────────────────────────────── */
+  /* ── Musical Insight (cached in Firestore, 24h TTL) ── */
 
   useEffect(() => {
     const track = currentTracks[trackIndex];
     if (!track) return;
 
     let isMounted = true;
-    const getInsight = async () => {
+    const fetchInsight = async () => {
       setInsight("");
+
+      // Check cache first
+      try {
+        const cached = await getTrackInsight(track.id);
+        if (cached && isMounted) {
+          setInsight(cached);
+          return;
+        }
+      } catch { }
+
+      // Cache miss or stale — call LLM
       try {
         const res = await fetch("/api/musical-interest", {
           method: "POST",
@@ -411,15 +409,18 @@ export default function Home() {
           })
         });
         const data = await res.json();
+        const text = data.insight || "Musical history in every note.";
         if (isMounted) {
-          setInsight(data.insight || "Musical history in every note.");
+          setInsight(text);
+          // Cache the result
+          setTrackInsight(track.id, text).catch(() => {});
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setInsight("Distilled musical elegance.");
       }
     };
 
-    getInsight();
+    fetchInsight();
     return () => { isMounted = false; };
   }, [trackIndex, currentTracks]);
 
@@ -494,31 +495,63 @@ export default function Home() {
     });
   }, [trackIndex]);
 
-  /* ── Radio Sync (non-logged-in) ────────────────── */
+  /* ── Radio Sync (server-driven) ────────────────── */
 
-  const radioAdvance = useCallback(() => {
-    const { trackIndex: rIdx, position: rPos } = computeRadioPosition(currentTracks);
-    // Clamp seek to actual audio duration to avoid seeking past content
-    const clampedPos = actualDuration.current && rPos > actualDuration.current - 0.5
-      ? Math.max(0, actualDuration.current - 0.5)
-      : rPos;
-    pendingRadioSeek.current = clampedPos;
-    setTrackIndex(rIdx);
-    setCurrentTime(rPos);
-    // If same track (audio element stays), seek immediately
-    if (audioRef.current) {
-      audioRef.current.currentTime = clampedPos;
-    }
-    // If track changes, onLoadedMetadata will apply pendingRadioSeek
-  }, [currentTracks]);
+  const isRadioMode = !user || activePlaylistId === masterPlaylist?.id;
 
+  // Subscribe to Firestore radioState when in radio mode
   useEffect(() => {
-    // Sync to radio if not logged in OR if the active playlist is the Master Playlist
-    const isMasterPlaylist = activePlaylistId === masterPlaylist?.id;
-    if ((!user || isMasterPlaylist) && currentTracks.length > 0) {
-      radioAdvance();
-    }
-  }, [user, currentTracks, radioAdvance, activePlaylistId, masterPlaylist?.id]);
+    if (!isRadioMode || currentTracks.length === 0) return;
+
+    // Initialize radio state if it doesn't exist
+    initRadioState(0).catch(() => {});
+
+    const unsub = onRadioStateChange((state) => {
+      if (!state) return;
+      radioStateRef.current = state;
+
+      const { trackIndex: rIdx, position: rPos } = computeCurrentRadioPosition(
+        currentTracks,
+        state.startedAtMillis,
+        state.trackIndex
+      );
+
+      // If we've gone past the stored track, advance the server state
+      if (rIdx !== state.trackIndex) {
+        advanceRadioTrack(state.trackIndex, rIdx).catch(() => {});
+        return; // The snapshot will fire again with the updated state
+      }
+
+      setTrackIndex(rIdx);
+      setCurrentTime(rPos);
+
+      // Seek the audio element
+      if (audioRef.current && isFinite(rPos)) {
+        audioRef.current.currentTime = rPos;
+      }
+    });
+
+    return unsub;
+  }, [isRadioMode, currentTracks, masterPlaylist?.id]);
+
+  // Lightweight drift correction (every 5s)
+  useEffect(() => {
+    if (!isRadioMode || currentTracks.length === 0) return;
+    const interval = setInterval(() => {
+      if (!isPlaying || !radioStateRef.current || !audioRef.current) return;
+      const state = radioStateRef.current;
+      const { position: expectedPos } = computeCurrentRadioPosition(
+        currentTracks,
+        state.startedAtMillis,
+        state.trackIndex
+      );
+      const drift = Math.abs(audioRef.current.currentTime - expectedPos);
+      if (drift > 2) {
+        audioRef.current.currentTime = expectedPos;
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isRadioMode, isPlaying, currentTracks]);
 
   // Scroll to active track when playlist sidebar opens
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -693,30 +726,37 @@ export default function Home() {
   /* ── Playback Controls ──────────────────────────── */
 
   const playPreviousTrack = () => {
-    if (activePlaylistId === masterPlaylist?.id) return;
-    if (!user) return;
+    if (isRadioMode) return;
     setTrackIndex((prev) => (prev - 1 + currentTracks.length) % currentTracks.length);
   };
 
   const advanceTrack = useCallback(() => {
-    advancedAt.current = Date.now();
-    setIsPlaying(true); // Keep playback active for the next track
-    setTrackIndex((prev) => {
-      const next = (prev + 1) % currentTracks.length;
+    setIsPlaying(true);
+    const prev = trackIndex;
+    const next = (prev + 1) % currentTracks.length;
+
+    // In radio mode, advance via Firestore so all clients sync
+    if (isRadioMode) {
+      advanceRadioTrack(prev, next).catch(() => {});
+      // The onSnapshot listener will update trackIndex for all clients
+      // But if it's a single-track playlist, force reload
       if (next === prev) setForceReload((r) => r + 1);
-      return next;
-    });
+      actualDuration.current = null;
+      return;
+    }
+
+    if (next === prev) setForceReload((r) => r + 1);
+    setTrackIndex(next);
     actualDuration.current = null;
-  }, [currentTracks.length]);
+  }, [currentTracks.length, trackIndex, isRadioMode]);
 
   const playNextTrack = () => {
-    if (!user) return;
+    if (isRadioMode) return;
     advanceTrack();
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Disable seeking if Master Playlist (radio) is active
-    if (activePlaylistId === masterPlaylist?.id) return;
+    if (isRadioMode) return;
 
     const track = currentTracks[trackIndex];
     if (!audioRef.current || !track) return;
@@ -748,11 +788,15 @@ export default function Home() {
       return;
     }
     // Radio mode: re-sync to live position on resume
-    if (!user || activePlaylistId === masterPlaylist?.id) {
-      radioAdvance();
-      // radioAdvance sets trackIndex + pendingRadioSeek.
-      // If track changes, new <audio> mounts with autoPlay + onLoadedMetadata seeks.
-      // If same track, we seeked immediately above — just resume playback.
+    if (isRadioMode && radioStateRef.current && currentTracks.length > 0) {
+      const { trackIndex: rIdx, position: rPos } = computeCurrentRadioPosition(
+        currentTracks,
+        radioStateRef.current.startedAtMillis,
+        radioStateRef.current.trackIndex
+      );
+      setTrackIndex(rIdx);
+      setCurrentTime(rPos);
+      if (audio && isFinite(rPos)) audio.currentTime = rPos;
       try { await audio.play(); } catch { }
       setIsPlaying(true);
       return;
@@ -761,18 +805,7 @@ export default function Home() {
       await audio.play();
       setIsPlaying(true);
     } catch { }
-  }, [isPlaying, user, radioAdvance, activePlaylistId, masterPlaylist?.id]);
-
-  useEffect(() => {
-    const radioInterval = setInterval(() => {
-      if (isPlaying && (activePlaylistId === masterPlaylist?.id || !user)) {
-        // Skip radio sync briefly after onEnded advance to prevent override
-        if (Date.now() - advancedAt.current < 3000) return;
-        radioAdvance();
-      }
-    }, 1000);
-    return () => clearInterval(radioInterval);
-  }, [isPlaying, user, radioAdvance, activePlaylistId, masterPlaylist?.id]);
+  }, [isPlaying, isRadioMode, currentTracks]);
 
   /* ── Playlist Actions ───────────────────────────── */
 
@@ -933,9 +966,14 @@ export default function Home() {
           playsInline
           onEnded={advanceTrack}
           onLoadedMetadata={() => {
-            if (pendingRadioSeek.current !== null && audioRef.current) {
-              audioRef.current.currentTime = pendingRadioSeek.current;
-              pendingRadioSeek.current = null;
+            // In radio mode, seek to the computed position for this track
+            if (isRadioMode && radioStateRef.current && audioRef.current) {
+              const { position: rPos } = computeCurrentRadioPosition(
+                currentTracks,
+                radioStateRef.current.startedAtMillis,
+                radioStateRef.current.trackIndex
+              );
+              if (isFinite(rPos)) audioRef.current.currentTime = rPos;
             }
             const audio = audioRef.current;
             if (audio && isFinite(audio.duration)) {
@@ -943,7 +981,6 @@ export default function Home() {
               const track = currentTracks[trackIndex];
               if (track && !track.durationVerified && Math.abs(audio.duration - track.durationSeconds) > 2) {
                 const corrected = Math.round(audio.duration);
-                // Update local state so computeRadioPosition uses correct duration
                 setCurrentTracks((prev) =>
                   prev.map((t) =>
                     t.id === track.id ? { ...t, durationSeconds: corrected, durationVerified: true } : t
@@ -959,11 +996,8 @@ export default function Home() {
           }}
           onPlay={() => setIsPlaying(true)}
           onPause={() => {
-            // Don't mark as paused when audio ended naturally — advanceTrack handles it
             if (audioRef.current?.ended) return;
-            // In radio mode, keep isPlaying true so the radio interval keeps ticking
-            // and will naturally advance to the next track via the wall clock
-            if (!user || activePlaylistId === masterPlaylist?.id) return;
+            if (isRadioMode) return;
             setIsPlaying(false);
           }}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
