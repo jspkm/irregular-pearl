@@ -1114,7 +1114,7 @@ export default function Home() {
                       )}
                     </svg>
                   </button>
-                  {user && activePlaylistId !== masterPlaylist?.id && (
+                  {user && activePlaylistId && masterPlaylist && activePlaylistId !== masterPlaylist.id && (
                     <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         {isPlaying ? (
