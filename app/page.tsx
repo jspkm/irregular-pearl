@@ -29,6 +29,22 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/* ── Duration Probe ────────────────────────────────── */
+
+function probeAudioDuration(url: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    const cleanup = () => { audio.src = ""; audio.load(); };
+    audio.addEventListener("loadedmetadata", () => {
+      const d = audio.duration;
+      cleanup();
+      resolve(isFinite(d) ? d : null);
+    }, { once: true });
+    audio.addEventListener("error", () => { cleanup(); resolve(null); }, { once: true });
+    audio.src = url;
+  });
+}
 
 
 /* ── Player Icon ────────────────────────────────────── */
@@ -296,6 +312,69 @@ export default function Home() {
     }
   }, [authLoading, loadData]);
 
+  // Probe actual audio durations and correct mismatches (skip already-verified tracks)
+  useEffect(() => {
+    const unverified = allTracks.filter((t) => !t.durationVerified);
+    if (unverified.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const corrections: { id: string; durationSeconds: number }[] = [];
+      const verified: string[] = [];
+      // Probe in parallel (batches of 4 to avoid overwhelming the browser)
+      for (let i = 0; i < unverified.length; i += 4) {
+        const batch = unverified.slice(i, i + 4);
+        const results = await Promise.all(
+          batch.map(async (track) => {
+            const actual = await probeAudioDuration(track.audioUrl);
+            if (actual && Math.abs(actual - track.durationSeconds) > 2) {
+              return { id: track.id, durationSeconds: Math.round(actual), corrected: true };
+            }
+            return { id: track.id, durationSeconds: track.durationSeconds, corrected: false };
+          })
+        );
+        if (cancelled) return;
+        for (const r of results) {
+          if (r) {
+            verified.push(r.id);
+            if (r.corrected) corrections.push({ id: r.id, durationSeconds: r.durationSeconds });
+          }
+        }
+      }
+      if (cancelled) return;
+      // Mark all probed tracks as verified; apply duration corrections
+      const correctionMap = new Map(corrections.map((c) => [c.id, c.durationSeconds]));
+      const verifiedSet = new Set(verified);
+      const applyUpdates = (tracks: Track[]) =>
+        tracks.map((t) => {
+          if (!verifiedSet.has(t.id)) return t;
+          const corrected = correctionMap.get(t.id);
+          return { ...t, durationVerified: true, ...(corrected != null ? { durationSeconds: corrected } : {}) };
+        });
+      setAllTracks(applyUpdates);
+      setCurrentTracks(applyUpdates);
+      // Fire-and-forget Firestore corrections (also sets durationVerified)
+      for (const c of corrections) {
+        fetch("/api/correct-duration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(c),
+        }).catch(() => {});
+      }
+      // Mark tracks with correct duration as verified in Firestore too
+      const alreadyCorrect = verified.filter((id) => !correctionMap.has(id));
+      for (const id of alreadyCorrect) {
+        const track = allTracks.find((t) => t.id === id);
+        if (track) {
+          fetch("/api/correct-duration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ trackId: id, durationSeconds: track.durationSeconds }),
+          }).catch(() => {});
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [allTracks.length]); // Only re-run when track count changes
 
   /* ──Track Insight (server-generated, cached in Firestore) ── */
 
@@ -918,6 +997,20 @@ export default function Home() {
             }
             if (audio && isFinite(audio.duration)) {
               actualDuration.current = audio.duration;
+              const track = currentTracks[trackIndex];
+              if (track && !track.durationVerified && Math.abs(audio.duration - track.durationSeconds) > 2) {
+                const corrected = Math.round(audio.duration);
+                setCurrentTracks((prev) =>
+                  prev.map((t) =>
+                    t.id === track.id ? { ...t, durationSeconds: corrected, durationVerified: true } : t
+                  )
+                );
+                fetch("/api/correct-duration", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ trackId: track.id, durationSeconds: corrected }),
+                }).catch(() => {});
+              }
             }
           }}
           onPlay={() => setIsPlaying(true)}
