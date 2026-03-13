@@ -25,6 +25,23 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/* ── Duration Probe ────────────────────────────────── */
+
+function probeAudioDuration(url: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    const cleanup = () => { audio.src = ""; audio.load(); };
+    audio.addEventListener("loadedmetadata", () => {
+      const d = audio.duration;
+      cleanup();
+      resolve(isFinite(d) ? d : null);
+    }, { once: true });
+    audio.addEventListener("error", () => { cleanup(); resolve(null); }, { once: true });
+    audio.src = url;
+  });
+}
+
 /* ── Radio Clock ───────────────────────────────────── */
 
 const RADIO_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
@@ -309,6 +326,48 @@ export default function Home() {
       loadData();
     }
   }, [authLoading, loadData]);
+
+  // Probe actual audio durations and correct mismatches
+  useEffect(() => {
+    if (allTracks.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const corrections: { id: string; durationSeconds: number }[] = [];
+      // Probe in parallel (batches of 4 to avoid overwhelming the browser)
+      for (let i = 0; i < allTracks.length; i += 4) {
+        const batch = allTracks.slice(i, i + 4);
+        const results = await Promise.all(
+          batch.map(async (track) => {
+            const actual = await probeAudioDuration(track.audioUrl);
+            if (actual && Math.abs(actual - track.durationSeconds) > 2) {
+              return { id: track.id, durationSeconds: Math.round(actual) };
+            }
+            return null;
+          })
+        );
+        if (cancelled) return;
+        for (const r of results) {
+          if (r) corrections.push(r);
+        }
+      }
+      if (cancelled || corrections.length === 0) return;
+      // Build a lookup for corrections
+      const correctionMap = new Map(corrections.map((c) => [c.id, c.durationSeconds]));
+      const applyCorrections = (tracks: Track[]) =>
+        tracks.map((t) => correctionMap.has(t.id) ? { ...t, durationSeconds: correctionMap.get(t.id)! } : t);
+      setAllTracks(applyCorrections);
+      setCurrentTracks(applyCorrections);
+      // Fire-and-forget Firestore corrections
+      for (const c of corrections) {
+        fetch("/api/correct-duration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(c),
+        }).catch(() => {});
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [allTracks.length]); // Only re-run when track count changes, not on every correction
 
   /* ── Musical Insight ────────────────────────────── */
 
@@ -1035,15 +1094,17 @@ export default function Home() {
                       )}
                     </svg>
                   </button>
-                  <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      {isPlaying ? (
-                        <rect className="icon-fill" x="7" y="7" width="10" height="10" />
-                      ) : (
-                        <path className="icon-fill" d="M8 6L18 12L8 18Z" />
-                      )}
-                    </svg>
-                  </button>
+                  {user && activePlaylistId !== masterPlaylist?.id && (
+                    <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        {isPlaying ? (
+                          <rect className="icon-fill" x="7" y="7" width="10" height="10" />
+                        ) : (
+                          <path className="icon-fill" d="M8 6L18 12L8 18Z" />
+                        )}
+                      </svg>
+                    </button>
+                  )}
                   {user && (
                     <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
                       <svg viewBox="0 0 24 24" aria-hidden="true">
