@@ -63,19 +63,24 @@ export const musicalInsight = onRequest(
   }
 );
 
-/* ── Helper: get current track duration from Firestore ──── */
+/* ── Helpers ──────────────────────────────────────────── */
 
-async function getCurrentTrackDuration(
-  trackIndex: number
-): Promise<number | null> {
+const INSIGHT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+async function getMasterTrackIds(): Promise<string[]> {
   const playlistSnap = await db
     .collection("playlists")
     .where("ownerId", "==", null)
     .limit(1)
     .get();
-  if (playlistSnap.empty) return null;
+  if (playlistSnap.empty) return [];
+  return playlistSnap.docs[0].data().trackIds ?? [];
+}
 
-  const trackIds: string[] = playlistSnap.docs[0].data().trackIds ?? [];
+async function getCurrentTrackDuration(
+  trackIndex: number
+): Promise<number | null> {
+  const trackIds = await getMasterTrackIds();
   if (trackIds.length === 0) return null;
 
   const idx = trackIndex % trackIds.length;
@@ -85,12 +90,58 @@ async function getCurrentTrackDuration(
   return (trackSnap.data()!.durationSeconds as number) ?? null;
 }
 
+async function generateAndCacheInsight(
+  trackId: string,
+  apiKey: string
+): Promise<void> {
+  // Check if a fresh insight already exists
+  const existing = await db.doc(`trackInsights/${trackId}`).get();
+  if (existing.exists) {
+    const age = Date.now() - (existing.data()!.generatedAt?.toMillis?.() ?? 0);
+    if (age < INSIGHT_TTL_MS) return; // still fresh
+  }
+
+  // Get track metadata for the prompt
+  const trackSnap = await db.collection("tracks").doc(trackId).get();
+  if (!trackSnap.exists) return;
+  const track = trackSnap.data()!;
+
+  const prompt = `Write a fascinating, multi-sentence musical insight about "${track.title}" composed by ${track.composer}, performed by ${(track.performers ?? []).join(", ")}.
+
+    The insight should be rich and detailed (approx. 250-400 characters), exploring:
+    - Information about the performer(s).
+    - What was happening culturally and artistically when the piece was composed or first performed.
+    - A brief music theory insight into this specific piece (e.g., harmonic structure, motif, or tonal innovations).
+
+    Avoid introductory phrases like "Did you know". Make it feel like an immersive program note whispered to the listener.
+    Vary the focus each time to keep it fresh.`;
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    }
+  );
+
+  const data = await response.json();
+  const insight =
+    data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+    "Musical history in every note.";
+
+  await db.doc(`trackInsights/${trackId}`).set({
+    insight,
+    generatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
 /**
  * Firestore trigger: when radioState/current is written,
  * schedule a Cloud Task to fire exactly when the current track ends.
  */
 export const scheduleNextTrack = onDocumentWritten(
-  "radioState/current",
+  { document: "radioState/current", secrets: [geminiApiKey] },
   async (event) => {
     const data = event.data?.after?.data();
     if (!data) return;
@@ -100,6 +151,18 @@ export const scheduleNextTrack = onDocumentWritten(
       startedAtMillis: number;
     };
 
+    // Pre-generate and cache the insight for the current track
+    const trackIds = await getMasterTrackIds();
+    if (trackIds.length > 0) {
+      const currentTrackId = trackIds[trackIndex % trackIds.length];
+      const apiKey = geminiApiKey.value();
+      if (apiKey && currentTrackId) {
+        await generateAndCacheInsight(currentTrackId, apiKey).catch((err) =>
+          console.error("Insight generation failed:", err)
+        );
+      }
+    }
+
     const durationSec = await getCurrentTrackDuration(trackIndex);
     if (durationSec == null || durationSec <= 0) return;
 
@@ -108,8 +171,6 @@ export const scheduleNextTrack = onDocumentWritten(
     const remainingSec = Math.max(durationSec - elapsedSec, 0);
 
     // Enqueue a task to fire when the track ends.
-    // Include startedAtMillis so the task can verify it's not stale
-    // (e.g. a client already advanced the track before this task fires).
     const queue = getFunctions().taskQueue("advanceRadioTask");
     await queue.enqueue(
       { trackIndex, startedAtMillis },

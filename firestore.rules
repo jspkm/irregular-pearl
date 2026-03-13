@@ -23,5 +23,17 @@ service cloud.firestore {
     match /userProfiles/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
+
+    // Radio state: anyone can read, only server (admin SDK) writes
+    match /radioState/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Track insights cache: anyone can read/write
+    match /trackInsights/{trackId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

@@ -6,37 +6,36 @@
  *
  * trackIndex defaults to 0 if not provided.
  *
- * Requires a .env.local file with NEXT_PUBLIC_FIREBASE_* variables.
+ * Requires GOOGLE_APPLICATION_CREDENTIALS or falls back to project ID.
  */
 
-import { readFileSync } from "fs";
-// Parse .env.local manually (no dotenv dependency needed)
-for (const line of readFileSync(".env.local", "utf-8").split("\n")) {
-  const match = line.match(/^([^#=]+)=(.*)$/);
-  if (match) process.env[match[1].trim()] = match[2].trim();
+import { initializeApp, cert, type ServiceAccount } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import * as fs from "fs";
+
+/* ── Firebase Admin init (same pattern as seed-tracks.ts) ── */
+
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+const envProjectId =
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+  process.env.FIREBASE_PROJECT_ID;
+
+if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
+  const sa = JSON.parse(
+    fs.readFileSync(serviceAccountPath, "utf-8")
+  ) as ServiceAccount;
+  initializeApp({ credential: cert(sa) });
+} else {
+  initializeApp({ projectId: envProjectId || "irregular-pearl-dev" });
 }
 
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+const db = getFirestore();
 const trackIndex = parseInt(process.argv[2] ?? "0", 10);
 
 async function main() {
-  await setDoc(doc(db, "radioState", "current"), {
+  await db.doc("radioState/current").set({
     trackIndex,
-    startedAt: serverTimestamp(),
+    startedAt: FieldValue.serverTimestamp(),
     startedAtMillis: Date.now(),
   });
   console.log(`Seeded radioState/current with trackIndex=${trackIndex}`);

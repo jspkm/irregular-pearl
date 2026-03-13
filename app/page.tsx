@@ -16,7 +16,6 @@ import {
   initRadioState,
   advanceRadioTrack,
   getTrackInsight,
-  setTrackInsight,
 } from "@/lib/firestore";
 import { computeCurrentRadioPosition } from "@/lib/radio";
 import type { Track, Playlist, RadioState } from "@/lib/types";
@@ -378,7 +377,7 @@ export default function Home() {
     return () => { cancelled = true; };
   }, [allTracks.length]); // Only re-run when track count changes
 
-  /* ── Musical Insight (cached in Firestore, 24h TTL) ── */
+  /* ── Musical Insight (server-generated, cached in Firestore) ── */
 
   useEffect(() => {
     const track = currentTracks[trackIndex];
@@ -388,7 +387,7 @@ export default function Home() {
     const fetchInsight = async () => {
       setInsight("");
 
-      // Check cache first
+      // Read cached insight from Firestore (server generates it on track change)
       try {
         const cached = await getTrackInsight(track.id);
         if (cached && isMounted) {
@@ -397,27 +396,21 @@ export default function Home() {
         }
       } catch { }
 
-      // Cache miss or stale — call LLM
-      try {
-        const res = await fetch("/api/musical-interest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: track.title,
-            composer: track.composer,
-            performers: track.performers
-          })
-        });
-        const data = await res.json();
-        const text = data.insight || "Musical history in every note.";
-        if (isMounted) {
-          setInsight(text);
-          // Cache the result
-          setTrackInsight(track.id, text).catch(() => {});
-        }
-      } catch {
-        if (isMounted) setInsight("Distilled musical elegance.");
+      // Cache not ready yet — poll briefly (server may still be generating)
+      let retries = 3;
+      while (retries > 0 && isMounted) {
+        await new Promise((r) => setTimeout(r, 2000));
+        try {
+          const cached = await getTrackInsight(track.id);
+          if (cached && isMounted) {
+            setInsight(cached);
+            return;
+          }
+        } catch { }
+        retries--;
       }
+
+      if (isMounted) setInsight("");
     };
 
     fetchInsight();
@@ -522,7 +515,7 @@ export default function Home() {
         return; // The snapshot will fire again with the updated state
       }
 
-      setTrackIndex(rIdx);
+      setTrackIndex((prev) => (prev === rIdx ? prev : rIdx));
       setCurrentTime(rPos);
 
       // Seek the audio element — only if already loaded (readyState >= 1)
@@ -552,7 +545,7 @@ export default function Home() {
         return;
       }
       // Update progress bar from computed position (independent of audio element)
-      setTrackIndex(rIdx);
+      setTrackIndex((prev) => (prev === rIdx ? prev : rIdx));
       setCurrentTime(rPos);
       // Correct audio drift if playing and drifted >2s
       const audio = audioRef.current;
