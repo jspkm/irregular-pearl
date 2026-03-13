@@ -14,7 +14,6 @@ import {
   setUserProfile,
   onRadioStateChange,
   initRadioState,
-  advanceRadioTrack,
   getTrackInsight,
 } from "@/lib/firestore";
 import { computeCurrentRadioPosition } from "@/lib/radio";
@@ -492,6 +491,15 @@ export default function Home() {
 
   const isRadioMode = !user || activePlaylistId === masterPlaylist?.id;
 
+  // Advance radio via server API (client Firestore rules block direct writes)
+  const advanceRadioViaApi = useCallback((expectedIndex: number, nextIndex: number) => {
+    fetch("/api/advance-radio", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expectedIndex, nextIndex }),
+    }).catch(() => {});
+  }, []);
+
   // Subscribe to Firestore radioState when in radio mode
   useEffect(() => {
     if (!isRadioMode || currentTracks.length === 0) return;
@@ -511,7 +519,7 @@ export default function Home() {
 
       // If we've gone past the stored track, advance the server state
       if (rIdx !== state.trackIndex) {
-        advanceRadioTrack(state.trackIndex, rIdx).catch(() => {});
+        advanceRadioViaApi(state.trackIndex, rIdx);
         return; // The snapshot will fire again with the updated state
       }
 
@@ -541,7 +549,7 @@ export default function Home() {
       );
       // Track has advanced past the stored index — update server state
       if (rIdx !== state.trackIndex) {
-        advanceRadioTrack(state.trackIndex, rIdx).catch(() => {});
+        advanceRadioViaApi(state.trackIndex, rIdx);
         return;
       }
       // Update progress bar from computed position (independent of audio element)
@@ -741,9 +749,9 @@ export default function Home() {
     const prev = trackIndex;
     const next = (prev + 1) % currentTracks.length;
 
-    // In radio mode, advance via Firestore so all clients sync
+    // In radio mode, advance via server API (client can't write radioState directly)
     if (isRadioMode) {
-      advanceRadioTrack(prev, next).catch(() => {});
+      advanceRadioViaApi(prev, next);
       // The onSnapshot listener will update trackIndex for all clients
       // But if it's a single-track playlist, force reload
       if (next === prev) setForceReload((r) => r + 1);
@@ -982,7 +990,7 @@ export default function Home() {
               );
               // If we've drifted past this track, advance server state
               if (rIdx !== radioStateRef.current.trackIndex) {
-                advanceRadioTrack(radioStateRef.current.trackIndex, rIdx).catch(() => {});
+                advanceRadioViaApi(radioStateRef.current.trackIndex, rIdx);
               } else if (isFinite(rPos)) {
                 audio.currentTime = rPos;
               }
