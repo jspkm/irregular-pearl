@@ -5,6 +5,7 @@ import { defineSecret } from "firebase-functions/params";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getFunctions } from "firebase-admin/functions";
 import { initializeApp } from "firebase-admin/app";
+import { parseWebStream } from "music-metadata";
 
 const app = initializeApp();
 const db = getFirestore(app);
@@ -77,6 +78,23 @@ async function getMasterTrackIds(): Promise<string[]> {
   return playlistSnap.docs[0].data().trackIds ?? [];
 }
 
+async function probeAudioDuration(audioUrl: string): Promise<number | null> {
+  try {
+    const response = await fetch(audioUrl);
+    if (!response.ok || !response.body) return null;
+    const contentType = response.headers.get("content-type") ?? "audio/mpeg";
+    const metadata = await parseWebStream(
+      response.body,
+      { mimeType: contentType },
+      { duration: true, skipCovers: true, skipPostHeaders: true }
+    );
+    return metadata.format.duration ?? null;
+  } catch (err) {
+    console.error("Audio probe failed:", err);
+    return null;
+  }
+}
+
 async function getCurrentTrackDuration(
   trackIndex: number
 ): Promise<number | null> {
@@ -84,10 +102,33 @@ async function getCurrentTrackDuration(
   if (trackIds.length === 0) return null;
 
   const idx = trackIndex % trackIds.length;
-  const trackSnap = await db.collection("tracks").doc(trackIds[idx]).get();
+  const trackId = trackIds[idx];
+  const trackSnap = await db.collection("tracks").doc(trackId).get();
   if (!trackSnap.exists) return null;
 
-  return (trackSnap.data()!.durationSeconds as number) ?? null;
+  const trackData = trackSnap.data()!;
+
+  // If duration is already verified, use it directly
+  if (trackData.durationVerified) {
+    return (trackData.durationSeconds as number) ?? null;
+  }
+
+  // Probe the actual audio file for the real duration
+  const audioUrl = trackData.audioUrl as string | undefined;
+  if (audioUrl) {
+    const probedDuration = await probeAudioDuration(audioUrl);
+    if (probedDuration != null && probedDuration > 0) {
+      const rounded = Math.round(probedDuration);
+      await db.collection("tracks").doc(trackId).update({
+        durationSeconds: rounded,
+        durationVerified: true,
+      });
+      return rounded;
+    }
+  }
+
+  // Fallback to stored value if probe fails
+  return (trackData.durationSeconds as number) ?? null;
 }
 
 async function generateAndCacheInsight(
