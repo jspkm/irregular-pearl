@@ -446,7 +446,7 @@ body {
 }
 
 .floating-player__controls-bottom {
-  margin-top: auto;
+  margin-top: 6px;
 }
 
 .floating-player__content-top {
