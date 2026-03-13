@@ -9,8 +9,12 @@
  * Requires a .env.local file with NEXT_PUBLIC_FIREBASE_* variables.
  */
 
-import { config } from "dotenv";
-config({ path: ".env.local" });
+import { readFileSync } from "fs";
+// Parse .env.local manually (no dotenv dependency needed)
+for (const line of readFileSync(".env.local", "utf-8").split("\n")) {
+  const match = line.match(/^([^#=]+)=(.*)$/);
+  if (match) process.env[match[1].trim()] = match[2].trim();
+}
 
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, serverTimestamp } from "firebase/firestore";
