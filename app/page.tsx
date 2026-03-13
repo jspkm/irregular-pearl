@@ -213,6 +213,8 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [trackIndex, setTrackIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [forceReload, setForceReload] = useState(0);
+  const actualDuration = useRef<number | null>(null);
   const [playlistOpen, setPlaylistOpen] = useState(false);
   const [playedOrder, setPlayedOrder] = useState<number[]>([0]);
   const [isPlaylistCollapsed, setIsPlaylistCollapsed] = useState(false);
@@ -610,13 +612,18 @@ export default function Home() {
     setTrackIndex((prev) => (prev - 1 + currentTracks.length) % currentTracks.length);
   };
 
+  const advanceTrack = useCallback(() => {
+    setTrackIndex((prev) => {
+      const next = (prev + 1) % currentTracks.length;
+      if (next === prev) setForceReload((r) => r + 1);
+      return next;
+    });
+    actualDuration.current = null;
+  }, [currentTracks.length]);
+
   const playNextTrack = () => {
-    if (activePlaylistId === masterPlaylist?.id) {
-      radioAdvance();
-      return;
-    }
     if (!user) return;
-    setTrackIndex((prev) => (prev + 1) % currentTracks.length);
+    advanceTrack();
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -627,7 +634,8 @@ export default function Home() {
     if (!audioRef.current || !track) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const percentage = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const newTime = percentage * track.durationSeconds;
+    const duration = actualDuration.current ?? track.durationSeconds;
+    const newTime = percentage * duration;
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
@@ -827,17 +835,30 @@ export default function Home() {
     <main className="min-h-screen w-full bg-cotton-candy">
       {currentTrack && (
         <audio
-          key={currentTrack.id}
+          key={`${currentTrack.id}-${forceReload}`}
           ref={audioRef}
           src={currentTrack.audioUrl}
           autoPlay
           muted={muted}
           playsInline
-          onEnded={user ? playNextTrack : radioAdvance}
+          onEnded={advanceTrack}
           onLoadedMetadata={() => {
             if (pendingRadioSeek.current !== null && audioRef.current) {
               audioRef.current.currentTime = pendingRadioSeek.current;
               pendingRadioSeek.current = null;
+            }
+            const audio = audioRef.current;
+            if (audio && isFinite(audio.duration)) {
+              actualDuration.current = audio.duration;
+              // Auto-correct Firestore if actual duration differs by >2s
+              const track = currentTracks[trackIndex];
+              if (track && Math.abs(audio.duration - track.durationSeconds) > 2) {
+                fetch("/api/correct-duration", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ trackId: track.id, durationSeconds: Math.round(audio.duration) }),
+                }).catch(() => {});
+              }
             }
           }}
           onPlay={() => setIsPlaying(true)}
@@ -845,8 +866,7 @@ export default function Home() {
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
           onError={() => {
             console.warn(`Audio failed to load: ${currentTrack?.title}`);
-            if (user) playNextTrack();
-            else radioAdvance();
+            advanceTrack();
           }}
         />
       )}
@@ -968,14 +988,14 @@ export default function Home() {
                     <div
                       className="floating-player__progress-fill"
                       style={{
-                        width: `${currentTrack ? (currentTime / currentTrack.durationSeconds) * 100 : 0}%`
+                        width: `${currentTrack ? (currentTime / (actualDuration.current ?? currentTrack.durationSeconds)) * 100 : 0}%`
                       }}
                     >
                       <div className="floating-player__progress-tick" />
                     </div>
                   </div>
                   <span className="floating-player__time">
-                    {currentTrack ? `-${formatDuration(Math.max(0, currentTrack.durationSeconds - currentTime))}` : "0:00"}
+                    {currentTrack ? `-${formatDuration(Math.max(0, (actualDuration.current ?? currentTrack.durationSeconds) - currentTime))}` : "0:00"}
                   </span>
                 </div>
 
