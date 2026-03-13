@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     }
 
     const db = getAdminDb();
-    await db.collection("tracks").doc(trackId).update({ durationSeconds });
+    await db.collection("tracks").doc(trackId).update({ durationSeconds, durationVerified: true });
 
     return NextResponse.json({ ok: true });
   } catch (error) {
