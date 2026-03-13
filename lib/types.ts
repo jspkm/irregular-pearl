@@ -10,6 +10,7 @@ export interface Track {
   datePerformed?: string;
   albumCover?: string;
   durationSeconds: number;
+  durationVerified?: boolean;
   epoch: string;
   source: string;
   audioUrl: string;

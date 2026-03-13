@@ -25,6 +25,23 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/* ── Duration Probe ────────────────────────────────── */
+
+function probeAudioDuration(url: string): Promise<number | null> {
+  return new Promise((resolve) => {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    const cleanup = () => { audio.src = ""; audio.load(); };
+    audio.addEventListener("loadedmetadata", () => {
+      const d = audio.duration;
+      cleanup();
+      resolve(isFinite(d) ? d : null);
+    }, { once: true });
+    audio.addEventListener("error", () => { cleanup(); resolve(null); }, { once: true });
+    audio.src = url;
+  });
+}
+
 /* ── Radio Clock ───────────────────────────────────── */
 
 const RADIO_EPOCH = new Date("2026-01-01T00:00:00Z").getTime();
@@ -310,6 +327,70 @@ export default function Home() {
     }
   }, [authLoading, loadData]);
 
+  // Probe actual audio durations and correct mismatches (skip already-verified tracks)
+  useEffect(() => {
+    const unverified = allTracks.filter((t) => !t.durationVerified);
+    if (unverified.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const corrections: { id: string; durationSeconds: number }[] = [];
+      const verified: string[] = [];
+      // Probe in parallel (batches of 4 to avoid overwhelming the browser)
+      for (let i = 0; i < unverified.length; i += 4) {
+        const batch = unverified.slice(i, i + 4);
+        const results = await Promise.all(
+          batch.map(async (track) => {
+            const actual = await probeAudioDuration(track.audioUrl);
+            if (actual && Math.abs(actual - track.durationSeconds) > 2) {
+              return { id: track.id, durationSeconds: Math.round(actual), corrected: true };
+            }
+            return { id: track.id, durationSeconds: track.durationSeconds, corrected: false };
+          })
+        );
+        if (cancelled) return;
+        for (const r of results) {
+          if (r) {
+            verified.push(r.id);
+            if (r.corrected) corrections.push({ id: r.id, durationSeconds: r.durationSeconds });
+          }
+        }
+      }
+      if (cancelled) return;
+      // Mark all probed tracks as verified; apply duration corrections
+      const correctionMap = new Map(corrections.map((c) => [c.id, c.durationSeconds]));
+      const verifiedSet = new Set(verified);
+      const applyUpdates = (tracks: Track[]) =>
+        tracks.map((t) => {
+          if (!verifiedSet.has(t.id)) return t;
+          const corrected = correctionMap.get(t.id);
+          return { ...t, durationVerified: true, ...(corrected != null ? { durationSeconds: corrected } : {}) };
+        });
+      setAllTracks(applyUpdates);
+      setCurrentTracks(applyUpdates);
+      // Fire-and-forget Firestore corrections (also sets durationVerified)
+      for (const c of corrections) {
+        fetch("/api/correct-duration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(c),
+        }).catch(() => {});
+      }
+      // Mark tracks with correct duration as verified in Firestore too
+      const alreadyCorrect = verified.filter((id) => !correctionMap.has(id));
+      for (const id of alreadyCorrect) {
+        const track = allTracks.find((t) => t.id === id);
+        if (track) {
+          fetch("/api/correct-duration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ trackId: id, durationSeconds: track.durationSeconds }),
+          }).catch(() => {});
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [allTracks.length]); // Only re-run when track count changes
+
   /* ── Musical Insight ────────────────────────────── */
 
   useEffect(() => {
@@ -417,12 +498,16 @@ export default function Home() {
 
   const radioAdvance = useCallback(() => {
     const { trackIndex: rIdx, position: rPos } = computeRadioPosition(currentTracks);
-    pendingRadioSeek.current = rPos;
+    // Clamp seek to actual audio duration to avoid seeking past content
+    const clampedPos = actualDuration.current && rPos > actualDuration.current - 0.5
+      ? Math.max(0, actualDuration.current - 0.5)
+      : rPos;
+    pendingRadioSeek.current = clampedPos;
     setTrackIndex(rIdx);
     setCurrentTime(rPos);
     // If same track (audio element stays), seek immediately
     if (audioRef.current) {
-      audioRef.current.currentTime = rPos;
+      audioRef.current.currentTime = clampedPos;
     }
     // If track changes, onLoadedMetadata will apply pendingRadioSeek
   }, [currentTracks]);
@@ -855,17 +940,15 @@ export default function Home() {
             const audio = audioRef.current;
             if (audio && isFinite(audio.duration)) {
               actualDuration.current = audio.duration;
-              // Auto-correct if actual duration differs by >2s
               const track = currentTracks[trackIndex];
-              if (track && Math.abs(audio.duration - track.durationSeconds) > 2) {
+              if (track && !track.durationVerified && Math.abs(audio.duration - track.durationSeconds) > 2) {
                 const corrected = Math.round(audio.duration);
                 // Update local state so computeRadioPosition uses correct duration
                 setCurrentTracks((prev) =>
                   prev.map((t) =>
-                    t.id === track.id ? { ...t, durationSeconds: corrected } : t
+                    t.id === track.id ? { ...t, durationSeconds: corrected, durationVerified: true } : t
                   )
                 );
-                // Also correct in Firestore for future sessions
                 fetch("/api/correct-duration", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
@@ -878,6 +961,9 @@ export default function Home() {
           onPause={() => {
             // Don't mark as paused when audio ended naturally — advanceTrack handles it
             if (audioRef.current?.ended) return;
+            // In radio mode, keep isPlaying true so the radio interval keeps ticking
+            // and will naturally advance to the next track via the wall clock
+            if (!user || activePlaylistId === masterPlaylist?.id) return;
             setIsPlaying(false);
           }}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -1028,15 +1114,17 @@ export default function Home() {
                       )}
                     </svg>
                   </button>
-                  <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      {isPlaying ? (
-                        <rect className="icon-fill" x="7" y="7" width="10" height="10" />
-                      ) : (
-                        <path className="icon-fill" d="M8 6L18 12L8 18Z" />
-                      )}
-                    </svg>
-                  </button>
+                  {user && activePlaylistId !== masterPlaylist?.id && (
+                    <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        {isPlaying ? (
+                          <rect className="icon-fill" x="7" y="7" width="10" height="10" />
+                        ) : (
+                          <path className="icon-fill" d="M8 6L18 12L8 18Z" />
+                        )}
+                      </svg>
+                    </button>
+                  )}
                   {user && (
                     <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
                       <svg viewBox="0 0 24 24" aria-hidden="true">
