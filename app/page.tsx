@@ -615,6 +615,7 @@ export default function Home() {
 
   const advanceTrack = useCallback(() => {
     advancedAt.current = Date.now();
+    setIsPlaying(true); // Keep playback active for the next track
     setTrackIndex((prev) => {
       const next = (prev + 1) % currentTracks.length;
       if (next === prev) setForceReload((r) => r + 1);
@@ -874,7 +875,11 @@ export default function Home() {
             }
           }}
           onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onPause={() => {
+            // Don't mark as paused when audio ended naturally — advanceTrack handles it
+            if (audioRef.current?.ended) return;
+            setIsPlaying(false);
+          }}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
           onError={() => {
             console.warn(`Audio failed to load: ${currentTrack?.title}`);
