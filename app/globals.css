@@ -446,7 +446,7 @@ body {
 }
 
 .floating-player__controls-bottom {
-  margin-top: 6px;
+  margin-top: auto;
 }
 
 .floating-player__content-top {
@@ -516,10 +516,10 @@ body {
 
 .floating-player__insight-container {
   margin-top: 14px;
-  height: 90px;
+  max-height: 90px;
   overflow-y: auto;
   padding-right: 4px;
-  padding-bottom: 20px; /* Space for the copy button */
+  padding-bottom: 8px;
 }
 
 /* Custom scrollbar for insights */
@@ -1482,9 +1482,9 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
-    height: 50px;
+    max-height: 50px;
     margin-top: 6px;
-    padding-bottom: 12px;
+    padding-bottom: 6px;
   }
 
   .floating-player__insight {
@@ -1584,7 +1584,7 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
-    height: 40px;
+    max-height: 40px;
   }
 
   .membership-header__text {
@@ -1606,6 +1606,6 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
-    height: 80px;
+    max-height: 80px;
   }
 }
