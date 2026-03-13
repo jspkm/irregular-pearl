@@ -198,6 +198,7 @@ export default function Home() {
   const activeTrackRef = useRef<HTMLLIElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pendingRadioSeek = useRef<number | null>(null);
+  const advancedAt = useRef<number>(0);
   const dragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
   const authDragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
 
@@ -613,6 +614,7 @@ export default function Home() {
   };
 
   const advanceTrack = useCallback(() => {
+    advancedAt.current = Date.now();
     setTrackIndex((prev) => {
       const next = (prev + 1) % currentTracks.length;
       if (next === prev) setForceReload((r) => r + 1);
@@ -678,6 +680,8 @@ export default function Home() {
   useEffect(() => {
     const radioInterval = setInterval(() => {
       if (isPlaying && (activePlaylistId === masterPlaylist?.id || !user)) {
+        // Skip radio sync briefly after onEnded advance to prevent override
+        if (Date.now() - advancedAt.current < 3000) return;
         radioAdvance();
       }
     }, 1000);
@@ -850,13 +854,21 @@ export default function Home() {
             const audio = audioRef.current;
             if (audio && isFinite(audio.duration)) {
               actualDuration.current = audio.duration;
-              // Auto-correct Firestore if actual duration differs by >2s
+              // Auto-correct if actual duration differs by >2s
               const track = currentTracks[trackIndex];
               if (track && Math.abs(audio.duration - track.durationSeconds) > 2) {
+                const corrected = Math.round(audio.duration);
+                // Update local state so computeRadioPosition uses correct duration
+                setCurrentTracks((prev) =>
+                  prev.map((t) =>
+                    t.id === track.id ? { ...t, durationSeconds: corrected } : t
+                  )
+                );
+                // Also correct in Firestore for future sessions
                 fetch("/api/correct-duration", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ trackId: track.id, durationSeconds: Math.round(audio.duration) }),
+                  body: JSON.stringify({ trackId: track.id, durationSeconds: corrected }),
                 }).catch(() => {});
               }
             }
