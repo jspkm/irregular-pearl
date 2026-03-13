@@ -358,8 +358,8 @@ body {
 
 .floating-player {
   position: fixed;
-  width: min(547px, calc(100vw - 24px));
-  height: 330px;
+  width: min(1094px, calc(100vw - 24px));
+  height: min(860px, calc(100vh - 24px));
   background: rgba(255, 236, 248, 0.9);
   border: 2px solid #c57aa7;
   border-radius: 12px;
@@ -379,10 +379,10 @@ body {
   background: linear-gradient(90deg, #f2b9dd 0%, #e8b8f5 100%);
   border-bottom: 2px solid #c57aa7;
   border-radius: 10px 10px 0 0;
-  padding: 8px 10px;
+  padding: 6px 10px;
   cursor: move;
   user-select: none;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #763f71;
   text-transform: uppercase;
@@ -427,9 +427,9 @@ body {
   background: #fce8f8;
   color: #88497a;
   width: 24px;
-  height: 24px;
+  height: 20px;
   line-height: 0;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -443,10 +443,12 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow: hidden;
 }
 
 .floating-player__controls-bottom {
-  margin-top: auto;
+  margin-top: 8px;
+  flex-shrink: 0;
 }
 
 .floating-player__content-top {
@@ -454,11 +456,16 @@ body {
   gap: 12px;
   align-items: flex-start;
   margin-bottom: 8px;
+  flex: 1;
+  min-height: 0;
 }
 
 .floating-player__track-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 0; /* Important for ellipsis/scroll in flex */
+  min-height: 0;
 }
 
 .floating-player__cover {
@@ -470,9 +477,19 @@ body {
 }
 
 .floating-player__track-container {
+  flex: 1;
   overflow: hidden;
   white-space: nowrap;
   margin-bottom: 0;
+  min-width: 0;
+}
+
+.floating-player__track-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
 }
 
 .floating-player__track {
@@ -502,24 +519,33 @@ body {
 }
 
 .floating-player__composer {
-  margin: 0 0 1px 12px;
+  margin: 0 0 0 12px;
   font-size: 15px;
   font-weight: 400;
   color: #7a4a74;
 }
 
 .floating-player__performer {
-  margin: 0 0 0 12px;
-  font-size: 13px;
+  margin: 10px 0 0;
+  font-size: 15px;
+  font-weight: 700;
   color: #8d5a85;
 }
 
 .floating-player__insight-container {
-  margin-top: 14px;
-  max-height: 100px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 6px 0 0;
+  max-height: none;
   overflow-y: auto;
-  padding-right: 4px;
-  padding-bottom: 8px;
+  padding: 10px 12px;
+  align-self: stretch;
+  min-height: 0;
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, rgba(255, 244, 250, 0.96) 0%, rgba(252, 232, 248, 0.92) 100%);
+  border: 1.5px solid rgba(197, 122, 167, 0.65);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 10px rgba(150, 95, 140, 0.08);
 }
 
 /* Custom scrollbar for insights */
@@ -538,9 +564,9 @@ body {
 .floating-player__insight {
   font-family: "Courier New", Courier, monospace;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.5;
-  color: #7a4a74;
+  color: #6e3d69;
   margin: 0;
   text-transform: none;
   letter-spacing: 0;
@@ -558,36 +584,45 @@ body {
   50% { opacity: 0; }
 }
 
-.insight-copy-btn {
+.track-copy-btn {
+  all: unset;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fce8f8;
-  border: 1.5px solid #d79bc1;
-  border-radius: 4px;
-  padding: 4px;
-  margin-left: 8px;
-  color: #7a4a74;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: #1f2937;
   cursor: pointer;
-  vertical-align: middle;
   position: relative;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(122, 74, 116, 0.1);
+  line-height: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+  opacity: 1;
+  visibility: visible;
 }
 
-.insight-copy-btn:hover {
-  background: #fdf2f9;
-  border-color: #7a4a74;
+.track-copy-btn:hover {
+  color: #111827;
   transform: translateY(-1px);
 }
 
-.insight-copy-btn:active {
+.track-copy-btn:active {
   transform: translateY(0);
 }
 
-.insight-copy-btn svg {
-  width: 14px;
-  height: 14px;
+.track-copy-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+.track-copy-btn .insight-tooltip {
+  top: calc(100% + 8px);
+  bottom: auto;
+  left: auto;
+  right: 0;
+  transform: none;
+  margin-bottom: 0;
 }
 
 .insight-tooltip {
@@ -595,15 +630,17 @@ body {
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: #7a4a74;
-  color: white;
+  background: rgba(122, 74, 116, 0.12);
+  color: #7a4a74;
+  border: 1px solid rgba(197, 122, 167, 0.35);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 999px;
   font-size: 10px;
   font-family: var(--font-inter), sans-serif;
   pointer-events: none;
   margin-bottom: 6px;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(150, 95, 140, 0.08);
   animation: fadeInOut 1.5s forwards;
 }
 
@@ -638,7 +675,7 @@ body {
   cursor: pointer;
   position: relative;
   overflow: visible;
-  margin: 0 4px; /* Buffers the 5px thumb overflow to ensure gaps remain visually perfectly even */
+  margin: 0 4px; /* Buffers the thumb overflow to keep the gaps visually even */
 }
 
 .floating-player__progress-fill {
@@ -1472,19 +1509,26 @@ button.playlist-manager__item small {
     font-size: 15px;
   }
 
+  .floating-player__track-row {
+    gap: 6px;
+  }
+
   .floating-player__composer {
     font-size: 12px !important;
-    margin: -6px 0 2px 8px !important;
+    margin: -6px 0 0 12px !important;
   }
 
   .floating-player__performer {
-    font-size: 11px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    margin-top: 8px !important;
   }
 
   .floating-player__insight-container {
+    aspect-ratio: auto;
     max-height: 50px;
     margin-top: 6px;
-    padding-bottom: 6px;
+    padding: 8px 10px;
   }
 
   .floating-player__insight {
@@ -1584,6 +1628,7 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
+    aspect-ratio: auto;
     max-height: 40px;
   }
 
@@ -1606,6 +1651,7 @@ button.playlist-manager__item small {
   }
 
   .floating-player__insight-container {
-    max-height: 100px;
+    aspect-ratio: auto;
+    max-height: 100%;
   }
 }

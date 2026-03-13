@@ -71,7 +71,17 @@ function PlayerIcon() {
 
 /* ── Track Title Component ────────────────────────── */
 
-function TrackTitle({ title, trackId }: { title: string; trackId: string }) {
+function TrackTitle({
+  title,
+  trackId,
+  onCopy,
+  showTooltip,
+}: {
+  title: string;
+  trackId: string;
+  onCopy: () => void;
+  showTooltip: boolean;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -99,25 +109,47 @@ function TrackTitle({ title, trackId }: { title: string; trackId: string }) {
   }, [title, trackId]);
 
   return (
-    <div className="floating-player__track-container" ref={containerRef}>
-      <p
-        ref={textRef}
-        className={`floating-player__track ${isOverflowing && !hasScrolledOnce ? "is-scrolling" : ""}`}
-        style={{ "--scroll-dist": scrollDist, lineHeight: 1.1 } as React.CSSProperties}
-        onAnimationEnd={() => setHasScrolledOnce(true)}
+    <div className="floating-player__track-row">
+      <div className="floating-player__track-container" ref={containerRef}>
+        <p
+          ref={textRef}
+          className={`floating-player__track ${isOverflowing && !hasScrolledOnce ? "is-scrolling" : ""}`}
+          style={{ "--scroll-dist": scrollDist, lineHeight: 1.1 } as React.CSSProperties}
+          onAnimationEnd={() => setHasScrolledOnce(true)}
+        >
+          {title}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="track-copy-btn"
+        onClick={onCopy}
+        title="Copy track info"
+        aria-label="Copy track info"
       >
-        {title}
-      </p>
+        {showTooltip && <span className="insight-tooltip">Copied!</span>}
+        <svg
+          viewBox="0 0 256 256"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="18"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="96" y="96" width="104" height="104" rx="16"></rect>
+          <path d="M160 96V56a16 16 0 0 0-16-16H56a16 16 0 0 0-16 16v88a16 16 0 0 0 16 16h40"></path>
+        </svg>
+      </button>
     </div>
   );
 }
 
 /* ── Typewriter Effect ───────────────────────────── */
 
-function TypewriterText({ text, speed = 40, fullInfoToCopy }: { text: string; speed?: number; fullInfoToCopy?: string }) {
+function TypewriterText({ text, speed = 40 }: { text: string; speed?: number }) {
   const [displayed, setDisplayed] = useState("");
   const [index, setIndex] = useState(0);
-  const [showTooltip, setShowTooltip] = useState(false);
   const scrollRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -141,51 +173,14 @@ function TypewriterText({ text, speed = 40, fullInfoToCopy }: { text: string; sp
       scrollRef.current.parentElement.scrollTop = scrollRef.current.parentElement.scrollHeight;
     }
   }, [displayed]);
-
-  const isDone = index >= text.length && text.length > 0;
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(fullInfoToCopy || text);
-      setShowTooltip(true);
-      setTimeout(() => setShowTooltip(false), 1500);
-    } catch (err) {
-      console.error("Failed to copy insight:", err);
-    }
-  };
-
   return (
     <p 
       className="floating-player__insight" 
       ref={scrollRef}
-      style={{ fontSize: '14px', fontWeight: 550, position: 'relative' }}
+      style={{ position: 'relative' }}
     >
       {displayed}
-      {isDone ? (
-        <span style={{ display: 'inline-block', marginLeft: '4px' }}>
-          <button 
-            className="insight-copy-btn" 
-            onClick={handleCopy}
-            title="Copy to clipboard"
-          >
-            {showTooltip && <span className="insight-tooltip">Copied!</span>}
-            <svg 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              style={{ width: '14px', height: '14px' }}
-            >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
-        </span>
-      ) : (
-        <span className="typewriter-cursor">_</span>
-      )}
+      <span className="typewriter-cursor">_</span>
     </p>
   );
 }
@@ -222,6 +217,7 @@ export default function Home() {
   const [playedOrder, setPlayedOrder] = useState<number[]>([0]);
   const [isPlaylistCollapsed, setIsPlaylistCollapsed] = useState(false);
   const [insight, setInsight] = useState("");
+  const [showCopyTooltip, setShowCopyTooltip] = useState(false);
 
   // Data state
   const [allTracks, setAllTracks] = useState<Track[]>([]);
@@ -424,8 +420,8 @@ export default function Home() {
     const mobile = w <= 640;
     setIsMobile(mobile);
     const isMobile = mobile;
-    const panelWidth = isMobile ? w - 16 : Math.min(547, w - 24);
-    const panelHeight = isMobile ? 280 : 330;
+    const panelWidth = isMobile ? w - 16 : Math.min(1094, w - 24);
+    const panelHeight = isMobile ? 280 : Math.min(860, h - 24);
     setPosition({
       x: isMobile ? 8 : Math.max(12, (w - panelWidth) / 2),
       y: isMobile ? 32 : Math.max(12, (h - panelHeight) / 2),
@@ -920,6 +916,19 @@ export default function Home() {
   /* ── Derived ────────────────────────────────────── */
 
   const currentTrack = currentTracks[trackIndex] ?? null;
+  const fullInfoToCopy = currentTrack
+    ? `${currentTrack.title}\nComposer: ${currentTrack.composer}\nPerformer: ${currentTrack.performers.join(", ")}${currentTrack.conductor ? `\nConductor: ${currentTrack.conductor}` : ""}\nDuration: ${formatDuration(currentTrack.durationSeconds)}\nVenue: ${masterPlaylist?.id === activePlaylistId ? "European Archive" : (userPlaylists.find((pl) => pl.id === activePlaylistId)?.name || "Irregular Pearl")}\n\nInsight:\n${insight}\n\n© 2026 Irregular Pearl`
+    : insight;
+
+  const handleCopyTrackInfo = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(fullInfoToCopy);
+      setShowCopyTooltip(true);
+      setTimeout(() => setShowCopyTooltip(false), 1500);
+    } catch (err) {
+      console.error("Failed to copy track info:", err);
+    }
+  }, [fullInfoToCopy]);
   const activePlaylist =
     activePlaylistId === masterPlaylist?.id
       ? masterPlaylist
@@ -1107,10 +1116,12 @@ export default function Home() {
                     <TrackTitle 
                       title={currentTrack.title} 
                       trackId={currentTrack.id} 
+                      onCopy={handleCopyTrackInfo}
+                      showTooltip={showCopyTooltip}
                     />
                   )}
-                  <p className="floating-player__composer" style={{ margin: '-8px 0 4px 12px', fontWeight: 400 }}>{currentTrack?.composer}</p>
-                  <p className="floating-player__performer" style={{ margin: '0', fontSize: '16px', fontWeight: 500 }}>
+                  <p className="floating-player__composer">{currentTrack?.composer}</p>
+                  <p className="floating-player__performer">
                     {currentTrack?.performers.join(", ")}
                     {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
                   </p>
@@ -1120,7 +1131,6 @@ export default function Home() {
                     <TypewriterText 
                       text={insight} 
                       speed={180} 
-                      fullInfoToCopy={currentTrack ? `${currentTrack.title}\nComposer: ${currentTrack.composer}\nPerformer: ${currentTrack.performers.join(", ")}${currentTrack.conductor ? `\nConductor: ${currentTrack.conductor}` : ""}\nDuration: ${formatDuration(currentTrack.durationSeconds)}\nVenue: ${masterPlaylist?.id === activePlaylistId ? "European Archive" : (userPlaylists.find(pl => pl.id === activePlaylistId)?.name || "Irregular Pearl")}\n\nInsight:\n${insight}\n\n© 2026 Irregular Pearl` : insight}
                     />
                   </div>
                 </div>
@@ -1226,7 +1236,7 @@ export default function Home() {
                 : (() => {
                     const w = window.innerWidth;
                     const sidebarWidth = w <= 960 ? Math.min(300, w - 24) : 340;
-                    const sidebarLeft = position.x + (panelRef.current?.offsetWidth ?? 547) + 8;
+                    const sidebarLeft = position.x + (panelRef.current?.offsetWidth ?? 1094) + 8;
                     const maxLeft = w - sidebarWidth - 8;
                     return {
                       left: Math.min(sidebarLeft, Math.max(8, maxLeft)),
