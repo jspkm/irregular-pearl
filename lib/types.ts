@@ -32,3 +32,14 @@ export interface UserProfile {
   photoURL?: string;
   updatedAt: Timestamp;
 }
+
+export interface RadioState {
+  trackIndex: number;
+  startedAt: Timestamp;
+  startedAtMillis: number;
+}
+
+export interface TrackInsight {
+  insight: string;
+  generatedAt: Timestamp;
+}

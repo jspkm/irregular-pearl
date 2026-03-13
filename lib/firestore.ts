@@ -9,9 +9,12 @@ import {
   query,
   where,
   serverTimestamp,
+  onSnapshot,
+  runTransaction,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import type { Track, Playlist, UserProfile } from "./types";
+import type { Track, Playlist, UserProfile, RadioState, TrackInsight } from "./types";
 
 /* ── Tracks ─────────────────────────────────────────── */
 
@@ -115,10 +118,80 @@ export async function setUserProfile(
   uid: string,
   data: { displayName?: string; photoURL?: string }
 ): Promise<void> {
-  const { setDoc } = await import("firebase/firestore");
   await setDoc(
     doc(db, "userProfiles", uid),
     { ...data, updatedAt: serverTimestamp() },
     { merge: true }
   );
+}
+
+/* ── Radio State ──────────────────────────────────── */
+
+const radioStateRef = doc(db, "radioState", "current");
+
+export function onRadioStateChange(
+  callback: (state: RadioState | null) => void
+): () => void {
+  return onSnapshot(radioStateRef, (snap) => {
+    if (!snap.exists()) {
+      callback(null);
+      return;
+    }
+    callback(snap.data() as RadioState);
+  });
+}
+
+export async function initRadioState(trackIndex: number): Promise<void> {
+  const snap = await getDoc(radioStateRef);
+  if (snap.exists()) return;
+  await setDoc(radioStateRef, {
+    trackIndex,
+    startedAt: serverTimestamp(),
+    startedAtMillis: Date.now(),
+  });
+}
+
+export async function advanceRadioTrack(
+  expectedIndex: number,
+  newIndex: number
+): Promise<boolean> {
+  try {
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(radioStateRef);
+      if (!snap.exists() || snap.data().trackIndex !== expectedIndex) {
+        throw new Error("stale");
+      }
+      tx.set(radioStateRef, {
+        trackIndex: newIndex,
+        startedAt: serverTimestamp(),
+        startedAtMillis: Date.now(),
+      });
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/* ── Track Insights Cache ─────────────────────────── */
+
+const INSIGHT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+export async function getTrackInsight(trackId: string): Promise<string | null> {
+  const d = await getDoc(doc(db, "trackInsights", trackId));
+  if (!d.exists()) return null;
+  const data = d.data() as TrackInsight;
+  const age = Date.now() - data.generatedAt.toMillis();
+  if (age > INSIGHT_TTL_MS) return null;
+  return data.insight;
+}
+
+export async function setTrackInsight(
+  trackId: string,
+  insight: string
+): Promise<void> {
+  await setDoc(doc(db, "trackInsights", trackId), {
+    insight,
+    generatedAt: serverTimestamp(),
+  });
 }
