@@ -417,12 +417,16 @@ export default function Home() {
 
   const radioAdvance = useCallback(() => {
     const { trackIndex: rIdx, position: rPos } = computeRadioPosition(currentTracks);
-    pendingRadioSeek.current = rPos;
+    // Clamp seek to actual audio duration to avoid seeking past content
+    const clampedPos = actualDuration.current && rPos > actualDuration.current - 0.5
+      ? Math.max(0, actualDuration.current - 0.5)
+      : rPos;
+    pendingRadioSeek.current = clampedPos;
     setTrackIndex(rIdx);
     setCurrentTime(rPos);
     // If same track (audio element stays), seek immediately
     if (audioRef.current) {
-      audioRef.current.currentTime = rPos;
+      audioRef.current.currentTime = clampedPos;
     }
     // If track changes, onLoadedMetadata will apply pendingRadioSeek
   }, [currentTracks]);
@@ -878,6 +882,9 @@ export default function Home() {
           onPause={() => {
             // Don't mark as paused when audio ended naturally — advanceTrack handles it
             if (audioRef.current?.ended) return;
+            // In radio mode, keep isPlaying true so the radio interval keeps ticking
+            // and will naturally advance to the next track via the wall clock
+            if (!user || activePlaylistId === masterPlaylist?.id) return;
             setIsPlaying(false);
           }}
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
