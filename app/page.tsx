@@ -525,33 +525,46 @@ export default function Home() {
       setTrackIndex(rIdx);
       setCurrentTime(rPos);
 
-      // Seek the audio element
-      if (audioRef.current && isFinite(rPos)) {
-        audioRef.current.currentTime = rPos;
+      // Seek the audio element — only if already loaded (readyState >= 1)
+      const audio = audioRef.current;
+      if (audio && isFinite(rPos) && audio.readyState >= 1) {
+        audio.currentTime = rPos;
       }
     });
 
     return unsub;
   }, [isRadioMode, currentTracks, masterPlaylist?.id]);
 
-  // Lightweight drift correction (every 5s)
+  // Radio clock: drives progress bar from server state and corrects audio drift
   useEffect(() => {
     if (!isRadioMode || currentTracks.length === 0) return;
-    const interval = setInterval(() => {
-      if (!isPlaying || !radioStateRef.current || !audioRef.current) return;
+    const tick = () => {
       const state = radioStateRef.current;
-      const { position: expectedPos } = computeCurrentRadioPosition(
+      if (!state) return;
+      const { trackIndex: rIdx, position: rPos } = computeCurrentRadioPosition(
         currentTracks,
         state.startedAtMillis,
         state.trackIndex
       );
-      const drift = Math.abs(audioRef.current.currentTime - expectedPos);
-      if (drift > 2) {
-        audioRef.current.currentTime = expectedPos;
+      // Track has advanced past the stored index — update server state
+      if (rIdx !== state.trackIndex) {
+        advanceRadioTrack(state.trackIndex, rIdx).catch(() => {});
+        return;
       }
-    }, 5000);
+      // Update progress bar from computed position (independent of audio element)
+      setTrackIndex(rIdx);
+      setCurrentTime(rPos);
+      // Correct audio drift if playing and drifted >2s
+      const audio = audioRef.current;
+      if (audio && !audio.paused && audio.readyState >= 1) {
+        const drift = Math.abs(audio.currentTime - rPos);
+        if (drift > 2) audio.currentTime = rPos;
+      }
+    };
+    tick(); // run immediately
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [isRadioMode, isPlaying, currentTracks]);
+  }, [isRadioMode, currentTracks]);
 
   // Scroll to active track when playlist sidebar opens
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -774,9 +787,9 @@ export default function Home() {
     setMuted(nextMuted);
     if (!audio) return;
     audio.muted = nextMuted;
-    if (!nextMuted) {
-      try { await audio.play(); } catch { }
-    }
+    // Always call play() on unmute — Safari requires play() within user gesture
+    // even if audio is already "playing" muted via autoPlay.
+    try { await audio.play(); } catch { }
   }, [muted]);
 
   const handlePlayStopToggle = useCallback(async () => {
@@ -966,16 +979,21 @@ export default function Home() {
           playsInline
           onEnded={advanceTrack}
           onLoadedMetadata={() => {
-            // In radio mode, seek to the computed position for this track
-            if (isRadioMode && radioStateRef.current && audioRef.current) {
-              const { position: rPos } = computeCurrentRadioPosition(
+            const audio = audioRef.current;
+            // In radio mode, seek to the computed live position
+            if (isRadioMode && radioStateRef.current && audio) {
+              const { trackIndex: rIdx, position: rPos } = computeCurrentRadioPosition(
                 currentTracks,
                 radioStateRef.current.startedAtMillis,
                 radioStateRef.current.trackIndex
               );
-              if (isFinite(rPos)) audioRef.current.currentTime = rPos;
+              // If we've drifted past this track, advance server state
+              if (rIdx !== radioStateRef.current.trackIndex) {
+                advanceRadioTrack(radioStateRef.current.trackIndex, rIdx).catch(() => {});
+              } else if (isFinite(rPos)) {
+                audio.currentTime = rPos;
+              }
             }
-            const audio = audioRef.current;
             if (audio && isFinite(audio.duration)) {
               actualDuration.current = audio.duration;
               const track = currentTracks[trackIndex];
@@ -1000,7 +1018,7 @@ export default function Home() {
             if (isRadioMode) return;
             setIsPlaying(false);
           }}
-          onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+          onTimeUpdate={(e) => { if (!isRadioMode) setCurrentTime(e.currentTarget.currentTime); }}
           onError={() => {
             console.warn(`Audio failed to load: ${currentTrack?.title}`);
             advanceTrack();
