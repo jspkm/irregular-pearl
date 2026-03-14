@@ -487,25 +487,34 @@ export default function Home() {
   /* ── Position ───────────────────────────────────── */
 
   const computePositions = useCallback(() => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const viewport = window.visualViewport;
+    const w = Math.round(viewport?.width ?? window.innerWidth);
+    const h = Math.round(viewport?.height ?? window.innerHeight);
+    const offsetLeft = Math.round(viewport?.offsetLeft ?? 0);
+    const offsetTop = Math.round(viewport?.offsetTop ?? 0);
     const mobile = w <= 640;
     setIsMobile(mobile);
-    const isMobile = mobile;
-    const panelWidth = isMobile ? w - 16 : Math.min(1094, w - 24);
-    const panelHeight = isMobile ? 280 : Math.min(860, h - 24);
+    const isMobileViewport = mobile;
+    const panelWidth = isMobileViewport ? w - 16 : Math.min(1094, w - 24);
+    const panelTop = isMobileViewport
+      ? Math.max(8, offsetTop + 8)
+      : Math.max(12, (h - Math.min(860, h - 24)) / 2);
+    const panelBottomMargin = isMobileViewport ? 8 : 12;
+    const panelHeight = isMobileViewport
+      ? Math.max(240, h - (panelTop - offsetTop) - panelBottomMargin)
+      : Math.min(860, h - 24);
     setPanelSize({ width: panelWidth, height: panelHeight });
     setPosition({
-      x: isMobile ? 8 : Math.max(12, (w - panelWidth) / 2),
-      y: isMobile ? 32 : Math.max(12, (h - panelHeight) / 2),
+      x: isMobileViewport ? Math.max(8, offsetLeft + 8) : Math.max(12, (w - panelWidth) / 2),
+      y: panelTop,
     });
     setAuthPosition({
-      x: isMobile ? 12 : Math.max(12, w - 324 - 16),
-      y: isMobile ? 50 : 38,
+      x: isMobileViewport ? Math.max(12, offsetLeft + 12) : Math.max(12, w - 324 - 16),
+      y: isMobileViewport ? Math.max(12, offsetTop + 12) : 38,
     });
     setProfilePosition({
-      x: isMobile ? 12 : Math.max(12, w - 276),
-      y: isMobile ? 50 : 38,
+      x: isMobileViewport ? Math.max(12, offsetLeft + 12) : Math.max(12, w - 276),
+      y: isMobileViewport ? Math.max(12, offsetTop + 12) : 38,
     });
   }, []);
 
@@ -515,7 +524,13 @@ export default function Home() {
 
     const handleResize = () => computePositions();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.visualViewport?.addEventListener("resize", handleResize);
+    window.visualViewport?.addEventListener("scroll", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.visualViewport?.removeEventListener("resize", handleResize);
+      window.visualViewport?.removeEventListener("scroll", handleResize);
+    };
   }, [computePositions]);
 
   // Load profile photo from Firestore
@@ -1408,6 +1423,9 @@ export default function Home() {
                     {currentTrack?.performers.join(", ")}
                     {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
                   </p>
+                  <div className="floating-player__section-rule" aria-hidden="true">
+                    <span className="floating-player__section-rule-ornament" />
+                  </div>
                   <div className="floating-player__tab-row" role="tablist" aria-label="Player panels">
                     <button
                       type="button"

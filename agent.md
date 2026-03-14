@@ -174,3 +174,74 @@ npx tsx scripts/seed-tracks.ts
 - **`@/` path alias** — Maps to project root (`lib/`, `contexts/`, etc.).
 - **All panels are draggable** — Follow the pointer event pattern described above.
 - **Membership header width is fixed** — `.membership-header__text` has `width: 207px` to maintain consistent button size across logged-in/logged-out states.
+
+---
+
+## Git Workflow
+
+This repository may be worked on by multiple coding agents and humans. Keep changes scoped, reviewable, and easy to trace through Git history.
+
+### Branching
+
+- Do not work directly on `main` unless explicitly requested.
+- For isolated tasks, create a branch whose prefix matches the agent or tool name in use.
+- Preferred branch format:
+  - `<agent-name>/<task-slug>`
+- Examples:
+  - `codex/fix-mobile-player`
+  - `claude/add-divider-ornament`
+  - `aider/update-build-script`
+- Use lowercase kebab-case for task slugs.
+
+### Worktrees
+
+- When a separate workspace is helpful, create a git worktree from `origin/main` unless another base is requested.
+- Place the worktree adjacent to the current repository when practical.
+- Name the worktree directory after the task slug or branch name.
+
+### Staging
+
+- Stage only files relevant to the current task.
+- Do not include unrelated local modifications in a commit.
+- If unrelated changes are present, work around them and keep commits task-specific.
+
+### Commit Messages
+
+- Use conventional commit style.
+- Preferred format:
+  - `<type>: <summary>`
+- Common types:
+  - `feat` for new functionality
+  - `fix` for bug fixes
+  - `refactor` for internal code changes without intended behavior change
+  - `docs` for documentation-only changes
+  - `test` for test changes
+  - `chore` for maintenance or tooling changes
+  - `style` for visual or presentation-only changes
+- Keep the summary concise and specific.
+- Good examples:
+  - `fix: prevent mobile player from clipping behind browser chrome`
+  - `style: add decorative divider to track panel`
+
+### Pushes
+
+- When pushing a new branch, set upstream.
+- Preferred command:
+  - `git push -u origin <branch>`
+- Do not force-push unless explicitly requested.
+- Do not amend published commits unless explicitly requested.
+
+### Safety
+
+- Do not discard or overwrite user changes unless explicitly instructed.
+- Avoid destructive commands such as `git reset --hard`, `git checkout -- .`, or `git clean -fd` unless explicitly approved.
+
+### Verification and Handoff
+
+- Before committing, run relevant checks when feasible.
+- Prefer targeted verification first, then broader validation if needed.
+- If verification cannot be run, note that clearly in the final handoff.
+- Summarize what changed, what was verified, and any known limitations or follow-up work.
+- In PR descriptions, keep the test plan focused on meaningful behavior verification rather than routine setup or workflow steps.
+- Do not list routine actions such as `npm install`, `npm run build`, or starting a local server as checkbox test items by default.
+- Reserve PR test plan checkboxes for user-visible behavior, regression checks, integration validation, device/browser checks, or other change-specific verification.
