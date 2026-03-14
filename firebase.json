@@ -10,6 +10,10 @@
       {
         "source": "/api/musical-interest",
         "function": "musicalInsight"
+      },
+      {
+        "source": "/api/track-chat",
+        "function": "trackChat"
       }
     ]
   },

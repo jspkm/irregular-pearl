@@ -63,6 +63,64 @@ export const musicalInsight = onRequest(
   }
 );
 
+export const trackChat = onRequest(
+  { secrets: [geminiApiKey], cors: true },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method not allowed" });
+      return;
+    }
+
+    try {
+      const { question, track } = req.body;
+      const apiKey = geminiApiKey.value();
+
+      if (!apiKey) {
+        res.status(500).json({ error: "API key not configured" });
+        return;
+      }
+
+      if (!question?.trim() || !track?.title || !track?.composer) {
+        res.status(400).json({ error: "Question and track are required" });
+        return;
+      }
+
+      const prompt = `You are answering a listener's question about the currently playing classical recording.
+
+Current track:
+- Title: ${track.title}
+- Composer: ${track.composer}
+- Performers: ${(track.performers ?? []).join(", ")}
+- Conductor: ${track.conductor || "Unknown"}
+
+User question: ${question.trim()}
+
+Answer in 2-4 sentences. Stay grounded in this track and its musical or historical context. If the question asks something broader, connect it back to the current recording. Avoid bullet points and avoid mentioning that you are an AI.`;
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        }
+      );
+
+      const data = await response.json();
+      const answer =
+        data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+        "I couldn't draw out a useful note on this performance just now.";
+
+      res.json({ answer });
+    } catch (error) {
+      console.error("Track Chat Error:", error);
+      res.status(500).json({ error: "Unable to answer this question right now." });
+    }
+  }
+);
+
 /* ── Helpers ──────────────────────────────────────────── */
 
 const INSIGHT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
