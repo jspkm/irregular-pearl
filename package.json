@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "predeploy:dev": "npm run build",
     "deploy:dev": "firebase deploy -P development",
+    "predeploy:prod": "npm run build",
     "deploy:prod": "firebase deploy -P production",
     "test": "vitest run"
   },
