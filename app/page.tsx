@@ -69,6 +69,28 @@ function PlayerIcon() {
   );
 }
 
+function MusicNotesSimpleIcon() {
+  return (
+    <svg viewBox="0 0 256 256" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M212.92,17.69a8,8,0,0,0-6.86-1.45l-128,32A8,8,0,0,0,72,56V166.08A36,36,0,1,0,88,196V110.25l112-28v51.83A36,36,0,1,0,216,164V24A8,8,0,0,0,212.92,17.69ZM52,216a20,20,0,1,1,20-20A20,20,0,0,1,52,216ZM88,93.75V62.25l112-28v31.5ZM180,184a20,20,0,1,1,20-20A20,20,0,0,1,180,184Z"
+      />
+    </svg>
+  );
+}
+
+function PlaylistIcon() {
+  return (
+    <svg viewBox="0 0 256 256" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"
+      />
+    </svg>
+  );
+}
+
 /* ── Track Title Component ────────────────────────── */
 
 function TrackTitle({
@@ -229,7 +251,7 @@ export default function Home() {
   const panelRef = useRef<HTMLDivElement>(null);
   const authPanelRef = useRef<HTMLDivElement>(null);
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
-  const activeTrackRef = useRef<HTMLLIElement>(null);
+  const activeTrackRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const radioStateRef = useRef<RadioState | null>(null);
   const dragRef = useRef<{ id: number; offsetX: number; offsetY: number } | null>(null);
@@ -250,14 +272,15 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [forceReload, setForceReload] = useState(0);
   const actualDuration = useRef<number | null>(null);
-  const [playlistOpen, setPlaylistOpen] = useState(false);
   const [playedOrder, setPlayedOrder] = useState<number[]>([0]);
   const [isPlaylistCollapsed, setIsPlaylistCollapsed] = useState(false);
   const [insight, setInsight] = useState("");
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+  const [activePlayerTab, setActivePlayerTab] = useState<"track-chat" | "playlists">("track-chat");
   const [chatQuestion, setChatQuestion] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [dialogMessages, setDialogMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
+  const [playlistDialogMessages, setPlaylistDialogMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
 
   // Data state
   const [allTracks, setAllTracks] = useState<Track[]>([]);
@@ -268,7 +291,7 @@ export default function Home() {
   const [masterPlaylist, setMasterPlaylist] = useState<Playlist | null>(null);
   const [userPlaylists, setUserPlaylists] = useState<Playlist[]>([]);
   const [activePlaylistId, setActivePlaylistId] = useState<string | null>(null);
-  const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null>(null);
+  const [expandedPlaylistId, setExpandedPlaylistId] = useState<string | null | undefined>(undefined);
   const [trackDropdownOpenId, setTrackDropdownOpenId] = useState<string | null>(null);
   // Browse/add state
   const [searchQuery, setSearchQuery] = useState("");
@@ -613,10 +636,10 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [isRadioMode, currentTracks]);
 
-  // Scroll to active track when playlist sidebar opens
+  // Scroll to active track when the playlists tab is visible
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (playlistOpen) {
+    if (activePlayerTab === "playlists") {
       // Clear any pending scroll
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
       scrollTimerRef.current = setTimeout(() => {
@@ -632,9 +655,7 @@ export default function Home() {
         container.scrollTop = scrollTarget;
       }, 400);
     }
-    // Only re-trigger on sidebar open, not on trackIndex changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playlistOpen]);
+  }, [activePlayerTab, trackIndex]);
 
   /* ── Drag ───────────────────────────────────────── */
 
@@ -920,6 +941,132 @@ export default function Home() {
     }
   };
 
+  const handlePlaylistChatSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!chatQuestion.trim() || chatLoading) return;
+
+    const question = chatQuestion.trim();
+    const lowered = question.toLowerCase();
+    const quotedName = question.match(/"([^"]+)"/)?.[1]?.trim() ?? null;
+    const byName = (name: string) =>
+      userPlaylists.find((playlist) => playlist.name.toLowerCase() === name.trim().toLowerCase()) ?? null;
+
+    setChatLoading(true);
+    setChatQuestion("");
+    setPlaylistDialogMessages((current) => [...current, { role: "user", text: question }]);
+
+    try {
+      if (!user) {
+        throw new Error("Sign in to create and manage playlists.");
+      }
+
+      if (/^(create|save|make)\b/.test(lowered) && lowered.includes("playlist")) {
+        const createdName =
+          quotedName ??
+          question.match(/(?:called|named|as)\s+(.+)$/i)?.[1]?.trim() ??
+          newPlaylistName.trim();
+
+        if (!createdName) {
+          throw new Error("Tell me what to call the playlist, like \"save this queue as Late Night\".");
+        }
+
+        const trackIds = currentTracks.map((track) => track.id);
+        await createPlaylist(user.uid, createdName, trackIds);
+        const playlists = await getUserPlaylists(user.uid);
+        setUserPlaylists(playlists);
+        setShowNewPlaylist(false);
+        setNewPlaylistName("");
+        setPlaylistDialogMessages((current) => [
+          ...current,
+          { role: "assistant", text: `Saved the current queue as "${createdName}".` },
+        ]);
+        return;
+      }
+
+      if (/^(rename)\b/.test(lowered) && lowered.includes(" to ")) {
+        const renameMatch = question.match(/rename\s+(.+?)\s+to\s+(.+)$/i);
+        if (!renameMatch) {
+          throw new Error("Try a rename like \"rename Favorites to Morning Music\".");
+        }
+        const currentName = renameMatch[1].replace(/^playlist\s+/i, "").trim().replace(/^"|"$/g, "");
+        const nextName = renameMatch[2].trim().replace(/^"|"$/g, "");
+        const playlist = byName(currentName);
+        if (!playlist) {
+          throw new Error(`I couldn't find a playlist named "${currentName}".`);
+        }
+        await renamePlaylist(playlist.id, nextName);
+        const playlists = await getUserPlaylists(user.uid);
+        setUserPlaylists(playlists);
+        setRenamingId(null);
+        setRenameValue("");
+        setPlaylistDialogMessages((current) => [
+          ...current,
+          { role: "assistant", text: `Renamed "${currentName}" to "${nextName}".` },
+        ]);
+        return;
+      }
+
+      if (/^(delete|remove)\b/.test(lowered) && lowered.includes("playlist")) {
+        const deleteName =
+          quotedName ??
+          question.match(/(?:delete|remove)\s+playlist\s+(.+)$/i)?.[1]?.trim()?.replace(/^"|"$/g, "");
+        if (!deleteName) {
+          throw new Error("Tell me which playlist to remove.");
+        }
+        const playlist = byName(deleteName);
+        if (!playlist) {
+          throw new Error(`I couldn't find a playlist named "${deleteName}".`);
+        }
+        await handleDeletePlaylist(playlist.id);
+        setPlaylistDialogMessages((current) => [
+          ...current,
+          { role: "assistant", text: `Deleted "${deleteName}".` },
+        ]);
+        return;
+      }
+
+      if (/^(open|play|switch)\b/.test(lowered) && lowered.includes("playlist")) {
+        const targetName =
+          quotedName ??
+          question.match(/(?:open|play|switch(?:\s+to)?)\s+playlist\s+(.+)$/i)?.[1]?.trim()?.replace(/^"|"$/g, "");
+        if (!targetName) {
+          throw new Error("Tell me which playlist to open.");
+        }
+        const playlist = byName(targetName);
+        if (!playlist) {
+          throw new Error(`I couldn't find a playlist named "${targetName}".`);
+        }
+        switchPlaylist(playlist);
+        setPlaylistDialogMessages((current) => [
+          ...current,
+          { role: "assistant", text: `Opened "${playlist.name}".` },
+        ]);
+        return;
+      }
+
+      const availablePlaylists = userPlaylists.length
+        ? userPlaylists.map((playlist) => playlist.name).join(", ")
+        : "none yet";
+      setPlaylistDialogMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: `I can save the current queue, rename a playlist, delete one, or open one. Right now you have ${availablePlaylists}.`,
+        },
+      ]);
+    } catch (err) {
+      setPlaylistDialogMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: err instanceof Error ? err.message : "I couldn't manage that playlist just now.",
+        },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  }, [chatLoading, chatQuestion, currentTracks, handleDeletePlaylist, newPlaylistName, switchPlaylist, user, userPlaylists]);
+
   const handleAddTrackToPlaylist = async (playlistId: string, trackId: string) => {
     const playlist = userPlaylists.find((p) => p.id === playlistId);
     if (!playlist) return;
@@ -1010,7 +1157,14 @@ export default function Home() {
         }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: { answer?: string; error?: string } = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        throw new Error("The track chat service returned an unexpected response.");
+      }
+
       if (!response.ok) {
         throw new Error(data.error || "Unable to answer this question right now.");
       }
@@ -1041,6 +1195,23 @@ export default function Home() {
     chatAbortRef.current = null;
     setChatLoading(false);
   }, []);
+
+  const handleChatSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    if (activePlayerTab === "playlists") {
+      void handlePlaylistChatSubmit(e);
+      return;
+    }
+    void handleTrackChatSubmit(e);
+  }, [activePlayerTab, handlePlaylistChatSubmit, handleTrackChatSubmit]);
+
+  const chatPlaceholder =
+    activePlayerTab === "playlists"
+      ? "Manage your playlist..."
+      : "Ask anything about this track...";
+  const chatAriaLabel =
+    activePlayerTab === "playlists"
+      ? "Manage your playlist"
+      : "Ask Gemini about this track";
   const activePlaylist =
     activePlaylistId === masterPlaylist?.id
       ? masterPlaylist
@@ -1237,12 +1408,211 @@ export default function Home() {
                     {currentTrack?.performers.join(", ")}
                     {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
                   </p>
-                  {/* Dynamic Insight */}
-                  <div className="floating-player__insight-container">
-                    <TrackDialogContent insight={insight} messages={dialogMessages} isLoading={chatLoading} />
+                  <div className="floating-player__tab-row" role="tablist" aria-label="Player panels">
+                    <button
+                      type="button"
+                      className={`floating-player__tab ${activePlayerTab === "track-chat" ? "is-active" : ""}`}
+                      role="tab"
+                      aria-selected={activePlayerTab === "track-chat"}
+                      aria-label="Track chat"
+                      title="Track chat"
+                      onClick={() => setActivePlayerTab("track-chat")}
+                    >
+                      <MusicNotesSimpleIcon />
+                    </button>
+                    <span className="floating-player__tab-divider" aria-hidden="true" />
+                    <button
+                      type="button"
+                      className={`floating-player__tab ${activePlayerTab === "playlists" ? "is-active" : ""}`}
+                      role="tab"
+                      aria-selected={activePlayerTab === "playlists"}
+                      aria-label="Playlists"
+                      title="Playlists"
+                      onClick={() => setActivePlayerTab("playlists")}
+                    >
+                      <PlaylistIcon />
+                    </button>
                   </div>
 
-                  <form className="floating-player__chat-form" onSubmit={handleTrackChatSubmit}>
+                  <div className="floating-player__insight-container">
+                    <div
+                      className={`floating-player__panel ${activePlayerTab === "track-chat" ? "is-active" : "is-hidden"}`}
+                      aria-hidden={activePlayerTab !== "track-chat"}
+                    >
+                      <TrackDialogContent insight={insight} messages={dialogMessages} isLoading={chatLoading} />
+                    </div>
+                    <div
+                      className={`floating-player__panel ${activePlayerTab === "playlists" ? "is-active" : "is-hidden"}`}
+                      aria-hidden={activePlayerTab !== "playlists"}
+                    >
+                      <div className="playlist-tab">
+                        <div className="playlist-tab__manager">
+                          <div ref={sidebarScrollRef} className="playlist-tab__list">
+                            <ul className="floating-player__sidebar-list">
+                              {[masterPlaylist, ...userPlaylists.slice().sort((a, b) => {
+                                const timeA = a.updatedAt ? (typeof a.updatedAt === "number" ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
+                                const timeB = b.updatedAt ? (typeof b.updatedAt === "number" ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
+                                return timeB - timeA;
+                              })].filter(Boolean).map((pl) => {
+                                const isActive = activePlaylistId === pl!.id;
+                                const isExpanded = expandedPlaylistId === undefined ? isActive : expandedPlaylistId === pl!.id;
+
+                                return (
+                                  <li key={pl!.id} style={{ marginBottom: "8px", padding: 0, background: "transparent" }}>
+                                    <button
+                                      type="button"
+                                      className={`playlist-tab__playlist-toggle ${isActive ? "is-active" : ""}`}
+                                      onClick={() => {
+                                        setExpandedPlaylistId(isExpanded ? null : pl!.id);
+                                      }}
+                                      aria-expanded={isExpanded}
+                                    >
+                                      <svg className={`playlist-tab__caret ${isExpanded ? "is-expanded" : ""}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M6 9l6 6 6-6" />
+                                      </svg>
+                                      <div className="playlist-tab__playlist-name">
+                                        {pl!.name === "Master Playlist" ? "Classical Masterworks" : pl!.name}
+                                      </div>
+                                    </button>
+
+                                    {isExpanded && (
+                                      <div className="playlist-tab__tracks-grid">
+                                        {(() => {
+                                          const plTracks = pl!.trackIds
+                                            .map((id) => allTracks.find((t) => t.id === id))
+                                            .filter(Boolean) as Track[];
+
+                                          if (plTracks.length === 0) {
+                                            return <div className="floating-player__sidebar-empty" style={{ fontSize: "11px", padding: "4px 0", marginLeft: "22px" }}>No tracks</div>;
+                                          }
+
+                                          return plTracks.map((track, index) => {
+                                            const isPlaying = isActive && index === trackIndex;
+                                            const isOwnedPlaylist = pl!.id !== masterPlaylist?.id;
+                                            return (
+                                              <div
+                                                key={`${track.id}-${index}`}
+                                                ref={isPlaying ? activeTrackRef : null}
+                                                className={`playlist-tab__track-card ${isPlaying ? "is-playing" : ""}`}
+                                              >
+                                                {user && (
+                                                  <div style={{ position: "relative", display: "flex", alignItems: "flex-start", flexShrink: 0 }}>
+                                                    <button
+                                                      type="button"
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setTrackDropdownOpenId(trackDropdownOpenId === track.id ? null : track.id);
+                                                      }}
+                                                      style={{ background: "none", border: "none", color: "#855081", width: "14px", height: "14px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "16px", fontWeight: "bold", padding: "0" }}
+                                                      title="Add to playlist"
+                                                    >
+                                                      +
+                                                    </button>
+
+                                                    {trackDropdownOpenId === track.id && (
+                                                      <div style={{ position: "absolute", left: "0", top: "100%", marginTop: "4px", background: "#fff4fc", border: "1px solid #d79bc1", borderRadius: "4px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", zIndex: 10, width: "160px", maxHeight: "200px", overflowY: "auto", padding: "4px 0" }}>
+                                                        {userPlaylists
+                                                          .slice()
+                                                          .sort((a, b) => {
+                                                            const timeA = a.updatedAt ? (typeof a.updatedAt === "number" ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
+                                                            const timeB = b.updatedAt ? (typeof b.updatedAt === "number" ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
+                                                            return timeB - timeA;
+                                                          })
+                                                          .map((upl) => {
+                                                            const hasTrack = upl.trackIds.includes(track.id);
+                                                            return (
+                                                              <button
+                                                                key={upl.id}
+                                                                type="button"
+                                                                onClick={async (e) => {
+                                                                  e.stopPropagation();
+                                                                  if (hasTrack) await handleRemoveTrackFromPlaylist(upl.id, track.id);
+                                                                  else await handleAddTrackToPlaylist(upl.id, track.id);
+                                                                  setTrackDropdownOpenId(null);
+                                                                }}
+                                                                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", padding: "6px 12px", border: "none", background: "transparent", color: "#855081", fontSize: "11px", textAlign: "left", cursor: "pointer" }}
+                                                              >
+                                                                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{upl.name}</span>
+                                                                {hasTrack && <span style={{ color: "#be70a6", marginLeft: "4px" }}>✓</span>}
+                                                              </button>
+                                                            );
+                                                          })}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                )}
+                                                <div
+                                                  style={{ flex: 1, minWidth: 0, cursor: isOwnedPlaylist ? "pointer" : "default" }}
+                                                  onClick={() => {
+                                                    if (!isOwnedPlaylist) return;
+                                                    switchPlaylist(pl!);
+                                                    setTrackIndex(index);
+                                                    setPlayedOrder([index]);
+                                                    if (muted) setMuted(false);
+                                                    setIsPlaying(true);
+                                                  }}
+                                                >
+                                                  <div className={`playlist-tab__track-title ${isPlaying ? "is-playing" : ""}`}>{track.title}</div>
+                                                  <div className={`playlist-tab__track-composer ${isPlaying ? "is-playing" : ""}`}>{track.composer}</div>
+                                                </div>
+                                              </div>
+                                            );
+                                          });
+                                        })()}
+                                      </div>
+                                    )}
+
+                                    {user && pl!.id !== masterPlaylist?.id && (
+                                      <div className="playlist-tab__item-actions">
+                                        {renamingId === pl!.id ? (
+                                          <div className="playlist-manager__rename-row">
+                                            <input
+                                              className="playlist-manager__input"
+                                              value={renameValue}
+                                              onChange={(e) => setRenameValue(e.target.value)}
+                                              onKeyDown={(e) => e.key === "Enter" && void handleRenamePlaylist()}
+                                              autoFocus
+                                            />
+                                            <button type="button" onClick={() => void handleRenamePlaylist()}>✓</button>
+                                            <button type="button" onClick={() => { setRenamingId(null); setRenameValue(""); }}>✕</button>
+                                          </div>
+                                        ) : (
+                                          <div className="playlist-manager__item-actions">
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setRenamingId(pl!.id);
+                                                setRenameValue(pl!.name);
+                                              }}
+                                              aria-label={`Rename ${pl!.name}`}
+                                            >
+                                              ✎
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => void handleDeletePlaylist(pl!.id)}
+                                              aria-label={`Delete ${pl!.name}`}
+                                            >
+                                              ✕
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                            {!user && (
+                              <p className="floating-player__sidebar-empty">Sign in to save, rename, and manage playlists.</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <form className="floating-player__chat-form" onSubmit={handleChatSubmit}>
                     <div className="floating-player__chat-input-row">
                       <div className="floating-player__chat-input-shell">
                         <textarea
@@ -1255,15 +1625,15 @@ export default function Home() {
                               e.currentTarget.form?.requestSubmit();
                             }
                           }}
-                          placeholder="Ask anything about this track..."
-                          aria-label="Ask Gemini about this track"
-                          disabled={!currentTrack || chatLoading}
+                          placeholder={chatPlaceholder}
+                          aria-label={chatAriaLabel}
+                          disabled={(activePlayerTab === "track-chat" && !currentTrack) || chatLoading}
                           rows={2}
                         />
                         <button
                           type={chatLoading ? "button" : "submit"}
                           className="floating-player__chat-submit"
-                          disabled={!chatLoading && (!chatQuestion.trim() || !currentTrack)}
+                          disabled={!chatLoading && (!chatQuestion.trim() || (activePlayerTab === "track-chat" && !currentTrack))}
                           aria-label={chatLoading ? "Stop response" : "Send question"}
                           onClick={chatLoading ? handleTrackChatStop : undefined}
                         >
@@ -1359,223 +1729,10 @@ export default function Home() {
                     </>
                   )}
 
-                  {/* Playlist Manager Toggle */}
-                  <button
-                    type="button"
-                    className="floating-player__btn-slide"
-                    onClick={() => {
-                      const opening = !playlistOpen;
-                      setPlaylistOpen(opening);
-                      // Reset expandedPlaylistId so active playlist auto-expands via fallback
-                      if (opening) {
-                        setExpandedPlaylistId(null);
-                      }
-                    }}
-                    aria-label={playlistOpen ? "Hide playlists" : "Show playlists"}
-                    title="Playlists"
-                  >
-                    <svg viewBox="0 0 256 256" aria-hidden="true">
-                      <path className="icon-stroke" d="M48 72H176M48 112H176M48 152H136" />
-                      <path className="icon-stroke" d="M200 152V216M168 184H232" />
-                    </svg>
-                  </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <aside
-            className={`floating-player__sidebar ${playlistOpen ? "is-open" : ""}`}
-            style={
-              isMobile
-                ? {}
-                : (() => {
-                    const w = window.innerWidth;
-                    const sidebarWidth = w <= 960 ? Math.min(300, w - 24) : 340;
-                    const sidebarLeft = position.x + (panelRef.current?.offsetWidth ?? 1094) + 8;
-                    const maxLeft = w - sidebarWidth - 8;
-                    return {
-                      left: Math.min(sidebarLeft, Math.max(8, maxLeft)),
-                      top: 60,
-                      bottom: 60,
-                    };
-                  })()
-            }
-          >
-            <div className="floating-player__sidebar-inner" style={{ padding: '0', display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div className="floating-player__sidebar-titlebar">
-                <span>PLAYLISTS</span>
-                <div className="floating-player__titlebar-actions">
-                  <button
-                    type="button"
-                    className="floating-player__sidebar-close"
-                    onClick={() => { setPlaylistOpen(false); setExpandedPlaylistId(null); }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              <div 
-                ref={sidebarScrollRef}
-                style={{ flex: 1, overflowY: 'auto', padding: '12px', minHeight: 0 }}
-              >
-                <ul className="floating-player__sidebar-list">
-                  {[masterPlaylist, ...userPlaylists.slice().sort((a,b) => {
-                    const timeA = a.updatedAt ? (typeof a.updatedAt === 'number' ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
-                    const timeB = b.updatedAt ? (typeof b.updatedAt === 'number' ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
-                    return timeB - timeA;
-                  })].filter(Boolean).map((pl) => {
-                    const isActive = activePlaylistId === pl!.id;
-                    const isExpanded = expandedPlaylistId !== null ? expandedPlaylistId === pl!.id : isActive;
-                    
-                    return (
-                      <li key={pl!.id} style={{ marginBottom: '8px', padding: 0, background: 'transparent' }}>
-                        <div 
-                          onClick={() => {
-                            setExpandedPlaylistId(isExpanded ? null : pl!.id);
-                          }}
-                          style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '8px', 
-                            cursor: 'pointer',
-                            padding: '4px 0',
-                            fontWeight: isActive ? 'bold' : 'normal',
-                            color: isActive ? '#855081' : '#be70a6'
-                          }}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s', color: '#855081' }}>
-                            <path d="M6 9l6 6 6-6" />
-                          </svg>
-                          <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            {pl!.name === "Master Playlist" ? "Classical Masterworks" : pl!.name}
-                          </span>
-                        </div>
-
-                        {isExpanded && (
-                          <ul className="floating-player__sidebar-list" style={{ marginTop: '0', marginLeft: '0' }}>
-                            {(() => {
-                              const plTracks = pl!.trackIds
-                                .map(id => allTracks.find(t => t.id === id))
-                                .filter(Boolean) as Track[];
-                                
-                              if (plTracks.length === 0) {
-                                return <li className="floating-player__sidebar-empty" style={{ fontSize: '11px', padding: '4px 0', marginLeft: '22px' }}>No tracks</li>;
-                              }
-                              
-                              return plTracks.map((track, index) => {
-                                const isPlaying = isActive && index === trackIndex;
-                                return (
-                                  <li 
-                                    key={`${track.id}-${index}`} 
-                                    ref={isPlaying ? activeTrackRef : null}
-                                    className={isPlaying ? "currently-playing" : ""}
-                                    style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', padding: '4px 0' }}
-                                  >
-                                    {user && (
-                                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setTrackDropdownOpenId(trackDropdownOpenId === track.id ? null : track.id);
-                                          }}
-                                          style={{ background: 'none', border: 'none', color: '#855081', width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold', padding: '0' }}
-                                          title="Add to playlist"
-                                        >
-                                          +
-                                        </button>
-                                        
-                                        {trackDropdownOpenId === track.id && (
-                                          <div style={{ position: 'absolute', left: '0', top: '100%', marginTop: '4px', background: '#fff4fc', border: '1px solid #d79bc1', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 10, width: '160px', maxHeight: '200px', overflowY: 'auto', padding: '4px 0' }}>
-                                            <div style={{ padding: '4px 8px', fontSize: '10px', color: '#916088', borderBottom: '1px solid #f2cde6', marginBottom: '4px' }}>Add to playlist:</div>
-                                            {userPlaylists
-                                              .slice()
-                                              .sort((a, b) => {
-                                                const timeA = a.updatedAt ? (typeof a.updatedAt === 'number' ? a.updatedAt : new Date(a.updatedAt as any).getTime()) : 0;
-                                                const timeB = b.updatedAt ? (typeof b.updatedAt === 'number' ? b.updatedAt : new Date(b.updatedAt as any).getTime()) : 0;
-                                                return timeB - timeA;
-                                              })
-                                              .map(upl => {
-                                                const hasTrack = upl.trackIds.includes(track.id);
-                                                return (
-                                                  <button
-                                                    key={upl.id}
-                                                    type="button"
-                                                    onClick={async (e) => {
-                                                      e.stopPropagation();
-                                                      if (hasTrack) await handleRemoveTrackFromPlaylist(upl.id, track.id);
-                                                      else await handleAddTrackToPlaylist(upl.id, track.id);
-                                                      setTrackDropdownOpenId(null);
-                                                    }}
-                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '6px 12px', border: 'none', background: 'transparent', color: '#855081', fontSize: '11px', textAlign: 'left', cursor: 'pointer' }}
-                                                  >
-                                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{upl.name}</span>
-                                                    {hasTrack && <span style={{ color: '#be70a6', marginLeft: '4px' }}>✓</span>}
-                                                  </button>
-                                                );
-                                              })}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                    <div 
-                                      style={{ flex: 1, minWidth: 0, cursor: pl!.id === masterPlaylist?.id ? 'default' : 'pointer' }}
-                                      onClick={() => {
-                                        if (pl!.id === masterPlaylist?.id) return;
-                                        switchPlaylist(pl!);
-                                        setTrackIndex(index);
-                                        setPlayedOrder([index]);
-                                        if (muted) setMuted(false);
-                                        setIsPlaying(true);
-                                      }}
-                                    >
-                                      <div className="track-title" style={{ fontSize: '12px', color: isPlaying ? '#855081' : '#be70a6', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: isPlaying ? 'bold' : 'normal' }}>{track.title}</div>
-                                      <div className="track-composer" style={{ fontSize: '10px', color: isPlaying ? '#916088' : '#d79bc1', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.composer}</div>
-                                    </div>
-                                  </li>
-                                );
-                              });
-                            })()}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
-              {user && (
-                <div style={{ padding: '12px', borderTop: '1px solid #f2cde6', background: '#ffeefa' }}>
-                  {showNewPlaylist ? (
-                    <div className="playlist-manager__new-row">
-                      <input
-                        className="playlist-manager__input"
-                        placeholder="Save current queue as..."
-                        value={newPlaylistName}
-                        onChange={(e) => setNewPlaylistName(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleCreatePlaylist()}
-                        autoFocus
-                        style={{ padding: '6px', fontSize: '12px', border: '1px solid #d79bc1', borderRadius: '4px', flex: 1 }}
-                      />
-                      <button type="button" onClick={handleCreatePlaylist} style={{ padding: '6px 10px', border: '1px solid #be70a6', background: '#eab8d9', color: '#fff', borderRadius: '4px', cursor: 'pointer', marginLeft: '4px' }}>✓</button>
-                      <button type="button" onClick={() => { setShowNewPlaylist(false); setNewPlaylistName(""); }} style={{ padding: '6px 10px', border: '1px solid #eab8d9', background: '#fff', color: '#be70a6', borderRadius: '4px', cursor: 'pointer', marginLeft: '4px' }}>✕</button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      className="playlist-manager__add-btn"
-                      onClick={() => setShowNewPlaylist(true)}
-                      style={{ padding: '8px', width: '100%', border: '1px dashed #d79bc1', background: 'transparent', color: '#855081', fontSize: '12px', cursor: 'pointer', textAlign: 'center', fontWeight: 'bold', borderRadius: '4px' }}
-                    >
-                      + Save Queue as Playlist
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          </aside>
           {/* Independent Auth Panel */}
           {!user && authPanelOpen && (
             <aside 
