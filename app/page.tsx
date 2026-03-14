@@ -180,8 +180,44 @@ function TypewriterText({ text, speed = 40 }: { text: string; speed?: number }) 
       style={{ position: 'relative' }}
     >
       {displayed}
-      <span className="typewriter-cursor">_</span>
     </p>
+  );
+}
+
+function TrackDialogContent({
+  insight,
+  messages,
+  isLoading,
+}: {
+  insight: string;
+  messages: Array<{ role: "user" | "assistant"; text: string }>;
+  isLoading: boolean;
+}) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current?.parentElement) {
+      contentRef.current.parentElement.scrollTop = contentRef.current.parentElement.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
+  return (
+    <div ref={contentRef} className="floating-player__dialog-thread">
+      <TypewriterText text={insight} speed={4} />
+      {messages.map((message, index) => (
+        <div
+          key={`${message.role}-${index}-${message.text.slice(0, 24)}`}
+          className={`floating-player__dialog-bubble floating-player__dialog-bubble--${message.role}`}
+        >
+          <p className="floating-player__dialog-text">{message.text}</p>
+        </div>
+      ))}
+      {isLoading && (
+        <div className="floating-player__dialog-bubble floating-player__dialog-bubble--assistant">
+          <p className="floating-player__dialog-text">Thinking...</p>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -202,6 +238,7 @@ export default function Home() {
   // Layout state
   const [ready, setReady] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [panelSize, setPanelSize] = useState({ width: 0, height: 0 });
   const [authPosition, setAuthPosition] = useState({ x: 0, y: 0 });
   const [minimized, setMinimized] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -218,6 +255,9 @@ export default function Home() {
   const [isPlaylistCollapsed, setIsPlaylistCollapsed] = useState(false);
   const [insight, setInsight] = useState("");
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+  const [chatQuestion, setChatQuestion] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [dialogMessages, setDialogMessages] = useState<Array<{ role: "user" | "assistant"; text: string }>>([]);
 
   // Data state
   const [allTracks, setAllTracks] = useState<Track[]>([]);
@@ -255,6 +295,7 @@ export default function Home() {
   const profilePanelRef = useRef<HTMLElement>(null);
   const [profilePosition, setProfilePosition] = useState({ x: 0, y: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatAbortRef = useRef<AbortController | null>(null);
 
   /* ── Data Loading ───────────────────────────────── */
 
@@ -412,6 +453,14 @@ export default function Home() {
     return () => { isMounted = false; };
   }, [currentTrackId]);
 
+  useEffect(() => {
+    setChatQuestion("");
+    setDialogMessages([]);
+    setChatLoading(false);
+    chatAbortRef.current?.abort();
+    chatAbortRef.current = null;
+  }, [currentTrackId]);
+
   /* ── Position ───────────────────────────────────── */
 
   const computePositions = useCallback(() => {
@@ -422,6 +471,7 @@ export default function Home() {
     const isMobile = mobile;
     const panelWidth = isMobile ? w - 16 : Math.min(1094, w - 24);
     const panelHeight = isMobile ? 280 : Math.min(860, h - 24);
+    setPanelSize({ width: panelWidth, height: panelHeight });
     setPosition({
       x: isMobile ? 8 : Math.max(12, (w - panelWidth) / 2),
       y: isMobile ? 32 : Math.max(12, (h - panelHeight) / 2),
@@ -929,6 +979,68 @@ export default function Home() {
       console.error("Failed to copy track info:", err);
     }
   }, [fullInfoToCopy]);
+
+  const handleTrackChatSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!currentTrack || !chatQuestion.trim() || chatLoading) return;
+
+    const question = chatQuestion.trim();
+    const controller = new AbortController();
+    chatAbortRef.current?.abort();
+    chatAbortRef.current = controller;
+    setChatLoading(true);
+    setChatQuestion("");
+    setDialogMessages((current) => [...current, { role: "user", text: question }]);
+
+    try {
+      const response = await fetch("/api/track-chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          question,
+          track: {
+            title: currentTrack.title,
+            composer: currentTrack.composer,
+            performers: currentTrack.performers,
+            conductor: currentTrack.conductor,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to answer this question right now.");
+      }
+
+      setDialogMessages((current) => [...current, { role: "assistant", text: data.answer || "" }]);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return;
+      }
+      console.error("Track chat failed:", err);
+      setDialogMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: err instanceof Error ? err.message : "Unable to answer this question right now.",
+        },
+      ]);
+    } finally {
+      if (chatAbortRef.current === controller) {
+        chatAbortRef.current = null;
+      }
+      setChatLoading(false);
+    }
+  }, [chatLoading, chatQuestion, currentTrack]);
+
+  const handleTrackChatStop = useCallback(() => {
+    chatAbortRef.current?.abort();
+    chatAbortRef.current = null;
+    setChatLoading(false);
+  }, []);
   const activePlaylist =
     activePlaylistId === masterPlaylist?.id
       ? masterPlaylist
@@ -1083,7 +1195,7 @@ export default function Home() {
           <div
             ref={panelRef}
             className="floating-player"
-            style={{ left: position.x, top: position.y }}
+            style={{ left: position.x, top: position.y, width: panelSize.width, height: panelSize.height }}
           >
             {/* Title Bar */}
             <div
@@ -1125,14 +1237,58 @@ export default function Home() {
                     {currentTrack?.performers.join(", ")}
                     {currentTrack?.conductor && ` · cond. ${currentTrack.conductor}`}
                   </p>
-                  
                   {/* Dynamic Insight */}
                   <div className="floating-player__insight-container">
-                    <TypewriterText 
-                      text={insight} 
-                      speed={180} 
-                    />
+                    <TrackDialogContent insight={insight} messages={dialogMessages} isLoading={chatLoading} />
                   </div>
+
+                  <form className="floating-player__chat-form" onSubmit={handleTrackChatSubmit}>
+                    <div className="floating-player__chat-input-row">
+                      <div className="floating-player__chat-input-shell">
+                        <textarea
+                          className="floating-player__chat-input"
+                          value={chatQuestion}
+                          onChange={(e) => setChatQuestion(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              e.currentTarget.form?.requestSubmit();
+                            }
+                          }}
+                          placeholder="Ask anything about this track..."
+                          aria-label="Ask Gemini about this track"
+                          disabled={!currentTrack || chatLoading}
+                          rows={2}
+                        />
+                        <button
+                          type={chatLoading ? "button" : "submit"}
+                          className="floating-player__chat-submit"
+                          disabled={!chatLoading && (!chatQuestion.trim() || !currentTrack)}
+                          aria-label={chatLoading ? "Stop response" : "Send question"}
+                          onClick={chatLoading ? handleTrackChatStop : undefined}
+                        >
+                          {chatLoading ? (
+                            <svg viewBox="0 0 256 256" aria-hidden="true">
+                              <circle cx="128" cy="128" r="96" fill="#121212" />
+                              <rect x="88" y="88" width="80" height="80" rx="10" fill="#ffffff" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 256 256" aria-hidden="true">
+                              <circle cx="128" cy="128" r="96" fill="#121212" />
+                              <path
+                                d="M128 176V80M88 120L128 80L168 120"
+                                fill="none"
+                                stroke="#ffffff"
+                                strokeWidth="16"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
 
                 {/* Album Cover */}
@@ -1168,36 +1324,36 @@ export default function Home() {
                 {/* Controls */}
                 <div className="floating-player__actions">
                   <button type="button" className="floating-player__btn-mute" onClick={handleMuteToggle} aria-label={muted ? "Unmute" : "Mute"}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path className="icon-stroke" d="M5 9H9L13 5V19L9 15H5Z" />
+                    <svg viewBox="0 0 256 256" aria-hidden="true">
+                      <path className="icon-stroke" d="M80 96H120L168 56V200L120 160H80Z" />
                       {muted ? (
-                        <path className="icon-stroke" d="M16 9L22 15M22 9L16 15" />
+                        <path className="icon-stroke" d="M192 96L232 136M232 96L192 136" />
                       ) : (
-                        <path className="icon-stroke" d="M16 9C17.5 10.4 17.5 13.6 16 15M18.5 7C21.8 10 21.8 14 18.5 17" />
+                        <path className="icon-stroke" d="M192 104C204 116 204 140 192 152M216 80C240 104 240 152 216 176" />
                       )}
                     </svg>
                   </button>
                   {user && activePlaylistId && masterPlaylist && activePlaylistId !== masterPlaylist.id && (
                     <>
                       <button type="button" onClick={handlePlayStopToggle} aria-label={isPlaying ? "Stop" : "Play"}>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <svg viewBox="0 0 256 256" aria-hidden="true">
                           {isPlaying ? (
-                            <rect className="icon-fill" x="7" y="7" width="10" height="10" />
+                            <path className="icon-fill" d="M96 72H120V184H96ZM136 72H160V184H136Z" />
                           ) : (
-                            <path className="icon-fill" d="M8 6L18 12L8 18Z" />
+                            <path className="icon-fill" d="M96 72L184 128L96 184Z" />
                           )}
                         </svg>
                       </button>
                       <button type="button" onClick={playPreviousTrack} aria-label="Previous track">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path className="icon-stroke" d="M7 6V18" />
-                          <path className="icon-fill" d="M19 6L10 12L19 18Z" />
+                        <svg viewBox="0 0 256 256" aria-hidden="true">
+                          <path className="icon-stroke" d="M80 64V192" />
+                          <path className="icon-fill" d="M192 72L104 128L192 184Z" />
                         </svg>
                       </button>
                       <button type="button" onClick={playNextTrack} aria-label="Next track">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path className="icon-stroke" d="M17 6V18" />
-                          <path className="icon-fill" d="M5 6L14 12L5 18Z" />
+                        <svg viewBox="0 0 256 256" aria-hidden="true">
+                          <path className="icon-stroke" d="M176 64V192" />
+                          <path className="icon-fill" d="M64 72L152 128L64 184Z" />
                         </svg>
                       </button>
                     </>
@@ -1218,9 +1374,9 @@ export default function Home() {
                     aria-label={playlistOpen ? "Hide playlists" : "Show playlists"}
                     title="Playlists"
                   >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path className="icon-stroke" d="M4 6h16M4 10h16M4 14h10M4 18h7" />
-                      <path className="icon-stroke" d="M19 14v6M16 17h6" />
+                    <svg viewBox="0 0 256 256" aria-hidden="true">
+                      <path className="icon-stroke" d="M48 72H176M48 112H176M48 152H136" />
+                      <path className="icon-stroke" d="M200 152V216M168 184H232" />
                     </svg>
                   </button>
                 </div>
