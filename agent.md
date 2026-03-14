@@ -242,3 +242,6 @@ This repository may be worked on by multiple coding agents and humans. Keep chan
 - Prefer targeted verification first, then broader validation if needed.
 - If verification cannot be run, note that clearly in the final handoff.
 - Summarize what changed, what was verified, and any known limitations or follow-up work.
+- In PR descriptions, keep the test plan focused on meaningful behavior verification rather than routine setup or workflow steps.
+- Do not list routine actions such as `npm install`, `npm run build`, or starting a local server as checkbox test items by default.
+- Reserve PR test plan checkboxes for user-visible behavior, regression checks, integration validation, device/browser checks, or other change-specific verification.
