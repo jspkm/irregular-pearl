@@ -1,7 +1,9 @@
 # Irregular Pearl
 
 Irregular Pearl is a collaborative platform for classical music knowledge—built by musicians, for musicians. 
+
 By bringing together works, composers, ideas, and traditions into a unified digital space, the platform enables artists and enthusiasts to study more deeply, discover connections, collaborate across borders, and contribute their insights to a growing body of shared knowledge. In doing so, Irregular Pearl helps equip the next generation of musicians while carrying the classical tradition forward in a modern, connected world.
+
 Irregular Pearl operates as a registered 501(c)(3) nonprofit organization dedicated to this mission.
 
 
