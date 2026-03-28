@@ -79,8 +79,8 @@ export default function WorkingOnButton({ pieceId }: WorkingOnButtonProps) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
       {count > 0 && (
-        <div className="text-sm text-gray-600 bg-[#f5f3ff] border border-[#e8e0f0] px-3 py-1.5 rounded-md inline-flex items-center gap-1.5">
-          <span className="w-2 h-2 bg-[#8b5cf6] rounded-full" />
+        <div className="text-sm text-gray-600 bg-[#FEF3C7] border border-[#FDE68A] px-3 py-1.5 rounded-md inline-flex items-center gap-1.5">
+          <span className="w-2 h-2 bg-[#B45309] rounded-full" />
           <strong>{count}</strong> musician{count !== 1 ? 's' : ''} working on this
         </div>
       )}
@@ -88,7 +88,7 @@ export default function WorkingOnButton({ pieceId }: WorkingOnButtonProps) {
         onClick={handleToggle}
         className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
           isWorking
-            ? 'bg-[#8b5cf6] text-white hover:bg-[#7c3aed]'
+            ? 'bg-[#B45309] text-white hover:bg-[#92400E]'
             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
         }`}
       >

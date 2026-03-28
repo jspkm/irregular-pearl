@@ -1,31 +1,45 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pearl-50: #faf8f5;
-  --color-pearl-100: #f0ece5;
-  --color-pearl-200: #e2dcd0;
-  --color-pearl-300: #cfc5b3;
-  --color-pearl-400: #b8a78e;
-  --color-pearl-500: #a08d73;
-  --color-pearl-600: #8a7560;
-  --color-pearl-700: #6e5d4e;
-  --color-pearl-800: #5a4d42;
-  --color-pearl-900: #4a4038;
+  /* Fonts */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --color-accent: #7c3aed;
-  --color-accent-light: #8b5cf6;
-  --color-accent-bg: #f5f3ff;
-  --color-accent-border: #e8e0f0;
+  /* Core colors */
+  --color-bg: #FAF8F5;
+  --color-surface: #FFFFFF;
+  --color-ink: #1C1917;
+  --color-muted: #78716C;
+  --color-border: #E7E5E4;
 
-  --color-star: #f59e0b;
+  /* Accent — amber/gold */
+  --color-accent: #B45309;
+  --color-accent-hover: #92400E;
+  --color-accent-light: #FEF3C7;
+  --color-accent-border: #FDE68A;
+  --color-star: #D97706;
+
+  /* Semantic */
+  --color-success: #15803D;
+  --color-success-bg: #F0FDF4;
+  --color-error: #DC2626;
+  --color-error-bg: #FEF2F2;
+  --color-warning: #CA8A04;
+  --color-warning-bg: #FEFCE8;
+  --color-info: #0369A1;
+  --color-info-bg: #F0F9FF;
+
+  /* Legacy aliases (used in existing components) */
+  --color-pearl-50: #FAF8F5;
 }
 
 html {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Ensure touch targets are at least 44px on tablet/mobile */
+/* Touch targets on tablet/mobile */
 @media (max-width: 1024px) {
   button, a, [role="button"] {
     min-height: 44px;

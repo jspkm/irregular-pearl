@@ -36,7 +36,7 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 md:px-5 py-2.5 text-sm whitespace-nowrap transition-colors ${
               activeTab === tab.id
-                ? 'font-semibold text-gray-900 border-b-2 border-gray-900'
+                ? 'font-semibold text-[#1C1917] border-b-2 border-[#B45309]'
                 : 'text-gray-500 border-b-2 border-transparent hover:text-gray-700'
             }`}
           >
@@ -265,7 +265,7 @@ function EditionCardFull({ id, publisher, editor, year, description }: {
             >
               <span className={
                 star <= (hoveredStar || userRating)
-                  ? 'text-[#f59e0b]'
+                  ? 'text-[#D97706]'
                   : 'text-gray-300'
               }>
                 ★

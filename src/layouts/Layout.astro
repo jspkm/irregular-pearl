@@ -25,6 +25,11 @@ const canonicalUrl = canonical || Astro.url.href;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
   <!-- SEO -->
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
@@ -60,7 +65,7 @@ const canonicalUrl = canonical || Astro.url.href;
 <style>
   @import '../styles/global.css';
 </style>
-<body class="bg-pearl-50 text-gray-900 min-h-screen">
+<body class="bg-bg text-ink min-h-screen font-body">
   <slot />
 </body>
 </html>
