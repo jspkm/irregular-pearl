@@ -99,7 +99,7 @@ export default function PiecePageLayout({ piece }: PiecePageLayoutProps) {
           style={{ width: `${sidebarWidth}px` }}
         >
           <div className="px-4 md:px-5 py-6 md:py-8 h-full">
-            <DiscussionSidebar pieceId={piece.id} pieceTitle={piece.title} />
+            <DiscussionSidebar pieceId={piece.id} pieceTitle={piece.title} sidebarWidth={sidebarWidth} />
           </div>
         </aside>
       </div>

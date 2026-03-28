@@ -14,6 +14,7 @@ interface Message {
 interface DiscussionSidebarProps {
   pieceId: string;
   pieceTitle: string;
+  sidebarWidth?: number;
 }
 
 // Placeholder messages for demo (used when Supabase is not configured)
@@ -51,7 +52,7 @@ function formatTime(dateStr: string): string {
   return `${diffDays}d ago`;
 }
 
-export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSidebarProps) {
+export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }: DiscussionSidebarProps) {
   const { user, signIn } = useAuth();
   const [messages, setMessages] = useState<Message[]>(() => {
     if (!hasSupabase) return placeholderMessages[pieceId] || [];
@@ -160,6 +161,16 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
+  // Show messages in chronological order (oldest first)
+  const sortedMessages = [...messages].reverse();
+
   return (
     <div className="flex flex-col h-full pb-20">
       <div className="flex justify-between items-center mb-4">
@@ -169,7 +180,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
         </span>
       </div>
 
-      {/* Messages */}
+      {/* Messages — chronological order */}
       <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
         {loading ? (
           <div className="text-center py-8 text-sm text-gray-400">Loading...</div>
@@ -181,7 +192,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
             </p>
           </div>
         ) : (
-          messages.map((msg) => (
+          sortedMessages.map((msg) => (
             <div key={msg.id} className={msg.parentId ? 'ml-9' : ''}>
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-[11px] font-semibold text-gray-500 flex-shrink-0">
@@ -202,12 +213,17 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
         <div ref={bottomRef} />
       </div>
 
-      {/* Compose — fixed to bottom of viewport */}
-      <form onSubmit={handleSubmit} className="fixed bottom-0 right-0 w-[340px] md:w-[280px] lg:w-[340px] bg-white border-t border-gray-200 px-4 py-3 z-50">
+      {/* Compose — fixed to bottom, width matches sidebar */}
+      <form
+        onSubmit={handleSubmit}
+        className="fixed bottom-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50"
+        style={{ width: sidebarWidth ? `${sidebarWidth}px` : undefined }}
+      >
         <div className="relative">
           <textarea
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder={user || !hasSupabase
               ? "Share a tip, ask a question..."
               : "Sign in to join the discussion..."
