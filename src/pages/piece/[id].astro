@@ -1,0 +1,77 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import DiscussionSidebar from '../../components/DiscussionSidebar';
+import WorkingOnButton from '../../components/WorkingOnButton';
+import PieceTabs from '../../components/PieceTabs';
+import { seedPieces } from '../../data/seed';
+
+const { id } = Astro.params;
+const piece = seedPieces.find(p => p.id === id);
+
+if (!piece) {
+  return Astro.redirect('/');
+}
+
+const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
+---
+<Layout
+  title={piece.title}
+  description={`${piece.title} by ${piece.composer_name} — editions, recordings, and community discussion`}
+>
+  <Navbar />
+
+  <!-- Breadcrumb -->
+  <div class="px-4 md:px-6 py-2 text-xs text-gray-400 border-b border-gray-100 bg-white">
+    <a href="/" class="hover:text-gray-600">Home</a>
+    {breadcrumb.map((crumb) => (
+      <span>
+        <span class="mx-1">›</span>
+        <span class="text-gray-500">{crumb}</span>
+      </span>
+    ))}
+  </div>
+
+  <!-- Main two-column layout -->
+  <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_340px] min-h-[calc(100vh-8rem)]">
+
+    <!-- Left: Piece content -->
+    <main class="px-4 md:px-8 lg:px-10 py-6 md:py-8 md:border-r border-gray-100">
+
+      <!-- Header (static Astro — no JS needed) -->
+      <div class="mb-6">
+        <h1 class="text-xl md:text-2xl lg:text-[28px] font-bold leading-tight mb-1">
+          {piece.title}
+          {piece.catalog_number && (
+            <span class="text-gray-400 font-normal text-base md:text-lg">, {piece.catalog_number}</span>
+          )}
+        </h1>
+        <p class="text-sm md:text-base text-gray-500 mb-3">
+          by <span class="text-gray-700 underline decoration-gray-300">{piece.composer_name}</span>
+        </p>
+
+        <!-- Tags -->
+        <div class="flex flex-wrap items-center gap-2 mb-4 text-xs md:text-sm text-gray-500">
+          {piece.instruments.map((inst) => (
+            <span class="bg-gray-100 px-2 py-0.5 rounded">{inst}</span>
+          ))}
+          <span class="bg-gray-100 px-2 py-0.5 rounded">{piece.era}</span>
+          <span class="bg-gray-100 px-2 py-0.5 rounded">{piece.form}</span>
+          {piece.duration_minutes && <span>~{piece.duration_minutes} min</span>}
+          <span class="capitalize">{piece.difficulty}</span>
+        </div>
+
+        <!-- Working On (React island) -->
+        <WorkingOnButton pieceId={piece.id} client:load />
+      </div>
+
+      <!-- Tabbed content (React island) -->
+      <PieceTabs piece={piece} client:load />
+    </main>
+
+    <!-- Right: Discussion sidebar (React island, always hydrated) -->
+    <aside class="bg-white px-4 md:px-5 py-6 md:py-8">
+      <DiscussionSidebar pieceId={piece.id} pieceTitle={piece.title} client:load />
+    </aside>
+  </div>
+</Layout>

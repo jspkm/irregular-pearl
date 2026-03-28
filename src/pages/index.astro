@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import PieceCard from '../components/PieceCard.astro';
+import { seedPieces } from '../data/seed';
+
+const query = Astro.url.searchParams.get('q')?.toLowerCase() || '';
+
+// Filter pieces by search query
+const filtered = query
+  ? seedPieces.filter(p =>
+      p.title.toLowerCase().includes(query) ||
+      p.composer_name.toLowerCase().includes(query) ||
+      p.instruments.some(i => i.toLowerCase().includes(query))
+    )
+  : seedPieces;
+
+// Group by instrument for homepage display
+const groups: Record<string, typeof seedPieces> = {};
+for (const piece of filtered) {
+  const instrument = piece.instruments[0] || 'Other';
+  // Normalize instrument group names
+  const group = instrument.startsWith('Voice') ? 'Voice' : instrument;
+  if (!groups[group]) groups[group] = [];
+  groups[group].push(piece);
+}
+
+// Sort groups in display order
+const groupOrder = ['Piano', 'Violin', 'Cello', 'Voice', 'Flute', 'Harpsichord'];
+const sortedGroups = Object.entries(groups).sort(([a], [b]) => {
+  const ai = groupOrder.indexOf(a);
+  const bi = groupOrder.indexOf(b);
+  return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+});
+---
+<Layout title="Home">
+  <Navbar />
+
+  <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    {!query && (
+      <div class="text-center mb-10">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-2">Irregular Pearl</h1>
+        <p class="text-gray-500 text-sm md:text-base">
+          {seedPieces.length} pieces. Every edition. A living community.
+        </p>
+      </div>
+    )}
+
+    {query && filtered.length === 0 && (
+      <div class="text-center py-16 text-gray-500">
+        <p class="text-lg mb-2">No pieces found for "{query}"</p>
+        <p class="text-sm">We're starting with {seedPieces.length} core works and growing. <a href="/" class="underline">Browse all pieces</a></p>
+      </div>
+    )}
+
+    {query && filtered.length > 0 && (
+      <p class="text-sm text-gray-500 mb-6">
+        {filtered.length} result{filtered.length !== 1 ? 's' : ''} for "{query}"
+        <a href="/" class="ml-2 underline">Clear</a>
+      </p>
+    )}
+
+    {sortedGroups.map(([group, pieces]) => (
+      <section class="mb-8">
+        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">{group}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {pieces.map((piece) => (
+            <PieceCard
+              id={piece.id}
+              title={piece.title}
+              composer_name={piece.composer_name}
+              instruments={piece.instruments}
+              era={piece.era}
+              difficulty={piece.difficulty}
+              duration_minutes={piece.duration_minutes}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+
+  <footer class="border-t border-gray-200 py-6 text-center text-xs text-gray-400">
+    Irregular Pearl — a non-profit for classical music knowledge
+  </footer>
+</Layout>

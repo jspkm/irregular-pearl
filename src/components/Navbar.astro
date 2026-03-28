@@ -1,0 +1,24 @@
+---
+import AuthButton from './AuthButton';
+---
+<nav class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 bg-white sticky top-0 z-50">
+  <a href="/" class="text-lg font-bold tracking-tight whitespace-nowrap">
+    Irregular Pearl <span class="text-gray-400 font-normal text-sm">beta</span>
+  </a>
+
+  <div class="flex-1 max-w-md mx-4 md:mx-8">
+    <form action="/" method="get">
+      <input
+        type="search"
+        name="q"
+        placeholder="Search pieces, composers..."
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+      />
+    </form>
+  </div>
+
+  <div class="flex items-center gap-4 text-sm text-gray-600">
+    <a href="/" class="hidden sm:inline hover:text-gray-900">Browse</a>
+    <AuthButton client:load />
+  </div>
+</nav>

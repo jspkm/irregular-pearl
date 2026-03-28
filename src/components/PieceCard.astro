@@ -1,0 +1,29 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  composer_name: string;
+  instruments: string[];
+  era: string;
+  difficulty: string;
+  duration_minutes: number | null;
+}
+
+const { id, title, composer_name, instruments, era, difficulty, duration_minutes } = Astro.props;
+---
+<a
+  href={`/piece/${id}`}
+  class="block p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-400 hover:shadow-sm transition-all"
+>
+  <h3 class="font-semibold text-sm leading-tight mb-1 text-gray-900">{title}</h3>
+  <p class="text-xs text-gray-500 mb-2">{composer_name}</p>
+  <div class="flex flex-wrap gap-1.5">
+    {instruments.map((inst) => (
+      <span class="text-[11px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{inst}</span>
+    ))}
+    <span class="text-[11px] px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">{era}</span>
+    {duration_minutes && (
+      <span class="text-[11px] text-gray-400">~{duration_minutes} min</span>
+    )}
+  </div>
+</a>
