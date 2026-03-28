@@ -120,33 +120,10 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
       {activeTab === 'recordings' && (
         <div>
           {youtubeLinks.length > 0 ? (
-            <div className="space-y-4">
-              {youtubeLinks.map((link, i) => {
-                const videoId = extractYouTubeId(link.url);
-                return (
-                  <div key={i} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-                    {videoId ? (
-                      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                        <iframe
-                          className="absolute inset-0 w-full h-full"
-                          src={`https://www.youtube.com/embed/${videoId}`}
-                          title={link.label}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    ) : (
-                      <a href={link.url} target="_blank" rel="noopener noreferrer"
-                        className="block p-4 text-sm text-gray-600 hover:text-gray-900">
-                        {link.label}
-                      </a>
-                    )}
-                    <div className="px-3 py-2 border-t border-gray-100">
-                      <p className="text-sm font-medium text-gray-800">{link.label}</p>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-2">
+              {youtubeLinks.map((link, i) => (
+                <RecordingCard key={i} url={link.url} label={link.label} />
+              ))}
             </div>
           ) : (
             <p className="text-sm text-gray-400 italic py-8 text-center">
@@ -179,6 +156,45 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
 }
 
 // --- Subcomponents ---
+
+function RecordingCard({ url, label }: { url: string; label: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const videoId = extractYouTubeId(url);
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left"
+      >
+        <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500 flex-shrink-0">
+          {expanded ? '▼' : '▶'}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gray-800">{label}</p>
+          <p className="text-xs text-gray-400">YouTube</p>
+        </div>
+      </button>
+      {expanded && videoId && (
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+            title={label}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      )}
+      {expanded && !videoId && (
+        <a href={url} target="_blank" rel="noopener noreferrer"
+          className="block px-3 pb-3 text-sm text-blue-600 hover:underline">
+          Open in YouTube →
+        </a>
+      )}
+    </div>
+  );
+}
 
 function EditionCardCompact({ publisher, editor, year, description }: {
   publisher: string; editor: string; year: number | null; description: string;
