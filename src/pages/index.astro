@@ -32,8 +32,33 @@ const sortedGroups = Object.entries(groups).sort(([a], [b]) => {
   const bi = groupOrder.indexOf(b);
   return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
 });
+
+const homeLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Irregular Pearl',
+  description: `A collaborative platform for classical music knowledge. ${seedPieces.length} pieces with editions, recordings, and community discussion.`,
+  url: Astro.url.origin,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${Astro.url.origin}/?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Irregular Pearl',
+  url: Astro.url.origin,
+  description: 'A non-profit collaborative platform for classical music knowledge.',
+  nonprofitStatus: 'NonprofitType',
+};
 ---
-<Layout title="Home">
+<Layout title="Home" jsonLd={[homeLd, orgLd]}>
   <Navbar />
 
   <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">

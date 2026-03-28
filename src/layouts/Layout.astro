@@ -2,21 +2,60 @@
 interface Props {
   title: string;
   description?: string;
+  canonical?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  ogType?: string;
 }
 
-const { title, description = 'A collaborative platform for classical music knowledge' } = Astro.props;
+const {
+  title,
+  description = 'A collaborative platform for classical music knowledge — editions, recordings, and community discussion for every piece.',
+  canonical,
+  jsonLd,
+  ogType = 'website',
+} = Astro.props;
+
+const siteName = 'Irregular Pearl';
+const fullTitle = title === 'Home' ? siteName : `${title} | ${siteName}`;
+const canonicalUrl = canonical || Astro.url.href;
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>{fullTitle}</title>
   <meta name="description" content={description} />
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content={ogType} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content={siteName} />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={fullTitle} />
+  <meta name="twitter:description" content={description} />
+
+  <!-- JSON-LD Structured Data -->
+  {jsonLd && !Array.isArray(jsonLd) && (
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  )}
+  {jsonLd && Array.isArray(jsonLd) && jsonLd.map((ld) => (
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  ))}
+
+  <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#faf8f5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>{title} | Irregular Pearl</title>
 </head>
 <style>
   @import '../styles/global.css';

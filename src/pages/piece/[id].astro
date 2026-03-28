@@ -14,10 +14,45 @@ if (!piece) {
 }
 
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
+const seoDescription = `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — compare ${piece.editions.length} editions, listen to recordings, and discuss with musicians. ${piece.description.slice(0, 120)}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'MusicComposition',
+  name: piece.title,
+  composer: {
+    '@type': 'Person',
+    name: piece.composer_name,
+  },
+  musicCompositionForm: piece.form,
+  musicalKey: piece.catalog_number || undefined,
+  genre: piece.era,
+  description: piece.description,
+  instrument: piece.instruments,
+  timeRequired: piece.duration_minutes ? `PT${piece.duration_minutes}M` : undefined,
+  url: Astro.url.href,
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Irregular Pearl',
+    url: Astro.url.origin,
+  },
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.url.origin },
+    { '@type': 'ListItem', position: 2, name: piece.instruments[0] || 'Music', item: `${Astro.url.origin}/?q=${encodeURIComponent(piece.instruments[0] || '')}` },
+    { '@type': 'ListItem', position: 3, name: piece.title },
+  ],
+};
 ---
 <Layout
   title={piece.title}
-  description={`${piece.title} by ${piece.composer_name} — editions, recordings, and community discussion`}
+  description={seoDescription}
+  ogType="music.song"
+  jsonLd={[jsonLd, breadcrumbLd]}
 >
   <Navbar />
 
