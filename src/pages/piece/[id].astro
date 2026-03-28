@@ -1,9 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import DiscussionSidebar from '../../components/DiscussionSidebar';
-import WorkingOnButton from '../../components/WorkingOnButton';
-import PieceTabs from '../../components/PieceTabs';
+import PiecePageLayout from '../../components/PiecePageLayout';
 import { seedPieces } from '../../data/seed';
 
 const { id } = Astro.params;
@@ -89,46 +87,6 @@ const breadcrumbLd = {
     ))}
   </div>
 
-  <!-- Main two-column layout -->
-  <div class="grid grid-cols-1 md:grid-cols-[1fr_280px] lg:grid-cols-[1fr_340px] min-h-[calc(100vh-8rem)]">
-
-    <!-- Left: Piece content -->
-    <main class="px-4 md:px-8 lg:px-10 py-6 md:py-8 md:border-r border-border">
-
-      <!-- Header -->
-      <div class="mb-6">
-        <h1 class="font-display text-xl md:text-2xl lg:text-[28px] leading-tight mb-1">
-          {piece.title}
-          {piece.catalog_number && (
-            <span class="font-mono text-muted text-sm md:text-base">, {piece.catalog_number}</span>
-          )}
-        </h1>
-        <p class="text-sm md:text-base text-muted mb-3">
-          by <span class="text-ink underline decoration-border">{piece.composer_name}</span>
-        </p>
-
-        <!-- Tags -->
-        <div class="flex flex-wrap items-center gap-2 mb-4 text-xs md:text-sm text-muted">
-          {piece.instruments.map((inst) => (
-            <span class="bg-bg border border-border px-2 py-0.5 rounded">{inst}</span>
-          ))}
-          <span class="bg-bg border border-border px-2 py-0.5 rounded">{piece.era}</span>
-          <span class="bg-bg border border-border px-2 py-0.5 rounded">{piece.form}</span>
-          {piece.duration_minutes && <span>~{piece.duration_minutes} min</span>}
-          <span class="capitalize">{piece.difficulty}</span>
-        </div>
-
-        <!-- Working On (React island) -->
-        <WorkingOnButton pieceId={piece.id} client:load />
-      </div>
-
-      <!-- Tabbed content (React island) -->
-      <PieceTabs piece={piece} client:load />
-    </main>
-
-    <!-- Right: Discussion sidebar (React island, always hydrated) -->
-    <aside class="bg-surface px-4 md:px-5 py-6 md:py-8">
-      <DiscussionSidebar pieceId={piece.id} pieceTitle={piece.title} client:load />
-    </aside>
-  </div>
+  <!-- Main resizable layout (React island) -->
+  <PiecePageLayout piece={piece} client:load />
 </Layout>

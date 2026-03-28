@@ -160,46 +160,14 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
     }
   };
 
-  const [expanded, setExpanded] = useState(false);
-
   return (
-    <>
-      {/* Backdrop blur overlay when expanded */}
-      {expanded && (
-        <div
-          className="fixed inset-0 bg-[#FAF8F5]/60 backdrop-blur-sm z-40"
-          onClick={() => setExpanded(false)}
-        />
-      )}
-
-      <div className={`flex flex-col transition-all duration-250 ease-in-out ${
-        expanded
-          ? 'fixed top-0 right-0 bottom-0 w-full md:w-[50vw] lg:w-[45vw] z-50 bg-white shadow-2xl px-6 py-6'
-          : 'h-full'
-      }`}>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-[15px] font-semibold">Discussion</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400">
-              {messages.length} message{messages.length !== 1 ? 's' : ''}
-            </span>
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
-              title={expanded ? 'Collapse discussion' : 'Expand discussion'}
-            >
-              {expanded ? (
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M10 2h4v4M6 14H2v-4M14 2L9.5 6.5M2 14l4.5-4.5" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M6 2H2v4M10 14h4v-4M2 2l4.5 4.5M14 14L9.5 9.5" />
-                </svg>
-              )}
-            </button>
-          </div>
-        </div>
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-[15px] font-semibold">Discussion</h2>
+        <span className="text-xs text-gray-400">
+          {messages.length} message{messages.length !== 1 ? 's' : ''}
+        </span>
+      </div>
 
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 min-h-0">
         {loading ? (
@@ -253,7 +221,6 @@ export default function DiscussionSidebar({ pieceId, pieceTitle }: DiscussionSid
           </button>
         </div>
       </form>
-      </div>
-    </>
+    </div>
   );
 }
