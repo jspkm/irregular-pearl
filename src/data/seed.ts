@@ -1195,6 +1195,91 @@ export const seedPieces: SeedPiece[] = [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Adagio_for_Strings', label: 'Wikipedia — Adagio for Strings' },
     ],
   },
+
+  // === ADDITIONAL CELLO ===
+  {
+    id: 'tchaikovsky-rococo-variations',
+    title: 'Variations on a Rococo Theme',
+    composer_name: 'Pyotr Ilyich Tchaikovsky',
+    catalog_number: 'Op. 33',
+    instruments: ['Cello'],
+    era: 'Romantic',
+    form: 'Theme and Variations',
+    duration_minutes: 19,
+    difficulty: 'professional',
+    description: 'Tchaikovsky\'s elegant homage to Mozart, written for cellist Wilhelm Fitzenhagen. Seven variations on a graceful Rococo-style theme showcase the full range of cello technique, from lyrical cantabile to sparkling virtuosity. Usually performed in Fitzenhagen\'s reordered version, though the original order has gained ground.',
+    editions: [
+      { id: 'e-tchaik-rv-henle', publisher: 'Henle Verlag', editor: 'Thomas Kohlhase', year: 2007, description: 'Urtext with both the original and Fitzenhagen versions. The definitive modern edition.' },
+      { id: 'e-tchaik-rv-imi', publisher: 'International Music Company', editor: 'Leonard Rose', year: 1965, description: 'Fitzenhagen version with Rose\'s practical fingerings and bowings.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Variations_on_a_Rococo_Theme,_Op.33_(Tchaikovsky,_Pyotr)', label: 'IMSLP — Rococo Variations' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Ud_TmhZqsRo', label: 'Rostropovich / Karajan — Berlin Philharmonic' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Variations_on_a_Rococo_Theme', label: 'Wikipedia — Rococo Variations' },
+    ],
+  },
+  {
+    id: 'piatti-caprice-1',
+    title: '12 Caprices for Solo Cello: No. 1 in B minor',
+    composer_name: 'Alfredo Piatti',
+    catalog_number: 'Op. 25 No. 1',
+    instruments: ['Cello'],
+    era: 'Romantic',
+    form: 'Caprice',
+    duration_minutes: 4,
+    difficulty: 'professional',
+    description: 'The first of Piatti\'s twelve caprices, the cello equivalent of Paganini\'s violin caprices. These works are essential study material for advanced cellists, demanding mastery of double stops, thumb position, rapid passage-work, and expressive phrasing. The first caprice in B minor is dramatic and technically comprehensive.',
+    editions: [
+      { id: 'e-piatti-c1-imi', publisher: 'International Music Company', editor: 'Jeffrey Solow', year: 1985, description: 'Performance edition with editorial suggestions for the complete set.' },
+      { id: 'e-piatti-c1-stainer', publisher: 'Stainer & Bell', editor: 'Original publication', year: 1874, description: 'The original publication. Historical reference.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/12_Caprices,_Op.25_(Piatti,_Alfredo)', label: 'IMSLP — Piatti 12 Caprices' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=XXPpz71RTPE', label: 'Steven Isserlis — complete caprices' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Alfredo_Piatti', label: 'Wikipedia — Alfredo Piatti' },
+    ],
+  },
+  {
+    id: 'bruch-kol-nidrei',
+    title: 'Kol Nidrei',
+    composer_name: 'Max Bruch',
+    catalog_number: 'Op. 47',
+    instruments: ['Cello'],
+    era: 'Romantic',
+    form: 'Adagio',
+    duration_minutes: 11,
+    difficulty: 'advanced',
+    description: 'An adagio on two Hebrew melodies for cello and orchestra. Despite Bruch being Protestant, this work captures the devotional intensity of the Kol Nidrei prayer with extraordinary sensitivity. The cello\'s singing first theme and the contrasting second melody create one of the most deeply moving works in the cello repertoire.',
+    editions: [
+      { id: 'e-bruch-kn-henle', publisher: 'Henle Verlag', editor: 'Christian Rudolf Riedel', year: 2010, description: 'Urtext with cello part edited by Peter Bruns.' },
+      { id: 'e-bruch-kn-imi', publisher: 'International Music Company', editor: 'Leonard Rose', year: 1962, description: 'Rose\'s performance edition with practical bowings.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Kol_Nidrei,_Op.47_(Bruch,_Max)', label: 'IMSLP — Kol Nidrei' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=sBKGq3P0d6Q', label: 'Jacqueline du Pré — studio recording' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kol_Nidrei_(Bruch)', label: 'Wikipedia — Bruch Kol Nidrei' },
+    ],
+  },
+  {
+    id: 'cassado-suite-for-solo-cello',
+    title: 'Suite for Solo Cello',
+    composer_name: 'Gaspar Cassadó',
+    catalog_number: null,
+    instruments: ['Cello'],
+    era: '20th Century',
+    form: 'Suite',
+    duration_minutes: 18,
+    difficulty: 'professional',
+    description: 'Written in 1926 by the great Catalan cellist and student of Casals, this three-movement suite is the most important solo cello work between Bach and Kodály. Spanish folk elements permeate the Preludio-Fantasia, the Sardana evokes Catalan dance rhythms, and the Intermezzo e Danza finale combines lyricism with fiery virtuosity.',
+    editions: [
+      { id: 'e-cassado-suite-ue', publisher: 'Universal Edition', editor: 'Original publication', year: 1926, description: 'The original Universal Edition publication.' },
+      { id: 'e-cassado-suite-salabert', publisher: 'Salabert', editor: 'Revised edition', year: 1960, description: 'Revised edition with some corrections to the original text.' },
+    ],
+    external_links: [
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Y0OOG2r_fMk', label: 'Matt Haimovitz — live performance' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gaspar_Cassad%C3%B3', label: 'Wikipedia — Gaspar Cassadó' },
+    ],
+  },
 ];
 
 // Import and merge additional piano/violin pieces

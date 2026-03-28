@@ -844,4 +844,138 @@ export const pianoViolinNew: SeedPiece[] = [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fritz_Kreisler', label: 'Wikipedia — Fritz Kreisler' },
     ],
   },
+
+  // === ADDITIONAL TO REACH 100 ===
+
+  // Piano #30
+  {
+    id: 'beethoven-sonata-32',
+    title: 'Piano Sonata No. 32 in C minor',
+    composer_name: 'Ludwig van Beethoven',
+    catalog_number: 'Op. 111',
+    instruments: ['Piano'],
+    era: 'Classical/Romantic',
+    form: 'Sonata',
+    duration_minutes: 25,
+    difficulty: 'professional',
+    description: 'Beethoven\'s final piano sonata, a two-movement work of cosmic scope. The turbulent first movement in C minor gives way to the Arietta, a sublime theme and variations that Thomas Mann described in Doctor Faustus as a farewell to the sonata form itself. The closing trills dissolve into silence.',
+    editions: [
+      { id: 'e-beethoven-s32-henle', publisher: 'Henle Verlag', editor: 'Bertha Antonia Wallner', year: 1980, description: 'Urtext with fingerings by Conrad Hansen. The scholarly standard.' },
+      { id: 'e-beethoven-s32-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 2004, description: 'Viennese Urtext with detailed notes on Beethoven\'s late style notation.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.32,_Op.111_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Sonata Op. 111' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=WGUgJkFMJOk', label: 'Maurizio Pollini — studio recording' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._32_(Beethoven)', label: 'Wikipedia — Beethoven Sonata No. 32' },
+    ],
+  },
+
+  // Violin #21-25
+  {
+    id: 'wieniawski-polonaise-brillante-1',
+    title: 'Polonaise brillante No. 1 in D major',
+    composer_name: 'Henryk Wieniawski',
+    catalog_number: 'Op. 4',
+    instruments: ['Violin', 'Piano'],
+    era: 'Romantic',
+    form: 'Polonaise',
+    duration_minutes: 9,
+    difficulty: 'professional',
+    description: 'Written when Wieniawski was only eighteen, this brilliant showpiece combines the stately character of the polonaise with dazzling virtuosic passages including double stops, harmonics, and flying spiccato. A perennial favorite on competition programs.',
+    editions: [
+      { id: 'e-wieniawski-pb1-imi', publisher: 'International Music Company', editor: 'Tyrone Greive', year: 1975, description: 'Clean performance edition with practical bowings and fingerings.' },
+      { id: 'e-wieniawski-pb1-pwm', publisher: 'PWM Edition', editor: 'Irena Dubiska', year: 1965, description: 'Polish critical edition based on first publication.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Polonaise_brillante_No.1,_Op.4_(Wieniawski,_Henryk)', label: 'IMSLP — Polonaise brillante No. 1' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8yVEeMfpmQk', label: 'Hilary Hahn — recital performance' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henryk_Wieniawski', label: 'Wikipedia — Wieniawski' },
+    ],
+  },
+  {
+    id: 'bach-violin-partita-3',
+    title: 'Violin Partita No. 3 in E major',
+    composer_name: 'Johann Sebastian Bach',
+    catalog_number: 'BWV 1006',
+    instruments: ['Violin'],
+    era: 'Baroque',
+    form: 'Partita',
+    duration_minutes: 17,
+    difficulty: 'professional',
+    description: 'The last of Bach\'s three solo violin partitas, opening with the famous Preludio, a perpetual-motion tour de force of unbroken sixteenth notes. The suite continues with dance movements of increasing charm: Loure, Gavotte en Rondeau, Menuets, Bourrée, and Gigue.',
+    editions: [
+      { id: 'e-bach-vp3-henle', publisher: 'Henle Verlag', editor: 'Klaus Rönnau', year: 2001, description: 'Urtext based on the autograph manuscript.' },
+      { id: 'e-bach-vp3-barenreiter', publisher: 'Bärenreiter', editor: 'Peter Wollny', year: 2020, description: 'Neue Bach-Ausgabe critical edition.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Partita_No.3_in_E_major,_BWV_1006_(Bach,_Johann_Sebastian)', label: 'IMSLP — Partita No. 3' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=1prweT95Mo0', label: 'Hilary Hahn — Preludio' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
+    ],
+  },
+  {
+    id: 'lalo-symphonie-espagnole',
+    title: 'Symphonie espagnole in D minor',
+    composer_name: 'Édouard Lalo',
+    catalog_number: 'Op. 21',
+    instruments: ['Violin'],
+    era: 'Romantic',
+    form: 'Concerto',
+    duration_minutes: 34,
+    difficulty: 'professional',
+    description: 'Written for Pablo de Sarasate, this five-movement concerto brilliantly captures Spanish color through French orchestral craft. The rhythmic vitality, exotic harmonies, and virtuosic solo writing make it one of the most exciting works in the violin concerto repertoire.',
+    editions: [
+      { id: 'e-lalo-se-henle', publisher: 'Henle Verlag', editor: 'Peter Jost', year: 2011, description: 'Urtext including the often-omitted third movement Intermezzo.' },
+      { id: 'e-lalo-se-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s bowings.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Symphonie_espagnole,_Op.21_(Lalo,_%C3%89douard)', label: 'IMSLP — Symphonie espagnole' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=w-MJqKVnFkE', label: 'Itzhak Perlman / Barenboim' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphonie_espagnole', label: 'Wikipedia — Symphonie espagnole' },
+    ],
+  },
+  {
+    id: 'massenet-meditation-thais',
+    title: 'Méditation from Thaïs',
+    composer_name: 'Jules Massenet',
+    catalog_number: null,
+    instruments: ['Violin', 'Piano'],
+    era: 'Romantic',
+    form: 'Intermezzo',
+    duration_minutes: 5,
+    difficulty: 'advanced',
+    description: 'The orchestral interlude from Massenet\'s opera Thaïs, arranged for violin and piano. One of the most popular encore pieces in the violin repertoire, its soaring D major melody demands a pure, singing tone and expressive vibrato. Deceptively simple, it reveals the quality of a violinist\'s sound.',
+    editions: [
+      { id: 'e-massenet-med-imi', publisher: 'International Music Company', editor: 'Arthur Hartmann', year: 1945, description: 'Standard violin/piano arrangement. Clean and practical.' },
+      { id: 'e-massenet-med-schirmer', publisher: 'G. Schirmer', editor: 'Martin Marsick', year: 1894, description: 'The original arrangement by Marsick, a colleague of Massenet.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/Tha%C3%AFs_(Massenet,_Jules)', label: 'IMSLP — Thaïs' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Vu2EW3GXjJQ', label: 'Joshua Bell — studio recording' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Tha%C3%AFs_(opera)', label: 'Wikipedia — Thaïs' },
+    ],
+  },
+
+  // Flute #1 more
+  {
+    id: 'telemann-flute-fantasia-1',
+    title: '12 Fantasias for Solo Flute: No. 1 in A major',
+    composer_name: 'Georg Philipp Telemann',
+    catalog_number: 'TWV 40:2',
+    instruments: ['Flute'],
+    era: 'Baroque',
+    form: 'Fantasia',
+    duration_minutes: 4,
+    difficulty: 'intermediate',
+    description: 'The first of Telemann\'s twelve fantasias for solo flute, composed around 1732-33. These works are the flute equivalent of Bach\'s solo violin works, though more intimate in scale. Each fantasia explores different affects and keys, with the first in A major being among the most accessible and frequently performed.',
+    editions: [
+      { id: 'e-telemann-ff1-barenreiter', publisher: 'Bärenreiter', editor: 'Günter Hauswald', year: 1955, description: 'Standard scholarly edition of all 12 fantasias.' },
+      { id: 'e-telemann-ff1-henle', publisher: 'Henle Verlag', editor: 'Marion Beyer', year: 2016, description: 'Urtext with detailed source commentary.' },
+    ],
+    external_links: [
+      { type: 'imslp', url: 'https://imslp.org/wiki/12_Fantasias_for_Solo_Flute,_TWV_40:2-13_(Telemann,_Georg_Philipp)', label: 'IMSLP — 12 Fantasias for Solo Flute' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=yTuFO4GxblQ', label: 'Emmanuel Pahud — complete fantasias' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/12_Fantasias_for_Solo_Flute_(Telemann)', label: 'Wikipedia — Telemann Flute Fantasias' },
+    ],
+  },
 ];
