@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import GenerativeAvatar from './GenerativeAvatar';
@@ -147,29 +147,26 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             <GenerativeAvatar userId={profile.id} size={80} />
           )}
           {isOwnProfile && !editing && (
-            <button
-              onClick={async () => {
-                if (profile.avatar_url) {
-                  await supabase.from('users').update({ avatar_url: null }).eq('id', user!.id);
-                  setProfile(prev => prev ? { ...prev, avatar_url: null } : null);
-                } else {
-                  // Restore Google avatar
-                  const googleAvatar = user?.user_metadata?.avatar_url;
-                  if (googleAvatar) {
-                    await supabase.from('users').update({ avatar_url: googleAvatar }).eq('id', user!.id);
-                    setProfile(prev => prev ? { ...prev, avatar_url: googleAvatar } : null);
-                  }
+            <AvatarMenu
+              hasPhoto={!!profile.avatar_url}
+              googleAvatarUrl={user?.user_metadata?.avatar_url}
+              onRemove={async () => {
+                await supabase.from('users').update({ avatar_url: null }).eq('id', user!.id);
+                setProfile(prev => prev ? { ...prev, avatar_url: null } : null);
+              }}
+              onRestoreGoogle={async () => {
+                const url = user?.user_metadata?.avatar_url;
+                if (url) {
+                  await supabase.from('users').update({ avatar_url: url }).eq('id', user!.id);
+                  setProfile(prev => prev ? { ...prev, avatar_url: url } : null);
                 }
               }}
-              className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-[#E7E5E4] flex items-center justify-center text-[#78716C] hover:text-[#1C1917] cursor-pointer transition-colors"
-              title={profile.avatar_url ? 'Remove photo' : 'Restore photo'}
-            >
-              {profile.avatar_url ? (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              ) : (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              )}
-            </button>
+              onUpload={async (url: string) => {
+                await supabase.from('users').update({ avatar_url: url }).eq('id', user!.id);
+                setProfile(prev => prev ? { ...prev, avatar_url: url } : null);
+              }}
+              userId={user!.id}
+            />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -323,5 +320,90 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         </div>
       )}
     </div>
+  );
+}
+
+// --- Avatar Menu ---
+
+function AvatarMenu({ hasPhoto, googleAvatarUrl, onRemove, onRestoreGoogle, onUpload, userId }: {
+  hasPhoto: boolean;
+  googleAvatarUrl?: string;
+  onRemove: () => void;
+  onRestoreGoogle: () => void;
+  onUpload: (url: string) => void;
+  userId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const ext = file.name.split('.').pop();
+    const path = `avatars/${userId}.${ext}`;
+
+    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+    if (!error) {
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      // Add cache buster so browser shows new image
+      onUpload(`${data.publicUrl}?t=${Date.now()}`);
+    }
+    setUploading(false);
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(!open)}
+        className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white border border-[#E7E5E4] flex items-center justify-center text-[#78716C] hover:text-[#1C1917] cursor-pointer transition-colors"
+        title="Change photo"
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute top-full left-0 mt-2 bg-white border border-[#E7E5E4] rounded-lg shadow-lg z-50 w-48 py-1">
+            {hasPhoto && (
+              <button
+                onClick={() => { onRemove(); setOpen(false); }}
+                className="w-full text-left px-3 py-2 text-sm text-[#78716C] hover:bg-[#FAF8F5] bg-transparent border-none cursor-pointer"
+              >
+                Remove photo
+              </button>
+            )}
+            {!hasPhoto && googleAvatarUrl && (
+              <button
+                onClick={() => { onRestoreGoogle(); setOpen(false); }}
+                className="w-full text-left px-3 py-2 text-sm text-[#78716C] hover:bg-[#FAF8F5] bg-transparent border-none cursor-pointer"
+              >
+                Restore Google photo
+              </button>
+            )}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full text-left px-3 py-2 text-sm text-[#78716C] hover:bg-[#FAF8F5] bg-transparent border-none cursor-pointer"
+              disabled={uploading}
+            >
+              {uploading ? 'Uploading...' : 'Upload new photo'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+        </>
+      )}
+    </>
   );
 }
