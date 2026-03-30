@@ -2,22 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import ArtistProfile from '../../components/ArtistProfile';
-import { supabase, hasSupabase } from '../../lib/supabase';
 
 const { id } = Astro.params;
-
-// Redirect to vanity URL if user has one
-if (hasSupabase && id) {
-  const { data } = await supabase
-    .from('users')
-    .select('vanity_slug')
-    .eq('id', id)
-    .single();
-
-  if (data?.vanity_slug) {
-    return Astro.redirect(`/@${data.vanity_slug}`, 301);
-  }
-}
 ---
 <Layout title="Artist Profile">
   <Navbar />

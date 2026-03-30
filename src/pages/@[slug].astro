@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
+import ProfileOwnerBar from '../components/ProfileOwnerBar';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { ACTIVITIES } from '../lib/helpers';
 
@@ -73,6 +74,7 @@ const breadcrumbLd = {
   <div class="flex min-h-[calc(100vh-8rem)] max-w-[1100px] mx-auto">
     <!-- Main content (server-rendered for SEO) -->
     <main class="flex-1 min-w-0 px-4 md:px-8 py-6 md:py-8">
+      <ProfileOwnerBar profileUserId={user.id} client:idle />
       <!-- Hero -->
       <div class="flex gap-5 mb-6">
         <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-3xl md:text-4xl text-muted flex-shrink-0">
