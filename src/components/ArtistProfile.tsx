@@ -77,13 +77,13 @@ export default function ArtistProfile({ userId }: { userId: string }) {
     if (!hasSupabase) { setLoading(false); return; }
 
     const fetchProfile = async () => {
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single();
 
-      if (profileData) {
+      if (!profileError && profileData) {
         setProfile(profileData as ProfileData);
         setEditForm({
           bio: profileData.bio || '',
@@ -100,9 +100,14 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (workingData) setWorkingOn(workingData as unknown as ActivityPiece[]);
+      if (workingData) setWorkingOn(workingData.map((d: any) => ({
+        piece_id: d.piece_id,
+        activity: d.activity,
+        created_at: d.created_at,
+        pieces: d.pieces || { title: '', composer_name: '', catalog_number: null },
+      })));
 
-      const { data: postData } = await supabase
+      const { data: postData, error: postError } = await supabase
         .from('discussions')
         .select('id, text, created_at, piece_id, pieces(title)')
         .eq('user_id', userId)
@@ -110,34 +115,40 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (postData) setPosts(postData as unknown as DiscussionPost[]);
+      if (!postError && postData) setPosts(postData.map((d: any) => ({
+        id: d.id, text: d.text, created_at: d.created_at,
+        piece_id: d.piece_id, pieces: d.pieces || { title: '' },
+      })));
 
-      const { data: reviewData } = await supabase
+      const { data: reviewData, error: reviewError } = await supabase
         .from('edition_reviews')
         .select('id, rating, text, created_at, editions(publisher, piece_id, pieces(title))')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      if (reviewData) setReviews(reviewData as unknown as EditionReview[]);
+      if (!reviewError && reviewData) setReviews(reviewData.map((d: any) => ({
+        id: d.id, rating: d.rating, text: d.text, created_at: d.created_at,
+        editions: d.editions || { publisher: '', piece_id: '', pieces: { title: '' } },
+      })));
 
-      const { data: perfData } = await supabase
+      const { data: perfData, error: perfError } = await supabase
         .from('performances')
         .select('id, event_name, venue, date, piece_id, is_upcoming')
         .eq('user_id', userId)
         .order('date', { ascending: false })
         .limit(20);
 
-      if (perfData) setPerformances(perfData as Performance[]);
+      if (!perfError && perfData) setPerformances(perfData as Performance[]);
 
-      const { data: discData } = await supabase
+      const { data: discData, error: discError } = await supabase
         .from('discography')
         .select('id, title, year, role, url')
         .eq('user_id', userId)
         .order('year', { ascending: false })
         .limit(20);
 
-      if (discData) setDiscography(discData as DiscographyItem[]);
+      if (!discError && discData) setDiscography(discData as DiscographyItem[]);
 
       setLoading(false);
     };

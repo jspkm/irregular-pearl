@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import InstrumentActions from '../../components/InstrumentActions';
 import { supabase, hasSupabase } from '../../lib/supabase';
 import { getInitials } from '../../lib/helpers';
 
@@ -96,6 +97,12 @@ const breadcrumbLd = {
           <a href={owner.vanity_slug ? `/@${owner.vanity_slug}` : `/profile/${owner.id}`} class="text-ink font-medium no-underline hover:underline ml-1">{owner.display_name}</a>
         </p>
       )}
+      <InstrumentActions
+        instrumentId={id}
+        currentOwnerId={instrument.current_owner_id}
+        onOwnershipChange={() => window.location.reload()}
+        client:idle
+      />
     </div>
 
     <!-- Provenance Story -->
