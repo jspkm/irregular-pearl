@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { ACTIVITIES } from '../lib/helpers';
+import type { ActivityType } from '../lib/database.types';
 import Toast from './Toast';
 
 interface ActivityLogButtonProps {

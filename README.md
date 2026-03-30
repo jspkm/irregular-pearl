@@ -10,8 +10,10 @@ A non-profit, community-driven classical music knowledge hub. Every piece gets a
 - **Edition comparisons** with publisher, editor, year, and editorial notes
 - **Activity logging** — track practice, lessons, performances, listening, and sight-reading
 - **Threaded discussion** on every piece page with realtime updates
-- **Artist profiles** with performances, discography, and edition reviews
-- **Full-text search** via Supabase tsvector with relevance ranking
+- **Artist profiles** — public pages at `/@username` with bio, training timeline, instruments, and activity feed
+- **Instrument registry** — provenance stories, ownership timelines, and maker info for classical instruments
+- **Events** — recitals, concerts, competitions, and masterclasses with program listings
+- **Unified search** across pieces, artists, and instruments via Supabase full-text search
 - **Browse by** composer, instrument, or era — each with a dedicated, crawlable page
 
 ## Stack
@@ -74,12 +76,17 @@ src/
   layouts/        Base HTML layout with SEO, fonts, footer
   lib/            Helpers, Supabase client, database types
   pages/
+    @[slug]           Artist profile vanity URLs
     piece/[id]        Piece detail pages
+    instruments/[id]  Instrument profile pages
+    events/[id]       Event pages
+    events/           Browse upcoming events
     composer/[name]   Composer index pages
-    instrument/[name] Instrument index pages
+    instrument/[name] Instrument category pages
     about, privacy, terms
     sitemap.xml, llms.txt, llms-full.txt, openapi.json
   e2e/            E2E tests
+  tests/          Unit and integration tests
 supabase/
   migrations/     SQL migration files
 public/
@@ -89,8 +96,8 @@ public/
 
 ## SEO and AI visibility
 
-- JSON-LD structured data on every page (MusicComposition, BreadcrumbList, Organization)
-- Sitemap with all piece, composer, and instrument pages
+- JSON-LD structured data on every page (MusicComposition, Person, Product, Event, BreadcrumbList, Organization)
+- Sitemap with all piece, composer, instrument, artist, and event pages (Supabase-driven for dynamic entities)
 - `robots.txt` allows Googlebot, GPTBot, ClaudeBot, Bingbot, PerplexityBot
 - `llms.txt` and `llms-full.txt` for AI model consumption
 - ChatGPT plugin manifest at `/.well-known/ai-plugin.json`

@@ -8,7 +8,7 @@
     "build": "astro build && printf '_worker.js\n_routes.json\n' > dist/.assetsignore",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "bun test src/lib src/data src/components src/pages",
+    "test": "bun test src/lib src/data src/components src/tests",
     "test:e2e": "bun test src/e2e",
     "test:all": "bun run test && bun run test:e2e"
   },

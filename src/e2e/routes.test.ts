@@ -77,7 +77,7 @@ describe('E2E: search', () => {
     const res = await fetchOk('/?q=');
     expect(res.status).toBe(200);
     const html = await res.text();
-    expect(html).toContain('Featured Pieces');
+    expect(html).toContain('Most Active This Week');
   });
 });
 
@@ -182,5 +182,29 @@ describe('E2E: meta tags', () => {
     const html = await res.text();
     expect(html).toContain('Ballade No. 1');
     expect(html).toContain('| Irregular Pearl');
+  });
+});
+
+describe('E2E: new pages', () => {
+  test('events page returns 200', async () => {
+    const res = await fetchOk('/events');
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain('Upcoming Events');
+  });
+
+  test('llms.txt includes artist and instrument routes', async () => {
+    const res = await fetchOk('/llms.txt');
+    const text = await res.text();
+    expect(text).toContain('/@{username}');
+    expect(text).toContain('/instruments/{id}');
+    expect(text).toContain('/events');
+    expect(text).toContain('Instrument Registry');
+  });
+
+  test('sitemap includes events page', async () => {
+    const res = await fetchOk('/sitemap.xml');
+    const xml = await res.text();
+    expect(xml).toContain('/events');
   });
 });
