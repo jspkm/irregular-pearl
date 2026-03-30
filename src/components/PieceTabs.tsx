@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { StarRating } from './StarRating';
+import { extractYouTubeId } from '../lib/helpers';
 import type { SeedPiece } from '../data/seed';
-
-function extractYouTubeId(url: string): string | null {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : null;
-}
 
 interface PieceTabsProps {
   piece: SeedPiece;

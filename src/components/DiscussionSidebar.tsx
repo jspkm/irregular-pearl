@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { getInitials, formatTime } from '../lib/helpers';
 
 interface Message {
   id: string;
@@ -16,24 +17,6 @@ interface DiscussionSidebarProps {
   pieceId: string;
   pieceTitle: string;
   sidebarWidth?: number;
-}
-
-
-function getInitials(name: string): string {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-}
-
-function formatTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHrs = Math.floor(diffMin / 60);
-  if (diffHrs < 24) return `${diffHrs}h ago`;
-  const diffDays = Math.floor(diffHrs / 24);
-  return `${diffDays}d ago`;
 }
 
 export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }: DiscussionSidebarProps) {

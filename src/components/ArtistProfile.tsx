@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { formatDate } from '../lib/helpers';
 import GenerativeAvatar from './GenerativeAvatar';
 
 interface ProfileData {
@@ -56,10 +57,6 @@ interface DiscographyItem {
   year: number | null;
   role: string | null;
   url: string | null;
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 export default function ArtistProfile({ userId }: { userId: string }) {
