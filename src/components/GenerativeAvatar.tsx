@@ -172,11 +172,6 @@ export function avatarDataUrl(userId: string): string {
   return `data:image/svg+xml,${encodeURIComponent(getAvatarSvg(userId))}`;
 }
 
-export function getComposerName(userId: string): string {
-  const hash = hashCode(userId);
-  return COMPOSERS[hash % COMPOSERS.length].name;
-}
-
 interface GenerativeAvatarProps {
   userId: string;
   size?: number;

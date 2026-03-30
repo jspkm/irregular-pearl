@@ -2,7 +2,7 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator';
 if (!globalThis.document) GlobalRegistrator.register();
 import { describe, test, expect } from 'bun:test';
 import { render } from '@testing-library/react';
-import GenerativeAvatar, { getAvatarSvg, avatarDataUrl, getComposerName } from './GenerativeAvatar';
+import GenerativeAvatar, { getAvatarSvg, avatarDataUrl } from './GenerativeAvatar';
 
 describe('getAvatarSvg', () => {
   test('returns valid SVG string', () => {
@@ -32,18 +32,6 @@ describe('avatarDataUrl', () => {
 
   test('is deterministic', () => {
     expect(avatarDataUrl('test')).toBe(avatarDataUrl('test'));
-  });
-});
-
-describe('getComposerName', () => {
-  test('returns a string', () => {
-    const name = getComposerName('user-123');
-    expect(typeof name).toBe('string');
-    expect(name.length).toBeGreaterThan(0);
-  });
-
-  test('is deterministic', () => {
-    expect(getComposerName('user-xyz')).toBe(getComposerName('user-xyz'));
   });
 });
 

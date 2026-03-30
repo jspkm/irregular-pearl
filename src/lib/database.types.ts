@@ -103,15 +103,6 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['discussions']['Row'], 'created_at'>;
         Update: Partial<Database['public']['Tables']['discussions']['Insert']>;
       };
-      working_on: {
-        Row: {
-          piece_id: string;
-          user_id: string;
-          created_at: string;
-        };
-        Insert: Omit<Database['public']['Tables']['working_on']['Row'], 'created_at'>;
-        Update: never;
-      };
       activity_log: {
         Row: {
           id: string;
@@ -149,11 +140,3 @@ export interface Database {
   };
 }
 
-// Convenience types
-export type Piece = Database['public']['Tables']['pieces']['Row'];
-export type Edition = Database['public']['Tables']['editions']['Row'];
-export type EditionReview = Database['public']['Tables']['edition_reviews']['Row'];
-export type Discussion = Database['public']['Tables']['discussions']['Row'];
-export type ExternalLink = Database['public']['Tables']['external_links']['Row'];
-export type User = Database['public']['Tables']['users']['Row'];
-export type ActivityLog = Database['public']['Tables']['activity_log']['Row'];

@@ -29,7 +29,7 @@ describe('database types', () => {
     // This is a compile-time check — if Database type is wrong, this won't compile
     const tableNames: (keyof Database['public']['Tables'])[] = [
       'users', 'pieces', 'editions', 'edition_reviews',
-      'discussions', 'working_on', 'external_links', 'reports', 'activity_log',
+      'discussions', 'external_links', 'reports', 'activity_log',
     ];
     expect(tableNames.length).toBeGreaterThan(0);
   });
