@@ -4,19 +4,41 @@ import Navbar from '../components/Navbar.astro';
 import PieceCard from '../components/PieceCard.astro';
 import PieceActivityStats from '../components/PieceActivityStats';
 import { seedPieces } from '../data/seed';
+import { supabase, hasSupabase } from '../lib/supabase';
 
-const query = Astro.url.searchParams.get('q')?.toLowerCase() || '';
+const query = Astro.url.searchParams.get('q')?.trim() || '';
 const filter = Astro.url.searchParams.get('filter') || '';
 const filterType = Astro.url.searchParams.get('type') || ''; // 'instrument', 'composer', 'era'
 
 // Apply filters
 let displayPieces = seedPieces;
 if (query) {
-  displayPieces = seedPieces.filter(p =>
-    p.title.toLowerCase().includes(query) ||
-    p.composer_name.toLowerCase().includes(query) ||
-    p.instruments.some(i => i.toLowerCase().includes(query))
-  );
+  if (hasSupabase) {
+    // Full-text search via Supabase — ranked by relevance
+    const { data } = await supabase
+      .from('pieces')
+      .select('id')
+      .textSearch('fts', query, { type: 'websearch' })
+      .limit(50);
+
+    if (data && data.length > 0) {
+      const idSet = new Set(data.map((r: { id: string }) => r.id));
+      // Preserve FTS ranking order
+      displayPieces = data
+        .map((r: { id: string }) => seedPieces.find(p => p.id === r.id))
+        .filter(Boolean) as typeof seedPieces;
+    } else {
+      displayPieces = [];
+    }
+  } else {
+    // Fallback: client-side substring search
+    const q = query.toLowerCase();
+    displayPieces = seedPieces.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.composer_name.toLowerCase().includes(q) ||
+      p.instruments.some(i => i.toLowerCase().includes(q))
+    );
+  }
 } else if (filter) {
   if (filterType === 'composer') {
     displayPieces = seedPieces.filter(p => p.composer_name.toLowerCase().includes(filter.toLowerCase()));
