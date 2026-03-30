@@ -108,8 +108,8 @@ const eras = [
 ].filter(e => eraCounts[e.name]).map(e => ({ ...e, count: eraCounts[e.name] || 0 }));
 
 // Most active pieces this week (by unique musicians in past 7 days)
-const fallbackIds = ['bach-cello-suite-1', 'chopin-ballade-1', 'beethoven-violin-concerto'];
-let mostActive = fallbackIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
+// Ties (including zero activity) are broken randomly
+let mostActive: typeof seedPieces = [];
 
 if (hasSupabase) {
   const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
@@ -118,23 +118,28 @@ if (hasSupabase) {
     .select('piece_id, user_id')
     .gte('created_at', oneWeekAgo);
 
-  if (data && data.length > 0) {
-    // Count unique musicians per piece
-    const pieceUsers: Record<string, Set<string>> = {};
+  const pieceUsers: Record<string, Set<string>> = {};
+  if (data) {
     for (const r of data) {
       if (!pieceUsers[r.piece_id]) pieceUsers[r.piece_id] = new Set();
       pieceUsers[r.piece_id].add(r.user_id);
     }
-    const topIds = Object.entries(pieceUsers)
-      .sort(([, a], [, b]) => b.size - a.size)
-      .slice(0, 3)
-      .map(([id]) => id);
-
-    if (topIds.length > 0) {
-      const topPieces = topIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
-      if (topPieces.length > 0) mostActive = topPieces;
-    }
   }
+
+  // Score every piece (0 for those with no activity), shuffle ties
+  const scored = seedPieces.map(p => ({
+    piece: p,
+    count: pieceUsers[p.id]?.size ?? 0,
+    rand: Math.random(),
+  }));
+  scored.sort((a, b) => b.count - a.count || a.rand - b.rand);
+  mostActive = scored.slice(0, 3).map(s => s.piece);
+}
+
+if (mostActive.length < 3) {
+  // Fallback when Supabase is not configured
+  const shuffled = [...seedPieces].sort(() => Math.random() - 0.5);
+  mostActive = shuffled.slice(0, 3);
 }
 
 // For filtered view, group pieces
