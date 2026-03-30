@@ -107,9 +107,35 @@ const eras = [
   { name: 'Post-Romantic', range: 'c. 1880–1920' },
 ].filter(e => eraCounts[e.name]).map(e => ({ ...e, count: eraCounts[e.name] || 0 }));
 
-// Featured pieces (hand-picked)
-const featuredIds = ['bach-cello-suite-1', 'chopin-ballade-1', 'beethoven-violin-concerto'];
-const featured = featuredIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
+// Most active pieces this week (by unique musicians in past 7 days)
+const fallbackIds = ['bach-cello-suite-1', 'chopin-ballade-1', 'beethoven-violin-concerto'];
+let mostActive = fallbackIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
+
+if (hasSupabase) {
+  const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+  const { data } = await supabase
+    .from('activity_log')
+    .select('piece_id, user_id')
+    .gte('created_at', oneWeekAgo);
+
+  if (data && data.length > 0) {
+    // Count unique musicians per piece
+    const pieceUsers: Record<string, Set<string>> = {};
+    for (const r of data) {
+      if (!pieceUsers[r.piece_id]) pieceUsers[r.piece_id] = new Set();
+      pieceUsers[r.piece_id].add(r.user_id);
+    }
+    const topIds = Object.entries(pieceUsers)
+      .sort(([, a], [, b]) => b.size - a.size)
+      .slice(0, 3)
+      .map(([id]) => id);
+
+    if (topIds.length > 0) {
+      const topPieces = topIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
+      if (topPieces.length > 0) mostActive = topPieces;
+    }
+  }
+}
 
 // For filtered view, group pieces
 const filteredGroups = isFiltered
@@ -204,11 +230,11 @@ const itemListLd = {
       </div>
 
       <div class="max-w-[960px] mx-auto px-4 md:px-6">
-        <!-- Featured Pieces -->
+        <!-- Most Active This Week -->
         <section class="mb-12">
-          <h2 class="font-display text-2xl mb-4">Featured Pieces</h2>
+          <h2 class="font-display text-2xl mb-4">Most Active This Week</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {featured.map((piece) => piece && (
+            {mostActive.map((piece) => piece && (
               <PieceCard
                 id={piece.id}
                 title={piece.title}
