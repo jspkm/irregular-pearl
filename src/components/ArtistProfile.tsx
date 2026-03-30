@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
-import { formatDate } from '../lib/helpers';
+import { formatDate, ACTIVITIES } from '../lib/helpers';
 import GenerativeAvatar from './GenerativeAvatar';
 
 interface ProfileData {
@@ -361,18 +361,11 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         ) : (
           <div className="space-y-2">
             {workingOn.map(w => {
-              const activityLabels: Record<string, string> = {
-                working_on: '✊ Working on',
-                listened: '👂 Listened',
-                practiced: '🎵 Practiced',
-                sight_read: '🏁 Sight-read',
-                took_lesson: '📖 Lesson',
-                performed: '🎤 Performed',
-              };
+              const act = ACTIVITIES.find(a => a.type === w.activity);
               return (
                 <a key={`${w.piece_id}-${w.created_at}`} href={`/piece/${w.piece_id}`} className="block bg-surface border border-border rounded-lg px-4 py-3 hover:border-muted transition-all no-underline">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted">{activityLabels[w.activity] || w.activity}</span>
+                    <span className="text-xs text-muted">{act ? `${act.emoji} ${act.label}` : w.activity}</span>
                   </div>
                   <div className="text-sm font-medium text-ink">{w.pieces.title}</div>
                   <div className="text-xs text-muted">{w.pieces.composer_name}{w.pieces.catalog_number ? ` · ${w.pieces.catalog_number}` : ''}</div>

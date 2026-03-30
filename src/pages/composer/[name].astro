@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import PieceCard from '../../components/PieceCard.astro';
 import { seedPieces } from '../../data/seed';
+import { groupBy } from '../../lib/helpers';
 
 const { name } = Astro.params;
 const decodedName = decodeURIComponent(name || '');
@@ -19,13 +20,7 @@ if (pieces.length === 0) {
 
 const composerName = pieces[0].composer_name;
 
-// Group by instrument
-const byInstrument: Record<string, typeof pieces> = {};
-for (const p of pieces) {
-  const inst = p.instruments[0] || 'Other';
-  if (!byInstrument[inst]) byInstrument[inst] = [];
-  byInstrument[inst].push(p);
-}
+const byInstrument = groupBy(pieces, p => p.instruments[0] || 'Other');
 
 // Unique eras and forms
 const eras = [...new Set(pieces.map(p => p.era))];

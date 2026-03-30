@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import PieceCard from '../../components/PieceCard.astro';
 import { seedPieces } from '../../data/seed';
+import { groupBy } from '../../lib/helpers';
 
 const { name } = Astro.params;
 const decodedName = decodeURIComponent(name || '');
@@ -19,13 +20,7 @@ if (pieces.length === 0) {
 // Use canonical casing from the first match
 const instrumentName = pieces[0].instruments.find(i => i.toLowerCase() === decodedName.toLowerCase()) || decodedName;
 
-// Group by composer
-const byComposer: Record<string, typeof pieces> = {};
-for (const p of pieces) {
-  if (!byComposer[p.composer_name]) byComposer[p.composer_name] = [];
-  byComposer[p.composer_name].push(p);
-}
-// Sort composers by piece count descending
+const byComposer = groupBy(pieces, p => p.composer_name);
 const composerGroups = Object.entries(byComposer).sort(([, a], [, b]) => b.length - a.length);
 
 const eras = [...new Set(pieces.map(p => p.era))];

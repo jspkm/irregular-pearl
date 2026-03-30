@@ -5,6 +5,7 @@ import PieceCard from '../components/PieceCard.astro';
 import PieceActivityStats from '../components/PieceActivityStats';
 import { seedPieces } from '../data/seed';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { groupBy } from '../lib/helpers';
 
 const query = Astro.url.searchParams.get('q')?.trim() || '';
 const filter = Astro.url.searchParams.get('filter') || '';
@@ -112,14 +113,9 @@ const featuredIds = ['bach-cello-suite-1', 'chopin-ballade-1', 'beethoven-violin
 const featured = featuredIds.map(id => seedPieces.find(p => p.id === id)).filter(Boolean);
 
 // For filtered view, group pieces
-const filteredGroups: Record<string, typeof seedPieces> = {};
-if (isFiltered) {
-  for (const piece of displayPieces) {
-    const group = piece.instruments[0]?.startsWith('Voice') ? 'Voice' : piece.instruments[0] || 'Other';
-    if (!filteredGroups[group]) filteredGroups[group] = [];
-    filteredGroups[group].push(piece);
-  }
-}
+const filteredGroups = isFiltered
+  ? groupBy(displayPieces, p => p.instruments[0]?.startsWith('Voice') ? 'Voice' : p.instruments[0] || 'Other')
+  : {};
 
 const homeLd = {
   '@context': 'https://schema.org',

@@ -1,17 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
-import type { ActivityType } from '../lib/database.types';
+import { ACTIVITIES } from '../lib/helpers';
 import Toast from './Toast';
-
-const ACTIVITIES: { type: ActivityType; emoji: string; label: string }[] = [
-  { type: 'working_on', emoji: '✊', label: 'Working on this' },
-  { type: 'listened', emoji: '👂', label: 'Listened / studied' },
-  { type: 'practiced', emoji: '🎵', label: 'Practiced' },
-  { type: 'sight_read', emoji: '🏁', label: 'Sight-read' },
-  { type: 'took_lesson', emoji: '📖', label: 'Took a lesson' },
-  { type: 'performed', emoji: '🎤', label: 'Performed' },
-];
 
 interface ActivityLogButtonProps {
   pieceId: string;

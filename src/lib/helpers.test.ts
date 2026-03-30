@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { extractYouTubeId, getInitials, formatTime, formatDate } from './helpers';
+import { extractYouTubeId, getInitials, formatTime, formatDate, ACTIVITIES, ACTIVITY_STAT_LABELS, groupBy } from './helpers';
 
 describe('extractYouTubeId', () => {
   test('extracts ID from standard watch URL', () => {
@@ -73,5 +73,39 @@ describe('formatDate', () => {
 
   test('formats another date', () => {
     expect(formatDate('2025-12-01T00:00:00Z')).toBe('December 2025');
+  });
+});
+
+describe('ACTIVITIES', () => {
+  test('has 6 activity types', () => {
+    expect(ACTIVITIES).toHaveLength(6);
+  });
+
+  test('each has type, emoji, and label', () => {
+    for (const a of ACTIVITIES) {
+      expect(a.type).toBeTruthy();
+      expect(a.emoji).toBeTruthy();
+      expect(a.label).toBeTruthy();
+    }
+  });
+});
+
+describe('ACTIVITY_STAT_LABELS', () => {
+  test('has labels for all 6 types', () => {
+    expect(Object.keys(ACTIVITY_STAT_LABELS)).toHaveLength(6);
+  });
+});
+
+describe('groupBy', () => {
+  test('groups items by key function', () => {
+    const items = [{ n: 'a', g: 'x' }, { n: 'b', g: 'x' }, { n: 'c', g: 'y' }];
+    const result = groupBy(items, i => i.g);
+    expect(Object.keys(result)).toEqual(['x', 'y']);
+    expect(result['x']).toHaveLength(2);
+    expect(result['y']).toHaveLength(1);
+  });
+
+  test('returns empty object for empty array', () => {
+    expect(groupBy([], () => 'key')).toEqual({});
   });
 });

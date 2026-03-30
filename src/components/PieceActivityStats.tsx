@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { ACTIVITY_STAT_LABELS } from '../lib/helpers';
 
 interface PieceActivityStatsProps {
   pieceId: string;
@@ -30,19 +31,10 @@ export default function PieceActivityStats({ pieceId }: PieceActivityStatsProps)
         counts[r.activity] = (counts[r.activity] || 0) + 1;
       }
 
-      const labels: Record<string, string> = {
-        practiced: 'practice',
-        took_lesson: 'lessons',
-        performed: 'performances',
-        listened: 'listens',
-        sight_read: 'sight-reads',
-        working_on: 'working',
-      };
-
       const parts = Object.entries(counts)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 3)
-        .map(([type, count]) => `${count} ${labels[type] || type}`);
+        .map(([type, count]) => `${count} ${ACTIVITY_STAT_LABELS[type] || type}`);
 
       setBreakdown(parts.join(', '));
     };
