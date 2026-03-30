@@ -1,14 +1,29 @@
 # Irregular Pearl
 
-A piece-centric knowledge platform for classical music. Every musical work gets a living page with structured metadata, edition comparisons, community ratings, and threaded discussion from musicians working on the same piece.
+A non-profit, community-driven classical music knowledge hub. Every piece gets a living page with editions, recordings, activity tracking, and discussion.
+
+**Live at [irregularpearl.org](https://irregularpearl.org)**
+
+## What it does
+
+- **193 pieces** across piano, violin, cello, voice, and winds — from Bach to Bartok
+- **Edition comparisons** with publisher, editor, year, and editorial notes
+- **Activity logging** — track practice, lessons, performances, listening, and sight-reading
+- **Threaded discussion** on every piece page with realtime updates
+- **Artist profiles** with performances, discography, and edition reviews
+- **Full-text search** via Supabase tsvector with relevance ranking
+- **Browse by** composer, instrument, or era — each with a dedicated, crawlable page
 
 ## Stack
 
-- **Astro** — islands architecture, near-zero JS for static content
-- **React** — interactive islands (discussions, ratings, working-on button)
-- **Supabase** — auth (Google OAuth), Postgres, Realtime subscriptions
-- **Tailwind CSS v4**
-- **Cloudflare Pages** — edge deployment
+| Layer | Tech |
+|-------|------|
+| Framework | [Astro](https://astro.build) 5 (SSR) with React islands |
+| Styling | Tailwind CSS 4 |
+| Database | [Supabase](https://supabase.com) (Postgres, Auth, Realtime) |
+| Hosting | Cloudflare Pages |
+| Package manager | Bun |
+| Tests | Bun test runner |
 
 ## Run locally
 
@@ -17,25 +32,31 @@ bun install
 bun run dev
 ```
 
-The app works without Supabase credentials using placeholder data. To enable auth, discussions, and ratings, add a `.env` file:
+The app works without Supabase — search falls back to client-side filtering, discussions and activity tracking are disabled. To enable everything, add a `.env` file:
 
 ```
 PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-## Database setup
+### Database setup
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run `supabase/schema.sql` in the SQL Editor
+2. Apply migrations: `supabase db push`
 3. Enable Google OAuth in Authentication > Providers
-4. Seed the database:
 
-```bash
-./seed.sh
-```
+Migration files are in `supabase/migrations/`.
 
-Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env` or as an env var.
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start dev server |
+| `bun run build` | Production build for Cloudflare |
+| `bun run test` | Unit + component tests (100% line coverage) |
+| `bun run test:e2e` | E2E tests against live site |
+| `bun run test:all` | All tests |
+| `bun run check` | Astro type checking |
 
 ## Deploy
 
@@ -48,16 +69,37 @@ Output directory: `dist`
 
 ```
 src/
-  components/     # Astro components + React islands
-  data/           # Seed data (15 pieces, expandable to 100)
-  layouts/        # Base HTML layout
-  lib/            # Supabase client, auth hook, types
-  pages/          # Homepage + piece/[id] pages
-  styles/         # Tailwind global styles
+  components/     React components (islands) and Astro components
+  data/           Seed data — 193 curated classical music pieces
+  layouts/        Base HTML layout with SEO, fonts, footer
+  lib/            Helpers, Supabase client, database types
+  pages/
+    piece/[id]        Piece detail pages
+    composer/[name]   Composer index pages
+    instrument/[name] Instrument index pages
+    about, privacy, terms
+    sitemap.xml, llms.txt, llms-full.txt, openapi.json
+  e2e/            E2E tests
 supabase/
-  schema.sql      # Full database schema with RLS
-  seed.ts         # Database seed script
+  migrations/     SQL migration files
+public/
+  robots.txt, manifest.json, favicon.svg
+  .well-known/ai-plugin.json
 ```
+
+## SEO and AI visibility
+
+- JSON-LD structured data on every page (MusicComposition, BreadcrumbList, Organization)
+- Sitemap with all piece, composer, and instrument pages
+- `robots.txt` allows Googlebot, GPTBot, ClaudeBot, Bingbot, PerplexityBot
+- `llms.txt` and `llms-full.txt` for AI model consumption
+- ChatGPT plugin manifest at `/.well-known/ai-plugin.json`
+- OpenAPI spec at `/openapi.json`
+- Registered with Google Search Console and Bing Webmaster Tools
+
+## Name
+
+From the Portuguese *barroco* — an irregularly shaped pearl — the word that gave us *Baroque*.
 
 ## License
 
