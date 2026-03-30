@@ -41,4 +41,4 @@ Allow: /
 User-agent: Applebot
 Allow: /
 
-Sitemap: https://irregular-pearl.pages.dev/sitemap.xml
+Sitemap: https://irregularpearl.org/sitemap.xml

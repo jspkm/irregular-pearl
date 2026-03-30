@@ -9,9 +9,9 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://irregular-pearl.pages.dev/openapi.json"
+    "url": "https://irregularpearl.org/openapi.json"
   },
-  "logo_url": "https://irregular-pearl.pages.dev/icon-512.png",
+  "logo_url": "https://irregularpearl.org/icon-512.png",
   "contact_email": "",
-  "legal_info_url": "https://irregular-pearl.pages.dev/"
+  "legal_info_url": "https://irregularpearl.org/"
 }
