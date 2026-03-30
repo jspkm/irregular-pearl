@@ -10,3 +10,4 @@ coverage/
 .gstack/
 .wrangler/
 .dev.vars
+supabase/.temp/

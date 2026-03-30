@@ -9,15 +9,16 @@ export const hasSupabase = Boolean(supabaseUrl && supabaseAnonKey);
 // Create a no-op client that won't crash when Supabase isn't configured
 let _supabase: SupabaseClient<Database> | null = null;
 
+export function createSupabaseClient(url: string, key: string): SupabaseClient<Database> {
+  return createClient<Database>(url, key);
+}
+
 export function getSupabase(): SupabaseClient<Database> {
   if (!_supabase) {
-    if (!hasSupabase) {
-      // Return a dummy client that won't be used (guarded by hasSupabase checks)
-      // but won't crash on import
-      _supabase = createClient<Database>('https://placeholder.supabase.co', 'placeholder');
-    } else {
-      _supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
-    }
+    _supabase = createSupabaseClient(
+      hasSupabase ? supabaseUrl : 'https://placeholder.supabase.co',
+      hasSupabase ? supabaseAnonKey : 'placeholder',
+    );
   }
   return _supabase;
 }
