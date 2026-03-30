@@ -1,10 +1,12 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 if (!globalThis.document) GlobalRegistrator.register();
-import { describe, test, expect, mock } from 'bun:test';
-import { render, fireEvent } from '@testing-library/react';
+import { describe, test, expect, mock, afterEach } from 'bun:test';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 import Toast from './Toast';
 
 describe('Toast', () => {
+  afterEach(() => cleanup());
+
   test('renders message', () => {
     const { getByText } = render(
       <Toast message="Logged: Practiced" onUndo={() => {}} onDismiss={() => {}} />

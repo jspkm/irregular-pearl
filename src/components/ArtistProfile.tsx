@@ -3,6 +3,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { formatDate, ACTIVITIES } from '../lib/helpers';
 import GenerativeAvatar from './GenerativeAvatar';
+import VanitySlugEditor from './VanitySlugEditor';
 
 interface ProfileData {
   id: string;
@@ -10,6 +11,7 @@ interface ProfileData {
   instrument: string | null;
   level: string | null;
   avatar_url: string | null;
+  vanity_slug: string | null;
   bio: string;
   website: string | null;
   social_links: Record<string, string>;
@@ -244,6 +246,15 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             {profile.location && <span>· {profile.location}</span>}
           </div>
           <div className="text-xs text-muted mt-1">Joined {formatDate(profile.created_at)}</div>
+          {isOwnProfile && (
+            <div className="mt-2">
+              <VanitySlugEditor
+                userId={userId}
+                currentSlug={(profile as any).vanity_slug || null}
+                onSlugChange={(slug) => setProfile({ ...profile, vanity_slug: slug } as ProfileData)}
+              />
+            </div>
+          )}
         </div>
         {isOwnProfile && !editing && (
           <button
