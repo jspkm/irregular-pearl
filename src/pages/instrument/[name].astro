@@ -90,10 +90,13 @@ const breadcrumbLd = {
               id={piece.id}
               title={piece.title}
               composer_name={piece.composer_name}
+              catalog_number={piece.catalog_number}
               instruments={piece.instruments}
               era={piece.era}
               difficulty={piece.difficulty}
               duration_minutes={piece.duration_minutes}
+              description={piece.description}
+              edition_count={piece.editions.length}
             />
           ))}
         </div>

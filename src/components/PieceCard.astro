@@ -5,27 +5,32 @@ interface Props {
   id: string;
   title: string;
   composer_name: string;
+  catalog_number?: string | null;
   instruments: string[];
   era: string;
   difficulty: string;
   duration_minutes: number | null;
+  description?: string;
+  edition_count?: number;
 }
 
-const { id, title, composer_name, instruments, era, difficulty, duration_minutes } = Astro.props;
+const { id, title, composer_name, catalog_number, instruments, era, difficulty, duration_minutes, description, edition_count } = Astro.props;
 ---
 <a
   href={`/piece/${id}`}
-  class="block p-4 bg-surface border border-border rounded-lg hover:border-muted hover:shadow-sm transition-all"
+  class="block bg-surface border border-border rounded-xl p-5 hover:border-muted hover:shadow-sm transition-all no-underline"
 >
-  <h3 class="font-semibold text-sm leading-tight mb-1 text-ink">{title}</h3>
-  <p class="text-xs text-muted mb-2">{composer_name}</p>
-  <div class="flex flex-wrap gap-1.5">
+  <div class="text-[11px] font-mono text-muted uppercase tracking-wider mb-2">{composer_name}</div>
+  <h3 class="font-display text-lg mb-1 text-ink">{title}</h3>
+  {catalog_number && <div class="font-mono text-xs text-muted mb-3">{catalog_number}</div>}
+  {description && <p class="text-xs text-muted leading-relaxed mb-3 line-clamp-3">{description.slice(0, 140)}...</p>}
+  <div class="flex gap-1.5 flex-wrap">
     {instruments.map((inst) => (
-      <span class="text-[11px] px-1.5 py-0.5 bg-bg rounded text-muted">{inst}</span>
+      <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{inst}</span>
     ))}
-    <span class="text-[11px] px-1.5 py-0.5 bg-bg rounded text-muted">{era}</span>
-    {duration_minutes && (
-      <span class="text-[11px] text-muted">~{duration_minutes} min</span>
+    <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{era}</span>
+    {edition_count && (
+      <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{edition_count} editions</span>
     )}
   </div>
   <PieceActivityStats pieceId={id} client:idle />

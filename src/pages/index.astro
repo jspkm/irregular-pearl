@@ -2,7 +2,6 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import PieceCard from '../components/PieceCard.astro';
-import PieceActivityStats from '../components/PieceActivityStats';
 import { seedPieces } from '../data/seed';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { groupBy } from '../lib/helpers';
@@ -184,10 +183,13 @@ const itemListLd = {
             id={piece.id}
             title={piece.title}
             composer_name={piece.composer_name}
+            catalog_number={piece.catalog_number}
             instruments={piece.instruments}
             era={piece.era}
             difficulty={piece.difficulty}
             duration_minutes={piece.duration_minutes}
+            description={piece.description}
+            edition_count={piece.editions.length}
           />
         ))}
       </div>
@@ -207,18 +209,18 @@ const itemListLd = {
           <h2 class="font-display text-2xl mb-4">Featured Pieces</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {featured.map((piece) => piece && (
-              <a href={`/piece/${piece.id}`} class="block bg-surface border border-border rounded-xl p-5 hover:border-muted hover:shadow-sm transition-all no-underline">
-                <div class="text-[11px] font-mono text-muted uppercase tracking-wider mb-2">{piece.composer_name}</div>
-                <h3 class="font-display text-lg mb-1 text-ink">{piece.title}</h3>
-                {piece.catalog_number && <div class="font-mono text-xs text-muted mb-3">{piece.catalog_number}</div>}
-                <p class="text-xs text-muted leading-relaxed mb-3 line-clamp-3">{piece.description.slice(0, 140)}...</p>
-                <div class="flex gap-1.5 flex-wrap">
-                  {piece.instruments.map(i => <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{i}</span>)}
-                  <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{piece.era}</span>
-                  <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{piece.editions.length} editions</span>
-                </div>
-                <PieceActivityStats pieceId={piece.id} client:idle />
-              </a>
+              <PieceCard
+                id={piece.id}
+                title={piece.title}
+                composer_name={piece.composer_name}
+                catalog_number={piece.catalog_number}
+                instruments={piece.instruments}
+                era={piece.era}
+                difficulty={piece.difficulty}
+                duration_minutes={piece.duration_minutes}
+                description={piece.description}
+                edition_count={piece.editions.length}
+              />
             ))}
           </div>
         </section>
