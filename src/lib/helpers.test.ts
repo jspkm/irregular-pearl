@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { extractYouTubeId, getInitials, formatTime, formatDate, ACTIVITIES, ACTIVITY_STAT_LABELS, groupBy } from './helpers';
+import { extractYouTubeId, getInitials, formatTime, formatDate, ACTIVITIES, ACTIVITY_STAT_LABELS, groupBy, validateSlug } from './helpers';
 
 describe('extractYouTubeId', () => {
   test('extracts ID from standard watch URL', () => {
@@ -107,5 +107,50 @@ describe('groupBy', () => {
 
   test('returns empty object for empty array', () => {
     expect(groupBy([], () => 'key')).toEqual({});
+  });
+});
+
+describe('validateSlug', () => {
+  test('accepts valid slugs', () => {
+    expect(validateSlug('cellist-anna').valid).toBe(true);
+    expect(validateSlug('bach42').valid).toBe(true);
+    expect(validateSlug('yo-yo-ma').valid).toBe(true);
+  });
+
+  test('rejects too short', () => {
+    expect(validateSlug('ab').valid).toBe(false);
+    expect(validateSlug('ab').error).toContain('3-30');
+  });
+
+  test('rejects too long', () => {
+    expect(validateSlug('a'.repeat(31)).valid).toBe(false);
+  });
+
+  test('rejects invalid characters', () => {
+    expect(validateSlug('hello world').valid).toBe(false);
+    expect(validateSlug('UPPER').valid).toBe(false);
+    expect(validateSlug('hello@world').valid).toBe(false);
+  });
+
+  test('rejects consecutive hyphens', () => {
+    expect(validateSlug('hello--world').valid).toBe(false);
+  });
+
+  test('rejects slugs starting or ending with hyphen', () => {
+    expect(validateSlug('-hello').valid).toBe(false);
+    expect(validateSlug('hello-').valid).toBe(false);
+  });
+
+  test('rejects reserved words', () => {
+    expect(validateSlug('about').valid).toBe(false);
+    expect(validateSlug('admin').valid).toBe(false);
+    expect(validateSlug('settings').valid).toBe(false);
+    expect(validateSlug('about').error).toContain('reserved');
+  });
+
+  test('rejects profanity', () => {
+    const result = validateSlug('fuckyou');
+    expect(result.valid).toBe(false);
+    expect(result.error).toContain('not allowed');
   });
 });

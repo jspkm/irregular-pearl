@@ -11,3 +11,4 @@ coverage/
 .wrangler/
 .dev.vars
 supabase/.temp/
+.context/

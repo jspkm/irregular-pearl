@@ -1,0 +1,118 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import { supabase, hasSupabase } from '../../lib/supabase';
+
+const { id } = Astro.params;
+
+if (!hasSupabase || !id) return Astro.redirect('/');
+
+const { data: event } = await supabase
+  .from('events')
+  .select('*')
+  .eq('id', id)
+  .single();
+
+if (!event) return Astro.redirect('/');
+
+const { data: performances } = await supabase
+  .from('event_performances')
+  .select('*, users(id, display_name, vanity_slug), pieces(id, title, composer_name), instruments(id, type, maker)')
+  .eq('event_id', id);
+
+const seoDescription = `${event.title} — ${event.venue || ''}${event.city ? `, ${event.city}` : ''} on ${new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: event.title,
+  description: event.description || seoDescription,
+  startDate: event.event_date,
+  location: event.venue ? {
+    '@type': 'Place',
+    name: event.venue,
+    address: { '@type': 'PostalAddress', addressLocality: event.city, addressCountry: event.country },
+  } : undefined,
+  url: Astro.url.href,
+  performer: performances?.filter((p: any) => p.users).map((p: any) => ({
+    '@type': 'Person',
+    name: p.users.display_name,
+  })),
+};
+---
+<Layout title={event.title} description={seoDescription} jsonLd={jsonLd}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <a href="/events" class="text-muted no-underline hover:underline">Events</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">{event.title}</span>
+  </div>
+
+  <main class="max-w-[800px] mx-auto px-4 md:px-6 py-6 md:py-8">
+    <div class="flex gap-4 mb-6">
+      <!-- Date column -->
+      <div class="text-center flex-shrink-0 w-14">
+        <div class="font-mono text-[11px] text-accent uppercase tracking-wider">
+          {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+        </div>
+        <div class="font-display text-3xl text-ink leading-tight">
+          {new Date(event.event_date).getDate()}
+        </div>
+        <div class="font-mono text-[10px] text-[#A8A29E]">
+          {new Date(event.event_date).getFullYear()}
+        </div>
+      </div>
+
+      <!-- Event details -->
+      <div>
+        <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded inline-block mb-2 capitalize">{event.event_type}</span>
+        <h1 class="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{event.title}</h1>
+        {event.venue && (
+          <p class="text-sm text-muted">
+            {event.venue}{event.city ? `, ${event.city}` : ''}{event.country ? `, ${event.country}` : ''}
+          </p>
+        )}
+      </div>
+    </div>
+
+    {event.description && (
+      <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-6">{event.description}</p>
+    )}
+
+    {event.url && (
+      <a href={event.url} class="text-sm text-accent no-underline hover:underline mb-6 inline-block" target="_blank" rel="noopener">Event website →</a>
+    )}
+
+    <!-- Program -->
+    {performances && performances.length > 0 && (
+      <section class="mt-6">
+        <h2 class="font-display text-xl mb-4">Program</h2>
+        {performances.map((p: any) => (
+          <div class="py-3 border-b border-[#F3F2F0] last:border-b-0">
+            {p.pieces && (
+              <a href={`/piece/${p.pieces.id}`} class="text-sm font-medium text-ink no-underline hover:underline">
+                {p.pieces.title}
+                {p.pieces.composer_name && <span class="text-muted font-normal"> — {p.pieces.composer_name}</span>}
+              </a>
+            )}
+            <div class="flex gap-3 mt-1 text-xs text-muted">
+              {p.users && (
+                <a href={p.users.vanity_slug ? `/@${p.users.vanity_slug}` : `/profile/${p.users.id}`} class="text-muted no-underline hover:underline">
+                  {p.users.display_name}
+                </a>
+              )}
+              {p.instruments && (
+                <a href={`/instruments/${p.instruments.id}`} class="text-muted no-underline hover:underline">
+                  {p.instruments.maker} {p.instruments.type}
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
+      </section>
+    )}
+  </main>
+</Layout>

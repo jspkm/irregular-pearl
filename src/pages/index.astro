@@ -12,26 +12,40 @@ const filterType = Astro.url.searchParams.get('type') || ''; // 'instrument', 'c
 
 // Apply filters
 let displayPieces = seedPieces;
+let searchArtists: { id: string; display_name: string; instrument: string | null; vanity_slug: string | null }[] = [];
+let searchInstruments: { id: string; type: string; maker: string | null; maker_year: number | null }[] = [];
+
 if (query) {
   if (hasSupabase) {
-    // Full-text search via Supabase — ranked by relevance
-    const { data } = await supabase
-      .from('pieces')
-      .select('id')
-      .textSearch('fts', query, { type: 'websearch' })
-      .limit(50);
+    // Unified search: pieces + artists + instruments (parallel, fault-tolerant)
+    const [piecesResult, artistsResult, instrumentsResult] = await Promise.allSettled([
+      supabase.from('pieces').select('id')
+        .textSearch('fts', query, { type: 'websearch' }).limit(20),
+      supabase.from('users').select('id, display_name, instrument, vanity_slug')
+        .textSearch('fts', query, { type: 'websearch' })
+        .not('vanity_slug', 'is', null).limit(5),
+      supabase.from('instruments').select('id, type, maker, maker_year')
+        .textSearch('fts', query, { type: 'websearch' })
+        .eq('privacy_level', 'public').limit(5),
+    ]);
 
-    if (data && data.length > 0) {
-      const idSet = new Set(data.map((r: { id: string }) => r.id));
-      // Preserve FTS ranking order
-      displayPieces = data
+    const pieceData = piecesResult.status === 'fulfilled' ? piecesResult.value.data : null;
+    if (pieceData && pieceData.length > 0) {
+      displayPieces = pieceData
         .map((r: { id: string }) => seedPieces.find(p => p.id === r.id))
         .filter(Boolean) as typeof seedPieces;
     } else {
       displayPieces = [];
     }
+
+    if (artistsResult.status === 'fulfilled' && artistsResult.value.data) {
+      searchArtists = artistsResult.value.data as typeof searchArtists;
+    }
+    if (instrumentsResult.status === 'fulfilled' && instrumentsResult.value.data) {
+      searchInstruments = instrumentsResult.value.data as typeof searchInstruments;
+    }
   } else {
-    // Fallback: client-side substring search
+    // Fallback: client-side substring search (pieces only)
     const q = query.toLowerCase();
     displayPieces = seedPieces.filter(p =>
       p.title.toLowerCase().includes(q) ||
@@ -45,7 +59,6 @@ if (query) {
   } else if (filterType === 'era') {
     displayPieces = seedPieces.filter(p => p.era.toLowerCase().includes(filter.toLowerCase()));
   } else {
-    // instrument
     displayPieces = seedPieces.filter(p =>
       p.instruments.some(i => i.toLowerCase().includes(filter.toLowerCase()))
     );
@@ -53,6 +66,7 @@ if (query) {
 }
 
 const isFiltered = !!(query || filter);
+const hasSearchResults = displayPieces.length > 0 || searchArtists.length > 0 || searchInstruments.length > 0;
 
 // Group instruments with counts
 const instrumentGroups: Record<string, number> = {};
@@ -192,38 +206,84 @@ const itemListLd = {
   {isFiltered ? (
     <!-- Filtered view: show results -->
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
-      {query && displayPieces.length === 0 && (
+      {query && !hasSearchResults && (
         <div class="text-center py-16 text-muted">
-          <p class="text-lg mb-2">No pieces found for "{query}"</p>
-          <p class="text-sm">We're starting with {seedPieces.length} core works and growing. <a href="/" class="underline">Browse all pieces</a></p>
+          <p class="text-lg mb-2">No results for "{query}"</p>
+          <p class="text-sm">Try a different search. <a href="/" class="underline">Browse all pieces</a></p>
         </div>
       )}
 
-      {displayPieces.length > 0 && (
+      {hasSearchResults && (
         <div class="mb-6">
           <p class="text-sm text-muted">
-            {query ? `${displayPieces.length} result${displayPieces.length !== 1 ? 's' : ''} for "${query}"` : `${displayPieces.length} pieces`}
+            {query ? `Results for "${query}"` : `${displayPieces.length} pieces`}
             <a href="/" class="ml-2 text-accent no-underline hover:underline">← Back</a>
           </p>
         </div>
       )}
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {displayPieces.map((piece) => (
-          <PieceCard
-            id={piece.id}
-            title={piece.title}
-            composer_name={piece.composer_name}
-            catalog_number={piece.catalog_number}
-            instruments={piece.instruments}
-            era={piece.era}
-            difficulty={piece.difficulty}
-            duration_minutes={piece.duration_minutes}
-            description={piece.description}
-            edition_count={piece.editions.length}
-          />
-        ))}
-      </div>
+      {/* Artist results */}
+      {searchArtists.length > 0 && (
+        <section class="mb-8">
+          <h2 class="font-display text-lg mb-3">Artists</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {searchArtists.map((artist) => (
+              <a href={`/@${artist.vanity_slug}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-sm text-muted flex-shrink-0">
+                  {artist.display_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                </div>
+                <div>
+                  <div class="font-display text-base text-ink">{artist.display_name}</div>
+                  {artist.instrument && (
+                    <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full">{artist.instrument}</span>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Instrument results */}
+      {searchInstruments.length > 0 && (
+        <section class="mb-8">
+          <h2 class="font-display text-lg mb-3">Instruments</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {searchInstruments.map((inst) => (
+              <a href={`/instruments/${inst.id}`} class="block bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
+                <div class="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
+                <div class="font-display text-base text-ink">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
+                <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full mt-1 inline-block">{inst.type}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Piece results */}
+      {displayPieces.length > 0 && (
+        <section class="mb-8">
+          {(searchArtists.length > 0 || searchInstruments.length > 0) && (
+            <h2 class="font-display text-lg mb-3">Pieces</h2>
+          )}
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {displayPieces.map((piece) => (
+              <PieceCard
+                id={piece.id}
+                title={piece.title}
+                composer_name={piece.composer_name}
+                catalog_number={piece.catalog_number}
+                instruments={piece.instruments}
+                era={piece.era}
+                difficulty={piece.difficulty}
+                duration_minutes={piece.duration_minutes}
+                description={piece.description}
+                edition_count={piece.editions.length}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   ) : (
     <!-- Lobby view -->

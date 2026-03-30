@@ -6,24 +6,45 @@ export const GET: APIRoute = ({ url }) => {
 
   const content = `# Irregular Pearl
 
-> A collaborative platform for classical music knowledge. Every musical work gets a living page with editions, recordings, and community discussion.
+> A collaborative platform for classical music knowledge. Every musical work gets a living page with editions, recordings, and community discussion. Musicians can create public artist profiles and register their instruments.
 
-Irregular Pearl organizes classical music knowledge around the PIECE as the atomic unit. Each piece page contains structured metadata, edition comparisons with community ratings, embedded recordings, and threaded discussion from musicians worldwide.
+Irregular Pearl organizes classical music knowledge around the PIECE as the atomic unit. Each piece page contains structured metadata, edition comparisons with community ratings, embedded recordings, and threaded discussion from musicians worldwide. Musicians can create public profiles showcasing their career, training, and instruments. The instrument registry tracks provenance and ownership history for classical instruments of all values.
 
 ## Key Facts
 - ${seedPieces.length} pieces across Piano, Violin, Cello, Voice, and Winds
 - Non-profit organization for public domain classical music knowledge
 - Each piece has 2-3 editions with publisher, editor, and year information
 - Community discussion and ratings from working musicians
+- Public artist profiles with career history and training timelines
+- Instrument registry with provenance stories and ownership chains
+- Event listings for recitals, concerts, competitions, and masterclasses
 
 ## Navigation
 - Homepage: ${origin}/
 - About: ${origin}/about
-- Search: ${origin}/?q={query}
+- Search: ${origin}/?q={query} (searches pieces, artists, and instruments)
 - Piece pages: ${origin}/piece/{piece-id}
 - Composer pages: ${origin}/composer/{Composer Name} (e.g., ${origin}/composer/Johann%20Sebastian%20Bach)
-- Instrument pages: ${origin}/instrument/{instrument} (e.g., ${origin}/instrument/piano)
+- Instrument category pages: ${origin}/instrument/{instrument} (e.g., ${origin}/instrument/piano)
+- Artist profiles: ${origin}/@{username} (e.g., ${origin}/@cellist-anna)
+- Instrument registry: ${origin}/instruments/{id}
+- Events: ${origin}/events and ${origin}/events/{id}
 - Full piece catalog: ${origin}/llms-full.txt
+
+## Artist Profiles
+Each artist profile (${origin}/@{username}) contains:
+- Name, instrument, level, location
+- Biographical narrative
+- Training timeline (conservatories, teachers, milestones)
+- Instruments owned with links to instrument pages
+- Activity feed (what pieces they're practicing, performing, studying)
+
+## Instrument Registry
+Each instrument page (${origin}/instruments/{id}) contains:
+- Maker, year, country of origin, type
+- Provenance story (narrative history of the instrument)
+- Ownership timeline showing chain of musicians who played it
+- Performance history from events
 
 ## Piece Page Structure
 Each piece page (${origin}/piece/{id}) contains:

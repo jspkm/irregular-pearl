@@ -7,6 +7,7 @@ interface Message {
   id: string;
   userId: string | null;
   sender: string;
+  vanitySlug: string | null;
   instrument: string | null;
   level: string | null;
   text: string;
@@ -39,7 +40,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
         .from('discussions')
         .select(`
           id, text, created_at, parent_id,
-          users!inner(display_name, instrument, level)
+          users!inner(display_name, vanity_slug, instrument, level)
         `)
         .eq('piece_id', pieceId)
         .eq('is_deleted', false)
@@ -51,6 +52,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
           id: d.id,
           userId: d.user_id,
           sender: d.users.display_name,
+          vanitySlug: d.users.vanity_slug,
           instrument: d.users.instrument,
           level: d.users.level,
           text: d.text,
@@ -75,7 +77,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
         // Fetch the user info for the new message
         const { data: userData } = await supabase
           .from('users')
-          .select('display_name, instrument, level')
+          .select('display_name, vanity_slug, instrument, level')
           .eq('id', payload.new.user_id)
           .single();
 
@@ -83,6 +85,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
           id: payload.new.id,
           userId: payload.new.user_id,
           sender: userData?.display_name || 'Unknown',
+          vanitySlug: (userData as any)?.vanity_slug || null,
           instrument: userData?.instrument || null,
           level: userData?.level || null,
           text: payload.new.text,
@@ -124,6 +127,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
         id: `local-${Date.now()}`,
         userId: null,
         sender: 'You',
+        vanitySlug: null,
         instrument: null,
         level: null,
         text: newMessage.trim(),
@@ -173,7 +177,7 @@ export default function DiscussionSidebar({ pieceId, pieceTitle, sidebarWidth }:
                   {getInitials(msg.sender)}
                 </div>
                 {msg.userId ? (
-                  <a href={`/profile/${msg.userId}`} className="text-[13px] font-semibold text-gray-800 no-underline hover:underline">{msg.sender}</a>
+                  <a href={msg.vanitySlug ? `/@${msg.vanitySlug}` : `/profile/${msg.userId}`} className="text-[13px] font-semibold text-gray-800 no-underline hover:underline">{msg.sender}</a>
                 ) : (
                   <span className="text-[13px] font-semibold text-gray-800">{msg.sender}</span>
                 )}

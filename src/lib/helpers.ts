@@ -55,3 +55,42 @@ export function formatTime(dateStr: string): string {
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
+
+// ── Slug validation ──
+
+const RESERVED_SLUGS = [
+  'about', 'terms', 'privacy', 'piece', 'composer', 'instrument',
+  'instruments', 'events', 'admin', 'api', 'auth', 'login', 'signup',
+  'settings', 'search', 'sitemap', 'llms', 'openapi', 'profile',
+  'help', 'support', 'contact', 'blog', 'news', 'feed', 'explore',
+];
+
+export function validateSlug(slug: string): { valid: boolean; error?: string } {
+  // Must be lowercase
+  if (slug !== slug.toLowerCase())
+    return { valid: false, error: 'Must be lowercase' };
+
+  const s = slug;
+
+  if (s.length < 3 || s.length > 30)
+    return { valid: false, error: 'Must be 3-30 characters' };
+
+  if (!/^[a-z0-9-]+$/.test(s))
+    return { valid: false, error: 'Only lowercase letters, numbers, and hyphens allowed' };
+
+  if (/--/.test(s))
+    return { valid: false, error: 'Cannot contain consecutive hyphens' };
+
+  if (!/^[a-z0-9]/.test(s) || !/[a-z0-9]$/.test(s))
+    return { valid: false, error: 'Must start and end with a letter or number' };
+
+  if (RESERVED_SLUGS.includes(s))
+    return { valid: false, error: 'This username is reserved' };
+
+  // Profanity check (basic inline list, avoids ESM/CJS issues with leo-profanity)
+  const PROFANITY = ['fuck', 'shit', 'ass', 'dick', 'cunt', 'nigger', 'faggot', 'retard', 'whore', 'slut', 'bitch'];
+  if (PROFANITY.some(w => s.includes(w)))
+    return { valid: false, error: 'This username is not allowed' };
+
+  return { valid: true };
+}
