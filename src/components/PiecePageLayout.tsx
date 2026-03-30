@@ -17,6 +17,20 @@ export default function PiecePageLayout({ piece }: PiecePageLayoutProps) {
   const [isDragging, setIsDragging] = useState(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
+  const mobileDiscussionRef = useRef<HTMLDivElement>(null);
+  const [isDiscussionVisible, setIsDiscussionVisible] = useState(false);
+
+  // Track whether mobile discussion section is in view
+  useEffect(() => {
+    const el = mobileDiscussionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsDiscussionVisible(entry.isIntersecting),
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -105,9 +119,22 @@ export default function PiecePageLayout({ piece }: PiecePageLayoutProps) {
       </div>
 
       {/* Mobile: sidebar below content */}
-      <div className="md:hidden bg-white px-4 py-6">
+      <div ref={mobileDiscussionRef} className="md:hidden bg-white px-4 py-6">
         <DiscussionSidebar pieceId={piece.id} pieceTitle={piece.title} />
       </div>
+
+      {/* Mobile: sticky Discussion button */}
+      {!isDiscussionVisible && (
+        <button
+          onClick={() => mobileDiscussionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-[#1C1917] text-white text-sm font-medium px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2 active:bg-[#292524]"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Discussion
+        </button>
+      )}
     </div>
   );
 }
