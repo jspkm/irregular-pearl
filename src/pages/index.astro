@@ -210,7 +210,7 @@ const itemListLd = {
           <h2 class="font-display text-2xl mb-4">Browse by Instrument</h2>
           <div class="grid grid-cols-3 md:grid-cols-5 gap-3">
             {displayInstruments.map((inst) => (
-              <a href={`/?filter=${encodeURIComponent(inst.filter.split(',')[0])}&type=instrument`} class="block bg-surface border border-border rounded-lg p-4 text-center hover:border-accent transition-all no-underline">
+              <a href={`/instrument/${encodeURIComponent(inst.filter.split(',')[0].toLowerCase())}`} class="block bg-surface border border-border rounded-lg p-4 text-center hover:border-accent transition-all no-underline">
                 <div class="text-[28px] mb-2" style="filter: saturate(0.1) opacity(0.6);">{instrumentEmoji[inst.name] || '🎵'}</div>
                 <div class="text-sm font-medium text-ink">{inst.name}</div>
                 <div class="text-xs text-muted">{inst.count} pieces</div>
@@ -226,7 +226,7 @@ const itemListLd = {
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {topComposers.map((c) => (
-              <a href={`/?filter=${encodeURIComponent(c.name)}&type=composer`} class="flex items-center gap-2.5 bg-surface border border-border rounded-lg px-3 py-2.5 hover:border-muted transition-all no-underline">
+              <a href={`/composer/${encodeURIComponent(c.name)}`} class="flex items-center gap-2.5 bg-surface border border-border rounded-lg px-3 py-2.5 hover:border-muted transition-all no-underline">
                 <div class="w-9 h-9 rounded-full bg-bg flex items-center justify-center font-display italic text-lg text-muted flex-shrink-0">{c.initial}</div>
                 <div>
                   <div class="text-sm font-medium text-ink">{c.name.split(' ').pop()}</div>

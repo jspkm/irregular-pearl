@@ -1,0 +1,108 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import PieceCard from '../../components/PieceCard.astro';
+import { seedPieces } from '../../data/seed';
+
+const { name } = Astro.params;
+const decodedName = decodeURIComponent(name || '');
+
+// Match instrument case-insensitively
+const pieces = seedPieces.filter(p =>
+  p.instruments.some(i => i.toLowerCase() === decodedName.toLowerCase())
+);
+
+if (pieces.length === 0) {
+  return Astro.redirect('/');
+}
+
+// Use canonical casing from the first match
+const instrumentName = pieces[0].instruments.find(i => i.toLowerCase() === decodedName.toLowerCase()) || decodedName;
+
+// Group by composer
+const byComposer: Record<string, typeof pieces> = {};
+for (const p of pieces) {
+  if (!byComposer[p.composer_name]) byComposer[p.composer_name] = [];
+  byComposer[p.composer_name].push(p);
+}
+// Sort composers by piece count descending
+const composerGroups = Object.entries(byComposer).sort(([, a], [, b]) => b.length - a.length);
+
+const eras = [...new Set(pieces.map(p => p.era))];
+const composerCount = composerGroups.length;
+const editionCount = pieces.reduce((sum, p) => sum + p.editions.length, 0);
+
+const seoDescription = `${instrumentName} repertoire on Irregular Pearl — ${pieces.length} pieces by ${composerCount} composers. Compare editions, listen to recordings, and discuss with musicians.`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `${instrumentName} Repertoire — Irregular Pearl`,
+  description: seoDescription,
+  url: Astro.url.href,
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Irregular Pearl',
+    url: Astro.url.origin,
+  },
+  about: {
+    '@type': 'MusicGroup',
+    name: instrumentName,
+    genre: 'Classical Music',
+  },
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.url.origin },
+    { '@type': 'ListItem', position: 2, name: instrumentName },
+  ],
+};
+---
+<Layout title={`${instrumentName} Repertoire`} description={seoDescription} jsonLd={[jsonLd, breadcrumbLd]}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">{instrumentName}</span>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="font-display text-3xl md:text-4xl italic mb-2">{instrumentName} Repertoire</h1>
+      <p class="text-muted text-sm md:text-base">
+        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {composerCount} composers · {editionCount} editions
+      </p>
+      <div class="flex flex-wrap gap-1.5 mt-3">
+        {eras.map(era => (
+          <span class="text-[11px] px-2.5 py-1 bg-bg border border-border rounded-full text-muted">{era}</span>
+        ))}
+      </div>
+    </div>
+
+    {composerGroups.map(([composer, composerPieces]) => (
+      <section class="mb-10">
+        <h2 class="font-display text-xl mb-1">
+          <a href={`/composer/${encodeURIComponent(composer)}`} class="text-ink no-underline hover:underline">{composer}</a>
+        </h2>
+        <p class="text-xs text-muted mb-4">{composerPieces.length} piece{composerPieces.length !== 1 ? 's' : ''}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {composerPieces.map((piece) => (
+            <PieceCard
+              id={piece.id}
+              title={piece.title}
+              composer_name={piece.composer_name}
+              instruments={piece.instruments}
+              era={piece.era}
+              difficulty={piece.difficulty}
+              duration_minutes={piece.duration_minutes}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+</Layout>

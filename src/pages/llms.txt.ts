@@ -18,8 +18,11 @@ Irregular Pearl organizes classical music knowledge around the PIECE as the atom
 
 ## Navigation
 - Homepage: ${origin}/
+- About: ${origin}/about
 - Search: ${origin}/?q={query}
 - Piece pages: ${origin}/piece/{piece-id}
+- Composer pages: ${origin}/composer/{Composer Name} (e.g., ${origin}/composer/Johann%20Sebastian%20Bach)
+- Instrument pages: ${origin}/instrument/{instrument} (e.g., ${origin}/instrument/piano)
 - Full piece catalog: ${origin}/llms-full.txt
 
 ## Piece Page Structure

@@ -85,6 +85,7 @@ const canonicalUrl = canonical || Astro.url.href;
       <!-- Desktop: three columns -->
       <div class="hidden md:flex justify-between items-center">
         <div class="flex gap-4">
+          <a href="/about" class="text-muted no-underline">About</a>
           <a href="/terms" class="text-muted no-underline">Terms</a>
           <a href="/privacy" class="text-muted no-underline">Privacy</a>
         </div>
@@ -96,6 +97,7 @@ const canonicalUrl = canonical || Astro.url.href;
       <!-- Mobile: stacked, centered -->
       <div class="flex flex-col items-center gap-2 md:hidden text-center">
         <a href="/"><img src="/logo.svg" alt="Irregular Pearl" class="h-5 w-auto" /></a>
+        <a href="/about" class="text-muted no-underline">About</a>
         <a href="/terms" class="text-muted no-underline">Terms</a>
         <a href="/privacy" class="text-muted no-underline">Privacy</a>
         <div>{seedPieces.length} pieces · {composerCount} composers · {editionCount}+ editions</div>

@@ -1,0 +1,110 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import PieceCard from '../../components/PieceCard.astro';
+import { seedPieces } from '../../data/seed';
+
+const { name } = Astro.params;
+const decodedName = decodeURIComponent(name || '');
+
+// Find pieces by this composer (case-insensitive match on last name or full name)
+const pieces = seedPieces.filter(p =>
+  p.composer_name.toLowerCase() === decodedName.toLowerCase() ||
+  p.composer_name.toLowerCase().endsWith(decodedName.toLowerCase())
+);
+
+if (pieces.length === 0) {
+  return Astro.redirect('/');
+}
+
+const composerName = pieces[0].composer_name;
+
+// Group by instrument
+const byInstrument: Record<string, typeof pieces> = {};
+for (const p of pieces) {
+  const inst = p.instruments[0] || 'Other';
+  if (!byInstrument[inst]) byInstrument[inst] = [];
+  byInstrument[inst].push(p);
+}
+
+// Unique eras and forms
+const eras = [...new Set(pieces.map(p => p.era))];
+const forms = [...new Set(pieces.map(p => p.form))];
+const instruments = [...new Set(pieces.flatMap(p => p.instruments))];
+const editionCount = pieces.reduce((sum, p) => sum + p.editions.length, 0);
+
+const seoDescription = `${composerName} on Irregular Pearl — browse ${pieces.length} pieces across ${instruments.join(', ')}. Compare editions, listen to recordings, and discuss with musicians.`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: composerName,
+  description: `Classical music composer with ${pieces.length} works on Irregular Pearl`,
+  url: Astro.url.href,
+  mainEntityOfPage: {
+    '@type': 'CollectionPage',
+    name: `${composerName} — Works on Irregular Pearl`,
+    description: seoDescription,
+    url: Astro.url.href,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Irregular Pearl',
+      url: Astro.url.origin,
+    },
+  },
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.url.origin },
+    { '@type': 'ListItem', position: 2, name: composerName },
+  ],
+};
+---
+<Layout title={composerName} description={seoDescription} jsonLd={[jsonLd, breadcrumbLd]}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">{composerName}</span>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="font-display text-3xl md:text-4xl italic mb-2">{composerName}</h1>
+      <p class="text-muted text-sm md:text-base">
+        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {editionCount} editions · {eras.join(', ')}
+      </p>
+      <div class="flex flex-wrap gap-1.5 mt-3">
+        {instruments.map(i => (
+          <a href={`/instrument/${encodeURIComponent(i.toLowerCase())}`} class="text-[11px] px-2.5 py-1 bg-bg border border-border rounded-full text-muted no-underline hover:border-accent">{i}</a>
+        ))}
+        {forms.map(f => (
+          <span class="text-[11px] px-2.5 py-1 bg-bg border border-border rounded-full text-muted">{f}</span>
+        ))}
+      </div>
+    </div>
+
+    {Object.entries(byInstrument).map(([instrument, instPieces]) => (
+      <section class="mb-10">
+        <h2 class="font-display text-xl mb-4">{instrument}</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {instPieces.map((piece) => (
+            <PieceCard
+              id={piece.id}
+              title={piece.title}
+              composer_name={piece.composer_name}
+              instruments={piece.instruments}
+              era={piece.era}
+              difficulty={piece.difficulty}
+              duration_minutes={piece.duration_minutes}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+</Layout>
