@@ -12,16 +12,16 @@ type Tab = 'overview' | 'editions' | 'recordings' | 'history';
 export default function PieceTabs({ piece }: PieceTabsProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
+  const recordingTypes = ['youtube', 'spotify', 'soundcloud', 'bandcamp', 'internet_archive', 'vimeo'];
+  const recordingLinks = piece.external_links.filter(l => recordingTypes.includes(l.type));
+  const otherLinks = piece.external_links.filter(l => !recordingTypes.includes(l.type));
+
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'editions', label: 'Editions', count: piece.editions.length },
     { id: 'recordings', label: 'Recordings', count: recordingLinks.length || undefined },
     { id: 'history', label: 'History' },
   ];
-
-  const recordingTypes = ['youtube', 'spotify', 'soundcloud', 'bandcamp', 'internet_archive', 'vimeo'];
-  const recordingLinks = piece.external_links.filter(l => recordingTypes.includes(l.type));
-  const otherLinks = piece.external_links.filter(l => !recordingTypes.includes(l.type));
 
   return (
     <div>
