@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { formatDate, ACTIVITIES, randomNoteStarter } from '../lib/helpers';
+import { VENUES } from '../data/venues';
 import GenerativeAvatar from './GenerativeAvatar';
 import VanitySlugEditor from './VanitySlugEditor';
 
@@ -421,7 +422,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                 }}
                 fields={[
                   { key: 'event_name', label: 'Event', value: p.event_name },
-                  { key: 'venue', label: 'Venue', value: p.venue || '' },
+                  { key: 'venue', label: 'Venue', value: p.venue || '', suggestions: VENUES },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
                   { key: 'role', label: '', value: p.role || 'performed', type: 'toggle', toggleLabels: ['Performed', 'Attended'], toggleValues: ['performed', 'attended'] },
                   { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea', placeholder: randomNoteStarter() },
@@ -734,7 +735,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
   isOwner: boolean;
   onDelete: () => void;
   onSave: (vals: Record<string, string>) => void;
-  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[]; toggleLabels?: string[]; toggleValues?: string[]; placeholder?: string }[];
+  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[]; toggleLabels?: string[]; toggleValues?: string[]; placeholder?: string; suggestions?: string[] }[];
 }) {
   const isNew = !fields[0]?.value;
   const [editMode, setEditMode] = useState(false);
@@ -774,6 +775,13 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
               <textarea value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
                 className="w-full border border-border rounded px-2 py-1 text-sm resize-none h-16 focus:outline-none focus:border-accent"
                 placeholder={f.placeholder || f.label} />
+            ) : f.suggestions ? (
+              <AutocompleteInput
+                value={vals[f.key] || ''}
+                onChange={v => setVals(prev => ({ ...prev, [f.key]: v }))}
+                suggestions={f.suggestions}
+                placeholder={f.placeholder || f.label}
+              />
             ) : (
               <input value={vals[f.key] || ''} type={f.type || 'text'}
                 onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
@@ -808,6 +816,47 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Autocomplete Input ---
+
+function AutocompleteInput({ value, onChange, suggestions, placeholder }: {
+  value: string;
+  onChange: (v: string) => void;
+  suggestions: string[];
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const matches = value.length >= 2
+    ? suggestions.filter(s => s.toLowerCase().includes(value.toLowerCase())).slice(0, 6)
+    : [];
+
+  return (
+    <div className="relative">
+      <input
+        value={value}
+        onChange={e => { onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        placeholder={placeholder}
+        className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent"
+      />
+      {open && matches.length > 0 && (
+        <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+          {matches.map(m => (
+            <button
+              key={m}
+              type="button"
+              onMouseDown={e => { e.preventDefault(); onChange(m); setOpen(false); }}
+              className="w-full text-left px-3 py-2 text-sm text-ink hover:bg-[#FEF3C7] bg-transparent border-none cursor-pointer"
+            >
+              {m}
+            </button>
+          ))}
         </div>
       )}
     </div>
