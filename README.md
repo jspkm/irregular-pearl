@@ -6,7 +6,7 @@ A non-profit, community-driven classical music knowledge hub. Every piece gets a
 
 ## What it does
 
-- **137 pieces** across piano, violin, cello, voice, and winds — from Bach to Bartok
+- **180 pieces** across piano, violin, cello, voice, and winds — from Bach to Bartok
 - **Edition comparisons** with publisher, editor, year, and editorial notes
 - **Activity logging** — track practice, lessons, performances, listening, and sight-reading
 - **Threaded discussion** on every piece page with realtime updates
