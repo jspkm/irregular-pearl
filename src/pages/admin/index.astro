@@ -1,0 +1,14 @@
+---
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+import AdminDashboard from '../../components/admin/AdminDashboard';
+import { getStaffUser, isAdminRole, isMaestroRole } from '../../lib/admin';
+
+const staff = await getStaffUser(Astro.cookies);
+if (!staff) return Astro.redirect('/');
+
+const isAdmin = isAdminRole(staff.profile);
+const isMaestro = isMaestroRole(staff.profile);
+---
+<AdminLayout title="Dashboard" activeTab="dashboard" isAdmin={isAdmin} isMaestro={isMaestro} staffName={staff.profile.display_name}>
+  <AdminDashboard isAdmin={isAdmin} client:load />
+</AdminLayout>
