@@ -249,11 +249,13 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         <div className="flex-1 min-w-0">
           <h1 className="font-['Instrument_Serif'] text-2xl md:text-3xl mb-1">{profile.display_name}</h1>
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
-            {profile.instrument && <span>{profile.instrument}</span>}
+            {profile.instrument && profile.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (
+              <span key={inst} className="text-[11px] bg-[#FEF3C7] text-[#B45309] px-2 py-0.5 rounded-full font-medium">{inst}</span>
+            ))}
             {profile.level && (
               <span className="text-[11px] bg-success-bg text-success px-1.5 py-0.5 rounded capitalize">{profile.level}</span>
             )}
-            {profile.location && <span>· {profile.location}</span>}
+            {profile.location && <span className="text-xs">· {profile.location}</span>}
           </div>
           <div className="text-xs text-muted mt-1">Joined {formatDate(profile.created_at)}</div>
           {isOwnProfile && (
@@ -307,17 +309,47 @@ export default function ArtistProfile({ userId }: { userId: string }) {
               className="w-full border border-border rounded-lg px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:border-accent"
               placeholder="Tell other musicians about yourself..." />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs text-muted mb-1">Instrument</label>
-              <input value={editForm.instrument} onChange={e => setEditForm(f => ({ ...f, instrument: e.target.value }))}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., Cello, Piano" />
+          <div>
+            <label className="block text-xs text-muted mb-1">Instruments</label>
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {editForm.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (
+                <span key={inst} className="inline-flex items-center gap-1 text-xs bg-[#FEF3C7] text-[#B45309] px-2.5 py-1 rounded-full font-medium">
+                  {inst}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = editForm.instrument.split(',').map(i => i.trim()).filter(i => i && i !== inst).join(', ');
+                      setEditForm(f => ({ ...f, instrument: updated }));
+                    }}
+                    className="text-[#B45309]/60 hover:text-[#B45309] bg-transparent border-none cursor-pointer p-0 ml-0.5 text-sm leading-none"
+                  >
+                    x
+                  </button>
+                </span>
+              ))}
             </div>
-            <div>
-              <label className="block text-xs text-muted mb-1">Location</label>
-              <input value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., New York, NY" />
-            </div>
+            <input
+              placeholder="Type an instrument and press comma or Enter"
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
+              onKeyDown={e => {
+                if (e.key === ',' || e.key === 'Enter') {
+                  e.preventDefault();
+                  const val = (e.target as HTMLInputElement).value.trim();
+                  if (val) {
+                    const existing = editForm.instrument.split(',').map(i => i.trim()).filter(Boolean);
+                    if (!existing.includes(val)) {
+                      setEditForm(f => ({ ...f, instrument: [...existing, val].join(', ') }));
+                    }
+                    (e.target as HTMLInputElement).value = '';
+                  }
+                }
+              }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-muted mb-1">Location</label>
+            <input value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
+              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., New York, NY" />
           </div>
           <div>
             <label className="block text-xs text-muted mb-1">Website</label>
