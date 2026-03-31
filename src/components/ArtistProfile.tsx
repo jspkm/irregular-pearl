@@ -196,7 +196,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
 
   if (loading) {
     return (
-      <div className="max-w-[720px] mx-auto px-4 md:px-6 py-10">
+      <div className="max-w-[720px] mx-auto px-6 md:px-10 py-10">
         <div className="flex items-start gap-5 mb-8 animate-pulse">
           <div className="w-20 h-20 rounded-full bg-gray-200 flex-shrink-0" />
           <div className="flex-1">
@@ -220,7 +220,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="max-w-[720px] mx-auto px-4 md:px-6 py-10">
+    <div className="max-w-[720px] mx-auto px-6 md:px-10 py-10">
       {/* Header */}
       <div className="flex items-start gap-5 mb-6">
         <div className="relative flex-shrink-0">
