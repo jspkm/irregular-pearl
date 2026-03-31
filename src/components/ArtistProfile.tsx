@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
-import { formatDate, ACTIVITIES, randomNoteStarter } from '../lib/helpers';
+import { formatDate, ACTIVITIES, randomNoteStarter, normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import { VENUES } from '../data/venues';
 import GenerativeAvatar from './GenerativeAvatar';
 import VanitySlugEditor from './VanitySlugEditor';
@@ -288,19 +288,19 @@ export default function ArtistProfile({ userId }: { userId: string }) {
       {!editing && (
         <div className="mb-8">
           {profile.bio && <p className="text-sm text-muted leading-relaxed mb-3 whitespace-pre-line">{profile.bio}</p>}
-          {profile.website && (
-            <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-accent no-underline hover:underline mb-3 block">
-              {profile.website.replace(/^https?:\/\//, '')}
-            </a>
-          )}
-          {profile.social_links && Object.keys(profile.social_links).some(k => profile.social_links[k]) && (
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(profile.social_links).filter(([, v]) => v).map(([platform, url]) => (
-                <a key={platform} href={url.startsWith('http') ? url : `https://${url}`} target="_blank" rel="noopener noreferrer"
-                  className="text-xs text-muted hover:text-accent no-underline border border-border px-3 py-1.5 rounded-full transition-colors">
-                  {platform}
+          {(profile.website || (profile.social_links && Object.values(profile.social_links).some(Boolean))) && (
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              {profile.social_links && Object.entries(profile.social_links).filter(([, v]) => v).map(([platform, value]) => (
+                <a key={platform} href={normalizeSocialUrl(platform, value)} target="_blank" rel="noopener noreferrer" title={platform}
+                  className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-border flex items-center justify-center text-muted hover:text-[#B45309] hover:border-[#B45309] transition-colors no-underline">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" dangerouslySetInnerHTML={{ __html: getSocialIcon(platform) }} />
                 </a>
               ))}
+              {profile.website && (
+                <a href={normalizeWebsiteUrl(profile.website)} className="text-xs text-[#B45309] no-underline hover:underline" target="_blank" rel="noopener">
+                  {profile.website.replace(/^https?:\/\//, '')}
+                </a>
+              )}
             </div>
           )}
         </div>
