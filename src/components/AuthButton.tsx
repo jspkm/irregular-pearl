@@ -58,7 +58,7 @@ export default function AuthButton() {
     return (
       <div className="flex items-center gap-3">
         {isMaestro && (
-          <a href="/admin/playlist" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+          <a href="/maestro" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
             Maestro
           </a>
         )}
@@ -68,7 +68,7 @@ export default function AuthButton() {
           </a>
         )}
         {userRole === 'firstchair' && (
-          <a href="/admin/reports" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+          <a href="/firstchair" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
             First Chair
           </a>
         )}
