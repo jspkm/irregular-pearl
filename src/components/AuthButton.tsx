@@ -6,7 +6,6 @@ import GenerativeAvatar from './GenerativeAvatar';
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [dbAvatarUrl, setDbAvatarUrl] = useState<string | null | undefined>(undefined);
-  const [vanitySlug, setVanitySlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,10 +18,9 @@ export default function AuthButton() {
       setUser(session?.user ?? null);
       if (session?.user) {
         // Fetch avatar_url from public.users (respects user's choice)
-        supabase.from('users').select('avatar_url, vanity_slug').eq('id', session.user.id).single()
+        supabase.from('users').select('avatar_url').eq('id', session.user.id).single()
           .then(({ data }) => {
             setDbAvatarUrl(data?.avatar_url ?? null);
-            setVanitySlug((data as any)?.vanity_slug ?? null);
             setLoading(false);
           });
       } else {
@@ -54,7 +52,7 @@ export default function AuthButton() {
     const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
 
     return (
-      <a href={vanitySlug ? `/@${vanitySlug}` : `/profile/${user.id}`} className="block no-underline" title={displayName}>
+      <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
         {dbAvatarUrl ? (
           <img src={dbAvatarUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover" />
         ) : (
