@@ -422,7 +422,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                 }}
                 fields={[
                   { key: 'event_name', label: 'Event', value: p.event_name },
-                  { key: 'venue', label: '', value: p.venue || '', suggestions: VENUES, placeholder: 'Start typing venue name...' },
+                  { key: 'venue', label: 'Venue', value: p.venue || '', suggestions: VENUES },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
                   { key: 'role', label: '', value: p.role || 'performed', type: 'toggle', toggleLabels: ['Performed', 'Attended'], toggleValues: ['performed', 'attended'] },
                   { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea', placeholder: randomNoteStarter() },
