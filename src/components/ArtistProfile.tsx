@@ -422,7 +422,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                 }}
                 fields={[
                   { key: 'event_name', label: 'Event', value: p.event_name },
-                  { key: 'venue', label: 'Venue', value: p.venue || '' },
+                  { key: 'venue', label: 'Venue', value: p.venue || '', suggestions: VENUES },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
                   { key: 'role', label: '', value: p.role || 'performed', type: 'toggle', toggleLabels: ['Performed', 'Attended'], toggleValues: ['performed', 'attended'] },
                   { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea', placeholder: randomNoteStarter() },
@@ -846,7 +846,7 @@ function AutocompleteInput({ value, onChange, suggestions, placeholder }: {
         className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent"
       />
       {open && matches.length > 0 && (
-        <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
           {matches.map(m => (
             <button
               key={m}
