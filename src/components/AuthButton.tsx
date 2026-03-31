@@ -6,7 +6,8 @@ import GenerativeAvatar from './GenerativeAvatar';
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [dbAvatarUrl, setDbAvatarUrl] = useState<string | null | undefined>(undefined);
-  const [isStaff, setIsStaff] = useState(false);
+  const [userRole, setUserRole] = useState<string>('user');
+  const [isMaestro, setIsMaestro] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,9 +23,8 @@ export default function AuthButton() {
         supabase.from('users').select('avatar_url, role, is_maestro').eq('id', session.user.id).single()
           .then(({ data }) => {
             setDbAvatarUrl(data?.avatar_url ?? null);
-            const role = (data as any)?.role;
-            const isMaestro = (data as any)?.is_maestro;
-            setIsStaff(role === 'admin' || role === 'firstchair' || isMaestro === true);
+            setUserRole((data as any)?.role || 'user');
+            setIsMaestro((data as any)?.is_maestro === true);
             setLoading(false);
           });
       } else {
@@ -57,9 +57,19 @@ export default function AuthButton() {
 
     return (
       <div className="flex items-center gap-3">
-        {isStaff && (
+        {isMaestro && (
+          <a href="/admin/playlist" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+            Maestro
+          </a>
+        )}
+        {userRole === 'admin' && (
           <a href="/admin" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
             Admin
+          </a>
+        )}
+        {userRole === 'firstchair' && (
+          <a href="/admin/reports" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+            First Chair
           </a>
         )}
         <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
