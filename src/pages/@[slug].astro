@@ -17,12 +17,13 @@ const { data: user } = await supabase
 
 if (!user) return Astro.redirect('/');
 
-// Fetch instruments owned by this user
+// Fetch instruments owned by this user (exclude blank entries)
 const { data: instruments } = await supabase
   .from('instruments')
   .select('*')
   .eq('current_owner_id', user.id)
-  .eq('privacy_level', 'public');
+  .eq('privacy_level', 'public')
+  .neq('type', '');
 
 // Fetch recent activity
 const { data: activity } = await supabase
@@ -32,13 +33,14 @@ const { data: activity } = await supabase
   .order('created_at', { ascending: false })
   .limit(10);
 
-// Fetch upcoming events
-const { data: events } = await supabase
-  .from('event_performances')
-  .select('events!inner(id, title, venue, city, event_date, event_type)')
-  .eq('artist_id', user.id)
-  .order('created_at', { ascending: false })
-  .limit(5);
+// Fetch performances
+const { data: performances } = await supabase
+  .from('performances')
+  .select('id, event_name, venue, date, role, notes, notes_public')
+  .eq('user_id', user.id)
+  .neq('event_name', '')
+  .order('date', { ascending: false })
+  .limit(20);
 
 const trainingHistory = (user.training_history || []) as { year: string; title: string; detail: string }[];
 const seoDescription = `${user.display_name} on Irregular Pearl — ${user.instrument || 'musician'}. ${user.bio?.slice(0, 120) || ''}`;
@@ -84,9 +86,9 @@ const breadcrumbLd = {
           <h1 class="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{user.display_name}</h1>
           <p class="font-mono text-xs text-[#A8A29E] mb-2">irregularpearl.org/@{slug}</p>
           <div class="flex flex-wrap gap-2 items-center">
-            {user.instrument && (
-              <span class="text-[11px] px-2.5 py-1 bg-[#FEF3C7] text-[#B45309] rounded-full font-medium">{user.instrument}</span>
-            )}
+            {user.instrument && user.instrument.split(',').map((i: string) => i.trim()).filter(Boolean).map((inst: string) => (
+              <span class="text-[11px] px-2.5 py-1 bg-[#FEF3C7] text-[#B45309] rounded-full font-medium">{inst}</span>
+            ))}
             {user.level && (
               <span class="text-[11px] px-2.5 py-1 bg-green-50 text-green-700 rounded-full capitalize font-medium">{user.level}</span>
             )}
@@ -139,6 +141,32 @@ const breadcrumbLd = {
               </div>
             </a>
           ))}
+        </section>
+      )}
+      <!-- Performances -->
+      {performances && performances.length > 0 && (
+        <section class="mb-8">
+          <h2 class="font-display text-xl mb-4">Performances</h2>
+          <div class="space-y-2">
+            {performances.map((p: any) => (
+              <div class="bg-surface border border-border rounded-lg px-5 py-3">
+                <div class="text-sm font-medium text-ink">
+                  {p.event_name}
+                  {p.role && (
+                    <span class={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${p.role === 'performed' ? 'bg-[#FEF3C7] text-[#B45309]' : 'bg-blue-50 text-blue-700'}`}>
+                      {p.role === 'performed' ? 'Performed' : 'Attended'}
+                    </span>
+                  )}
+                </div>
+                <div class="text-xs text-muted">{p.venue && `${p.venue} · `}{p.date || ''}</div>
+                {p.notes && p.notes_public && (
+                  <div class="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2">
+                    {p.notes}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </main>
