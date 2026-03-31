@@ -205,22 +205,6 @@ export default function ArtistProfile({ userId }: { userId: string }) {
 
   return (
     <div className="max-w-[720px] mx-auto px-4 md:px-6 py-10">
-      {/* Owner edit bar */}
-      {isOwnProfile && (
-        <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-lg px-4 py-2.5 mb-6 flex items-center justify-between">
-          <span className="text-sm text-[#92400E]">You are editing your profile</span>
-          {(profile as any).vanity_slug ? (
-            <a
-              href={`/@${(profile as any).vanity_slug}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1C1917] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
-            >
-              View public profile
-            </a>
-          ) : (
-            <span className="text-xs text-[#92400E]">Set a username below to get a public profile URL</span>
-          )}
-        </div>
-      )}
       {/* Header */}
       <div className="flex items-start gap-5 mb-6">
         <div className="relative flex-shrink-0">

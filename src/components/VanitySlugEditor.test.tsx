@@ -17,7 +17,7 @@ describe('VanitySlugEditor', () => {
       <VanitySlugEditor userId="test-id" currentSlug="cellist-anna" onSlugChange={() => {}} />
     );
     expect(getByText(/cellist-anna/)).toBeTruthy();
-    expect(getByText('Change')).toBeTruthy();
+    expect(getByText('Change username')).toBeTruthy();
   });
 
   test('shows input field after clicking Claim', () => {
@@ -30,11 +30,20 @@ describe('VanitySlugEditor', () => {
     expect(getByText('Cancel')).toBeTruthy();
   });
 
-  test('shows pre-filled input after clicking Change', () => {
+  test('shows pre-filled input after clicking Change username', () => {
     const { getByText, getByDisplayValue } = render(
       <VanitySlugEditor userId="test-id" currentSlug="cellist-anna" onSlugChange={() => {}} />
     );
-    fireEvent.click(getByText('Change'));
+    fireEvent.click(getByText('Change username'));
     expect(getByDisplayValue('cellist-anna')).toBeTruthy();
+  });
+
+  test('shows View link to public profile', () => {
+    const { getByText } = render(
+      <VanitySlugEditor userId="test-id" currentSlug="cellist-anna" onSlugChange={() => {}} />
+    );
+    const viewLink = getByText('View');
+    expect(viewLink).toBeTruthy();
+    expect(viewLink.getAttribute('href')).toBe('/@cellist-anna');
   });
 });

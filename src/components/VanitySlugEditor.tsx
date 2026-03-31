@@ -64,11 +64,18 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
             <span className="font-mono text-xs text-[#A8A29E]">
               irregularpearl.org/@{currentSlug}
             </span>
+            <a
+              href={`/@${currentSlug}`}
+              className="text-[11px] text-accent hover:underline no-underline"
+            >
+              View
+            </a>
+            <span className="text-[11px] text-[#E7E5E4]">·</span>
             <button
               onClick={() => { setEditing(true); setSlug(currentSlug); }}
               className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0"
             >
-              Change
+              Change username
             </button>
             {saved && <span className="text-[11px] text-green-600">Saved</span>}
           </>
