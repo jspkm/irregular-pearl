@@ -423,7 +423,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                   { key: 'event_name', label: 'Event', value: p.event_name },
                   { key: 'venue', label: 'Venue', value: p.venue || '' },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
-                  { key: 'role', label: 'I was', value: p.role || 'performed', type: 'select', options: [
+                  { key: 'role', label: '', value: p.role || 'performed', type: 'select', options: [
                     { value: 'performed', label: 'Performed' },
                     { value: 'attended', label: 'Attended' },
                   ]},
@@ -753,7 +753,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
       <div className="bg-surface border border-accent/30 rounded-lg px-4 py-3 space-y-2">
         {fields.map(f => (
           <div key={f.key}>
-            <label className="block text-[11px] text-muted mb-0.5">{f.label}</label>
+            {f.label && <label className="block text-[11px] text-muted mb-0.5">{f.label}</label>}
             {f.type === 'select' && f.options ? (
               <select value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
                 className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent bg-white">
