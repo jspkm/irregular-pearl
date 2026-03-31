@@ -9,6 +9,7 @@ if (hasSupabase) {
     .from('events')
     .select('*, event_performances(users(display_name, vanity_slug), pieces(title))')
     .gte('event_date', new Date().toISOString().split('T')[0])
+    .neq('title', '')
     .order('event_date', { ascending: true })
     .limit(50);
   events = data || [];
@@ -58,7 +59,7 @@ const jsonLd = {
             </div>
             <div class="flex-1">
               <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded inline-block mb-1 capitalize">{event.event_type}</span>
-              <div class="font-display text-lg text-ink mb-0.5">{event.title}</div>
+              <div class="font-display text-lg text-ink mb-0.5">{event.title || 'Untitled Event'}</div>
               {event.venue && (
                 <div class="text-xs text-muted">{event.venue}{event.city ? `, ${event.city}` : ''}</div>
               )}
