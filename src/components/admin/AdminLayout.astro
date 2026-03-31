@@ -12,7 +12,7 @@ const { title, activeTab, isAdmin, isMaestro, staffName, userRole } = Astro.prop
 const headerLabel = isAdmin ? 'Admin' : userRole === 'firstchair' ? 'First Chair' : isMaestro ? 'Maestro' : 'Admin';
 
 const reportsHref = isAdmin ? '/admin/reports' : '/firstchair/reports';
-const playlistHref = isAdmin ? '/admin/playlist' : '/maestro/playlist';
+const playlistHref = '/maestro';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', href: '/admin', show: isAdmin },

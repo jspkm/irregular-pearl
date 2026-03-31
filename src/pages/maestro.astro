@@ -1,7 +1,7 @@
 ---
-import AdminLayout from '../../components/admin/AdminLayout.astro';
-import AdminPlaylist from '../../components/admin/AdminPlaylist';
-import { getStaffUser, isAdminRole, isMaestroRole } from '../../lib/admin';
+import AdminLayout from '../components/admin/AdminLayout.astro';
+import AdminPlaylist from '../components/admin/AdminPlaylist';
+import { getStaffUser, isAdminRole, isMaestroRole } from '../lib/admin';
 
 const staff = await getStaffUser(Astro.cookies);
 if (!staff) return Astro.redirect('/');
