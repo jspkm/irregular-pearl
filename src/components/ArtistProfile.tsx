@@ -287,7 +287,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
       {/* Bio & links */}
       {!editing && (
         <div className="mb-8">
-          {profile.bio && <p className="text-sm text-muted leading-relaxed mb-3">{profile.bio}</p>}
+          {profile.bio && <p className="text-sm text-muted leading-relaxed mb-3 whitespace-pre-line">{profile.bio}</p>}
           {profile.website && (
             <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-accent no-underline hover:underline mb-3 block">
               {profile.website.replace(/^https?:\/\//, '')}
@@ -440,7 +440,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                 </div>
                 <div className="text-xs text-muted">{p.venue && `${p.venue} · `}{p.date || ''}</div>
                 {p.notes && (isOwnProfile || p.notes_public) && (
-                  <div className="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2">
+                  <div className="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2 whitespace-pre-line">
                     <span className="text-muted font-medium">How was it: </span>
                     {p.notes}
                     {isOwnProfile && !p.notes_public && (

@@ -101,7 +101,7 @@ const breadcrumbLd = {
 
       <!-- Bio -->
       {user.bio && (
-        <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-4">{user.bio}</p>
+        <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-4 whitespace-pre-line">{user.bio}</p>
       )}
 
       <!-- Social & Website (inline, visible on all screens) -->
@@ -181,7 +181,7 @@ const breadcrumbLd = {
                 </div>
                 <div class="text-xs text-muted">{p.venue && `${p.venue} · `}{p.date || ''}</div>
                 {p.notes && p.notes_public && (
-                  <div class="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2">
+                  <div class="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2 whitespace-pre-line">
                     {p.notes}
                   </div>
                 )}
