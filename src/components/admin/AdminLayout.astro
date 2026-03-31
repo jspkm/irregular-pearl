@@ -11,11 +11,14 @@ interface Props {
 const { title, activeTab, isAdmin, isMaestro, staffName, userRole } = Astro.props;
 const headerLabel = isAdmin ? 'Admin' : userRole === 'firstchair' ? 'First Chair' : isMaestro ? 'Maestro' : 'Admin';
 
+const reportsHref = isAdmin ? '/admin/reports' : '/firstchair/reports';
+const playlistHref = isAdmin ? '/admin/playlist' : '/maestro/playlist';
+
 const tabs = [
-  { id: 'dashboard', label: 'Dashboard', href: '/admin', show: true },
+  { id: 'dashboard', label: 'Dashboard', href: '/admin', show: isAdmin },
   { id: 'users', label: 'Users', href: '/admin/users', show: isAdmin },
-  { id: 'reports', label: 'Reports', href: '/admin/reports', show: isAdmin || !isMaestro },
-  { id: 'playlist', label: 'Playlist', href: '/admin/playlist', show: isMaestro },
+  { id: 'reports', label: 'Reports', href: reportsHref, show: isAdmin || userRole === 'firstchair' },
+  { id: 'playlist', label: 'Playlist', href: playlistHref, show: isMaestro },
 ].filter(t => t.show);
 ---
 <div class="min-h-screen bg-bg">
