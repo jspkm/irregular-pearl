@@ -805,7 +805,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
 
   return (
     <div className="bg-surface border border-border rounded-lg px-5 md:px-6 py-3 flex justify-between items-start group">
-      <div className="flex-1 min-w-0">{children}</div>
+      <div className="flex-1 min-w-0 whitespace-pre-line">{children}</div>
       {isOwner && (
         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
           <button onClick={() => setEditMode(true)} className="text-muted hover:text-ink bg-transparent border-none cursor-pointer p-1" title="Edit">
