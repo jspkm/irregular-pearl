@@ -21,7 +21,7 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Toccata_and_Fugue_in_D_minor,_BWV_565_(Bach,_Johann_Sebastian)', label: 'IMSLP — 12 editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=ho9rZjlsyYY', label: 'Karl Richter — St. Mark\'s Basilica' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=ho9rZjlsyYY', label: 'Toccata and Fugue in D Minor' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Toccata_and_Fugue_in_D_minor,_BWV_565', label: 'Wikipedia — Toccata and Fugue BWV 565' }
     ],
   },
@@ -202,7 +202,7 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-shost-q8-dsch', publisher: 'DSCH Publishers', editor: 'Manashir Yakubov', year: 2005, description: 'New collected works edition with detailed editorial commentary.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=PjvTTfbpWjY', label: 'Borodin Quartet — definitive recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=PjvTTfbpWjY', label: 'Shostakovich String Quartet No. 8 in C Minor' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._8_(Shostakovich)', label: 'Wikipedia — Shostakovich Quartet No. 8' }
     ],
   },
@@ -290,7 +290,7 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.5,_Op.67_(Beethoven,_Ludwig_van)', label: 'IMSLP — editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=jv2WJMVPQi8', label: 'Carlos Kleiber — Vienna Philharmonic' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=jv2WJMVPQi8', label: 'Beethoven - Symphony No. 5' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Beethoven)', label: 'Wikipedia — Beethoven Symphony No. 5' }
     ],
   },
@@ -330,7 +330,7 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-mahler-sym5-kalmus', publisher: 'Kalmus', editor: 'Edwin F. Kalmus', year: 1964, description: 'Affordable study score.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=vOvXhyldUko', label: 'Bernstein — Vienna Philharmonic' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=vOvXhyldUko', label: 'Mahler - Symphony No.5 - Abbado - Lucerne Festival Orches...' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Mahler)', label: 'Wikipedia — Mahler Symphony No. 5' }
     ],
   },
@@ -351,7 +351,7 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.4,_Op.98_(Brahms,_Johannes)', label: 'IMSLP — editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=pT6SN4tPbv8', label: 'Carlos Kleiber — Bavarian State Orchestra' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=pT6SN4tPbv8', label: 'Johannes Brahms - Symphony no.4, op.98' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._4_(Brahms)', label: 'Wikipedia — Brahms Symphony No. 4' }
     ],
   },
@@ -533,7 +533,7 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.2,_Op.18_(Rachmaninoff,_Sergei)', label: 'IMSLP — editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=rEGOihjqO9w', label: 'Anna Fedorova — complete performance' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=rEGOihjqO9w', label: 'Rachmaninoff: Piano Concerto no.2 op.18 - Anna Fedorova -...' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Rachmaninoff)', label: 'Wikipedia — Rachmaninoff Piano Concerto No. 2' }
     ],
   },
@@ -554,7 +554,7 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.3,_Op.30_(Rachmaninoff,_Sergei)', label: 'IMSLP — editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=D5mxU_7BTRA', label: 'Horowitz — complete legendary performance' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=D5mxU_7BTRA', label: 'Horowitz Rachmaninoff 3rd Concerto Mehta NYPO 1978' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._3_(Rachmaninoff)', label: 'Wikipedia — Rachmaninoff Piano Concerto No. 3' }
     ],
   },
@@ -641,7 +641,7 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-rodrigo-ca-schott2', publisher: 'Schott', editor: 'Joaquín Rodrigo', year: 1959, description: 'Original authorized edition.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=e9RS4biqyAc', label: 'Pepe Romero — complete performance' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=e9RS4biqyAc', label: 'Paco de Lucía Concierto Aranjuez - Adagio' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Concierto_de_Aranjuez', label: 'Wikipedia — Concierto de Aranjuez' }
     ],
   },

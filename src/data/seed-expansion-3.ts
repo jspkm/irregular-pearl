@@ -361,7 +361,7 @@ export const expansionPieces3: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=sPlhKP0nZII",
-        "label": "Karajan — Vienna Philharmonic"
+        "label": "Mozart - Requiem in D minor (Complete/Full) [HD]"
       },
       {
         "type": "wikipedia",
@@ -485,7 +485,7 @@ export const expansionPieces3: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=YCp5XC2rsEM",
-        "label": "Renaud Capuçon & Martha Argerich"
+        "label": "César Franck - Violin Sonata"
       },
       {
         "type": "wikipedia",
@@ -600,7 +600,7 @@ export const expansionPieces3: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=hlR9rDJMEiQ",
-        "label": "Karajan — Berlin Philharmonic"
+        "label": "Debussy - La Mer"
       },
       {
         "type": "wikipedia",
@@ -673,7 +673,7 @@ export const expansionPieces3: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=Isic2Z2e2xs",
-        "label": "Karajan — Berlin Philharmonic"
+        "label": "Gustav Holst- The Planets, Full Suite"
       },
       {
         "type": "wikipedia",

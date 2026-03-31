@@ -47,8 +47,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.1_in_G_major,_BWV_1007_(Bach,_Johann_Sebastian)', label: 'IMSLP — 12 editions available' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=PCicM6i59_I', label: 'Rostropovich (1991) — reference recording' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=DwHpDOWhkGk', label: 'Yo-Yo Ma (2018) — Six Evolutions' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=PCicM6i59_I', label: 'Bach Cello Suite No.1 - Prelude' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=DwHpDOWhkGk', label: 'Bach - Cello Suite No. 1 in G Major BWV1007 - Mov. 1-3/6' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Cello Suites' }
     ],
   },
@@ -69,7 +69,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_in_B_minor,_Op.104_(Dvo%C5%99%C3%A1k,_Anton%C3%ADn)', label: 'IMSLP — Dvořák Cello Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=FVKb3DwPFA8', label: 'Du Pré / Celibidache (1967)' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=FVKb3DwPFA8', label: 'Gautier Capuçon | Dvořák: Cello Concerto' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Dvo%C5%99%C3%A1k)', label: 'Wikipedia — Dvořák Cello Concerto' }
     ],
   },
@@ -92,7 +92,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.14,_Op.27_No.2_(Beethoven,_Ludwig_van)', label: 'IMSLP — Moonlight Sonata' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=4Tr0otuiQuU', label: 'Barenboim — complete sonata' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=4Tr0otuiQuU', label: 'Beethoven - Moonlight Sonata' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._14_(Beethoven)', label: 'Wikipedia — Moonlight Sonata' }
     ],
   },
@@ -134,7 +134,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Etudes,_Op.10_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Études Op. 10' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=g0hoN6_HDVU', label: 'Pollini — Op. 10 complete' }
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=g0hoN6_HDVU', label: 'Chopin: Etudes Op.10 and Op.25' }
     ],
   },
   {
@@ -154,7 +154,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Suite_bergamasque_(Debussy,_Claude)', label: 'IMSLP — Suite bergamasque' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=CvFH_6DNRCY', label: 'Gieseking — classic interpretation' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=CvFH_6DNRCY', label: 'CLAUDE DEBUSSY:  CLAIR DE LUNE' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Suite_bergamasque', label: 'Wikipedia — Suite bergamasque' }
     ],
   },
@@ -218,7 +218,7 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-mozart-qon-schirmer', publisher: 'G. Schirmer', editor: 'Ruth Martin & Thomas Martin', year: 1951, description: 'English/German vocal score. Practical for audition preparation and studio use.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YuBeBjqKSGQ', label: 'Diana Damrau — Royal Opera House' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YuBeBjqKSGQ', label: 'The Magic Flute – Queen of the Night aria' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Der_H%C3%B6lle_Rache_kocht_in_meinem_Herzen', label: 'Wikipedia — Queen of the Night Aria' }
     ],
   },
@@ -349,7 +349,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.2,_Op.18_(Rachmaninoff,_Sergei)', label: 'IMSLP — Rachmaninoff Piano Concerto No. 2' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=rEGOihjqO9w', label: 'Rachmaninoff (composer\'s own recording, 1929)' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=rEGOihjqO9w', label: 'Rachmaninoff: Piano Concerto No. 2 — Anna Fedorova' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Rachmaninoff)', label: 'Wikipedia — Rachmaninoff Piano Concerto No. 2' }
     ],
   },
@@ -393,7 +393,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.3_in_C_major,_BWV_1009_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 3' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mGQLXRTl3Z0', label: 'Rostropovich — complete suite' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mGQLXRTl3Z0', label: 'Mischa Maisky plays Bach Cello Suite No.1 in G' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
     ],
   },
@@ -760,7 +760,7 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-puccini-nd-schirmer', publisher: 'G. Schirmer', editor: 'Licensed reprint', year: 1958, description: 'Vocal score with English and Italian text. Standard for American studios and auditions.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=cWc7vYjgnTs', label: 'Pavarotti — 1990 World Cup concert' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=cWc7vYjgnTs', label: 'Luciano Pavarotti sings "Nessun dorma" from Turandot' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nessun_dorma', label: 'Wikipedia — Nessun dorma' }
     ],
   },
@@ -819,8 +819,8 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-verdi-ldm-schirmer', publisher: 'G. Schirmer', editor: 'Ruth Martin & Thomas Martin', year: 1957, description: 'Italian/English vocal score. Standard American studio and audition edition.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8A3zetSuYRg', label: 'Pavarotti — classic recording' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=xCFEk6Y8TmM', label: 'Juan Diego Flórez — live' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8A3zetSuYRg', label: 'Rigoletto La Dona e mobile' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=xCFEk6Y8TmM', label: 'Luciano Pavarotti - La Donna È Mobile' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile', label: 'Wikipedia — La donna è mobile' }
     ],
   },
@@ -841,7 +841,7 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-verdi-vp-dover', publisher: 'Dover', editor: 'Full score reprint', year: 1998, description: 'Affordable full orchestral score for study and conducting preparation.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=2F4G5H_TTvU', label: 'Riccardo Muti / La Scala — legendary encore' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=2F4G5H_TTvU', label: 'Nabucco - Hebrew Slaves Chorus' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Va,_pensiero', label: 'Wikipedia — Va, pensiero' }
     ],
   },
@@ -862,7 +862,7 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Ellens_Gesang_III,_D.839_(Schubert,_Franz)', label: 'IMSLP — Schubert Ave Maria' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=2bosouX_d8Y', label: 'Barbara Bonney' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=2bosouX_d8Y', label: 'Schubert - Ave Maria' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Ellens_dritter_Gesang', label: 'Wikipedia — Ave Maria (Schubert)' }
     ],
   },
@@ -945,7 +945,7 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-bizet-hab-peters', publisher: 'Peters', editor: 'Fritz Oeser', year: 1964, description: 'Critical edition that restores dialogue passages often replaced by recitatives in the Guiraud version.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KJ_HHRJf0xg', label: 'Maria Callas — classic recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KJ_HHRJf0xg', label: 'Carmen - Habanera' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Habanera_(Carmen)', label: 'Wikipedia — Habanera (Carmen)' }
     ],
   },
@@ -989,8 +989,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Clarinet_Concerto_in_A_major,_K.622_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Clarinet Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YT_63UntRJE', label: 'Martin Fröst — live' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=iCEDfZgDPS8', label: 'Karl Leister / Karajan — Berlin Philharmonic' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YT_63UntRJE', label: 'Wolfgang Amadeus Mozart: Clarinet Concerto in A major, K.622' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=iCEDfZgDPS8', label: 'Mussorgsky - Night on Bald Mountain' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Concerto_(Mozart)', label: 'Wikipedia — Mozart Clarinet Concerto' }
     ],
   },
@@ -1110,7 +1110,7 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-rodrigo-ca-schott-rev', publisher: 'Schott', editor: 'Revised edition', year: 1984, description: 'Corrected reprint with minor engraving improvements. The standard modern performance edition.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=e9RS4biqyAc', label: 'Narciso Yepes — original soloist, 1960s' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=e9RS4biqyAc', label: 'Paco de Lucía Concierto Aranjuez - Adagio' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Concierto_de_Aranjuez', label: 'Wikipedia — Concierto de Aranjuez' }
     ],
   },
@@ -1131,8 +1131,8 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-barber-afs-schirmer-sq', publisher: 'G. Schirmer', editor: 'String Quartet Op. 11', year: 1943, description: 'The original string quartet from which the Adagio is drawn. Essential for understanding the work\'s origins.' }
     ],
     external_links: [
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=izQsgE0L450', label: 'Leonard Bernstein / New York Philharmonic' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=WAoLJ8GbA4Y', label: 'Gustavo Dudamel / Berlin Philharmonic' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=izQsgE0L450', label: 'Samuel Barber - Adagio for Strings' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=WAoLJ8GbA4Y', label: 'Vienna Philharmonic & Gustavo Dudamel – Barber: Adagio fo...' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Adagio_for_Strings', label: 'Wikipedia — Adagio for Strings' }
     ],
   },

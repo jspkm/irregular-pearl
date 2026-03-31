@@ -39,7 +39,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=IeKMMDxrsBE",
-        "label": "Martha Argerich — live performance"
+        "label": "Liszt: Sonata in B Minor"
       },
       {
         "type": "wikipedia",
@@ -128,7 +128,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=hKgcHjq1xKQ",
-        "label": "Martha Argerich — live"
+        "label": "Pogorelich plays Ravel: Gaspard de la nuit"
       },
       {
         "type": "wikipedia",
@@ -223,7 +223,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=JTc1mDieQI8",
-        "label": "Harnoncourt — period instruments"
+        "label": "Mozart - Symphony No. 40 in G minor, K. 550 [complete]"
       },
       {
         "type": "wikipedia",
@@ -276,7 +276,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=ETNoPqYAIPI",
-        "label": "Karajan — Berlin Philharmonic"
+        "label": "Antonin Dvorak - New World Symphony"
       },
       {
         "type": "wikipedia",
@@ -354,7 +354,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=EkwqPJZe8ms",
-        "label": "Boulez — Cleveland Orchestra"
+        "label": "Stravinsky The Rite of Spring // London Symphony Orchestr..."
       },
       {
         "type": "wikipedia",
@@ -618,7 +618,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=GRxofEmo3HA",
-        "label": "Janine Jansen — complete"
+        "label": "Four Seasons ~ Vivaldi"
       },
       {
         "type": "wikipedia",
@@ -707,7 +707,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=I1Yoyz6_Los",
-        "label": "Leif Ove Andsnes — complete"
+        "label": "Arthur Rubinstein - Grieg - Piano Concerto in A minor, Op 16"
       },
       {
         "type": "wikipedia",
@@ -755,7 +755,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=ZWCZq33BrOo",
-        "label": "Muti — Philadelphia Orchestra"
+        "label": "Saint-Saëns - Symphony No 3 in C minor, Op 78 - Järvi"
       },
       {
         "type": "wikipedia",
@@ -797,7 +797,7 @@ export const expansionPieces2: SeedPiece[] = [
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=izQsgE0L450",
-        "label": "Bernstein — New York Philharmonic"
+        "label": "Samuel Barber - Adagio for Strings"
       },
       {
         "type": "wikipedia",

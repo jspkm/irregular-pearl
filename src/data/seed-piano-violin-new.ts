@@ -21,7 +21,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.8,_Op.13_(Beethoven,_Ludwig_van)', label: 'IMSLP — Pathétique Sonata' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SrcOcKYQX3c', label: 'Daniel Barenboim — complete sonata' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SrcOcKYQX3c', label: 'Daniel Barenboim plays Beethoven Sonata No. 8 Op. 13' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._8_(Beethoven)', label: 'Wikipedia — Pathétique Sonata' }
     ],
   },
@@ -62,7 +62,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.21,_Op.53_(Beethoven,_Ludwig_van)', label: 'IMSLP — Waldstein Sonata' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=lbblMw6k1cU', label: 'Maurizio Pollini — studio recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=lbblMw6k1cU', label: 'Beethoven: Sonata No.21 in C Major, "Waldstein"' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._21_(Beethoven)', label: 'Wikipedia — Waldstein Sonata' }
     ],
   },
@@ -83,7 +83,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Etudes,_Op.10_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Études Op. 10' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Mk1JQk90UbY', label: 'Maurizio Pollini — Op. 10 complete' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Mk1JQk90UbY', label: 'Chopin Revolutionary Etude op 10 no 12' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/%C3%89tude_Op._10,_No._12_(Chopin)', label: 'Wikipedia — Revolutionary Étude' }
     ],
   },
@@ -104,7 +104,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Nocturnes,_Op.9_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Nocturnes Op. 9' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YGRO05WcNDk', label: 'Arthur Rubinstein — studio recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YGRO05WcNDk', label: 'Chopin Nocturne Op.9 No.2' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nocturnes,_Op._9_(Chopin)', label: 'Wikipedia — Nocturnes Op. 9' }
     ],
   },
@@ -145,7 +145,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Polonaise_in_A-flat_major,_Op.53_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Heroic Polonaise' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8QT7ITv9Ecs', label: 'Vladimir Horowitz — Carnegie Hall' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8QT7ITv9Ecs', label: 'Chopin - Polonaise, Op. 53' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Polonaise_in_A-flat_major,_Op._53_(Chopin)', label: 'Wikipedia — Heroic Polonaise' }
     ],
   },
@@ -166,7 +166,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Fantaisie-impromptu,_Op.66_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Fantaisie-Impromptu' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=75x6DncZDgI', label: 'Arthur Rubinstein — studio recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=75x6DncZDgI', label: 'Chopin - Fantaisie Impromptu, Op. 66' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fantaisie-Impromptu', label: 'Wikipedia — Fantaisie-Impromptu' }
     ],
   },
@@ -187,7 +187,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Goldberg_Variations,_BWV_988_(Bach,_Johann_Sebastian)', label: 'IMSLP — Goldberg Variations' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=15ezpwCHtJs', label: 'Glenn Gould — 1955 debut recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=15ezpwCHtJs', label: 'Goldberg Variations Complete (J.S. Bach BWV 988), with sc...' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Goldberg_Variations', label: 'Wikipedia — Goldberg Variations' }
     ],
   },
@@ -228,7 +228,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Hungarian_Rhapsody_No.2,_S.244/2_(Liszt,_Franz)', label: 'IMSLP — Hungarian Rhapsody No. 2' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=LdH1hSWGFGU', label: 'Marc-André Hamelin — live performance' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=LdH1hSWGFGU', label: 'Valentina Lisitsa plays Liszt Hungarian Rhapsody No. 2' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Hungarian_Rhapsody_No._2', label: 'Wikipedia — Hungarian Rhapsody No. 2' }
     ],
   },
@@ -249,7 +249,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Liebestr%C3%A4ume,_S.541_(Liszt,_Franz)', label: 'IMSLP — Liebesträume' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KpOtuoHL45Y', label: 'Van Cliburn — studio recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KpOtuoHL45Y', label: 'Franz Liszt - Liebestraum - Love Dream' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Liebestr%C3%A4ume', label: 'Wikipedia — Liebesträume' }
     ],
   },
@@ -270,7 +270,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_in_B_minor,_S.178_(Liszt,_Franz)', label: 'IMSLP — Liszt Sonata in B minor' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=IeKMMDxrsBE', label: 'Krystian Zimerman — live performance' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=IeKMMDxrsBE', label: 'Liszt: Sonata in B Minor' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B_minor_(Liszt)', label: 'Wikipedia — Liszt Sonata in B minor' }
     ],
   },
@@ -332,7 +332,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Kinderszenen,_Op.15_(Schumann,_Robert)', label: 'IMSLP — Kinderszenen' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=6z82w0l6kwE', label: 'Vladimir Horowitz — Träumerei' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=6z82w0l6kwE', label: 'Schumann - Träumerei, "Kinderszenen" No. 7, Scenes from C...' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kinderszenen', label: 'Wikipedia — Kinderszenen' }
     ],
   },
@@ -453,7 +453,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_in_B-flat_major,_D.960_(Schubert,_Franz)', label: 'IMSLP — Schubert Sonata D. 960' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=MAZ8PA5_gVA', label: 'Alfred Brendel — studio recording' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=MAZ8PA5_gVA', label: 'Schubert: Piano Sonata in B-flat Major, D.960' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B-flat_major,_D._960_(Schubert)', label: 'Wikipedia — Schubert Sonata D. 960' }
     ],
   },
@@ -693,7 +693,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_minor,_Op.47_(Sibelius,_Jean)', label: 'IMSLP — Sibelius Violin Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=gpS_u5RvMpM', label: 'Jascha Heifetz / Hendl — Chicago Symphony' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=gpS_u5RvMpM', label: 'Sarah Chang plays Sibelius Violin Concerto in D minor' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Sibelius)', label: 'Wikipedia — Sibelius Violin Concerto' }
     ],
   },
@@ -754,7 +754,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/The_Four_Seasons_(Vivaldi,_Antonio)', label: 'IMSLP — The Four Seasons' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=GRxofEmo3HA', label: 'Janine Jansen — live with ensemble' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=GRxofEmo3HA', label: 'Four Seasons ~ Vivaldi' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Four_Seasons_(Vivaldi)', label: 'Wikipedia — The Four Seasons' }
     ],
   },
@@ -881,7 +881,7 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Partita_No.3_in_E_major,_BWV_1006_(Bach,_Johann_Sebastian)', label: 'IMSLP — Partita No. 3' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=1prweT95Mo0', label: 'Hilary Hahn — Preludio' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=1prweT95Mo0', label: 'Yo-Yo Ma - Bach: Cello Suite No. 1 in G Major, Prélude' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' }
     ],
   },
