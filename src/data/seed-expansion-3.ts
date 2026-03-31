@@ -37,11 +37,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP — editions available"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=BICxYMCp-us",
-        "label": "Seong-Jin Cho — Chopin Competition"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Concerto_No._1_(Chopin)",
         "label": "Wikipedia"
@@ -82,11 +77,6 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Piano_Concerto_No.2,_Op.21_(Chopin,_Fr%C3%A9d%C3%A9ric)",
         "label": "IMSLP"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=05FQGqhF9ng",
-        "label": "Zimerman — complete"
       },
       {
         "type": "wikipedia",
@@ -131,11 +121,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=g73GHxWcJpc",
-        "label": "Martha Argerich — live"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Concerto_(Schumann)",
         "label": "Wikipedia"
@@ -178,11 +163,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=qjQ5aE3S6nk",
-        "label": "Mitsuko Uchida — complete"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Sonata_No._11_(Mozart)",
         "label": "Wikipedia"
@@ -212,11 +192,6 @@ export const expansionPieces3: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=jS1IBgaXEHY",
-        "label": "Janine Jansen — live"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Prokofiev)",
@@ -263,11 +238,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=InxT4S6wQf4",
-        "label": "Kleiber — Vienna Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._3_(Beethoven)",
         "label": "Wikipedia"
@@ -306,11 +276,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=s1qAWcd4rr0",
-        "label": "Kleiber — Concertgebouw"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._7_(Beethoven)",
         "label": "Wikipedia"
@@ -347,11 +312,6 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Symphony_No.9,_Op.125_(Beethoven,_Ludwig_van)",
         "label": "IMSLP"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=t3gMfJYGhpU",
-        "label": "Bernstein — Berlin Wall 1989"
       },
       {
         "type": "wikipedia",
@@ -447,11 +407,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=wpYibADyh4k",
-        "label": "Klemperer — Philharmonia"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Ein_deutsches_Requiem",
         "label": "Wikipedia"
@@ -491,11 +446,6 @@ export const expansionPieces3: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=pM3XO4Fv7Xo",
-        "label": "Karajan — La Scala"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Requiem_(Verdi)",
@@ -576,11 +526,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=GBDBi1qbBPQ",
-        "label": "Karl Leister & Vermeer Quartet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Clarinet_Quintet_(Brahms)",
         "label": "Wikipedia"
@@ -617,11 +562,6 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Scheherazade,_Op.35_(Rimsky-Korsakov,_Nikolay)",
         "label": "IMSLP"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=SQNymNaTr-Y",
-        "label": "Gergiev — Vienna Philharmonic"
       },
       {
         "type": "wikipedia",
@@ -697,11 +637,6 @@ export const expansionPieces3: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=dZDiaRZy0Ak",
-        "label": "Dudamel — Vienna Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Bol%C3%A9ro",
         "label": "Wikipedia"
@@ -776,11 +711,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Sq7Gnno2OkI",
-        "label": "Richter — piano, Sofia 1958"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Pictures_at_an_Exhibition",
         "label": "Wikipedia"
@@ -819,11 +749,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=8OZCyp-LQ_o",
-        "label": "Abbado — Berlin Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/The_Marriage_of_Figaro",
         "label": "Wikipedia"
@@ -853,11 +778,6 @@ export const expansionPieces3: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Kt0FrfRWdik",
-        "label": "Emmanuel Pahud — flute"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Flute_Concerto_(Nielsen)",
@@ -895,11 +815,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=1-kGxDL5Yz4",
-        "label": "Pahud & Langlamet — Berlin Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Concerto_for_Flute,_Harp,_and_Orchestra_(Mozart)",
         "label": "Wikipedia"
@@ -933,11 +848,6 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Fantasia_and_Fugue_in_G_minor,_BWV_542_(Bach,_Johann_Sebastian)",
         "label": "IMSLP"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=4bZB8aq37wI",
-        "label": "Helmut Walcha — organ"
       },
       {
         "type": "wikipedia",
@@ -982,11 +892,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=1ZMJqKnLdus",
-        "label": "Jean-Yves Thibaudet — studio"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Estampes_(Debussy)",
         "label": "Wikipedia"
@@ -1029,11 +934,6 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=hBCjB-ao6mY",
-        "label": "Maurizio Pollini — live"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Polonaise_in_A-flat_major,_Op._53_(Chopin)",
         "label": "Wikipedia"
@@ -1067,11 +967,6 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Prelude_in_C-sharp_minor,_Op.3_No.2_(Rachmaninoff,_Sergei)",
         "label": "IMSLP"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=d-qwS3KLHs0",
-        "label": "Rachmaninoff — composer's own recording"
       },
       {
         "type": "wikipedia",

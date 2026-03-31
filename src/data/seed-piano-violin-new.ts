@@ -17,12 +17,12 @@ export const pianoViolinNew: SeedPiece[] = [
     editions: [
       { id: 'e-beethoven-s8-henle', publisher: 'Henle Verlag', editor: 'Bertha Antonia Wallner', year: 1980, description: 'Urtext edition with fingerings by Conrad Hansen. The standard scholarly edition for Beethoven sonatas.' },
       { id: 'e-beethoven-s8-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 1999, description: 'Viennese Urtext with detailed commentary on Beethoven\'s autograph markings and first edition variants.' },
-      { id: 'e-beethoven-s8-schirmer', publisher: 'G. Schirmer', editor: 'Hans von Bülow', year: 1894, description: 'Historic performance edition with extensive editorial markings. Reflects 19th-century performance practice.' },
+      { id: 'e-beethoven-s8-schirmer', publisher: 'G. Schirmer', editor: 'Hans von Bülow', year: 1894, description: 'Historic performance edition with extensive editorial markings. Reflects 19th-century performance practice.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.8,_Op.13_(Beethoven,_Ludwig_van)', label: 'IMSLP — Pathétique Sonata' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=SrcOcKYQX3c', label: 'Daniel Barenboim — complete sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._8_(Beethoven)', label: 'Wikipedia — Pathétique Sonata' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._8_(Beethoven)', label: 'Wikipedia — Pathétique Sonata' }
     ],
   },
   {
@@ -38,12 +38,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The "Appassionata" is one of Beethoven\'s most powerful and technically demanding sonatas. The first movement builds from a brooding opening to volcanic outbursts; the serene variations of the Andante lead without pause into a perpetual-motion finale of relentless intensity.',
     editions: [
       { id: 'e-beethoven-s23-henle', publisher: 'Henle Verlag', editor: 'Bertha Antonia Wallner', year: 1980, description: 'Urtext edition with fingerings by Conrad Hansen. Faithful to the autograph and first edition.' },
-      { id: 'e-beethoven-s23-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 2004, description: 'Detailed Urtext with scholarly notes on pedal markings and dynamic nuances from Beethoven\'s manuscripts.' },
+      { id: 'e-beethoven-s23-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 2004, description: 'Detailed Urtext with scholarly notes on pedal markings and dynamic nuances from Beethoven\'s manuscripts.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.23,_Op.57_(Beethoven,_Ludwig_van)', label: 'IMSLP — Appassionata Sonata' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8NRkEoj3MWo', label: 'Sviatoslav Richter — live 1960' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._23_(Beethoven)', label: 'Wikipedia — Appassionata Sonata' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._23_(Beethoven)', label: 'Wikipedia — Appassionata Sonata' }
     ],
   },
   {
@@ -59,12 +58,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Dedicated to Count Waldstein, this sonata marks the beginning of Beethoven\'s middle "heroic" period. The first movement\'s rapidly repeated chords and sweeping scales give way to one of the most luminous rondos in the piano literature, with its glissando octaves and ecstatic coda.',
     editions: [
       { id: 'e-beethoven-s21-henle', publisher: 'Henle Verlag', editor: 'Bertha Antonia Wallner', year: 1980, description: 'Urtext edition. Part of the complete Beethoven sonata series with fingerings by Conrad Hansen.' },
-      { id: 'e-beethoven-s21-peters', publisher: 'Peters', editor: 'Claudio Arrau & Lothar Hoffmann-Erbrecht', year: 1973, description: 'Performance-oriented Urtext with Arrau\'s practical fingerings and insightful editorial suggestions.' },
+      { id: 'e-beethoven-s21-peters', publisher: 'Peters', editor: 'Claudio Arrau & Lothar Hoffmann-Erbrecht', year: 1973, description: 'Performance-oriented Urtext with Arrau\'s practical fingerings and insightful editorial suggestions.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.21,_Op.53_(Beethoven,_Ludwig_van)', label: 'IMSLP — Waldstein Sonata' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=lbblMw6k1cU', label: 'Maurizio Pollini — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._21_(Beethoven)', label: 'Wikipedia — Waldstein Sonata' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._21_(Beethoven)', label: 'Wikipedia — Waldstein Sonata' }
     ],
   },
   {
@@ -80,12 +79,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Reportedly composed after Chopin learned of the fall of Warsaw to Russian forces in 1831, the "Revolutionary" Étude channels political fury into torrential left-hand passagework. The right hand declaims a defiant melody over unrelenting sixteenth-note figures that demand stamina and evenness across the entire range.',
     editions: [
       { id: 'e-chopin-e1012-henle', publisher: 'Henle Verlag', editor: 'Norbert Müllemann', year: 2004, description: 'Urtext edition of the complete Op. 10. Clean engraving with fingerings by Marc-André Hamelin.' },
-      { id: 'e-chopin-e1012-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2000, description: 'Polish National Edition with exhaustive critical commentary. The most authoritative modern source for Chopin\'s études.' },
+      { id: 'e-chopin-e1012-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2000, description: 'Polish National Edition with exhaustive critical commentary. The most authoritative modern source for Chopin\'s études.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Etudes,_Op.10_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Études Op. 10' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=Mk1JQk90UbY', label: 'Maurizio Pollini — Op. 10 complete' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/%C3%89tude_Op._10,_No._12_(Chopin)', label: 'Wikipedia — Revolutionary Étude' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/%C3%89tude_Op._10,_No._12_(Chopin)', label: 'Wikipedia — Revolutionary Étude' }
     ],
   },
   {
@@ -101,12 +100,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The most famous of Chopin\'s twenty-one nocturnes, composed when he was just twenty years old. A singing right-hand melody floats over a gently rocking left-hand accompaniment, with increasingly elaborate ornamentation on each return. Its accessibility and beauty make it one of the first Chopin pieces many pianists learn.',
     editions: [
       { id: 'e-chopin-n92-henle', publisher: 'Henle Verlag', editor: 'Ewald Zimmermann', year: 2005, description: 'Urtext edition of the complete nocturnes. Fingerings by Hans-Martin Theopold.' },
-      { id: 'e-chopin-n92-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 1995, description: 'Polish National Edition based on all available sources. Contains important variants not found in other editions.' },
+      { id: 'e-chopin-n92-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 1995, description: 'Polish National Edition based on all available sources. Contains important variants not found in other editions.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Nocturnes,_Op.9_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Nocturnes Op. 9' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=YGRO05WcNDk', label: 'Arthur Rubinstein — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nocturnes,_Op._9_(Chopin)', label: 'Wikipedia — Nocturnes Op. 9' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nocturnes,_Op._9_(Chopin)', label: 'Wikipedia — Nocturnes Op. 9' }
     ],
   },
   {
@@ -122,12 +121,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The most popular of Chopin\'s four scherzos, opening with a sotto voce question-and-answer figure that explodes into a brilliant con fuoco response. The lyrical middle section in A major provides contrast before the dramatic return.',
     editions: [
       { id: 'e-chopin-s2-henle', publisher: 'Henle Verlag', editor: 'Norbert Müllemann', year: 2007, description: 'Critical Urtext with fingerings by Vladimir Ashkenazy. Clean, scholarly presentation.' },
-      { id: 'e-chopin-s2-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2004, description: 'Polish National Edition with detailed source commentary and critical apparatus.' },
+      { id: 'e-chopin-s2-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2004, description: 'Polish National Edition with detailed source commentary and critical apparatus.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Scherzo_No.2,_Op.31_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Scherzo No. 2' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=sDBkFi7G8_o', label: 'Martha Argerich — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Scherzo_No._2_(Chopin)', label: 'Wikipedia — Chopin Scherzo No. 2' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Scherzo_No._2_(Chopin)', label: 'Wikipedia — Chopin Scherzo No. 2' }
     ],
   },
   {
@@ -143,12 +141,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The "Heroic" Polonaise is Chopin\'s most triumphant statement of Polish national pride. After a dramatic introduction, the famous main theme enters with unmatched grandeur. The central section features thundering left-hand octaves that have become a benchmark for pianistic stamina and power.',
     editions: [
       { id: 'e-chopin-p53-henle', publisher: 'Henle Verlag', editor: 'Norbert Müllemann', year: 2007, description: 'Urtext with fingerings by Vladimir Ashkenazy. Faithful to Chopin\'s autograph.' },
-      { id: 'e-chopin-p53-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 1998, description: 'The Polish National Edition, considered the most authoritative source for Chopin\'s polonaises.' },
+      { id: 'e-chopin-p53-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 1998, description: 'The Polish National Edition, considered the most authoritative source for Chopin\'s polonaises.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Polonaise_in_A-flat_major,_Op.53_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Heroic Polonaise' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=8QT7ITv9Ecs', label: 'Vladimir Horowitz — Carnegie Hall' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Polonaise_in_A-flat_major,_Op._53_(Chopin)', label: 'Wikipedia — Heroic Polonaise' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Polonaise_in_A-flat_major,_Op._53_(Chopin)', label: 'Wikipedia — Heroic Polonaise' }
     ],
   },
   {
@@ -164,12 +162,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Published posthumously against Chopin\'s wishes, the Fantaisie-Impromptu is one of the most popular piano pieces ever written. Its technical challenge lies in the polyrhythmic interplay of four-against-three between the hands. The dreamy central cantabile section contrasts with the fiery outer sections.',
     editions: [
       { id: 'e-chopin-fi-henle', publisher: 'Henle Verlag', editor: 'Ewald Zimmermann', year: 2005, description: 'Urtext edition of the complete impromptus. Includes both the published and earlier manuscript versions.' },
-      { id: 'e-chopin-fi-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2002, description: 'National Edition with critical commentary on the complex manuscript history of this work.' },
+      { id: 'e-chopin-fi-ekier', publisher: 'PWM / National Edition', editor: 'Jan Ekier', year: 2002, description: 'National Edition with critical commentary on the complex manuscript history of this work.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Fantaisie-impromptu,_Op.66_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Fantaisie-Impromptu' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=75x6DncZDgI', label: 'Arthur Rubinstein — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fantaisie-Impromptu', label: 'Wikipedia — Fantaisie-Impromptu' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fantaisie-Impromptu', label: 'Wikipedia — Fantaisie-Impromptu' }
     ],
   },
   {
@@ -185,13 +183,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'A monumental set of an aria and thirty variations, originally composed for two-manual harpsichord. Every third variation is a canon at increasing intervals. The work demands encyclopedic keyboard technique and profound musical understanding.',
     editions: [
       { id: 'e-bach-gv-henle', publisher: 'Henle Verlag', editor: 'Rudolf Steglich', year: 1977, description: 'Urtext edition with fingerings by Rolf Koenen. Includes a thorough critical report on source discrepancies.' },
-      { id: 'e-bach-gv-barenreiter', publisher: 'Bärenreiter', editor: 'Christoph Wolff', year: 1977, description: 'Part of the Neue Bach-Ausgabe. Scholarly edition with detailed historical notes.' },
+      { id: 'e-bach-gv-barenreiter', publisher: 'Bärenreiter', editor: 'Christoph Wolff', year: 1977, description: 'Part of the Neue Bach-Ausgabe. Scholarly edition with detailed historical notes.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Goldberg_Variations,_BWV_988_(Bach,_Johann_Sebastian)', label: 'IMSLP — Goldberg Variations' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Ah392lnFHnM', label: 'Glenn Gould — 1981 studio recording' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=15ezpwCHtJs', label: 'Glenn Gould — 1955 debut recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Goldberg_Variations', label: 'Wikipedia — Goldberg Variations' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Goldberg_Variations', label: 'Wikipedia — Goldberg Variations' }
     ],
   },
   {
@@ -207,12 +204,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Bach\'s brilliant imitation of an Italian orchestral concerto for solo keyboard. Written for two-manual harpsichord, the contrasts between forte and piano simulate the interplay of tutti and solo. The lyrical slow movement is one of Bach\'s most expressive keyboard creations.',
     editions: [
       { id: 'e-bach-ic-henle', publisher: 'Henle Verlag', editor: 'Rudolf Steglich', year: 1977, description: 'Urtext edition based on the original 1735 print from Clavier-Übung II.' },
-      { id: 'e-bach-ic-barenreiter', publisher: 'Bärenreiter', editor: 'Walter Emery', year: 1981, description: 'Part of the Neue Bach-Ausgabe. Scholarly edition with full critical commentary.' },
+      { id: 'e-bach-ic-barenreiter', publisher: 'Bärenreiter', editor: 'Walter Emery', year: 1981, description: 'Part of the Neue Bach-Ausgabe. Scholarly edition with full critical commentary.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Italian_Concerto,_BWV_971_(Bach,_Johann_Sebastian)', label: 'IMSLP — Italian Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SsBdl0sQMFo', label: 'Glenn Gould — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Italian_Concerto', label: 'Wikipedia — Italian Concerto' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Italian_Concerto', label: 'Wikipedia — Italian Concerto' }
     ],
   },
   {
@@ -228,12 +224,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The most famous of Liszt\'s nineteen Hungarian Rhapsodies. It follows the traditional Hungarian verbunkos structure: a slow, improvisatory lassan followed by a fast, brilliant friska. The cadenza passages and whirlwind coda demand spectacular virtuosity.',
     editions: [
       { id: 'e-liszt-hr2-henle', publisher: 'Henle Verlag', editor: 'Peter Jost', year: 2013, description: 'Urtext based on Liszt\'s autograph and first edition. Includes the original and revised cadenzas.' },
-      { id: 'e-liszt-hr2-emi', publisher: 'Editio Musica Budapest', editor: 'Zoltán Gárdonyi & István Szelényi', year: 1972, description: 'Hungarian critical edition from the Liszt complete works.' },
+      { id: 'e-liszt-hr2-emi', publisher: 'Editio Musica Budapest', editor: 'Zoltán Gárdonyi & István Szelényi', year: 1972, description: 'Hungarian critical edition from the Liszt complete works.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Hungarian_Rhapsody_No.2,_S.244/2_(Liszt,_Franz)', label: 'IMSLP — Hungarian Rhapsody No. 2' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=LdH1hSWGFGU', label: 'Marc-André Hamelin — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Hungarian_Rhapsody_No._2', label: 'Wikipedia — Hungarian Rhapsody No. 2' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Hungarian_Rhapsody_No._2', label: 'Wikipedia — Hungarian Rhapsody No. 2' }
     ],
   },
   {
@@ -249,12 +245,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The third and most famous of Liszt\'s three "Dreams of Love." A sweeping nocturne that builds from tender lyricism to a passionate climax with wide-spanning arpeggios before subsiding to a tranquil close. A staple of the Romantic piano repertoire.',
     editions: [
       { id: 'e-liszt-lb3-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2008, description: 'Urtext with fingerings by Hans-Martin Theopold. Based on the first edition overseen by Liszt.' },
-      { id: 'e-liszt-lb3-peters', publisher: 'Peters', editor: 'Emil von Sauer', year: 1917, description: 'The Sauer edition with practical performance suggestions from a direct Liszt pupil.' },
+      { id: 'e-liszt-lb3-peters', publisher: 'Peters', editor: 'Emil von Sauer', year: 1917, description: 'The Sauer edition with practical performance suggestions from a direct Liszt pupil.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Liebestr%C3%A4ume,_S.541_(Liszt,_Franz)', label: 'IMSLP — Liebesträume' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=KpOtuoHL45Y', label: 'Van Cliburn — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Liebestr%C3%A4ume', label: 'Wikipedia — Liebesträume' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Liebestr%C3%A4ume', label: 'Wikipedia — Liebesträume' }
     ],
   },
   {
@@ -270,12 +266,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'One of the supreme achievements of 19th-century piano music. Cast in a single continuous movement, Liszt fuses sonata form with a four-movement symphonic structure through thematic transformation. Dedicated to Schumann, it ranges from diabolical fury to sublime transcendence.',
     editions: [
       { id: 'e-liszt-sonata-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2016, description: 'Urtext based on autograph and first edition. Includes thorough critical commentary.' },
-      { id: 'e-liszt-sonata-emi', publisher: 'Editio Musica Budapest', editor: 'Imre Sulyok & Imre Mező', year: 1984, description: 'Critical edition from the Neue Liszt-Ausgabe. The most comprehensive scholarly source.' },
+      { id: 'e-liszt-sonata-emi', publisher: 'Editio Musica Budapest', editor: 'Imre Sulyok & Imre Mező', year: 1984, description: 'Critical edition from the Neue Liszt-Ausgabe. The most comprehensive scholarly source.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_in_B_minor,_S.178_(Liszt,_Franz)', label: 'IMSLP — Liszt Sonata in B minor' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=IeKMMDxrsBE', label: 'Krystian Zimerman — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B_minor_(Liszt)', label: 'Wikipedia — Liszt Sonata in B minor' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B_minor_(Liszt)', label: 'Wikipedia — Liszt Sonata in B minor' }
     ],
   },
   {
@@ -291,12 +287,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'One of Debussy\'s earliest and most beloved piano works. The intertwining melodic lines evoke the decorative arabesques of visual art. Though it predates his fully mature Impressionist style, its flowing triplet figures and luminous harmonies already hint at the revolutionary composer to come.',
     editions: [
       { id: 'e-debussy-a1-henle', publisher: 'Henle Verlag', editor: 'Ernst-Günter Heinemann', year: 2001, description: 'Urtext edition based on the first edition and Debussy\'s proofs.' },
-      { id: 'e-debussy-a1-durand', publisher: 'Durand', editor: 'Original publication', year: 1891, description: 'The original French edition published during Debussy\'s lifetime.' },
+      { id: 'e-debussy-a1-durand', publisher: 'Durand', editor: 'Original publication', year: 1891, description: 'The original French edition published during Debussy\'s lifetime.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/2_Arabesques_(Debussy,_Claude)', label: 'IMSLP — Deux Arabesques' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=Yh36PaE-Pf0', label: 'Jean-Yves Thibaudet — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Deux_arabesques', label: 'Wikipedia — Deux Arabesques' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Deux_arabesques', label: 'Wikipedia — Deux Arabesques' }
     ],
   },
   {
@@ -312,12 +308,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Inspired by "the sound of water and the musical sounds made by fountains, waterfalls, and streams," Jeux d\'eau (1901) was a landmark in piano writing. Ravel combined Lisztian virtuosity with new harmonic language to create shimmering textures. The work demands crystalline fingerwork and sophisticated pedaling.',
     editions: [
       { id: 'e-ravel-jd-henle', publisher: 'Henle Verlag', editor: 'Peter Jost', year: 2014, description: 'Urtext based on the autograph and first edition.' },
-      { id: 'e-ravel-jd-durand', publisher: 'Durand', editor: 'Original publication', year: 1902, description: 'The original Durand edition. The historical standard.' },
+      { id: 'e-ravel-jd-durand', publisher: 'Durand', editor: 'Original publication', year: 1902, description: 'The original Durand edition. The historical standard.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Jeux_d%27eau_(Ravel,_Maurice)', label: 'IMSLP — Jeux d\'eau' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=J_36x1_LfdE', label: 'Martha Argerich — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jeux_d%27eau_(Ravel)', label: 'Wikipedia — Jeux d\'eau' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jeux_d%27eau_(Ravel)', label: 'Wikipedia — Jeux d\'eau' }
     ],
   },
   {
@@ -333,12 +328,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'A cycle of thirteen short pieces depicting scenes from childhood, viewed through adult eyes. The seventh piece, "Träumerei" (Dreaming), is one of the most beloved melodies in all of classical music. The set demands poetic imagination and tonal refinement rather than raw virtuosity.',
     editions: [
       { id: 'e-schumann-ks-henle', publisher: 'Henle Verlag', editor: 'Wolfgang Boetticher', year: 1977, description: 'Urtext edition with fingerings by Andreas Schiff.' },
-      { id: 'e-schumann-ks-wiener', publisher: 'Wiener Urtext', editor: 'Michael Beiche', year: 2009, description: 'Viennese Urtext with detailed notes on Schumann\'s metronome markings and Clara Schumann\'s performance practice.' },
+      { id: 'e-schumann-ks-wiener', publisher: 'Wiener Urtext', editor: 'Michael Beiche', year: 2009, description: 'Viennese Urtext with detailed notes on Schumann\'s metronome markings and Clara Schumann\'s performance practice.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Kinderszenen,_Op.15_(Schumann,_Robert)', label: 'IMSLP — Kinderszenen' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=6z82w0l6kwE', label: 'Vladimir Horowitz — Träumerei' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kinderszenen', label: 'Wikipedia — Kinderszenen' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kinderszenen', label: 'Wikipedia — Kinderszenen' }
     ],
   },
   {
@@ -354,12 +349,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Subtitled "Scènes mignonnes sur quatre notes," Carnaval is a suite of twenty-one short pieces based on the musical letters A-S-C-H. Portraits of Chopin, Paganini, and Schumann\'s alter egos Florestan and Eusebius alternate with dance movements, culminating in the triumphant "Marche des Davidsbündler."',
     editions: [
       { id: 'e-schumann-carn-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Urtext with fingerings by Vladimir Ashkenazy.' },
-      { id: 'e-schumann-carn-wiener', publisher: 'Wiener Urtext', editor: 'Ute Bär', year: 2010, description: 'Viennese Urtext with performance notes discussing Schumann\'s pianistic idiom.' },
+      { id: 'e-schumann-carn-wiener', publisher: 'Wiener Urtext', editor: 'Ute Bär', year: 2010, description: 'Viennese Urtext with performance notes discussing Schumann\'s pianistic idiom.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Carnaval,_Op.9_(Schumann,_Robert)', label: 'IMSLP — Carnaval' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=gfOIhMaqOHY', label: 'Arthur Rubinstein — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Carnaval_(Schumann)', label: 'Wikipedia — Carnaval' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Carnaval_(Schumann)', label: 'Wikipedia — Carnaval' }
     ],
   },
   {
@@ -375,12 +369,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Brahms\'s first orchestral work began life as a sonata for two pianos before being reworked into a symphony and finally a concerto. The titanic first movement is among the most dramatic in the concerto literature. The serene Adagio was described by Brahms as "a gentle portrait of Clara Schumann."',
     editions: [
       { id: 'e-brahms-pc1-henle', publisher: 'Henle Verlag', editor: 'Johannes Behr', year: 2018, description: 'Urtext of the two-piano reduction with orchestral parts.' },
-      { id: 'e-brahms-pc1-breitkopf', publisher: 'Breitkopf & Härtel', editor: 'Original publication', year: 1861, description: 'The original Breitkopf edition.' },
+      { id: 'e-brahms-pc1-breitkopf', publisher: 'Breitkopf & Härtel', editor: 'Original publication', year: 1861, description: 'The original Breitkopf edition.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.1,_Op.15_(Brahms,_Johannes)', label: 'IMSLP — Brahms Piano Concerto No. 1' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=OOlc2PAiWUU', label: 'Emil Gilels / Jochum — Berlin Philharmonic' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._1_(Brahms)', label: 'Wikipedia — Brahms Piano Concerto No. 1' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._1_(Brahms)', label: 'Wikipedia — Brahms Piano Concerto No. 1' }
     ],
   },
   {
@@ -396,12 +389,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Unique among Mozart\'s sonatas for lacking a movement in sonata form. It opens with a graceful theme and six variations, continues with a Menuetto, and concludes with the famous "Rondo alla Turca," whose imitation of Turkish Janissary music has made it one of the most recognized piano pieces in existence.',
     editions: [
       { id: 'e-mozart-ps11-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 1992, description: 'Urtext with fingerings by Hans-Martin Theopold.' },
-      { id: 'e-mozart-ps11-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2014, description: 'Updated Urtext incorporating findings from the 2014 discovery of autograph pages in Budapest.' },
+      { id: 'e-mozart-ps11-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2014, description: 'Updated Urtext incorporating findings from the 2014 discovery of autograph pages in Budapest.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.11_in_A_major,_K.331/300i_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Sonata K. 331' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=qUEud0-Jukw', label: 'Mitsuko Uchida — complete sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._11_(Mozart)', label: 'Wikipedia — Mozart Sonata No. 11' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._11_(Mozart)', label: 'Wikipedia — Mozart Sonata No. 11' }
     ],
   },
   {
@@ -417,12 +409,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The famous Andante second movement, used in the 1967 Swedish film "Elvira Madigan," is one of Mozart\'s most sublimely beautiful creations, with the piano floating over muted strings. The outer movements are brilliant and sophisticated.',
     editions: [
       { id: 'e-mozart-pc21-barenreiter', publisher: 'Bärenreiter', editor: 'Christoph Wolff', year: 2007, description: 'Neue Mozart-Ausgabe critical edition.' },
-      { id: 'e-mozart-pc21-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2006, description: 'Urtext two-piano reduction with carefully marked orchestral cues.' },
+      { id: 'e-mozart-pc21-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2006, description: 'Urtext two-piano reduction with carefully marked orchestral cues.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.21_in_C_major,_K.467_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Piano Concerto No. 21' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=cKtShCAriTk', label: 'Murray Perahia — English Chamber Orchestra' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._21_(Mozart)', label: 'Wikipedia — Mozart Piano Concerto No. 21' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._21_(Mozart)', label: 'Wikipedia — Mozart Piano Concerto No. 21' }
     ],
   },
   {
@@ -438,12 +429,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'A serenely beautiful piece built on a flowing melody over gently rocking arpeggiated figures. Its deceptive simplicity conceals the need for exquisite legato, tonal shading, and long-line phrasing.',
     editions: [
       { id: 'e-schubert-i903-henle', publisher: 'Henle Verlag', editor: 'Walter Gieseking', year: 1976, description: 'Urtext with fingerings by Gieseking.' },
-      { id: 'e-schubert-i903-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2005, description: 'Viennese Urtext with scholarly notes on the publication history.' },
+      { id: 'e-schubert-i903-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2005, description: 'Viennese Urtext with scholarly notes on the publication history.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/4_Impromptus,_D.899_(Schubert,_Franz)', label: 'IMSLP — Impromptus D. 899' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KMbRVoKUYhg', label: 'Krystian Zimerman — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/4_Impromptus,_Op._90_(Schubert)', label: 'Wikipedia — Schubert Impromptus Op. 90' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/4_Impromptus,_Op._90_(Schubert)', label: 'Wikipedia — Schubert Impromptus Op. 90' }
     ],
   },
   {
@@ -459,12 +449,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Schubert\'s last piano sonata, completed just weeks before his death in 1828. The first movement\'s vast, song-like expanses and mysterious bass trill create a landscape of unprecedented emotional depth. One of the greatest piano sonatas ever written.',
     editions: [
       { id: 'e-schubert-d960-henle', publisher: 'Henle Verlag', editor: 'Paul Mies', year: 1976, description: 'Urtext based on the autograph. The standard scholarly edition.' },
-      { id: 'e-schubert-d960-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2008, description: 'Viennese Urtext with discussion of the autograph\'s corrections and variants.' },
+      { id: 'e-schubert-d960-wiener', publisher: 'Wiener Urtext', editor: 'Ulrich Leisinger', year: 2008, description: 'Viennese Urtext with discussion of the autograph\'s corrections and variants.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_in_B-flat_major,_D.960_(Schubert,_Franz)', label: 'IMSLP — Schubert Sonata D. 960' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=MAZ8PA5_gVA', label: 'Alfred Brendel — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B-flat_major,_D._960_(Schubert)', label: 'Wikipedia — Schubert Sonata D. 960' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B-flat_major,_D._960_(Schubert)', label: 'Wikipedia — Schubert Sonata D. 960' }
     ],
   },
   {
@@ -480,12 +470,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The second of Prokofiev\'s three "War Sonatas," premiered by Sviatoslav Richter in 1943. The relentless 7/8 Precipitato finale is one of the most physically demanding movements in the piano literature.',
     editions: [
       { id: 'e-prokofiev-ps7-boosey', publisher: 'Boosey & Hawkes', editor: 'Original publication', year: 1943, description: 'The standard Boosey & Hawkes edition.' },
-      { id: 'e-prokofiev-ps7-muzyka', publisher: 'Muzyka', editor: 'Pavel Lamm', year: 1955, description: 'Russian edition from the collected works.' },
+      { id: 'e-prokofiev-ps7-muzyka', publisher: 'Muzyka', editor: 'Pavel Lamm', year: 1955, description: 'Russian edition from the collected works.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.7,_Op.83_(Prokofiev,_Sergei)', label: 'IMSLP — Prokofiev Sonata No. 7' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=VfHWqWF8jqM', label: 'Sviatoslav Richter — live recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._7_(Prokofiev)', label: 'Wikipedia — Prokofiev Sonata No. 7' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._7_(Prokofiev)', label: 'Wikipedia — Prokofiev Sonata No. 7' }
     ],
   },
 
@@ -503,12 +492,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The first of Bach\'s three sonatas for solo violin, structured as a sonata da chiesa. The monumental four-voice fugue is one of the most technically and musically demanding movements in the solo violin repertoire, requiring the performer to sustain polyphonic textures on a single melodic instrument.',
     editions: [
       { id: 'e-bach-vs1-henle', publisher: 'Henle Verlag', editor: 'Klaus Rönnau', year: 2001, description: 'Urtext based on the autograph. Fingerings and bowings by Wolfgang Schneiderhan.' },
-      { id: 'e-bach-vs1-barenreiter', publisher: 'Bärenreiter', editor: 'Peter Wollny', year: 2020, description: 'Neue Bach-Ausgabe critical edition with updated scholarship.' },
+      { id: 'e-bach-vs1-barenreiter', publisher: 'Bärenreiter', editor: 'Peter Wollny', year: 2020, description: 'Neue Bach-Ausgabe critical edition with updated scholarship.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Sonata_No.1_in_G_minor,_BWV_1001_(Bach,_Johann_Sebastian)', label: 'IMSLP — Violin Sonata BWV 1001' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=jvL6MhBF30c', label: 'Hilary Hahn — complete sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' }
     ],
   },
   {
@@ -524,12 +512,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'One of only two surviving solo violin concertos by Bach. The hauntingly beautiful Andante middle movement features the solo violin singing over a walking bass, while the energetic outer movements showcase Baroque figuration.',
     editions: [
       { id: 'e-bach-vca-henle', publisher: 'Henle Verlag', editor: 'Hans Eppstein', year: 1990, description: 'Urtext with violin part edited by Igor Ozim.' },
-      { id: 'e-bach-vca-barenreiter', publisher: 'Bärenreiter', editor: 'Dietrich Kilian', year: 1986, description: 'Part of the Neue Bach-Ausgabe.' },
+      { id: 'e-bach-vca-barenreiter', publisher: 'Bärenreiter', editor: 'Dietrich Kilian', year: 1986, description: 'Part of the Neue Bach-Ausgabe.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_A_minor,_BWV_1041_(Bach,_Johann_Sebastian)', label: 'IMSLP — Bach Violin Concerto BWV 1041' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=nMC0P7jE8Hk', label: 'Itzhak Perlman — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_in_A_minor_(Bach)', label: 'Wikipedia — Bach Violin Concerto in A minor' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_in_A_minor_(Bach)', label: 'Wikipedia — Bach Violin Concerto in A minor' }
     ],
   },
   {
@@ -545,12 +532,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The last and most famous of Paganini\'s 24 Caprices, a theme with eleven variations and a finale. Its iconic theme has been used by Brahms, Rachmaninoff, Lutoslawski, and many others. The variations demand the full range of advanced violin techniques.',
     editions: [
       { id: 'e-paganini-c24-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Urtext based on the first edition of 1820.' },
-      { id: 'e-paganini-c24-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'The Flesch edition with comprehensive fingerings and bowings. A standard pedagogical reference.' },
+      { id: 'e-paganini-c24-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'The Flesch edition with comprehensive fingerings and bowings. A standard pedagogical reference.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=E8GVRj2c7bM', label: 'Hilary Hahn — Caprice No. 24' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Caprice_No._24_(Paganini)', label: 'Wikipedia — Paganini Caprice No. 24' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Caprice_No._24_(Paganini)', label: 'Wikipedia — Paganini Caprice No. 24' }
     ],
   },
   {
@@ -566,12 +552,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The opening caprice of Paganini\'s legendary set, built on rapid arpeggio figuration that traverses the entire range of the violin. Often the first Paganini caprice students attempt, though its apparent simplicity masks the extreme technical control required.',
     editions: [
       { id: 'e-paganini-c1-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Urtext edition of the complete 24 Caprices.' },
-      { id: 'e-paganini-c1-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Complete Caprices with Flesch\'s detailed fingerings and bowings.' },
+      { id: 'e-paganini-c1-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Complete Caprices with Flesch\'s detailed fingerings and bowings.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=ip4d5uEOeYk', label: 'Itzhak Perlman — complete Caprices' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/24_Caprices_for_Solo_Violin_(Paganini)', label: 'Wikipedia — Paganini 24 Caprices' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/24_Caprices_for_Solo_Violin_(Paganini)', label: 'Wikipedia — Paganini 24 Caprices' }
     ],
   },
   {
@@ -587,11 +572,10 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'A brilliant showpiece alternating between rapid spiccato passages and a lyrical central section. Its compact structure makes it a popular encore piece.',
     editions: [
       { id: 'e-paganini-c5-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Part of the complete Caprices Urtext.' },
-      { id: 'e-paganini-c5-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with detailed bowing and fingering suggestions.' },
+      { id: 'e-paganini-c5-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with detailed bowing and fingering suggestions.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=fVuIaZK2mJU', label: 'Alexander Markov — live performance' },
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
     ],
   },
   {
@@ -607,11 +591,10 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Nicknamed "La Chasse" (The Hunt), this caprice imitates hunting horns through double-stop passages and ricochet bowing. It showcases Paganini\'s innovative use of the violin to create orchestral effects.',
     editions: [
       { id: 'e-paganini-c9-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Part of the complete Urtext Caprices.' },
-      { id: 'e-paganini-c9-imi', publisher: 'International Music Company', editor: 'Ruggiero Ricci', year: 1990, description: 'Ricci\'s performance edition with practical solutions for the double-stop passages.' },
+      { id: 'e-paganini-c9-imi', publisher: 'International Music Company', editor: 'Ruggiero Ricci', year: 1990, description: 'Ricci\'s performance edition with practical solutions for the double-stop passages.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=s2vVSVLhD9M', label: 'Salvatore Accardo — studio recording' },
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
     ],
   },
   {
@@ -627,11 +610,10 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Sometimes called "Devil\'s Laughter" for its eerie chromatic runs and diabolical character. Among the more technically treacherous of the 24 Caprices, requiring precise intonation in chromatic passages.',
     editions: [
       { id: 'e-paganini-c13-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2003, description: 'Complete Caprices Urtext.' },
-      { id: 'e-paganini-c13-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with fingerings and bowings for all 24 Caprices.' },
+      { id: 'e-paganini-c13-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with fingerings and bowings for all 24 Caprices.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=ynIJlGq9JeI', label: 'James Ehnes — complete Caprices' },
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
     ],
   },
   {
@@ -647,12 +629,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Written for and in collaboration with Joseph Joachim, Brahms\'s only violin concerto is one of the four great German Romantic violin concertos. The Adagio opens with one of the most beautiful oboe solos in orchestral literature, and the Hungarian-flavored finale reflects Joachim\'s heritage.',
     editions: [
       { id: 'e-brahms-vc-henle', publisher: 'Henle Verlag', editor: 'Kathrin Kirsch', year: 2015, description: 'Urtext with violin part by Frank Peter Zimmermann. Includes Joachim\'s cadenza.' },
-      { id: 'e-brahms-vc-imi', publisher: 'International Music Company', editor: 'Joseph Joachim', year: 1905, description: 'Joachim\'s own edition with his cadenza and bowings.' },
+      { id: 'e-brahms-vc-imi', publisher: 'International Music Company', editor: 'Joseph Joachim', year: 1905, description: 'Joachim\'s own edition with his cadenza and bowings.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_major,_Op.77_(Brahms,_Johannes)', label: 'IMSLP — Brahms Violin Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=7C5Cq4aNVpQ', label: 'Jascha Heifetz / Reiner — legendary recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Brahms)', label: 'Wikipedia — Brahms Violin Concerto' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Brahms)', label: 'Wikipedia — Brahms Violin Concerto' }
     ],
   },
   {
@@ -668,12 +649,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Beethoven\'s only violin concerto, now regarded as perhaps the greatest in the repertoire, was initially considered a failure at its 1806 premiere. The serene, expansive first movement opens with five quiet timpani strokes that pervade the entire work.',
     editions: [
       { id: 'e-beethoven-vc-henle', publisher: 'Henle Verlag', editor: 'Shin-Augustin Kojima', year: 2004, description: 'Urtext based on the autograph, with detailed critical commentary.' },
-      { id: 'e-beethoven-vc-barenreiter', publisher: 'Bärenreiter', editor: 'Jonathan Del Mar', year: 2009, description: 'Critical edition with comprehensive source evaluation.' },
+      { id: 'e-beethoven-vc-barenreiter', publisher: 'Bärenreiter', editor: 'Jonathan Del Mar', year: 2009, description: 'Critical edition with comprehensive source evaluation.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_major,_Op.61_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Violin Concerto' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=0Cg_0jepxzs', label: 'Anne-Sophie Mutter / Karajan — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)', label: 'Wikipedia — Beethoven Violin Concerto' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)', label: 'Wikipedia — Beethoven Violin Concerto' }
     ],
   },
   {
@@ -689,12 +669,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The grandest of Beethoven\'s ten violin sonatas, originally dedicated to George Bridgetower. The dramatic first movement is followed by one of Beethoven\'s most elaborate variation movements and a whirlwind tarantella finale. Tolstoy\'s novella was inspired by its emotional intensity.',
     editions: [
       { id: 'e-beethoven-vs9-henle', publisher: 'Henle Verlag', editor: 'Shin-Augustin Kojima', year: 2000, description: 'Urtext with violin part edited by Max Rostal.' },
-      { id: 'e-beethoven-vs9-peters', publisher: 'Peters', editor: 'Max Rostal', year: 1973, description: 'Performance edition with Rostal\'s practical bowings and fingerings.' },
+      { id: 'e-beethoven-vs9-peters', publisher: 'Peters', editor: 'Max Rostal', year: 1973, description: 'Performance edition with Rostal\'s practical bowings and fingerings.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Sonata_No.9,_Op.47_(Beethoven,_Ludwig_van)', label: 'IMSLP — Kreutzer Sonata' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=kTCciN7NVSQ', label: 'Perlman / Argerich — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Sonata_No._9_(Beethoven)', label: 'Wikipedia — Kreutzer Sonata' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Sonata_No._9_(Beethoven)', label: 'Wikipedia — Kreutzer Sonata' }
     ],
   },
   {
@@ -710,12 +689,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Sibelius\'s only concerto, born of his abandoned dream of becoming a concert violinist. The opening theme emerges from shimmering strings like a soloist improvising in a frozen Nordic landscape. One of the most technically demanding concertos in the standard repertoire.',
     editions: [
       { id: 'e-sibelius-vc-henle', publisher: 'Henle Verlag', editor: 'Bengt de Törne', year: 2010, description: 'Urtext of the revised 1905 version with fingerings by Frank Peter Zimmermann.' },
-      { id: 'e-sibelius-vc-boosey', publisher: 'Boosey & Hawkes', editor: 'Original publication', year: 1905, description: 'The standard Boosey & Hawkes edition.' },
+      { id: 'e-sibelius-vc-boosey', publisher: 'Boosey & Hawkes', editor: 'Original publication', year: 1905, description: 'The standard Boosey & Hawkes edition.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_minor,_Op.47_(Sibelius,_Jean)', label: 'IMSLP — Sibelius Violin Concerto' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=gpS_u5RvMpM', label: 'Jascha Heifetz / Hendl — Chicago Symphony' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Sibelius)', label: 'Wikipedia — Sibelius Violin Concerto' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Sibelius)', label: 'Wikipedia — Sibelius Violin Concerto' }
     ],
   },
   {
@@ -731,12 +710,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'A dazzling fantasy on Roma themes, Zigeunerweisen (Gypsy Airs) is one of the most spectacular showpieces in the violin repertoire. It opens with a dramatic slow section, followed by a hauntingly beautiful lassú, and concludes with a breathtaking allegro that pushes spiccato technique to the limit.',
     editions: [
       { id: 'e-sarasate-zw-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s fingerings and bowings.' },
-      { id: 'e-sarasate-zw-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2009, description: 'Urtext based on the first edition and autograph sources.' },
+      { id: 'e-sarasate-zw-henle', publisher: 'Henle Verlag', editor: 'Ernst Herttrich', year: 2009, description: 'Urtext based on the first edition and autograph sources.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Zigeunerweisen,_Op.20_(Sarasate,_Pablo_de)', label: 'IMSLP — Zigeunerweisen' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=xFAfJSaRzZg', label: 'Jascha Heifetz — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Zigeunerweisen_(Sarasate)', label: 'Wikipedia — Zigeunerweisen' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Zigeunerweisen_(Sarasate)', label: 'Wikipedia — Zigeunerweisen' }
     ],
   },
   {
@@ -752,12 +730,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'One of the most popular violin concertos ever written. The passionate first movement leads attacca into the sublime Adagio, widely regarded as one of the most beautiful slow movements in the concerto repertoire.',
     editions: [
       { id: 'e-bruch-vc1-henle', publisher: 'Henle Verlag', editor: 'Othmar Moe', year: 2016, description: 'Urtext with violin part edited by Frank Peter Zimmermann.' },
-      { id: 'e-bruch-vc1-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s bowings and fingerings.' },
+      { id: 'e-bruch-vc1-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s bowings and fingerings.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_No.1,_Op.26_(Bruch,_Max)', label: 'IMSLP — Bruch Violin Concerto No. 1' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KDJ6Wbkj4MA', label: 'Janine Jansen — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Bruch)', label: 'Wikipedia — Bruch Violin Concerto No. 1' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Bruch)', label: 'Wikipedia — Bruch Violin Concerto No. 1' }
     ],
   },
   {
@@ -773,12 +750,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The first and most famous of Vivaldi\'s four violin concertos depicting the seasons. Birdsong trills, murmuring brooks, and a thunderstorm are vividly depicted through Baroque figuration. One of the most recognized pieces of classical music worldwide.',
     editions: [
       { id: 'e-vivaldi-spring-henle', publisher: 'Henle Verlag', editor: 'Federico Maria Sardelli', year: 2016, description: 'Urtext with scholarly commentary on Vivaldi\'s programmatic annotations.' },
-      { id: 'e-vivaldi-spring-ricordi', publisher: 'Ricordi', editor: 'Gian Francesco Malipiero', year: 1950, description: 'Classic Italian edition from the Vivaldi complete works.' },
+      { id: 'e-vivaldi-spring-ricordi', publisher: 'Ricordi', editor: 'Gian Francesco Malipiero', year: 1950, description: 'Classic Italian edition from the Vivaldi complete works.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/The_Four_Seasons_(Vivaldi,_Antonio)', label: 'IMSLP — The Four Seasons' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=GRxofEmo3HA', label: 'Janine Jansen — live with ensemble' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Four_Seasons_(Vivaldi)', label: 'Wikipedia — The Four Seasons' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Four_Seasons_(Vivaldi)', label: 'Wikipedia — The Four Seasons' }
     ],
   },
   {
@@ -794,12 +771,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Known as the "Strasbourg" concerto, this is the most frequently performed of Mozart\'s five violin concertos. A staple of audition repertoire with its sunny Allegro, ineffable Adagio, and finale that alternates between courtly grace and rustic humor.',
     editions: [
       { id: 'e-mozart-vc3-barenreiter', publisher: 'Bärenreiter', editor: 'Christoph-Hellmut Mahling', year: 1983, description: 'Neue Mozart-Ausgabe critical edition.' },
-      { id: 'e-mozart-vc3-henle', publisher: 'Henle Verlag', editor: 'Wolf-Dieter Seiffert', year: 2002, description: 'Urtext with violin part by Igor Ozim.' },
+      { id: 'e-mozart-vc3-henle', publisher: 'Henle Verlag', editor: 'Wolf-Dieter Seiffert', year: 2002, description: 'Urtext with violin part by Igor Ozim.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_No.3_in_G_major,_K.216_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Violin Concerto No. 3' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=oQ1FMomBnVw', label: 'Anne-Sophie Mutter — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._3_(Mozart)', label: 'Wikipedia — Mozart Violin Concerto No. 3' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._3_(Mozart)', label: 'Wikipedia — Mozart Violin Concerto No. 3' }
     ],
   },
   {
@@ -815,12 +791,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Originally composed as the finale to Saint-Saëns\'s First Violin Concerto, dedicated to Pablo de Sarasate. The haunting Andante introduction gives way to a brilliant rondo with Spanish-flavored themes. One of the most popular virtuoso showpieces for violin.',
     editions: [
       { id: 'e-ss-irc-henle', publisher: 'Henle Verlag', editor: 'Peter Jost', year: 2012, description: 'Urtext with bowings by Frank Peter Zimmermann.' },
-      { id: 'e-ss-irc-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1958, description: 'Francescatti\'s performance edition.' },
+      { id: 'e-ss-irc-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1958, description: 'Francescatti\'s performance edition.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Introduction_et_Rondo_capriccioso,_Op.28_(Saint-Sa%C3%ABns,_Camille)', label: 'IMSLP — Introduction and Rondo Capriccioso' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=9TsaDBX0GKI', label: 'Sarah Chang — live performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Introduction_and_Rondo_Capriccioso', label: 'Wikipedia — Introduction and Rondo Capriccioso' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Introduction_and_Rondo_Capriccioso', label: 'Wikipedia — Introduction and Rondo Capriccioso' }
     ],
   },
   {
@@ -836,12 +811,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Originally attributed to the 18th-century violinist Gaetano Pugnani, later revealed to be entirely Kreisler\'s own composition. The stately Praeludium gives way to a brilliant Allegro with sweeping arpeggios. A beloved recital opener.',
     editions: [
       { id: 'e-kreisler-pa-schott', publisher: 'Schott', editor: 'Fritz Kreisler', year: 1910, description: 'The original publication by the composer.' },
-      { id: 'e-kreisler-pa-imi', publisher: 'International Music Company', editor: 'Joseph Gingold', year: 1972, description: 'Gingold\'s edition with practical performance suggestions.' },
+      { id: 'e-kreisler-pa-imi', publisher: 'International Music Company', editor: 'Joseph Gingold', year: 1972, description: 'Gingold\'s edition with practical performance suggestions.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Praeludium_and_Allegro_(Kreisler,_Fritz)', label: 'IMSLP — Praeludium and Allegro' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=op0O3g-sHHk', label: 'Jascha Heifetz — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fritz_Kreisler', label: 'Wikipedia — Fritz Kreisler' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fritz_Kreisler', label: 'Wikipedia — Fritz Kreisler' }
     ],
   },
 
@@ -861,12 +835,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Beethoven\'s final piano sonata, a two-movement work of cosmic scope. The turbulent first movement in C minor gives way to the Arietta, a sublime theme and variations that Thomas Mann described in Doctor Faustus as a farewell to the sonata form itself. The closing trills dissolve into silence.',
     editions: [
       { id: 'e-beethoven-s32-henle', publisher: 'Henle Verlag', editor: 'Bertha Antonia Wallner', year: 1980, description: 'Urtext with fingerings by Conrad Hansen. The scholarly standard.' },
-      { id: 'e-beethoven-s32-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 2004, description: 'Viennese Urtext with detailed notes on Beethoven\'s late style notation.' },
+      { id: 'e-beethoven-s32-wiener', publisher: 'Wiener Urtext', editor: 'Peter Hauschild', year: 2004, description: 'Viennese Urtext with detailed notes on Beethoven\'s late style notation.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.32,_Op.111_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Sonata Op. 111' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=WGUgJkFMJOk', label: 'Maurizio Pollini — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._32_(Beethoven)', label: 'Wikipedia — Beethoven Sonata No. 32' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._32_(Beethoven)', label: 'Wikipedia — Beethoven Sonata No. 32' }
     ],
   },
 
@@ -884,12 +857,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Written when Wieniawski was only eighteen, this brilliant showpiece combines the stately character of the polonaise with dazzling virtuosic passages including double stops, harmonics, and flying spiccato. A perennial favorite on competition programs.',
     editions: [
       { id: 'e-wieniawski-pb1-imi', publisher: 'International Music Company', editor: 'Tyrone Greive', year: 1975, description: 'Clean performance edition with practical bowings and fingerings.' },
-      { id: 'e-wieniawski-pb1-pwm', publisher: 'PWM Edition', editor: 'Irena Dubiska', year: 1965, description: 'Polish critical edition based on first publication.' },
+      { id: 'e-wieniawski-pb1-pwm', publisher: 'PWM Edition', editor: 'Irena Dubiska', year: 1965, description: 'Polish critical edition based on first publication.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Polonaise_brillante_No.1,_Op.4_(Wieniawski,_Henryk)', label: 'IMSLP — Polonaise brillante No. 1' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8yVEeMfpmQk', label: 'Hilary Hahn — recital performance' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henryk_Wieniawski', label: 'Wikipedia — Wieniawski' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henryk_Wieniawski', label: 'Wikipedia — Wieniawski' }
     ],
   },
   {
@@ -905,12 +877,12 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The last of Bach\'s three solo violin partitas, opening with the famous Preludio, a perpetual-motion tour de force of unbroken sixteenth notes. The suite continues with dance movements of increasing charm: Loure, Gavotte en Rondeau, Menuets, Bourrée, and Gigue.',
     editions: [
       { id: 'e-bach-vp3-henle', publisher: 'Henle Verlag', editor: 'Klaus Rönnau', year: 2001, description: 'Urtext based on the autograph manuscript.' },
-      { id: 'e-bach-vp3-barenreiter', publisher: 'Bärenreiter', editor: 'Peter Wollny', year: 2020, description: 'Neue Bach-Ausgabe critical edition.' },
+      { id: 'e-bach-vp3-barenreiter', publisher: 'Bärenreiter', editor: 'Peter Wollny', year: 2020, description: 'Neue Bach-Ausgabe critical edition.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Partita_No.3_in_E_major,_BWV_1006_(Bach,_Johann_Sebastian)', label: 'IMSLP — Partita No. 3' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=1prweT95Mo0', label: 'Hilary Hahn — Preludio' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' }
     ],
   },
   {
@@ -926,12 +898,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'Written for Pablo de Sarasate, this five-movement concerto brilliantly captures Spanish color through French orchestral craft. The rhythmic vitality, exotic harmonies, and virtuosic solo writing make it one of the most exciting works in the violin concerto repertoire.',
     editions: [
       { id: 'e-lalo-se-henle', publisher: 'Henle Verlag', editor: 'Peter Jost', year: 2011, description: 'Urtext including the often-omitted third movement Intermezzo.' },
-      { id: 'e-lalo-se-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s bowings.' },
+      { id: 'e-lalo-se-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1960, description: 'Performance edition with Francescatti\'s bowings.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphonie_espagnole,_Op.21_(Lalo,_%C3%89douard)', label: 'IMSLP — Symphonie espagnole' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=w-MJqKVnFkE', label: 'Itzhak Perlman / Barenboim' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphonie_espagnole', label: 'Wikipedia — Symphonie espagnole' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphonie_espagnole', label: 'Wikipedia — Symphonie espagnole' }
     ],
   },
   {
@@ -947,12 +918,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The orchestral interlude from Massenet\'s opera Thaïs, arranged for violin and piano. One of the most popular encore pieces in the violin repertoire, its soaring D major melody demands a pure, singing tone and expressive vibrato. Deceptively simple, it reveals the quality of a violinist\'s sound.',
     editions: [
       { id: 'e-massenet-med-imi', publisher: 'International Music Company', editor: 'Arthur Hartmann', year: 1945, description: 'Standard violin/piano arrangement. Clean and practical.' },
-      { id: 'e-massenet-med-schirmer', publisher: 'G. Schirmer', editor: 'Martin Marsick', year: 1894, description: 'The original arrangement by Marsick, a colleague of Massenet.' },
+      { id: 'e-massenet-med-schirmer', publisher: 'G. Schirmer', editor: 'Martin Marsick', year: 1894, description: 'The original arrangement by Marsick, a colleague of Massenet.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Tha%C3%AFs_(Massenet,_Jules)', label: 'IMSLP — Thaïs' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Vu2EW3GXjJQ', label: 'Joshua Bell — studio recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Tha%C3%AFs_(opera)', label: 'Wikipedia — Thaïs' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Tha%C3%AFs_(opera)', label: 'Wikipedia — Thaïs' }
     ],
   },
 
@@ -970,12 +940,11 @@ export const pianoViolinNew: SeedPiece[] = [
     description: 'The first of Telemann\'s twelve fantasias for solo flute, composed around 1732-33. These works are the flute equivalent of Bach\'s solo violin works, though more intimate in scale. Each fantasia explores different affects and keys, with the first in A major being among the most accessible and frequently performed.',
     editions: [
       { id: 'e-telemann-ff1-barenreiter', publisher: 'Bärenreiter', editor: 'Günter Hauswald', year: 1955, description: 'Standard scholarly edition of all 12 fantasias.' },
-      { id: 'e-telemann-ff1-henle', publisher: 'Henle Verlag', editor: 'Marion Beyer', year: 2016, description: 'Urtext with detailed source commentary.' },
+      { id: 'e-telemann-ff1-henle', publisher: 'Henle Verlag', editor: 'Marion Beyer', year: 2016, description: 'Urtext with detailed source commentary.' }
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/12_Fantasias_for_Solo_Flute,_TWV_40:2-13_(Telemann,_Georg_Philipp)', label: 'IMSLP — 12 Fantasias for Solo Flute' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=yTuFO4GxblQ', label: 'Emmanuel Pahud — complete fantasias' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/12_Fantasias_for_Solo_Flute_(Telemann)', label: 'Wikipedia — Telemann Flute Fantasias' },
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/12_Fantasias_for_Solo_Flute_(Telemann)', label: 'Wikipedia — Telemann Flute Fantasias' }
     ],
-  },
-];
+  }
+    ];

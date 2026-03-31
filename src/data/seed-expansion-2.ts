@@ -84,11 +84,6 @@ export const expansionPieces2: SeedPiece[] = [
         "label": "IMSLP — editions available"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=CnAaCA0bFGM",
-        "label": "Martha Argerich — studio recording"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Kreisleriana",
         "label": "Wikipedia — Kreisleriana"
@@ -176,11 +171,6 @@ export const expansionPieces2: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Piano_Sonata_No.5,_Op.53_(Scriabin,_Aleksandr)",
         "label": "IMSLP — editions available"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=MaEi2QGjBxs",
-        "label": "Horowitz — volcanic performance"
       },
       {
         "type": "wikipedia",
@@ -329,11 +319,6 @@ export const expansionPieces2: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Us1jfC7bMpg",
-        "label": "Karajan — Berlin Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Ein_Heldenleben",
         "label": "Wikipedia — Ein Heldenleben"
@@ -414,11 +399,6 @@ export const expansionPieces2: SeedPiece[] = [
         "label": "IMSLP — editions available"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=tV_VJk6AYOU",
-        "label": "Ton Koopman — organ"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Prelude_and_Fugue_in_E_minor,_BWV_548",
         "label": "Wikipedia — BWV 548"
@@ -459,11 +439,6 @@ export const expansionPieces2: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/3_Chorals_(Franck,_C%C3%A9sar)",
         "label": "IMSLP — Three Chorales"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=RfJ6Z2vDCJY",
-        "label": "Marie-Claire Alain — Sainte-Clotilde"
       },
       {
         "type": "wikipedia",
@@ -508,11 +483,6 @@ export const expansionPieces2: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Octet,_Op.20_(Mendelssohn,_Felix)",
         "label": "IMSLP — editions available"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=xalC8VP5S0A",
-        "label": "Janine Jansen and friends — live"
       },
       {
         "type": "wikipedia",
@@ -560,11 +530,6 @@ export const expansionPieces2: SeedPiece[] = [
         "label": "IMSLP — editions available"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=RBwTYmPGDzY",
-        "label": "Emerson Quartet & Ax — complete"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quintet_No._2_(Dvo%C5%99%C3%A1k)",
         "label": "Wikipedia — Dvořák Piano Quintet"
@@ -607,11 +572,6 @@ export const expansionPieces2: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/String_Quintet,_D.956_(Schubert,_Franz)",
         "label": "IMSLP — editions available"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=GvWfO3ACe3U",
-        "label": "Alban Berg Quartet + Heinrich Schiff"
       },
       {
         "type": "wikipedia",
@@ -701,11 +661,6 @@ export const expansionPieces2: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Piano_Concerto_No.5,_Op.73_(Beethoven,_Ludwig_van)",
         "label": "IMSLP — editions available"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=hDXWK3W477w",
-        "label": "Zimerman & Bernstein — complete"
       },
       {
         "type": "wikipedia",
