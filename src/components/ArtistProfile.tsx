@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
-import { formatDate, ACTIVITIES } from '../lib/helpers';
+import { formatDate, ACTIVITIES, randomNoteStarter } from '../lib/helpers';
 import GenerativeAvatar from './GenerativeAvatar';
 import VanitySlugEditor from './VanitySlugEditor';
 
@@ -423,12 +423,9 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                   { key: 'event_name', label: 'Event', value: p.event_name },
                   { key: 'venue', label: 'Venue', value: p.venue || '' },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
-                  { key: 'role', label: '', value: p.role || 'performed', type: 'select', options: [
-                    { value: 'performed', label: 'Performed' },
-                    { value: 'attended', label: 'Attended' },
-                  ]},
-                  { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea' },
-                  { key: 'notes_public', label: 'Notes visibility', value: p.notes_public === false ? 'false' : 'true', type: 'toggle' },
+                  { key: 'role', label: '', value: p.role || 'performed', type: 'toggle', toggleLabels: ['Performed', 'Attended'], toggleValues: ['performed', 'attended'] },
+                  { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea', placeholder: randomNoteStarter() },
+                  { key: 'notes_public', label: '', value: p.notes_public === false ? 'false' : 'true', type: 'toggle', toggleLabels: ['Public', 'Private'], toggleValues: ['true', 'false'] },
                 ]}
               >
                 <div className="text-sm font-medium text-ink">
@@ -737,7 +734,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
   isOwner: boolean;
   onDelete: () => void;
   onSave: (vals: Record<string, string>) => void;
-  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[] }[];
+  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[]; toggleLabels?: string[]; toggleValues?: string[]; placeholder?: string }[];
 }) {
   const isNew = !fields[0]?.value;
   const [editMode, setEditMode] = useState(false);
@@ -760,15 +757,23 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
                 {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             ) : f.type === 'toggle' ? (
-              <button type="button"
-                onClick={() => setVals(v => ({ ...v, [f.key]: v[f.key] === 'true' ? 'false' : 'true' }))}
-                className={`text-xs px-3 py-1 rounded-full border-none cursor-pointer transition-colors ${vals[f.key] === 'true' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                {vals[f.key] === 'true' ? 'Public' : 'Private'}
-              </button>
+              <div className="inline-flex rounded-lg overflow-hidden border border-border">
+                {(f.toggleLabels || ['On', 'Off']).map((lbl, idx) => {
+                  const val = f.toggleValues?.[idx] || (idx === 0 ? 'true' : 'false');
+                  const isActive = vals[f.key] === val;
+                  return (
+                    <button key={val} type="button"
+                      onClick={() => setVals(v => ({ ...v, [f.key]: val }))}
+                      className={`text-xs px-3 py-1 border-none cursor-pointer transition-colors ${isActive ? 'bg-[#1C1917] text-white' : 'bg-white text-muted hover:bg-gray-50'}`}>
+                      {lbl}
+                    </button>
+                  );
+                })}
+              </div>
             ) : f.type === 'textarea' ? (
               <textarea value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
                 className="w-full border border-border rounded px-2 py-1 text-sm resize-none h-16 focus:outline-none focus:border-accent"
-                placeholder={f.label} />
+                placeholder={f.placeholder || f.label} />
             ) : (
               <input value={vals[f.key] || ''} type={f.type || 'text'}
                 onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}

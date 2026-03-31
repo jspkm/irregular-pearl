@@ -56,6 +56,30 @@ export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
+// ── Performance note starters ──
+
+export const NOTE_STARTERS = [
+  'The acoustics were incredible because...',
+  'I wasn\'t expecting the encore to be...',
+  'The highlight was the second movement when...',
+  'What surprised me most was...',
+  'I\'ll never forget the moment when...',
+  'The conductor\'s interpretation of the adagio...',
+  'My hands were shaking before the cadenza but...',
+  'The audience reaction after the final chord...',
+  'I finally understood why this piece matters when...',
+  'Three words: standing ovation because...',
+  'The soloist did something unexpected in the...',
+  'Best sight-reading experience of my life because...',
+  'I almost didn\'t go, but I\'m glad I did because...',
+  'The venue made the pianissimo sections feel like...',
+  'After years of practicing this piece, performing it felt...',
+];
+
+export function randomNoteStarter(): string {
+  return NOTE_STARTERS[Math.floor(Math.random() * NOTE_STARTERS.length)];
+}
+
 // ── Slug validation ──
 
 const RESERVED_SLUGS = [
