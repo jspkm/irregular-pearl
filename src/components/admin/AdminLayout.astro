@@ -5,9 +5,11 @@ interface Props {
   isAdmin: boolean;
   isMaestro: boolean;
   staffName: string;
+  userRole: string;
 }
 
-const { title, activeTab, isAdmin, isMaestro, staffName } = Astro.props;
+const { title, activeTab, isAdmin, isMaestro, staffName, userRole } = Astro.props;
+const headerLabel = isAdmin ? 'Admin' : userRole === 'firstchair' ? 'First Chair' : isMaestro ? 'Maestro' : 'Admin';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', href: '/admin', show: true },
@@ -22,7 +24,7 @@ const tabs = [
     <div class="flex items-center gap-4">
       <a href="/" class="font-display italic text-lg text-white no-underline opacity-70 hover:opacity-100">Irregular Pearl</a>
       <span class="text-xs text-white/40">|</span>
-      <span class="text-sm font-medium">Admin</span>
+      <span class="text-sm font-medium">{headerLabel}</span>
     </div>
     <div class="flex items-center gap-3">
       <span class="text-xs text-white/60">{staffName}</span>

@@ -176,19 +176,24 @@ export default function AdminUserList() {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-surface border border-border rounded-xl p-6 w-96 max-h-[80vh] overflow-y-auto">
             <h3 className="font-display text-lg mb-4">Assign Sections</h3>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {SECTIONS.map(s => (
-                <label key={s} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tempSections.includes(s)}
-                    onChange={e => {
-                      setTempSections(prev => e.target.checked ? [...prev, s] : prev.filter(x => x !== s));
-                    }}
-                  />
-                  <span className="capitalize">{s}</span>
-                </label>
-              ))}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {SECTIONS.map(s => {
+                const selected = tempSections.includes(s);
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setTempSections(prev => selected ? prev.filter(x => x !== s) : [...prev, s])}
+                    className={`text-xs px-3 py-1.5 rounded-full border cursor-pointer transition-colors capitalize ${
+                      selected
+                        ? 'bg-[#FEF3C7] text-[#B45309] border-[#B45309] font-medium'
+                        : 'bg-white text-muted border-border hover:border-[#B45309] hover:text-[#B45309]'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
             </div>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setEditingSections(null)} className="text-sm text-muted bg-transparent border-none cursor-pointer">Cancel</button>

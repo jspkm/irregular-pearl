@@ -9,6 +9,6 @@ if (!isAdminRole(staff.profile)) return Astro.redirect('/admin');
 
 const isMaestro = isMaestroRole(staff.profile);
 ---
-<AdminLayout title="User Management" activeTab="users" isAdmin={true} isMaestro={isMaestro} staffName={staff.profile.display_name}>
+<AdminLayout title="User Management" activeTab="users" isAdmin={true} isMaestro={isMaestro} staffName={staff.profile.display_name} userRole={staff.profile.role}>
   <AdminUserList client:load />
 </AdminLayout>
