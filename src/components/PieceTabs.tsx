@@ -116,7 +116,7 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
 
       {activeTab === 'recordings' && (
         <div>
-          {youtubeLinks.length > 0 ? (
+          {recordingLinks.length > 0 ? (
             <div className="space-y-2">
               {recordingLinks.map((link, i) => (
                 <RecordingCard key={i} url={link.url} label={link.label} type={link.type} />
