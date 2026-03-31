@@ -739,13 +739,13 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
   onSave: (vals: Record<string, string>) => void;
   fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[] }[];
 }) {
+  const isNew = !fields[0]?.value;
   const [editMode, setEditMode] = useState(false);
   const [vals, setVals] = useState<Record<string, string>>(() => Object.fromEntries(fields.map(f => [f.key, f.value])));
 
   // Open in edit mode if title/event_name is empty (just created)
   useEffect(() => {
-    const mainField = fields[0];
-    if (mainField && !mainField.value) setEditMode(true);
+    if (isNew) setEditMode(true);
   }, []);
 
   if (editMode && isOwner) {
@@ -777,8 +777,14 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
           </div>
         ))}
         <div className="flex gap-2 justify-end pt-1">
-          <button onClick={() => setEditMode(false)} className="text-xs text-muted bg-transparent border-none cursor-pointer p-0">Cancel</button>
-          <button onClick={() => { onSave(vals); setEditMode(false); }} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">Save</button>
+          <button onClick={() => { if (isNew) { onDelete(); } else { setEditMode(false); } }} className="text-xs text-muted bg-transparent border-none cursor-pointer p-0">Cancel</button>
+          <button onClick={() => {
+            // Treat as empty if only default values (e.g., only date filled)
+            const meaningful = fields.filter(f => f.type !== 'date' && f.type !== 'select' && f.type !== 'toggle');
+            const hasContent = meaningful.some(f => vals[f.key]?.trim());
+            if (!hasContent) { onDelete(); return; }
+            onSave(vals); setEditMode(false);
+          }} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">Save</button>
         </div>
       </div>
     );
