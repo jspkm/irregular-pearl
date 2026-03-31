@@ -3,7 +3,7 @@ import type { AstroCookies } from 'astro';
 
 interface StaffProfile {
   id: string;
-  role: 'admin' | 'manager' | 'user';
+  role: 'admin' | 'firstchair' | 'user';
   is_maestro: boolean;
   managed_sections: string[];
   display_name: string;
@@ -45,7 +45,7 @@ export async function getStaffUser(cookies: AstroCookies) {
     .eq('id', user.id)
     .single();
 
-  if (!profile || (!['admin', 'manager'].includes(profile.role) && !profile.is_maestro)) return null;
+  if (!profile || (!['admin', 'firstchair'].includes(profile.role) && !profile.is_maestro)) return null;
 
   return {
     user,
@@ -64,7 +64,7 @@ export function isMaestroRole(profile: StaffProfile): boolean {
 
 export function canManageSection(profile: StaffProfile, section: string): boolean {
   if (profile.role === 'admin') return true;
-  if (profile.role === 'manager') {
+  if (profile.role === 'firstchair') {
     return (profile.managed_sections || []).includes(section);
   }
   return false;

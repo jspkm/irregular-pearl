@@ -10,7 +10,7 @@ const isAdmin = isAdminRole(staff.profile);
 const isMaestro = isMaestroRole(staff.profile);
 
 // Maestro-only users can't access reports
-if (!isAdmin && staff.profile.role !== 'manager') return Astro.redirect('/admin');
+if (!isAdmin && staff.profile.role !== 'firstchair') return Astro.redirect('/admin');
 ---
 <AdminLayout title="Reports" activeTab="reports" isAdmin={isAdmin} isMaestro={isMaestro} staffName={staff.profile.display_name}>
   <AdminReportList isAdmin={isAdmin} managedSections={staff.profile.managed_sections} client:load />

@@ -61,7 +61,7 @@ export default function AdminUserList() {
   };
 
   const handleRoleChange = async (userId: string, newRole: string) => {
-    if (newRole === 'manager') {
+    if (newRole === 'firstchair') {
       setEditingSections(userId);
       setTempSections([]);
       return;
@@ -70,7 +70,7 @@ export default function AdminUserList() {
   };
 
   const saveSections = async (userId: string) => {
-    await updateUser(userId, { role: 'manager', managed_sections: tempSections });
+    await updateUser(userId, { role: 'firstchair', managed_sections: tempSections });
     setEditingSections(null);
   };
 
@@ -92,7 +92,7 @@ export default function AdminUserList() {
         >
           <option value="all">All roles</option>
           <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
+          <option value="firstchair">First Chair</option>
           <option value="user">User</option>
         </select>
       </div>
@@ -126,7 +126,7 @@ export default function AdminUserList() {
                     className="text-xs border border-border rounded px-2 py-1 bg-white"
                   >
                     <option value="user">User</option>
-                    <option value="manager">Manager</option>
+                    <option value="firstchair">First Chair</option>
                     <option value="admin">Admin</option>
                   </select>
                 </td>
@@ -139,7 +139,7 @@ export default function AdminUserList() {
                   </button>
                 </td>
                 <td className="px-4 py-2 hidden md:table-cell">
-                  {u.role === 'manager' && u.managed_sections?.length > 0 ? (
+                  {u.role === 'firstchair' && u.managed_sections?.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {u.managed_sections.map(s => (
                         <span key={s} className="text-[10px] bg-[#FEF3C7] text-[#B45309] px-1.5 py-0.5 rounded-full">{s}</span>
