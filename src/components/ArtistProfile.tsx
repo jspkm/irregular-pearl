@@ -341,62 +341,8 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         </div>
       )}
 
-      {/* Instruments */}
-      <section className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Instruments</h2>
-          {isOwnProfile && (
-            <button onClick={() => addInstrument()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
-          )}
-        </div>
-        {instruments.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Add your instrument to build its story and provenance." : "No instruments listed yet."}
-            action={isOwnProfile ? "Add your instrument" : undefined}
-            onAction={isOwnProfile ? () => addInstrument() : undefined}
-          />
-        ) : (
-          <div className="space-y-3">
-            {instruments.map(inst => (
-              <div key={inst.id} className="bg-surface border border-border rounded-xl overflow-hidden group">
-                <div className="h-28 bg-gradient-to-br from-[#E8DDD3] via-[#D5C4B0] to-[#C9B89A] flex items-center justify-center">
-                  <span className="text-4xl opacity-15">🎻</span>
-                </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
-                      <div className="font-['Instrument_Serif'] text-lg">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
-                      {inst.country_of_origin && <div className="font-mono text-xs text-muted">{inst.country_of_origin}</div>}
-                      {inst.provenance_story && <p className="text-xs text-muted leading-relaxed mt-2 line-clamp-2">{inst.provenance_story.slice(0, 150)}...</p>}
-                    </div>
-                    {isOwnProfile && (
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                        <a href={`/instruments/${inst.id}`} className="text-muted hover:text-ink p-1 no-underline" title="View page">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                        </a>
-                        <button onClick={async () => {
-                          await supabase.from('instruments').delete().eq('id', inst.id);
-                          setInstruments(prev => prev.filter(x => x.id !== inst.id));
-                        }} className="text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-1" title="Delete">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* Divider before sections */}
       <div className="border-t border-border mb-10" />
-
-      {/* === REORDERED: Performances first (identity), then Working On, Discography, Reviews, Discussions === */}
 
       {/* Performances */}
       <section className="mb-10">
@@ -464,6 +410,58 @@ export default function ArtistProfile({ userId }: { userId: string }) {
                     <button onClick={() => deleteTraining(i)} className="text-[11px] text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-0">Delete</button>
                   </div>
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Instruments */}
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="font-['Instrument_Serif'] text-xl">Instruments</h2>
+          {isOwnProfile && (
+            <button onClick={() => addInstrument()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
+          )}
+        </div>
+        {instruments.length === 0 ? (
+          <EmptyState
+            message={isOwnProfile ? "Add your instrument to build its story and provenance." : "No instruments listed yet."}
+            action={isOwnProfile ? "Add your instrument" : undefined}
+            onAction={isOwnProfile ? () => addInstrument() : undefined}
+          />
+        ) : (
+          <div className="space-y-3">
+            {instruments.map(inst => (
+              <div key={inst.id} className="bg-surface border border-border rounded-xl overflow-hidden group">
+                <div className="h-28 bg-gradient-to-br from-[#E8DDD3] via-[#D5C4B0] to-[#C9B89A] flex items-center justify-center">
+                  <span className="text-4xl opacity-15">🎻</span>
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
+                      <div className="font-['Instrument_Serif'] text-lg">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
+                      {inst.country_of_origin && <div className="font-mono text-xs text-muted">{inst.country_of_origin}</div>}
+                      {inst.provenance_story && <p className="text-xs text-muted leading-relaxed mt-2 line-clamp-2">{inst.provenance_story.slice(0, 150)}...</p>}
+                    </div>
+                    {isOwnProfile && (
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
+                        <a href={`/instruments/${inst.id}`} className="text-muted hover:text-ink p-1 no-underline" title="View page">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        </a>
+                        <button onClick={async () => {
+                          await supabase.from('instruments').delete().eq('id', inst.id);
+                          setInstruments(prev => prev.filter(x => x.id !== inst.id));
+                        }} className="text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-1" title="Delete">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
