@@ -396,21 +396,24 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             onAction={isOwnProfile ? () => addTraining() : undefined}
           />
         ) : (
-          <div className="relative pl-6">
-            <div className="absolute left-[5px] top-1 bottom-1 w-0.5 bg-border" />
+          <div className="space-y-2">
             {trainingHistory.map((item, i) => (
-              <div key={i} className="relative mb-4 group">
-                <div className="absolute -left-[19px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-bg" />
-                <div className="font-mono text-[11px] text-[#A8A29E] mb-0.5">{item.year}</div>
-                <div className="text-sm text-ink">{item.title}</div>
-                {item.detail && <div className="text-xs text-muted">{item.detail}</div>}
-                {isOwnProfile && (
-                  <div className="inline-flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
-                    <button onClick={() => editTraining(i)} className="text-[11px] text-muted hover:text-ink bg-transparent border-none cursor-pointer p-0">Edit</button>
-                    <button onClick={() => deleteTraining(i)} className="text-[11px] text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-0">Delete</button>
-                  </div>
-                )}
-              </div>
+              <EditableCard key={`training-${i}`} isOwner={isOwnProfile}
+                onDelete={() => deleteTraining(i)}
+                onSave={(vals) => {
+                  const updated = [...trainingHistory];
+                  updated[i] = { year: vals.year, title: vals.title, detail: vals.detail };
+                  saveTrainingHistory(updated);
+                }}
+                fields={[
+                  { key: 'year', label: 'Year or period (e.g., 2015-2019)', value: item.year },
+                  { key: 'title', label: 'Institution, teacher, or program', value: item.title },
+                  { key: 'detail', label: 'Details (e.g., degree, instrument, focus)', value: item.detail },
+                ]}
+              >
+                <div className="text-sm font-medium text-ink">{item.title}</div>
+                <div className="text-xs text-muted">{item.year}{item.detail ? ` · ${item.detail}` : ''}</div>
+              </EditableCard>
             ))}
           </div>
         )}
@@ -431,38 +434,42 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             onAction={isOwnProfile ? () => addInstrument() : undefined}
           />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {instruments.map(inst => (
-              <div key={inst.id} className="bg-surface border border-border rounded-xl overflow-hidden group">
-                <div className="h-28 bg-gradient-to-br from-[#E8DDD3] via-[#D5C4B0] to-[#C9B89A] flex items-center justify-center">
-                  <span className="text-4xl opacity-15">🎻</span>
+              <EditableCard key={inst.id} isOwner={isOwnProfile}
+                onDelete={async () => {
+                  await supabase.from('instruments').delete().eq('id', inst.id);
+                  setInstruments(prev => prev.filter(x => x.id !== inst.id));
+                }}
+                onSave={async (vals) => {
+                  const year = vals.maker_year ? parseInt(vals.maker_year) || null : null;
+                  await supabase.from('instruments').update({
+                    type: vals.type, maker: vals.maker || null,
+                    maker_year: year, country_of_origin: vals.country_of_origin || null,
+                    provenance_story: vals.provenance_story,
+                  }).eq('id', inst.id);
+                  setInstruments(prev => prev.map(x => x.id === inst.id ? { ...x, ...vals, maker_year: year } : x));
+                }}
+                fields={[
+                  { key: 'type', label: 'Instrument type (e.g., Cello, Violin)', value: inst.type },
+                  { key: 'maker', label: 'Maker', value: inst.maker || '' },
+                  { key: 'maker_year', label: 'Year made', value: inst.maker_year?.toString() || '' },
+                  { key: 'country_of_origin', label: 'Country of origin', value: inst.country_of_origin || '' },
+                  { key: 'provenance_story', label: 'Story / provenance', value: inst.provenance_story },
+                ]}
+              >
+                <div className="text-sm font-medium text-ink">
+                  {inst.type || 'New instrument'}{inst.maker ? ` — ${inst.maker}` : ''}
+                  {inst.maker_year ? `, c. ${inst.maker_year}` : ''}
                 </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <div className="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
-                      <div className="font-['Instrument_Serif'] text-lg">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
-                      {inst.country_of_origin && <div className="font-mono text-xs text-muted">{inst.country_of_origin}</div>}
-                      {inst.provenance_story && <p className="text-xs text-muted leading-relaxed mt-2 line-clamp-2">{inst.provenance_story.slice(0, 150)}...</p>}
-                    </div>
-                    {isOwnProfile && (
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                        <a href={`/instruments/${inst.id}`} className="text-muted hover:text-ink p-1 no-underline" title="View page">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                        </a>
-                        <button onClick={async () => {
-                          await supabase.from('instruments').delete().eq('id', inst.id);
-                          setInstruments(prev => prev.filter(x => x.id !== inst.id));
-                        }} className="text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-1" title="Delete">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                <div className="text-xs text-muted">
+                  {inst.country_of_origin || ''}
+                  {inst.provenance_story ? ` · ${inst.provenance_story.slice(0, 80)}...` : ''}
                 </div>
-              </div>
+                {inst.type && (
+                  <a href={`/instruments/${inst.id}`} className="text-[11px] text-accent hover:underline no-underline mt-1 inline-block">View instrument page →</a>
+                )}
+              </EditableCard>
             ))}
           </div>
         )}
@@ -588,25 +595,12 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   }
 
   function addTraining() {
-    const year = prompt('Year or period (e.g., 2015-2019, 2020):');
-    if (!year) return;
-    const title = prompt('What (e.g., MDW Vienna, Lessons with Heinrich Schiff):');
-    if (!title) return;
-    const detail = prompt('Details (optional, e.g., Master\'s in Cello Performance):') || '';
-    saveTrainingHistory([...trainingHistory, { year, title, detail }]);
+    // Add blank entry — inline form will auto-open
+    setTrainingHistory(prev => [{ year: '', title: '', detail: '' }, ...prev]);
   }
 
-  function editTraining(index: number) {
-    const item = trainingHistory[index];
-    const year = prompt('Year or period:', item.year);
-    if (year === null) return;
-    const title = prompt('What:', item.title);
-    if (title === null) return;
-    const detail = prompt('Details:', item.detail);
-    if (detail === null) return;
-    const updated = [...trainingHistory];
-    updated[index] = { year, title, detail: detail || '' };
-    saveTrainingHistory(updated);
+  function editTraining(_index: number) {
+    // EditableCard handles this inline
   }
 
   function deleteTraining(index: number) {
@@ -615,20 +609,12 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   }
 
   function addInstrument() {
-    const type = prompt('Instrument type (e.g., Cello, Violin, Piano):');
-    if (!type) return;
-    const maker = prompt('Maker (optional):') || null;
-    const yearStr = prompt('Year made (optional):');
-    const maker_year = yearStr ? parseInt(yearStr) || null : null;
-    const country = prompt('Country of origin (optional):') || null;
-
     supabase.from('instruments').insert({
-      type, maker, maker_year, country_of_origin: country,
+      type: '', maker: '', maker_year: null, country_of_origin: '',
       current_owner_id: user!.id, provenance_story: '',
     }).select().single().then(({ data, error }) => {
       if (!error && data) {
         setInstruments(prev => [data, ...prev]);
-        // Also add to instrument_history
         supabase.from('instrument_history').insert({
           instrument_id: data.id, artist_id: user!.id,
           date_from: new Date().toISOString().split('T')[0],
