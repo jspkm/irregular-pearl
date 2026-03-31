@@ -51,6 +51,9 @@ interface Performance {
   date: string | null;
   piece_id: string | null;
   is_upcoming: boolean;
+  role: string | null;
+  notes: string | null;
+  notes_public: boolean;
 }
 
 interface DiscographyItem {
@@ -140,7 +143,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
 
       const { data: perfData, error: perfError } = await supabase
         .from('performances')
-        .select('id, event_name, venue, date, piece_id, is_upcoming')
+        .select('id, event_name, venue, date, piece_id, is_upcoming, role, notes, notes_public')
         .eq('user_id', userId)
         .order('date', { ascending: false })
         .limit(20);
@@ -411,18 +414,42 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             {performances.map(p => (
               <EditableCard key={p.id} isOwner={isOwnProfile}
                 onDelete={async () => { await supabase.from('performances').delete().eq('id', p.id); setPerformances(prev => prev.filter(x => x.id !== p.id)); }}
-                onSave={async (vals) => { await supabase.from('performances').update(vals).eq('id', p.id); setPerformances(prev => prev.map(x => x.id === p.id ? { ...x, ...vals } : x)); }}
+                onSave={async (vals) => {
+                  const updates = { ...vals, notes_public: vals.notes_public === 'false' ? false : true };
+                  await supabase.from('performances').update(updates).eq('id', p.id);
+                  setPerformances(prev => prev.map(x => x.id === p.id ? { ...x, ...updates } as Performance : x));
+                }}
                 fields={[
                   { key: 'event_name', label: 'Event', value: p.event_name },
                   { key: 'venue', label: 'Venue', value: p.venue || '' },
                   { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
+                  { key: 'role', label: 'I was', value: p.role || 'performed', type: 'select', options: [
+                    { value: 'performed', label: 'Performed' },
+                    { value: 'attended', label: 'Attended' },
+                  ]},
+                  { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea' },
+                  { key: 'notes_public', label: 'Notes visibility', value: p.notes_public === false ? 'false' : 'true', type: 'toggle' },
                 ]}
               >
                 <div className="text-sm font-medium text-ink">
                   {p.event_name}
+                  {p.role && (
+                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${p.role === 'performed' ? 'bg-[#FEF3C7] text-[#B45309]' : 'bg-blue-50 text-blue-700'}`}>
+                      {p.role === 'performed' ? 'Performed' : 'Attended'}
+                    </span>
+                  )}
                   {p.is_upcoming && <span className="ml-2 text-[10px] bg-accent-light text-accent px-1.5 py-0.5 rounded">Upcoming</span>}
                 </div>
                 <div className="text-xs text-muted">{p.venue && `${p.venue} · `}{p.date || ''}</div>
+                {p.notes && (isOwnProfile || p.notes_public) && (
+                  <div className="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2">
+                    <span className="text-muted font-medium">How was it: </span>
+                    {p.notes}
+                    {isOwnProfile && !p.notes_public && (
+                      <span className="ml-1 text-[10px] text-[#A8A29E]">(private)</span>
+                    )}
+                  </div>
+                )}
               </EditableCard>
             ))}
           </div>
@@ -674,7 +701,8 @@ export default function ArtistProfile({ userId }: { userId: string }) {
 
   function addPerformance() {
     supabase.from('performances').insert({
-      user_id: user!.id, event_name: '', venue: '', date: new Date().toISOString().split('T')[0], is_upcoming: true,
+      user_id: user!.id, event_name: '', venue: '', date: new Date().toISOString().split('T')[0],
+      is_upcoming: true, role: 'performed', notes: '', notes_public: true,
     }).select().single().then(({ data }) => {
       if (data) setPerformances(prev => [data as Performance, ...prev]);
     });
@@ -709,7 +737,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
   isOwner: boolean;
   onDelete: () => void;
   onSave: (vals: Record<string, string>) => void;
-  fields: { key: string; label: string; value: string; type?: string }[];
+  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[] }[];
 }) {
   const [editMode, setEditMode] = useState(false);
   const [vals, setVals] = useState<Record<string, string>>(() => Object.fromEntries(fields.map(f => [f.key, f.value])));
@@ -726,9 +754,26 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
         {fields.map(f => (
           <div key={f.key}>
             <label className="block text-[11px] text-muted mb-0.5">{f.label}</label>
-            <input value={vals[f.key] || ''} type={f.type || 'text'}
-              onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
-              className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent" />
+            {f.type === 'select' && f.options ? (
+              <select value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
+                className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent bg-white">
+                {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            ) : f.type === 'toggle' ? (
+              <button type="button"
+                onClick={() => setVals(v => ({ ...v, [f.key]: v[f.key] === 'true' ? 'false' : 'true' }))}
+                className={`text-xs px-3 py-1 rounded-full border-none cursor-pointer transition-colors ${vals[f.key] === 'true' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                {vals[f.key] === 'true' ? 'Public' : 'Private'}
+              </button>
+            ) : f.type === 'textarea' ? (
+              <textarea value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
+                className="w-full border border-border rounded px-2 py-1 text-sm resize-none h-16 focus:outline-none focus:border-accent"
+                placeholder={f.label} />
+            ) : (
+              <input value={vals[f.key] || ''} type={f.type || 'text'}
+                onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
+                className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent" />
+            )}
           </div>
         ))}
         <div className="flex gap-2 justify-end pt-1">
