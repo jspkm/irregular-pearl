@@ -748,7 +748,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
 
   if (editMode && isOwner) {
     return (
-      <div className="bg-surface border border-accent/30 rounded-lg px-4 py-3 space-y-2">
+      <div className="bg-surface border border-accent/30 rounded-lg px-5 md:px-6 py-4 space-y-2">
         {fields.map(f => (
           <div key={f.key}>
             {f.label && <label className="block text-[11px] text-muted mb-0.5">{f.label}</label>}
@@ -804,7 +804,7 @@ function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
   }
 
   return (
-    <div className="bg-surface border border-border rounded-lg px-4 py-3 flex justify-between items-start group">
+    <div className="bg-surface border border-border rounded-lg px-5 md:px-6 py-3 flex justify-between items-start group">
       <div className="flex-1 min-w-0">{children}</div>
       {isOwner && (
         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
