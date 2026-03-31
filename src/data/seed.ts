@@ -1282,6 +1282,8 @@ export const seedPieces: SeedPiece[] = [
   },
 ];
 
-// Import and merge additional piano/violin pieces
+// Import and merge additional pieces
 import { pianoViolinNew } from './seed-piano-violin-new';
+import { expansionPieces } from './seed-expansion';
 seedPieces.push(...pianoViolinNew);
+seedPieces.push(...expansionPieces);
