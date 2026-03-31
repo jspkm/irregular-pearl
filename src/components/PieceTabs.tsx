@@ -15,12 +15,13 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'editions', label: 'Editions', count: piece.editions.length },
-    { id: 'recordings', label: 'Recordings' },
+    { id: 'recordings', label: 'Recordings', count: recordingLinks.length || undefined },
     { id: 'history', label: 'History' },
   ];
 
-  const youtubeLinks = piece.external_links.filter(l => l.type === 'youtube');
-  const otherLinks = piece.external_links.filter(l => l.type !== 'youtube');
+  const recordingTypes = ['youtube', 'spotify', 'soundcloud', 'bandcamp', 'internet_archive', 'vimeo'];
+  const recordingLinks = piece.external_links.filter(l => recordingTypes.includes(l.type));
+  const otherLinks = piece.external_links.filter(l => !recordingTypes.includes(l.type));
 
   return (
     <div>
@@ -117,8 +118,8 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
         <div>
           {youtubeLinks.length > 0 ? (
             <div className="space-y-2">
-              {youtubeLinks.map((link, i) => (
-                <RecordingCard key={i} url={link.url} label={link.label} />
+              {recordingLinks.map((link, i) => (
+                <RecordingCard key={i} url={link.url} label={link.label} type={link.type} />
               ))}
             </div>
           ) : (
@@ -153,39 +154,74 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
 
 // --- Subcomponents ---
 
-function RecordingCard({ url, label }: { url: string; label: string }) {
+const PLATFORM_STYLES: Record<string, { bg: string; text: string; name: string }> = {
+  youtube: { bg: 'bg-red-50', text: 'text-red-500', name: 'YouTube' },
+  spotify: { bg: 'bg-green-50', text: 'text-green-600', name: 'Spotify' },
+  soundcloud: { bg: 'bg-orange-50', text: 'text-orange-500', name: 'SoundCloud' },
+  bandcamp: { bg: 'bg-blue-50', text: 'text-blue-500', name: 'Bandcamp' },
+  internet_archive: { bg: 'bg-amber-50', text: 'text-amber-600', name: 'Internet Archive' },
+  vimeo: { bg: 'bg-cyan-50', text: 'text-cyan-600', name: 'Vimeo' },
+};
+
+function getEmbedUrl(url: string, type: string): string | null {
+  if (type === 'youtube') {
+    const id = extractYouTubeId(url);
+    return id ? `https://www.youtube.com/embed/${id}?autoplay=1` : null;
+  }
+  if (type === 'spotify') {
+    // https://open.spotify.com/track/XXX → https://open.spotify.com/embed/track/XXX
+    const m = url.match(/open\.spotify\.com\/(track|album|playlist)\/([a-zA-Z0-9]+)/);
+    return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : null;
+  }
+  if (type === 'soundcloud') {
+    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=true&visual=true`;
+  }
+  if (type === 'bandcamp') {
+    return null; // Bandcamp embeds need album/track IDs, link out instead
+  }
+  if (type === 'vimeo') {
+    const m = url.match(/vimeo\.com\/(\d+)/);
+    return m ? `https://player.vimeo.com/video/${m[1]}?autoplay=1` : null;
+  }
+  return null;
+}
+
+function RecordingCard({ url, label, type }: { url: string; label: string; type: string }) {
   const [expanded, setExpanded] = useState(false);
-  const videoId = extractYouTubeId(url);
+  const style = PLATFORM_STYLES[type] || { bg: 'bg-gray-50', text: 'text-gray-500', name: type };
+  const embedUrl = getEmbedUrl(url, type);
+  const isAudioOnly = ['spotify', 'soundcloud', 'bandcamp', 'internet_archive'].includes(type);
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left"
+        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left bg-transparent border-none cursor-pointer"
       >
-        <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500 flex-shrink-0">
-          {expanded ? '▼' : '▶'}
+        <div className={`w-10 h-10 ${style.bg} rounded-lg flex items-center justify-center ${style.text} flex-shrink-0`}>
+          {expanded ? '▼' : isAudioOnly ? '♫' : '▶'}
         </div>
         <div className="min-w-0">
           <p className="text-sm font-medium text-gray-800">{label}</p>
-          <p className="text-xs text-gray-400">YouTube</p>
+          <p className="text-xs text-gray-400">{style.name}</p>
         </div>
       </button>
-      {expanded && videoId && (
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+      {expanded && embedUrl && (
+        <div className="relative w-full" style={{ paddingBottom: isAudioOnly ? '80px' : '56.25%', height: isAudioOnly ? '80px' : undefined }}>
           <iframe
-            className="absolute inset-0 w-full h-full"
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+            className={isAudioOnly ? 'w-full' : 'absolute inset-0 w-full h-full'}
+            style={isAudioOnly ? { height: '80px' } : undefined}
+            src={embedUrl}
             title={label}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+            allowFullScreen={!isAudioOnly}
           />
         </div>
       )}
-      {expanded && !videoId && (
+      {expanded && !embedUrl && (
         <a href={url} target="_blank" rel="noopener noreferrer"
-          className="block px-3 pb-3 text-sm text-blue-600 hover:underline">
-          Open in YouTube →
+          className="block px-3 pb-3 text-sm text-[#B45309] hover:underline no-underline">
+          Open on {style.name} →
         </a>
       )}
     </div>

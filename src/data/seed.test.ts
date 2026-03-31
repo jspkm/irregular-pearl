@@ -43,7 +43,7 @@ describe('seed data integrity', () => {
   test('all external links have valid types', () => {
     for (const piece of seedPieces) {
       for (const link of piece.external_links) {
-        expect(['imslp', 'youtube', 'wikipedia']).toContain(link.type);
+        expect(['imslp', 'youtube', 'wikipedia', 'spotify', 'soundcloud', 'bandcamp', 'internet_archive', 'vimeo']).toContain(link.type);
         expect(link.url).toMatch(/^https?:\/\//);
         expect(link.label).toBeTruthy();
       }

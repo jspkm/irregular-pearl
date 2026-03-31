@@ -1,6 +1,6 @@
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'professional';
 export type UserLevel = 'student' | 'amateur' | 'professional' | 'teacher';
-export type LinkType = 'imslp' | 'youtube' | 'wikipedia';
+export type LinkType = 'imslp' | 'youtube' | 'wikipedia' | 'spotify' | 'soundcloud' | 'bandcamp' | 'internet_archive' | 'vimeo';
 export type ActivityType = 'working_on' | 'listened' | 'practiced' | 'sight_read' | 'took_lesson' | 'performed';
 
 export interface Database {

@@ -21,7 +21,7 @@ export interface SeedPiece {
     description: string;
   }[];
   external_links: {
-    type: 'imslp' | 'youtube' | 'wikipedia';
+    type: 'imslp' | 'youtube' | 'wikipedia' | 'spotify' | 'soundcloud' | 'bandcamp' | 'internet_archive' | 'vimeo';
     url: string;
     label: string;
   }[];
