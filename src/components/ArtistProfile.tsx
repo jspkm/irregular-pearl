@@ -72,6 +72,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   const [performances, setPerformances] = useState<Performance[]>([]);
   const [discography, setDiscography] = useState<DiscographyItem[]>([]);
   const [instruments, setInstruments] = useState<{ id: string; type: string; maker: string | null; maker_year: number | null; country_of_origin: string | null; provenance_story: string }[]>([]);
+  const [trainingHistory, setTrainingHistory] = useState<{ year: string; title: string; detail: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({ bio: '', instrument: '', website: '', location: '', social_links: {} as Record<string, string> });
@@ -95,6 +96,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
           location: profileData.location || '',
           social_links: profileData.social_links || {},
         });
+        setTrainingHistory((profileData as any).training_history || []);
       }
 
       const { data: workingData } = await supabase
@@ -433,6 +435,41 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         )}
       </section>
 
+      {/* Training */}
+      <section className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="font-['Instrument_Serif'] text-xl">Training</h2>
+          {isOwnProfile && (
+            <button onClick={() => addTraining()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
+          )}
+        </div>
+        {trainingHistory.length === 0 ? (
+          <EmptyState
+            message={isOwnProfile ? "Add your training history — conservatories, teachers, lessons, masterclasses." : "No training listed yet."}
+            action={isOwnProfile ? "Add training" : undefined}
+            onAction={isOwnProfile ? () => addTraining() : undefined}
+          />
+        ) : (
+          <div className="relative pl-6">
+            <div className="absolute left-[5px] top-1 bottom-1 w-0.5 bg-border" />
+            {trainingHistory.map((item, i) => (
+              <div key={i} className="relative mb-4 group">
+                <div className="absolute -left-[19px] top-1.5 w-2.5 h-2.5 rounded-full bg-accent border-2 border-bg" />
+                <div className="font-mono text-[11px] text-[#A8A29E] mb-0.5">{item.year}</div>
+                <div className="text-sm text-ink">{item.title}</div>
+                {item.detail && <div className="text-xs text-muted">{item.detail}</div>}
+                {isOwnProfile && (
+                  <div className="inline-flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                    <button onClick={() => editTraining(i)} className="text-[11px] text-muted hover:text-ink bg-transparent border-none cursor-pointer p-0">Edit</button>
+                    <button onClick={() => deleteTraining(i)} className="text-[11px] text-muted hover:text-red-600 bg-transparent border-none cursor-pointer p-0">Delete</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Activity Log */}
       <section className="mb-10">
         <h2 className="font-['Instrument_Serif'] text-xl mb-4">Activity</h2>
@@ -546,6 +583,39 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   );
 
   // Helper functions for adding items
+  async function saveTrainingHistory(updated: { year: string; title: string; detail: string }[]) {
+    const sorted = [...updated].sort((a, b) => (b.year || '').localeCompare(a.year || ''));
+    await supabase.from('users').update({ training_history: sorted }).eq('id', user!.id);
+    setTrainingHistory(sorted);
+  }
+
+  function addTraining() {
+    const year = prompt('Year or period (e.g., 2015-2019, 2020):');
+    if (!year) return;
+    const title = prompt('What (e.g., MDW Vienna, Lessons with Heinrich Schiff):');
+    if (!title) return;
+    const detail = prompt('Details (optional, e.g., Master\'s in Cello Performance):') || '';
+    saveTrainingHistory([...trainingHistory, { year, title, detail }]);
+  }
+
+  function editTraining(index: number) {
+    const item = trainingHistory[index];
+    const year = prompt('Year or period:', item.year);
+    if (year === null) return;
+    const title = prompt('What:', item.title);
+    if (title === null) return;
+    const detail = prompt('Details:', item.detail);
+    if (detail === null) return;
+    const updated = [...trainingHistory];
+    updated[index] = { year, title, detail: detail || '' };
+    saveTrainingHistory(updated);
+  }
+
+  function deleteTraining(index: number) {
+    const updated = trainingHistory.filter((_, i) => i !== index);
+    saveTrainingHistory(updated);
+  }
+
   function addInstrument() {
     const type = prompt('Instrument type (e.g., Cello, Violin, Piano):');
     if (!type) return;
