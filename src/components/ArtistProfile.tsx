@@ -75,7 +75,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   const [trainingHistory, setTrainingHistory] = useState<{ year: string; title: string; detail: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ bio: '', instrument: '', website: '', location: '', social_links: {} as Record<string, string> });
+  const [editForm, setEditForm] = useState({ bio: '', instrument: '', level: '', website: '', location: '', social_links: {} as Record<string, string> });
 
   useEffect(() => {
     if (!hasSupabase) { setLoading(false); return; }
@@ -92,6 +92,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         setEditForm({
           bio: profileData.bio || '',
           instrument: profileData.instrument || '',
+          level: profileData.level || '',
           website: profileData.website || '',
           location: profileData.location || '',
           social_links: profileData.social_links || {},
@@ -174,6 +175,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
     await supabase.from('users').update({
       bio: editForm.bio,
       instrument: editForm.instrument || null,
+      level: editForm.level || null,
       website: editForm.website || null,
       location: editForm.location || null,
       social_links: cleanLinks,
@@ -346,10 +348,24 @@ export default function ArtistProfile({ userId }: { userId: string }) {
               }}
             />
           </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Location</label>
-            <input value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., New York, NY" />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-muted mb-1">I am</label>
+              <select value={editForm.level} onChange={e => setEditForm(f => ({ ...f, level: e.target.value }))}
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent bg-white">
+                <option value="">Select...</option>
+                <option value="student">Student</option>
+                <option value="enthusiast">Enthusiast</option>
+                <option value="amateur">Amateur</option>
+                <option value="professional">Professional</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-muted mb-1">Location</label>
+              <input value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
+                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., New York, NY" />
+            </div>
           </div>
           <div>
             <label className="block text-xs text-muted mb-1">Website</label>
