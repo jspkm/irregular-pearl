@@ -6,6 +6,7 @@ import GenerativeAvatar from './GenerativeAvatar';
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [dbAvatarUrl, setDbAvatarUrl] = useState<string | null | undefined>(undefined);
+  const [isStaff, setIsStaff] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,9 +19,12 @@ export default function AuthButton() {
       setUser(session?.user ?? null);
       if (session?.user) {
         // Fetch avatar_url from public.users (respects user's choice)
-        supabase.from('users').select('avatar_url').eq('id', session.user.id).single()
+        supabase.from('users').select('avatar_url, role, is_maestro').eq('id', session.user.id).single()
           .then(({ data }) => {
             setDbAvatarUrl(data?.avatar_url ?? null);
+            const role = (data as any)?.role;
+            const isMaestro = (data as any)?.is_maestro;
+            setIsStaff(role === 'admin' || role === 'firstchair' || isMaestro === true);
             setLoading(false);
           });
       } else {
@@ -52,13 +56,20 @@ export default function AuthButton() {
     const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
 
     return (
-      <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
-        {dbAvatarUrl ? (
-          <img src={dbAvatarUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover" />
-        ) : (
-          <GenerativeAvatar userId={user.id} size={28} />
+      <div className="flex items-center gap-3">
+        {isStaff && (
+          <a href="/admin" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+            Admin
+          </a>
         )}
-      </a>
+        <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
+          {dbAvatarUrl ? (
+            <img src={dbAvatarUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover" />
+          ) : (
+            <GenerativeAvatar userId={user.id} size={28} />
+          )}
+        </a>
+      </div>
     );
   }
 
