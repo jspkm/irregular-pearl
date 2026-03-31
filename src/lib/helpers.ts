@@ -80,6 +80,44 @@ export function randomNoteStarter(): string {
   return NOTE_STARTERS[Math.floor(Math.random() * NOTE_STARTERS.length)];
 }
 
+// ── Social URL normalization ──
+
+const SOCIAL_BASES: Record<string, string> = {
+  'Instagram': 'https://instagram.com/',
+  'YouTube': 'https://youtube.com/@',
+  'X / Twitter': 'https://x.com/',
+  'Facebook': 'https://facebook.com/',
+};
+
+const SOCIAL_ICONS: Record<string, string> = {
+  'Instagram': '<path d="M7.8 2h8.4C19 2 22 5 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C5 22 2 19 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"/>',
+  'YouTube': '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43zM9.75 15.02V8.48l5.75 3.27-5.75 3.27z"/>',
+  'X / Twitter': '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
+  'Facebook': '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+};
+
+export function normalizeSocialUrl(platform: string, value: string): string {
+  if (!value) return '';
+  const v = value.trim();
+  // Already a full URL
+  if (v.startsWith('http://') || v.startsWith('https://')) return v;
+  // Strip leading @
+  const username = v.startsWith('@') ? v.slice(1) : v;
+  const base = SOCIAL_BASES[platform];
+  return base ? `${base}${username}` : `https://${v}`;
+}
+
+export function getSocialIcon(platform: string): string {
+  return SOCIAL_ICONS[platform] || '';
+}
+
+export function normalizeWebsiteUrl(url: string): string {
+  if (!url) return '';
+  const v = url.trim();
+  if (v.startsWith('http://') || v.startsWith('https://')) return v;
+  return `https://${v}`;
+}
+
 // ── Slug validation ──
 
 const RESERVED_SLUGS = [

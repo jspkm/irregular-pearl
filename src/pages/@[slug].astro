@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import ProfileOwnerBar from '../components/ProfileOwnerBar';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { ACTIVITIES } from '../lib/helpers';
+import { ACTIVITIES, normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 
 const { slug } = Astro.params;
 
@@ -101,7 +101,28 @@ const breadcrumbLd = {
 
       <!-- Bio -->
       {user.bio && (
-        <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-8">{user.bio}</p>
+        <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-4">{user.bio}</p>
+      )}
+
+      <!-- Social & Website (inline, visible on all screens) -->
+      {(user.website || (user.social_links && Object.values(user.social_links).some(Boolean))) && (
+        <div class="flex flex-wrap items-center gap-3 mb-8">
+          {user.social_links && Object.entries(user.social_links).filter(([, v]) => v).map(([platform, value]) => {
+            const url = normalizeSocialUrl(platform, value as string);
+            const icon = getSocialIcon(platform);
+            return (
+              <a href={url} target="_blank" rel="noopener noreferrer" title={platform}
+                class="w-8 h-8 rounded-full bg-bg border border-border flex items-center justify-center text-muted hover:text-accent hover:border-accent transition-colors no-underline">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" set:html={icon} />
+              </a>
+            );
+          })}
+          {user.website && (
+            <a href={normalizeWebsiteUrl(user.website)} class="text-xs text-accent no-underline hover:underline" target="_blank" rel="noopener">
+              {user.website.replace(/^https?:\/\//, '')}
+            </a>
+          )}
+        </div>
       )}
 
       <!-- Training Timeline -->
@@ -195,12 +216,6 @@ const breadcrumbLd = {
         </div>
       )}
 
-      {user.website && (
-        <div class="mb-4">
-          <h2 class="text-[15px] font-semibold mb-2">Links</h2>
-          <a href={user.website} class="text-xs text-accent no-underline hover:underline" target="_blank" rel="noopener">{user.website}</a>
-        </div>
-      )}
     </aside>
   </div>
 </Layout>
