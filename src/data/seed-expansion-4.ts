@@ -1457,5 +1457,526 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "Wikipedia — Piano Quintet (Schumann)"
       }
     ]
+  },
+  {
+    "id": "berlioz-symphonie-fantastique",
+    "title": "Symphonie fantastique",
+    "composer_name": "Hector Berlioz",
+    "catalog_number": "Op. 14",
+    "instruments": ["Orchestra"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 50,
+    "difficulty": "advanced",
+    "description": "Premiered in Paris in 1830, the Symphonie fantastique is the founding work of programmatic orchestral music. Its five movements — Dreams and Passions, A Ball, Scene in the Country, March to the Scaffold, and Dream of a Witches' Sabbath — trace the autobiographical hallucinations of a lovesick artist. Berlioz's idée fixe, a recurring melodic motto representing the beloved, pioneered the technique of thematic transformation. The work's expanded orchestration, including multiple harps, English horn, and extended brass writing, transformed the possibilities of the symphony orchestra.",
+    "editions": [
+      {
+        "id": "e-berlioz-sf-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Nicholas Temperley",
+        "year": 2000,
+        "description": "Critical New Berlioz Edition, collating autograph, early copies, and corrected proofs. The definitive scholarly text."
+      },
+      {
+        "id": "e-berlioz-sf-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Charles Malherbe & Felix Weingartner",
+        "year": 1900,
+        "description": "Original Berlioz complete works edition. Historically important; now superseded for scholarly use but still available in many libraries."
+      },
+      {
+        "id": "e-berlioz-sf-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Edward Cone",
+        "year": 1971,
+        "description": "Miniature study score with analytical preface by Edward Cone. Widely used in university orchestration courses."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Symphonie_fantastique,_Op.14_(Berlioz,_Hector)",
+        "label": "IMSLP — Berlioz: Symphonie fantastique Op. 14"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=5HgqPpjIH5c",
+        "label": "YouTube — Colin Davis, London Symphony Orchestra"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Symphonie_fantastique",
+        "label": "Wikipedia — Symphonie fantastique"
+      },
+      {
+        "type": "vimeo",
+        "url": "https://vimeo.com/189444440",
+        "label": "Vimeo — Gustavo Dudamel, Orchestre de Paris"
+      }
+    ]
+  },
+  {
+    "id": "saint-saens-symphony-3",
+    "title": "Symphony No. 3 in C minor 'Organ Symphony'",
+    "composer_name": "Camille Saint-Saëns",
+    "catalog_number": "Op. 78",
+    "instruments": ["Orchestra", "Organ", "Piano"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 36,
+    "difficulty": "advanced",
+    "description": "Commissioned by the Philharmonic Society of London and premiered there in 1886, the Organ Symphony is Saint-Saëns's orchestral masterpiece. Its two large movements, each subdivided, culminate in a blazing C major apotheosis in which the full organ and orchestra unite in one of the most overwhelming passages in the Romantic repertoire. Saint-Saëns described it as the work in which he had given everything he was able to give. The piano parts, written for four hands, add further richness to the luminous orchestration.",
+    "editions": [
+      {
+        "id": "e-saintsaens-sym3-durand",
+        "publisher": "Durand",
+        "editor": "Camille Saint-Saëns",
+        "year": 1886,
+        "description": "Original French edition, the primary source text and the basis for all subsequent editions."
+      },
+      {
+        "id": "e-saintsaens-sym3-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Paul Dukas",
+        "year": 1927,
+        "description": "Miniature study score with preface; widely used in orchestration courses and for score-reading alongside recordings."
+      },
+      {
+        "id": "e-saintsaens-sym3-kalmus",
+        "publisher": "Kalmus",
+        "editor": "Editorial staff",
+        "year": 1970,
+        "description": "Reprint of the Durand full score; economical and practical for orchestral libraries."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Symphony_No.3,_Op.78_(Saint-Sa%C3%ABns,_Camille)",
+        "label": "IMSLP — Saint-Saëns: Symphony No. 3 Op. 78"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=y4DZDeVVxg0",
+        "label": "YouTube — Charles Dutoit, Orchestre de Paris"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Symphony_No._3_(Saint-Sa%C3%ABns)",
+        "label": "Wikipedia — Saint-Saëns Symphony No. 3"
+      }
+    ]
+  },
+  {
+    "id": "liszt-prelude-fugue-bach",
+    "title": "Prelude and Fugue on the name BACH",
+    "composer_name": "Franz Liszt",
+    "catalog_number": "S. 260",
+    "instruments": ["Organ"],
+    "era": "Romantic",
+    "form": "Prelude and Fugue",
+    "duration_minutes": 15,
+    "difficulty": "professional",
+    "description": "Composed in 1855 and extensively revised in 1870, this is the most celebrated and technically demanding Romantic organ work outside the French tradition. The four-note motif B-A-C-H (using German note names, where B is B-flat and H is B-natural) serves as the subject of both the turbulent prelude and the massive double fugue. Liszt's organ writing draws on his pianistic virtuosity, demanding huge stretches, rapid repeated chords, and a commanding control of registration throughout.",
+    "editions": [
+      {
+        "id": "e-liszt-pfbach-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Karl Straube",
+        "year": 1908,
+        "description": "Classic early edition prepared by the great Bach-organist Karl Straube, with detailed registration for German Romantic organs."
+      },
+      {
+        "id": "e-liszt-pfbach-peters",
+        "publisher": "Edition Peters",
+        "editor": "Hermann Keller",
+        "year": 1936,
+        "description": "Revised practical edition with updated registration suggestions; widely used in European conservatories."
+      },
+      {
+        "id": "e-liszt-pfbach-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Michael Gailit",
+        "year": 2004,
+        "description": "Critical edition comparing both the 1855 and 1870 versions with full critical commentary. Preferred for informed scholarly performance."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Prelude_and_Fugue_on_the_name_BACH,_S.260_(Liszt,_Franz)",
+        "label": "IMSLP — Liszt: Prelude and Fugue on BACH S. 260"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Z3WQOQM-14s",
+        "label": "YouTube — Thierry Escaich, Cathédrale Saint-Étienne"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Prelude_and_Fugue_on_the_name_BACH_(Liszt)",
+        "label": "Wikipedia — Liszt Prelude and Fugue on BACH"
+      }
+    ]
+  },
+  {
+    "id": "ginastera-harp-sonata",
+    "title": "Sonata for Harp",
+    "composer_name": "Alberto Ginastera",
+    "catalog_number": "Op. 52",
+    "instruments": ["Harp"],
+    "era": "20th Century",
+    "form": "Sonata",
+    "duration_minutes": 17,
+    "difficulty": "professional",
+    "description": "Composed in 1956 and premiered by Nicanor Zabaleta, the Harp Sonata is widely considered the most important solo harp work of the 20th century outside the French tradition. Its three movements — Allegramente rustico, Liberamente capriccioso, and Ritmico e cavalleresco — draw on Argentine folk rhythms and modal harmonies, translated into a language of ferocious percussive attack and luminous lyricism. The finale's malambo rhythm drives the work to an explosive close.",
+    "editions": [
+      {
+        "id": "e-ginastera-harp-boosey",
+        "publisher": "Boosey & Hawkes",
+        "editor": "Nicanor Zabaleta",
+        "year": 1958,
+        "description": "Original edition, prepared with the dedicatee Nicanor Zabaleta. The standard performing text."
+      },
+      {
+        "id": "e-ginastera-harp-gsm",
+        "publisher": "Glocken Verlag / Schott",
+        "editor": "Marielle Nordmann",
+        "year": 1995,
+        "description": "Revised edition with updated pedalling and fingering by French harpist Marielle Nordmann."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Harp_Sonata,_Op.52_(Ginastera,_Alberto)",
+        "label": "IMSLP — Ginastera: Harp Sonata Op. 52"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=zVLSjU3XRMU",
+        "label": "YouTube — Xavier de Maistre, harp"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Alberto_Ginastera",
+        "label": "Wikipedia — Alberto Ginastera"
+      },
+      {
+        "type": "vimeo",
+        "url": "https://vimeo.com/228473011",
+        "label": "Vimeo — Gwyneth Wentink, live recital"
+      }
+    ]
+  },
+  {
+    "id": "sor-fantasie-op7",
+    "title": "Fantaisie, Op. 7",
+    "composer_name": "Fernando Sor",
+    "catalog_number": "Op. 7",
+    "instruments": ["Guitar"],
+    "era": "Classical",
+    "form": "Fantasy",
+    "duration_minutes": 14,
+    "difficulty": "advanced",
+    "description": "Published in London around 1822, Sor's Op. 7 Fantaisie is one of the grandest solo works of the Classical guitar repertoire. It opens with a searching slow introduction before unfolding into a set of variations and a brilliant finale, drawing on operatic and dance idioms. Sor was the foremost guitar composer and pedagogue of his era; this work showcases both his technical demands and his deeply vocal approach to melody, earning him the title 'the Beethoven of the guitar'.",
+    "editions": [
+      {
+        "id": "e-sor-op7-tecla",
+        "publisher": "Tecla Editions",
+        "editor": "Brian Jeffery",
+        "year": 1982,
+        "description": "Facsimile of the original London print with editorial commentary by Brian Jeffery. The preferred scholarly source."
+      },
+      {
+        "id": "e-sor-op7-chanterelle",
+        "publisher": "Chanterelle",
+        "editor": "Matanya Ophee",
+        "year": 1990,
+        "description": "Practical performing edition with modern notation, fingering, and introductory notes on historical performance practice."
+      },
+      {
+        "id": "e-sor-op7-schott",
+        "publisher": "Schott",
+        "editor": "Karl Scheit",
+        "year": 1963,
+        "description": "Long-standard conservatory edition; some minor editorial liberties but readable and well-laid-out."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Fantaisie,_Op.7_(Sor,_Fernando)",
+        "label": "IMSLP — Sor: Fantaisie Op. 7"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=3yRA6oSmC8M",
+        "label": "YouTube — Pepe Romero, guitar"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Fernando_Sor",
+        "label": "Wikipedia — Fernando Sor"
+      }
+    ]
+  },
+  {
+    "id": "bottesini-gran-duo",
+    "title": "Gran Duo Concertante",
+    "composer_name": "Giovanni Bottesini",
+    "catalog_number": null,
+    "instruments": ["Double Bass", "Violin", "Orchestra"],
+    "era": "Romantic",
+    "form": "Concerto",
+    "duration_minutes": 22,
+    "difficulty": "professional",
+    "description": "The Gran Duo Concertante for violin, double bass, and orchestra is the showpiece of Bottesini's concertante output, demanding equal virtuosity from both soloists. The double bass is required to play in the upper positions with singing lyrical tone, its natural resonance offset against the brilliance of the violin. Bottesini, known as 'the Paganini of the double bass', designed the work to astound audiences with the contrast between the instrument's stereotyped bass role and its true lyrical capability.",
+    "editions": [
+      {
+        "id": "e-bottesini-gd-yorke",
+        "publisher": "Yorke Edition",
+        "editor": "Thomas Martin",
+        "year": 1990,
+        "description": "Standard modern edition with piano reduction, bowing and fingering suggestions for both instruments. Widely used for auditions and recitals."
+      },
+      {
+        "id": "e-bottesini-gd-recital",
+        "publisher": "Recital Music",
+        "editor": "Chi-chi Nwanoku",
+        "year": 2005,
+        "description": "Revised performing edition prepared by Chi-chi Nwanoku, with updated bowings reflecting modern double bass technique."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Gran_Duo_Concertante_(Bottesini,_Giovanni)",
+        "label": "IMSLP — Bottesini: Gran Duo Concertante"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=YHcDMSTlPuA",
+        "label": "YouTube — Francois Rabbath & Itzhak Perlman"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Giovanni_Bottesini",
+        "label": "Wikipedia — Giovanni Bottesini"
+      }
+    ]
+  },
+  {
+    "id": "faure-piano-quartet-1",
+    "title": "Piano Quartet No. 1 in C minor",
+    "composer_name": "Gabriel Fauré",
+    "catalog_number": "Op. 15",
+    "instruments": ["Piano", "Violin", "Viola", "Cello"],
+    "era": "Romantic",
+    "form": "Piano Quartet",
+    "duration_minutes": 30,
+    "difficulty": "advanced",
+    "description": "Composed between 1876 and 1879, Fauré's First Piano Quartet is regarded as one of the finest French chamber works of the 19th century. Its four movements move between passionate drama and luminous serenity, with a particularly celebrated Scherzo notable for its rhythmic drive and the long-breathed melody of the Adagio. The work established Fauré's reputation as a chamber composer of the first rank and had a formative influence on the generation of Debussy and Ravel.",
+    "editions": [
+      {
+        "id": "e-faure-pq1-hamelle",
+        "publisher": "Hamelle",
+        "editor": "Gabriel Fauré",
+        "year": 1883,
+        "description": "Original French edition published by Hamelle; the primary source text still used in performance."
+      },
+      {
+        "id": "e-faure-pq1-henle",
+        "publisher": "Henle Verlag",
+        "editor": "Jean-Michel Nectoux",
+        "year": 2009,
+        "description": "Critical Urtext edition with full critical commentary by Fauré scholar Jean-Michel Nectoux. The preferred modern scholarly text."
+      },
+      {
+        "id": "e-faure-pq1-peters",
+        "publisher": "Edition Peters",
+        "editor": "Editorial staff",
+        "year": 1958,
+        "description": "Practical performing edition, clearly engraved and widely available in chamber music libraries."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Quartet_No.1,_Op.15_(Faur%C3%A9,_Gabriel)",
+        "label": "IMSLP — Fauré: Piano Quartet No. 1 Op. 15"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=K_oGcHJbTsE",
+        "label": "YouTube — Domus Piano Quartet"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Quartet_No._1_(Faur%C3%A9)",
+        "label": "Wikipedia — Fauré Piano Quartet No. 1"
+      }
+    ]
+  },
+  {
+    "id": "schumann-piano-quartet",
+    "title": "Piano Quartet in E-flat major",
+    "composer_name": "Robert Schumann",
+    "catalog_number": "Op. 47",
+    "instruments": ["Piano", "Violin", "Viola", "Cello"],
+    "era": "Romantic",
+    "form": "Piano Quartet",
+    "duration_minutes": 28,
+    "difficulty": "advanced",
+    "description": "Completed in 1842, Schumann's Piano Quartet Op. 47 was composed in the same extraordinarily productive chamber music year as the Piano Quintet. Its four movements balance Romantic passion with Classical architecture; the Andante cantabile slow movement in particular is one of Schumann's most tender and sustained inspirations, with the piano weaving around a long cello melody. Brahms later cited both the Quartet and Quintet as models when composing his own chamber music.",
+    "editions": [
+      {
+        "id": "e-schumann-pqt-henle",
+        "publisher": "Henle Verlag",
+        "editor": "Ernst Herttrich",
+        "year": 1986,
+        "description": "Critical Urtext edition based on autograph and first edition. The standard modern performing and scholarly text."
+      },
+      {
+        "id": "e-schumann-pqt-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Clara Schumann",
+        "year": 1887,
+        "description": "Clara Schumann's edition from the complete works. Historically important; reflects late 19th-century performance practice."
+      },
+      {
+        "id": "e-schumann-pqt-peters",
+        "publisher": "Edition Peters",
+        "editor": "Heinrich Grünfeld",
+        "year": 1910,
+        "description": "Practical performing edition, long standard in conservatories; some editorial markings mixed with original text."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Quartet,_Op.47_(Schumann,_Robert)",
+        "label": "IMSLP — Schumann: Piano Quartet Op. 47"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=gBnl0GtIPeo",
+        "label": "YouTube — Martha Argerich & Gidon Kremer"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Quartet_(Schumann)",
+        "label": "Wikipedia — Piano Quartet (Schumann)"
+      },
+      {
+        "type": "vimeo",
+        "url": "https://vimeo.com/107490028",
+        "label": "Vimeo — Quatuor Ébène with Nelson Goerner"
+      }
+    ]
+  },
+  {
+    "id": "handel-water-music",
+    "title": "Water Music",
+    "composer_name": "George Frideric Handel",
+    "catalog_number": "HWV 348–350",
+    "instruments": ["Orchestra"],
+    "era": "Baroque",
+    "form": "Suite",
+    "duration_minutes": 55,
+    "difficulty": "intermediate",
+    "description": "Composed for a royal water party on the Thames in July 1717, the Water Music consists of three suites in F major, G major, and D major, scored for varying combinations of oboes, bassoon, horns, trumpets, strings, and continuo. The D major suite's 'Air' and the F major suite's 'Hornpipe' are among the most enduring melodies in Baroque orchestral music. The work is a landmark in the genre of outdoor ceremonial music and showcases Handel's gift for spacious, confident orchestration.",
+    "editions": [
+      {
+        "id": "e-handel-wm-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Hans Ferdinand Redlich",
+        "year": 1959,
+        "description": "Hallische Händel-Ausgabe critical edition. The scholarly standard, based on all available manuscript and printed sources."
+      },
+      {
+        "id": "e-handel-wm-chrysander",
+        "publisher": "Deutsche Händelgesellschaft",
+        "editor": "Friedrich Chrysander",
+        "year": 1886,
+        "description": "Original complete works edition; historically important, though now superseded by the Bärenreiter HHA for scholarly use."
+      },
+      {
+        "id": "e-handel-wm-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Roger Fiske",
+        "year": 1973,
+        "description": "Miniature study score with introductory essay. Practical and widely available for orchestral students."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Water_Music_(Handel,_George_Frideric)",
+        "label": "IMSLP — Handel: Water Music HWV 348–350"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Izz6OmFiKWk",
+        "label": "YouTube — Nikolaus Harnoncourt, Concentus Musicus Wien"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Water_Music_(Handel)",
+        "label": "Wikipedia — Water Music (Handel)"
+      }
+    ]
+  },
+  {
+    "id": "vivaldi-flute-concerto-la-notte",
+    "title": "Flute Concerto in G minor 'La notte'",
+    "composer_name": "Antonio Vivaldi",
+    "catalog_number": "RV 439",
+    "instruments": ["Flute", "String Orchestra", "Continuo"],
+    "era": "Baroque",
+    "form": "Concerto",
+    "duration_minutes": 13,
+    "difficulty": "advanced",
+    "description": "One of Vivaldi's most atmospheric and inventive concertos, 'La notte' (The Night) from Op. 10 No. 2 evokes darkness, dreams, and ghostly apparitions through novel harmonic language and pictorial writing unusual even by the standards of programme music. Its six movements — Largo, Fantasmi, Largo, Presto, Il sonno, Allegro — alternate turbulent gestures with slow, eerie nocturnal music. The 'Fantasmi' (Phantoms) movement is among the most dramatic passages in Baroque orchestral literature.",
+    "editions": [
+      {
+        "id": "e-vivaldi-notte-ricordi",
+        "publisher": "Ricordi",
+        "editor": "Angelo Ephrikian",
+        "year": 1948,
+        "description": "Standard 20th-century performing edition; long the default text for orchestral and chamber performances."
+      },
+      {
+        "id": "e-vivaldi-notte-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Winfried Michel",
+        "year": 1991,
+        "description": "Critical edition based on the Dresden manuscript sources, with ornament realisations and continuo realisation."
+      },
+      {
+        "id": "e-vivaldi-notte-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Friedrich Neumann",
+        "year": 1965,
+        "description": "Urtext edition with a practical realised continuo part; useful for small ensemble and recital performances."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Flute_Concerto_in_G_minor,_RV_439_(Vivaldi,_Antonio)",
+        "label": "IMSLP — Vivaldi: Flute Concerto 'La notte' RV 439"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=PQJWK7JVX1g",
+        "label": "YouTube — Jean-Pierre Rampal, I Solisti Veneti"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Flute_Concerto_in_G_minor,_RV_439_(Vivaldi)",
+        "label": "Wikipedia — Vivaldi Flute Concerto RV 439"
+      }
+    ]
   }
 ];
