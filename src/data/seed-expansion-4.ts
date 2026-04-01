@@ -978,4 +978,484 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ]
   },
+  {
+    "id": "beethoven-symphony-6",
+    "title": "Symphony No. 6 in F major, Op. 68 'Pastoral'",
+    "composer_name": "Ludwig van Beethoven",
+    "catalog_number": "Op. 68",
+    "instruments": ["Orchestra"],
+    "era": "Classical",
+    "form": "Symphony",
+    "duration_minutes": 40,
+    "difficulty": "professional",
+    "description": "Composed alongside the Fifth Symphony and premiered together in 1808, the Pastoral is Beethoven's only programmatic symphony, depicting scenes of country life in five movements. Subtitled 'Recollections of country life, expressed in tones rather than painting,' it is notable for its lyrical warmth, bird-call imitations in the slow movement, and a thunderstorm that yields to a shepherd's thanksgiving hymn.",
+    "editions": [
+      {
+        "id": "e-beethoven-sym6-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Lionel Robbins",
+        "year": 1862,
+        "description": "Part of the complete Beethoven works edition; long a standard orchestral reference."
+      },
+      {
+        "id": "e-beethoven-sym6-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Jonathan Del Mar",
+        "year": 1999,
+        "description": "Authoritative critical edition based on all surviving autograph and early print sources; the preferred scholarly text."
+      },
+      {
+        "id": "e-beethoven-sym6-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Max Unger",
+        "year": 1936,
+        "description": "Compact study score edition widely used by students and conductors."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Symphony_No.6_in_F_major,_Op.68_(Beethoven,_Ludwig_van)",
+        "label": "IMSLP — Beethoven Symphony No. 6"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=iLG-ANQtaKg",
+        "label": "Beethoven: Symphony No. 6 — Karajan / Berlin Philharmonic (1984)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Symphony_No._6_(Beethoven)",
+        "label": "Wikipedia — Symphony No. 6 (Beethoven)"
+      }
+    ]
+  },
+  {
+    "id": "brahms-symphony-1",
+    "title": "Symphony No. 1 in C minor, Op. 68",
+    "composer_name": "Johannes Brahms",
+    "catalog_number": "Op. 68",
+    "instruments": ["Orchestra"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 48,
+    "difficulty": "professional",
+    "description": "Brahms laboured over his First Symphony for over two decades, fearful of comparisons to Beethoven. Premiered in 1876, it was immediately hailed as 'Beethoven's Tenth.' The finale's horn call and subsequent chorale melody — one of the most celebrated themes in the symphonic repertoire — arrive after three movements of intense preparation, embodying Brahms's mastery of organic development.",
+    "editions": [
+      {
+        "id": "e-brahms-sym1-simrock",
+        "publisher": "Simrock",
+        "editor": "First edition",
+        "year": 1877,
+        "description": "The original publication by Brahms's preferred publisher; historically significant."
+      },
+      {
+        "id": "e-brahms-sym1-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Hans Gál",
+        "year": 1926,
+        "description": "Complete Brahms Edition published by the Gesellschaft der Musikfreunde; longstanding scholarly standard."
+      },
+      {
+        "id": "e-brahms-sym1-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Robert Pascall",
+        "year": 1996,
+        "description": "New critical edition with thorough examination of all sources, preferred for modern performances."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Symphony_No.1_in_C_minor,_Op.68_(Brahms,_Johannes)",
+        "label": "IMSLP — Brahms Symphony No. 1"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=_kHNeCTHo3A",
+        "label": "Brahms: Symphony No. 1 — Karajan / Berlin Philharmonic (1987)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Symphony_No._1_(Brahms)",
+        "label": "Wikipedia — Symphony No. 1 (Brahms)"
+      }
+    ]
+  },
+  {
+    "id": "franck-piece-heroique",
+    "title": "Pièce héroïque in B minor",
+    "composer_name": "César Franck",
+    "catalog_number": "FWV 37",
+    "instruments": ["Organ"],
+    "era": "Romantic",
+    "form": "Character Piece",
+    "duration_minutes": 10,
+    "difficulty": "advanced",
+    "description": "Composed in 1878 for the inauguration of the Trocadéro organ at the Paris World Exhibition, the Pièce héroïque is one of Franck's most dramatic organ works. Its bold opening march-like theme, epic development, and triumphant climax made it an immediate sensation and remain the hallmarks of the heroic French symphonic organ style.",
+    "editions": [
+      {
+        "id": "e-franck-ph-durand",
+        "publisher": "Durand",
+        "editor": "Original edition",
+        "year": 1883,
+        "description": "Original French publication; the standard source for French organists."
+      },
+      {
+        "id": "e-franck-ph-leduc",
+        "publisher": "Alphonse Leduc",
+        "editor": "Marcel Dupré",
+        "year": 1956,
+        "description": "With detailed registration and fingering annotations by Marcel Dupré."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Pi%C3%A8ce_h%C3%A9ro%C3%AFque_(Franck,_C%C3%A9sar)",
+        "label": "IMSLP — Franck Pièce héroïque"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=4JBiSINiMjE",
+        "label": "Franck: Pièce héroïque — Marie-Claire Alain"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Pi%C3%A8ce_h%C3%A9ro%C3%AFque",
+        "label": "Wikipedia — Pièce héroïque"
+      }
+    ]
+  },
+  {
+    "id": "boieldieu-harp-concerto",
+    "title": "Harp Concerto in C major",
+    "composer_name": "François-Adrien Boieldieu",
+    "catalog_number": null,
+    "instruments": ["Harp", "Orchestra"],
+    "era": "Classical",
+    "form": "Concerto",
+    "duration_minutes": 22,
+    "difficulty": "advanced",
+    "description": "Composed around 1800 and one of the most celebrated works in the harp concerto repertoire, Boieldieu's Concerto in C major showcases the instrument's lyrical and virtuosic capabilities against a light Classical orchestra. Its singing melodic lines and brilliant passage work made it a standard vehicle for harpists from the 19th century onward.",
+    "editions": [
+      {
+        "id": "e-boieldieu-harp-leduc",
+        "publisher": "Alphonse Leduc",
+        "editor": "Standard edition",
+        "year": 1950,
+        "description": "The most widely used performance edition for harpists; includes cadenza by Carlos Salzedo."
+      },
+      {
+        "id": "e-boieldieu-harp-durand",
+        "publisher": "Durand",
+        "editor": "Henriette Renié",
+        "year": 1920,
+        "description": "Edition prepared by the celebrated French harpist Henriette Renié, with her performance indications."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Harp_Concerto_in_C_major_(Boieldieu,_Fran%C3%A7ois-Adrien)",
+        "label": "IMSLP — Boieldieu Harp Concerto"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=qd5pSGBVc1M",
+        "label": "Boieldieu: Harp Concerto — Marielle Nordmann"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Harp_Concerto_(Boieldieu)",
+        "label": "Wikipedia — Boieldieu Harp Concerto"
+      }
+    ]
+  },
+  {
+    "id": "cage-third-construction",
+    "title": "Third Construction",
+    "composer_name": "John Cage",
+    "catalog_number": null,
+    "instruments": ["Percussion Quartet"],
+    "era": "20th Century",
+    "form": "Percussion Ensemble",
+    "duration_minutes": 14,
+    "difficulty": "professional",
+    "description": "Composed in 1941 for percussion quartet, Third Construction employs an enormous variety of instruments — tin cans, ratchets, conch shell, lion's roar, claves, and more — arranged in a complex rhythmic structure Cage called the 'square-root' form. A landmark of the American percussion repertoire, it demonstrates Cage's systematic approach to rhythm and timbre before his turn toward indeterminacy.",
+    "editions": [
+      {
+        "id": "e-cage-3rd-cfp",
+        "publisher": "C. F. Peters",
+        "editor": "John Cage",
+        "year": 1960,
+        "description": "The authoritative Peters edition; includes the full score and all four parts."
+      },
+      {
+        "id": "e-cage-3rd-cfp-revised",
+        "publisher": "C. F. Peters",
+        "editor": "James Pritchett",
+        "year": 2002,
+        "description": "Revised edition with corrected notation and expanded performance notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Third_Construction",
+        "label": "Wikipedia — Third Construction"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=pNxVZN_OQGA",
+        "label": "Cage: Third Construction — Nexus Percussion"
+      }
+    ]
+  },
+  {
+    "id": "bach-lute-suite-bwv997",
+    "title": "Lute Suite in C minor, BWV 997",
+    "composer_name": "Johann Sebastian Bach",
+    "catalog_number": "BWV 997",
+    "instruments": ["Guitar", "Lute"],
+    "era": "Baroque",
+    "form": "Suite",
+    "duration_minutes": 22,
+    "difficulty": "advanced",
+    "description": "One of Bach's four suites for lute, BWV 997 is a masterly work in five movements: Prelude, Fugue, Sarabande, Gigue, and Double. Particularly notable for its intricate four-voice fugue — rarely encountered in lute or guitar writing — the suite is equally prized in transcriptions for classical guitar, where it stands among the most intellectually demanding works in the repertoire.",
+    "editions": [
+      {
+        "id": "e-bach-bwv997-henle",
+        "publisher": "G. Henle Verlag",
+        "editor": "Klaus Rönnau",
+        "year": 1979,
+        "description": "Urtext edition with a guitar transcription by Konrad Ragossnig; the standard scholarly text."
+      },
+      {
+        "id": "e-bach-bwv997-schott",
+        "publisher": "Schott",
+        "editor": "Julian Bream",
+        "year": 1965,
+        "description": "Classic guitar edition prepared by Julian Bream, one of the work's finest interpreters."
+      },
+      {
+        "id": "e-bach-bwv997-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Rainer Stahmer",
+        "year": 2010,
+        "description": "New critical edition for lute and guitar with extensive source-critical notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Lute_Suite_in_C_minor,_BWV_997_(Bach,_Johann_Sebastian)",
+        "label": "IMSLP — Bach Lute Suite BWV 997"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=qVvpjfEMHH0",
+        "label": "Bach: Lute Suite BWV 997 — Julian Bream (guitar)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Lute_Suite_in_C_minor,_BWV_997",
+        "label": "Wikipedia — Lute Suite BWV 997"
+      }
+    ]
+  },
+  {
+    "id": "dittersdorf-db-concerto-2",
+    "title": "Double Bass Concerto No. 2 in E major",
+    "composer_name": "Karl Ditters von Dittersdorf",
+    "catalog_number": "Krebs 172",
+    "instruments": ["Double Bass", "Orchestra"],
+    "era": "Classical",
+    "form": "Concerto",
+    "duration_minutes": 22,
+    "difficulty": "professional",
+    "description": "One of the earliest and most important concertos for double bass, Dittersdorf's Second Concerto in E major was composed in the 1770s for one of his virtuoso players. Its three-movement structure — lively Allegro, singing Adagio, and spirited finale — fully exploits the upper register of the instrument and has become a standard work for orchestral auditions and recitals.",
+    "editions": [
+      {
+        "id": "e-dittersdorf-db2-hofmeister",
+        "publisher": "Friedrich Hofmeister",
+        "editor": "Standard edition",
+        "year": 1948,
+        "description": "Long-standing performance edition with piano reduction."
+      },
+      {
+        "id": "e-dittersdorf-db2-kalmus",
+        "publisher": "Edwin F. Kalmus",
+        "editor": "Study edition",
+        "year": 1970,
+        "description": "Affordable study score widely used in conservatory training."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Double_Bass_Concerto_No.2_in_E_major_(Dittersdorf,_Karl_Ditters_von)",
+        "label": "IMSLP — Dittersdorf Double Bass Concerto No. 2"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=8L8M1k9biKc",
+        "label": "Dittersdorf: Double Bass Concerto No. 2 — Gary Karr"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Double_Bass_Concertos_(Dittersdorf)",
+        "label": "Wikipedia — Dittersdorf Double Bass Concertos"
+      }
+    ]
+  },
+  {
+    "id": "beethoven-piano-trio-archduke",
+    "title": "Piano Trio No. 7 in B-flat major, Op. 97 'Archduke'",
+    "composer_name": "Ludwig van Beethoven",
+    "catalog_number": "Op. 97",
+    "instruments": ["Piano", "Violin", "Cello"],
+    "era": "Classical",
+    "form": "Piano Trio",
+    "duration_minutes": 40,
+    "difficulty": "professional",
+    "description": "Dedicated to Beethoven's patron Archduke Rudolph, the Archduke Trio of 1811 is widely regarded as the greatest piano trio ever written. Its vast four-movement design — culminating in one of the most sublime sets of variations in the chamber music repertoire — achieves an unprecedented emotional depth and architectural scale. The famous 1827 performance by Ignaz Schuppanzigh, with Beethoven himself at the piano, was reportedly distressing to hear as his deafness had become total.",
+    "editions": [
+      {
+        "id": "e-beethoven-archduke-henle",
+        "publisher": "G. Henle Verlag",
+        "editor": "Hans-Werner Küthen",
+        "year": 1979,
+        "description": "Definitive Urtext edition based on the autograph and first edition; preferred by chamber ensembles worldwide."
+      },
+      {
+        "id": "e-beethoven-archduke-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Jonathan Del Mar",
+        "year": 2007,
+        "description": "New critical edition with full critical commentary and urtext text."
+      },
+      {
+        "id": "e-beethoven-archduke-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Complete Works Edition",
+        "year": 1862,
+        "description": "Part of the complete Beethoven works edition; historically significant."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Trio_No.7_in_B-flat_major,_Op.97_(Beethoven,_Ludwig_van)",
+        "label": "IMSLP — Beethoven Archduke Trio"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=GdFGPF-BQBE",
+        "label": "Beethoven: Archduke Trio — Beaux Arts Trio"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._7_(Beethoven)",
+        "label": "Wikipedia — Beethoven Archduke Trio"
+      }
+    ]
+  },
+  {
+    "id": "sibelius-symphony-2",
+    "title": "Symphony No. 2 in D major, Op. 43",
+    "composer_name": "Jean Sibelius",
+    "catalog_number": "Op. 43",
+    "instruments": ["Orchestra"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 45,
+    "difficulty": "professional",
+    "description": "Composed in 1902 and premiered to tremendous acclaim in Helsinki, Sibelius's Second Symphony is his most immediately appealing orchestral work. The expansive finale, built from a series of unfolding paragraphs that culminate in a sweeping D major apotheosis, has often been interpreted as a metaphor for Finnish national awakening. The symphony remains one of the most frequently performed in the orchestral repertoire.",
+    "editions": [
+      {
+        "id": "e-sibelius-sym2-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Original edition",
+        "year": 1903,
+        "description": "The original publication; standard performing edition used in most orchestras."
+      },
+      {
+        "id": "e-sibelius-sym2-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Timo Virtanen",
+        "year": 2014,
+        "description": "New critical edition from the Jean Sibelius Works series with comprehensive critical notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Symphony_No.2_in_D_major,_Op.43_(Sibelius,_Jean)",
+        "label": "IMSLP — Sibelius Symphony No. 2"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=qPR9RbMjpU0",
+        "label": "Sibelius: Symphony No. 2 — Osmo Vänskä / Minnesota Orchestra"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Symphony_No._2_(Sibelius)",
+        "label": "Wikipedia — Symphony No. 2 (Sibelius)"
+      }
+    ]
+  },
+  {
+    "id": "schumann-piano-quintet",
+    "title": "Piano Quintet in E-flat major, Op. 44",
+    "composer_name": "Robert Schumann",
+    "catalog_number": "Op. 44",
+    "instruments": ["Piano", "Violin", "Violin", "Viola", "Cello"],
+    "era": "Romantic",
+    "form": "Piano Quintet",
+    "duration_minutes": 28,
+    "difficulty": "professional",
+    "description": "Composed in 1842 during Schumann's remarkable 'chamber music year,' the Piano Quintet in E-flat effectively created the genre of the Romantic piano quintet. Brahms, Dvořák, and Fauré all wrote their own quintets following Schumann's model. The slow movement's funeral-march-like opening, the exhilarating scherzo, and the final double fugue showcase Schumann's mastery of combining symphonic breadth with intimate chamber discourse.",
+    "editions": [
+      {
+        "id": "e-schumann-pq-henle",
+        "publisher": "G. Henle Verlag",
+        "editor": "Linda Correll Roesner",
+        "year": 1993,
+        "description": "Urtext edition based on autograph and early sources; the preferred scholarly text for performance."
+      },
+      {
+        "id": "e-schumann-pq-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Clara Schumann",
+        "year": 1880,
+        "description": "Part of the complete Robert Schumann edition edited by Clara Schumann; historically significant."
+      },
+      {
+        "id": "e-schumann-pq-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Wilhelm Altmann",
+        "year": 1910,
+        "description": "Practical performance edition widely used in conservatories and professional ensembles."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Quintet_in_E-flat_major,_Op.44_(Schumann,_Robert)",
+        "label": "IMSLP — Schumann Piano Quintet"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=KCFSJXcBBpM",
+        "label": "Schumann: Piano Quintet — Martha Argerich and Friends"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Quintet_(Schumann)",
+        "label": "Wikipedia — Piano Quintet (Schumann)"
+      }
+    ]
+  }
 ];
