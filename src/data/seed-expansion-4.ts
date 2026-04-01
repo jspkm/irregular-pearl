@@ -1978,5 +1978,452 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "Wikipedia — Vivaldi Flute Concerto RV 439"
       }
     ]
+  },
+  {
+    "id": "elgar-enigma-variations",
+    "title": "Variations on an Original Theme 'Enigma', Op. 36",
+    "composer_name": "Edward Elgar",
+    "catalog_number": "Op. 36",
+    "instruments": ["Orchestra"],
+    "era": "Romantic",
+    "form": "Variations",
+    "duration_minutes": 30,
+    "difficulty": "professional",
+    "description": "Fourteen orchestral variations on an original theme, each a musical portrait of one of Elgar's friends identified only by initials. The hidden 'enigma' — a larger unheard theme said to go through and over the variations — has never been definitively identified. The Nimrod variation (IX) is among the most celebrated passages in British orchestral music.",
+    "editions": [
+      {
+        "id": "e-elgar-enigma-novello",
+        "publisher": "Novello",
+        "editor": "Robert Anderson",
+        "year": 1999,
+        "description": "Critical edition based on the autograph full score and first edition, with detailed critical commentary."
+      },
+      {
+        "id": "e-elgar-enigma-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Peter Dennison",
+        "year": 1986,
+        "description": "Miniature score with scholarly preface discussing sources and performance history."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Enigma_Variations,_Op.36_(Elgar,_Edward)",
+        "label": "IMSLP — Elgar: Enigma Variations Op. 36"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Zi7wJQXqHnA",
+        "label": "YouTube — BBC Symphony Orchestra, Andrew Davis"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Enigma_Variations",
+        "label": "Wikipedia — Enigma Variations"
+      }
+    ]
+  },
+  {
+    "id": "reger-fantasia-fugue-bach",
+    "title": "Fantasia and Fugue on B-A-C-H, Op. 46",
+    "composer_name": "Max Reger",
+    "catalog_number": "Op. 46",
+    "instruments": ["Organ"],
+    "era": "Romantic",
+    "form": "Fantasia and Fugue",
+    "duration_minutes": 22,
+    "difficulty": "professional",
+    "description": "Reger's monumental organ work built on the four-note BACH motif (B-flat, A, C, B-natural). The improvisatory fantasia unfolds in cascading chromatic waves before the massive double fugue brings the work to a thunderous conclusion. One of the most technically and harmonically demanding works in the organ repertoire.",
+    "editions": [
+      {
+        "id": "e-reger-bach-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Hermann Keller",
+        "year": 1954,
+        "description": "Standard urtext edition widely used in conservatoire training."
+      },
+      {
+        "id": "e-reger-bach-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Siegfried Reda",
+        "year": 1963,
+        "description": "Complete Reger organ works edition with fingering suggestions and registration notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Fantasia_and_Fugue_on_B-A-C-H,_Op.46_(Reger,_Max)",
+        "label": "IMSLP — Reger: Fantasia and Fugue on B-A-C-H Op. 46"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=NVHbPNz9Kk4",
+        "label": "YouTube — Hans Fagius, organ"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Fantasia_and_Fugue_on_B-A-C-H_(Reger)",
+        "label": "Wikipedia — Reger Fantasia and Fugue on B-A-C-H"
+      }
+    ]
+  },
+  {
+    "id": "vierne-organ-symphony-3",
+    "title": "Organ Symphony No. 3 in F-sharp minor, Op. 28",
+    "composer_name": "Louis Vierne",
+    "catalog_number": "Op. 28",
+    "instruments": ["Organ"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 40,
+    "difficulty": "professional",
+    "description": "The third of Vierne's six organ symphonies, cast in six movements and centred on the dark key of F-sharp minor. Written during a period of personal tragedy, the symphony balances lyrical introspection with virtuosic display. The Adagio is particularly celebrated for its sustained melodic invention over a complex harmonic foundation.",
+    "editions": [
+      {
+        "id": "e-vierne-sym3-leduc",
+        "publisher": "Alphonse Leduc",
+        "editor": "Norbert Dufourcq",
+        "year": 1932,
+        "description": "Original publisher edition; the standard performing text for most of the twentieth century."
+      },
+      {
+        "id": "e-vierne-sym3-van-oosten",
+        "publisher": "Durand",
+        "editor": "Ben van Oosten",
+        "year": 2001,
+        "description": "Revised edition incorporating Vierne's manuscript corrections with detailed registration guide."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Organ_Symphony_No.3,_Op.28_(Vierne,_Louis)",
+        "label": "IMSLP — Vierne: Organ Symphony No. 3 Op. 28"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=OJzCFKdTdYQ",
+        "label": "YouTube — Ben van Oosten, Cavaillé-Coll organ"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Louis_Vierne",
+        "label": "Wikipedia — Louis Vierne"
+      }
+    ]
+  },
+  {
+    "id": "villa-lobos-choros-1",
+    "title": "Choros No. 1",
+    "composer_name": "Heitor Villa-Lobos",
+    "catalog_number": "W. 110",
+    "instruments": ["Guitar"],
+    "era": "20th Century",
+    "form": "Choros",
+    "duration_minutes": 4,
+    "difficulty": "advanced",
+    "description": "Villa-Lobos's earliest choros, written in 1920 as a guitar solo that captures the spirit of Brazilian street serenaders. Syncopated rhythms, cross-string slurs, and characteristic folk-music inflections create a portrait of Rio de Janeiro's popular music culture. A cornerstone of the 20th-century guitar recital programme.",
+    "editions": [
+      {
+        "id": "e-vl-choros1-eschig",
+        "publisher": "Max Eschig",
+        "editor": "Turibio Santos",
+        "year": 1975,
+        "description": "Authoritative edition by the leading Villa-Lobos guitar scholar, with idiomatic fingering."
+      },
+      {
+        "id": "e-vl-choros1-berben",
+        "publisher": "Bèrben",
+        "editor": "Angelo Gilardino",
+        "year": 1993,
+        "description": "Scholarly edition with commentary on sources and performance practice of the choros tradition."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Chor%C3%B4s_No.1_(Villa-Lobos,_Heitor)",
+        "label": "IMSLP — Villa-Lobos: Choros No. 1"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=fR6G7f8XPZE",
+        "label": "YouTube — Julian Bream, guitar"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Heitor_Villa-Lobos",
+        "label": "Wikipedia — Heitor Villa-Lobos"
+      }
+    ]
+  },
+  {
+    "id": "brouwer-etudes-simples",
+    "title": "Etudes Simples (20 Studies for Guitar)",
+    "composer_name": "Leo Brouwer",
+    "catalog_number": null,
+    "instruments": ["Guitar"],
+    "era": "20th Century",
+    "form": "Studies",
+    "duration_minutes": 25,
+    "difficulty": "intermediate",
+    "description": "Twenty progressive studies composed between 1960 and 1981, ranging from elementary to advanced. Each étude targets a specific technical challenge — right-hand arpeggios, left-hand extensions, harmonics, rasgueado — while remaining genuinely musical. The later pieces incorporate avant-garde techniques and have become standard repertoire from beginners to conservatoire level.",
+    "editions": [
+      {
+        "id": "e-brouwer-etudes-eschig",
+        "publisher": "Max Eschig",
+        "editor": "Leo Brouwer",
+        "year": 1981,
+        "description": "Composer-supervised edition containing all twenty études in four volumes."
+      },
+      {
+        "id": "e-brouwer-etudes-chester",
+        "publisher": "Chester Music",
+        "editor": "Stanley Yates",
+        "year": 2002,
+        "description": "Combined edition with editorial fingering and a preface on Brouwer's compositional approach."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Qq_9nLLOyFk",
+        "label": "YouTube — Ana Vidovic, complete 20 études"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Leo_Brouwer",
+        "label": "Wikipedia — Leo Brouwer"
+      }
+    ]
+  },
+  {
+    "id": "kraft-timpani-concerto",
+    "title": "Timpani Concerto No. 1",
+    "composer_name": "William Kraft",
+    "catalog_number": null,
+    "instruments": ["Timpani", "Orchestra"],
+    "era": "20th Century",
+    "form": "Concerto",
+    "duration_minutes": 21,
+    "difficulty": "professional",
+    "description": "A landmark work in the percussion concerto repertoire, composed in 1983 for timpanist Mitchell Peters. Kraft exploits the tonal and rhythmic range of the instrument across three movements, demanding rapid retuning and complex coordination with the orchestra. The concerto remains one of the most challenging and celebrated works for orchestral timpani as soloist.",
+    "editions": [
+      {
+        "id": "e-kraft-timp-peer",
+        "publisher": "Peer International",
+        "editor": "William Kraft",
+        "year": 1984,
+        "description": "Original publisher's edition with solo part and full orchestral score."
+      },
+      {
+        "id": "e-kraft-timp-southern",
+        "publisher": "Southern Music",
+        "editor": "William Kraft",
+        "year": 1990,
+        "description": "Revised edition with additional performance notes by the composer."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=TqHmO1NSKDE",
+        "label": "YouTube — Mitchell Peters, Los Angeles Philharmonic"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/William_Kraft",
+        "label": "Wikipedia — William Kraft"
+      }
+    ]
+  },
+  {
+    "id": "schubert-octet-d803",
+    "title": "Octet in F major, D. 803",
+    "composer_name": "Franz Schubert",
+    "catalog_number": "D. 803",
+    "instruments": ["Clarinet", "Bassoon", "Horn", "Violin", "Violin", "Viola", "Cello", "Double Bass"],
+    "era": "Romantic",
+    "form": "Octet",
+    "duration_minutes": 60,
+    "difficulty": "advanced",
+    "description": "Schubert's grandest chamber work, written in 1824 in deliberate homage to Beethoven's Septet. The six movements span nearly an hour and explore every facet of chamber music writing — lyrical slow movements, a theme and variations, a minuet, and finale. The seamless integration of eight heterogeneous wind and string voices remains one of the marvels of the chamber repertoire.",
+    "editions": [
+      {
+        "id": "e-schubert-oct-henle",
+        "publisher": "Henle Verlag",
+        "editor": "Arnold Feil",
+        "year": 1989,
+        "description": "Urtext based on the autograph manuscript, with separate parts and full score."
+      },
+      {
+        "id": "e-schubert-oct-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Friedrich Hermann",
+        "year": 1935,
+        "description": "Long-established performing edition with practical bowings for the string parts."
+      },
+      {
+        "id": "e-schubert-oct-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Andrea Lindmayr-Brandl",
+        "year": 2012,
+        "description": "New Schubert Edition critical text with full critical commentary volume."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Octet_in_F_major,_D.803_(Schubert,_Franz)",
+        "label": "IMSLP — Schubert: Octet D. 803"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=gv0SNQS3DKQ",
+        "label": "YouTube — Vienna Octet"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Octet_(Schubert)",
+        "label": "Wikipedia — Schubert Octet"
+      }
+    ]
+  },
+  {
+    "id": "brahms-string-quartet-1",
+    "title": "String Quartet No. 1 in C minor, Op. 51 No. 1",
+    "composer_name": "Johannes Brahms",
+    "catalog_number": "Op. 51 No. 1",
+    "instruments": ["Violin", "Violin", "Viola", "Cello"],
+    "era": "Romantic",
+    "form": "String Quartet",
+    "duration_minutes": 36,
+    "difficulty": "advanced",
+    "description": "Brahms reportedly destroyed more than twenty string quartets before publishing this pair as Op. 51. The C minor quartet opens with a turbulent Allegro that fuses Classical rigour with Romantic intensity, followed by a deeply lyrical Romance. The finale's obsessive rhythmic drive and complex voice-leading show Brahms at his most architecturally demanding.",
+    "editions": [
+      {
+        "id": "e-brahms-sq1-henle",
+        "publisher": "Henle Verlag",
+        "editor": "Hans Gál",
+        "year": 1974,
+        "description": "Urtext edition based on the autograph and first edition, from the Brahms Complete Works."
+      },
+      {
+        "id": "e-brahms-sq1-simrock",
+        "publisher": "N. Simrock",
+        "editor": "Fritz Simrock",
+        "year": 1873,
+        "description": "Original first edition; facsimile reprints widely consulted for historical performance practice."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/String_Quartet_No.1,_Op.51_No.1_(Brahms,_Johannes)",
+        "label": "IMSLP — Brahms: String Quartet No. 1 Op. 51"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=A7i7T2nRF7Y",
+        "label": "YouTube — Emerson String Quartet"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/String_Quartets,_Op._51_(Brahms)",
+        "label": "Wikipedia — Brahms String Quartets Op. 51"
+      }
+    ]
+  },
+  {
+    "id": "saint-saens-cello-concerto-2",
+    "title": "Cello Concerto No. 2 in D minor, Op. 119",
+    "composer_name": "Camille Saint-Saëns",
+    "catalog_number": "Op. 119",
+    "instruments": ["Cello", "Orchestra"],
+    "era": "Romantic",
+    "form": "Concerto",
+    "duration_minutes": 21,
+    "difficulty": "professional",
+    "description": "Completed in 1902, the Second Cello Concerto is a more introspective and harmonically adventurous work than its famous predecessor. In three linked movements, it moves from an austere opening Allegro through a tender Andante to a fiery finale. Long overshadowed by the First Concerto, it has gained recognition for its depth of feeling and refined orchestration.",
+    "editions": [
+      {
+        "id": "e-ss-cc2-durand",
+        "publisher": "Durand",
+        "editor": "Camille Saint-Saëns",
+        "year": 1902,
+        "description": "Original publisher edition, the primary performing text used throughout the 20th century."
+      },
+      {
+        "id": "e-ss-cc2-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Friedrich Grützmacher",
+        "year": 1910,
+        "description": "Early reprint with cellist Grützmacher's practical bowings and fingerings."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Cello_Concerto_No.2,_Op.119_(Saint-Sa%C3%ABns,_Camille)",
+        "label": "IMSLP — Saint-Saëns: Cello Concerto No. 2 Op. 119"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=UqCInWPFoTs",
+        "label": "YouTube — Truls Mørk, cello"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Cello_Concerto_No._2_(Saint-Sa%C3%ABns)",
+        "label": "Wikipedia — Saint-Saëns Cello Concerto No. 2"
+      }
+    ]
+  },
+  {
+    "id": "bottesini-elegy",
+    "title": "Elegy in D major",
+    "composer_name": "Giovanni Bottesini",
+    "catalog_number": null,
+    "instruments": ["Double Bass", "Piano"],
+    "era": "Romantic",
+    "form": "Elegy",
+    "duration_minutes": 6,
+    "difficulty": "professional",
+    "description": "A short lyrical showpiece that displays the singing upper register of the double bass at its most expressive. Bottesini — himself the foremost double bass virtuoso of the 19th century — writes long-breathed cantabile lines that test the instrument's ability to sustain an operatic vocal quality. A beloved encore piece and recital staple.",
+    "editions": [
+      {
+        "id": "e-bottesini-elegy-yorke",
+        "publisher": "Yorke Edition",
+        "editor": "Thomas Martin",
+        "year": 1978,
+        "description": "Practical edition with piano reduction and solo double bass part; standard performing text."
+      },
+      {
+        "id": "e-bottesini-elegy-zimmermann",
+        "publisher": "Wilhelm Zimmermann",
+        "editor": "Ludwig Streicher",
+        "year": 1965,
+        "description": "Edition with fingering and bowing adapted for modern German school technique."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Elegy_(Bottesini,_Giovanni)",
+        "label": "IMSLP — Bottesini: Elegy in D major"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=7jTIbhHqP9M",
+        "label": "YouTube — Gary Karr, double bass"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Giovanni_Bottesini",
+        "label": "Wikipedia — Giovanni Bottesini"
+      }
+    ]
   }
 ];
