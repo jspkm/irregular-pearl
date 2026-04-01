@@ -114,7 +114,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Ballade_No.1,_Op.23_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Ballade No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Ballade_No._1_(Chopin)', label: 'Wikipedia — Chopin Ballade No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Ballade_No._1_(Chopin)', label: 'Wikipedia — Chopin Ballade No. 1' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=BSFNl4roGlI', label: 'Chopin - Ballade No.1 in G minor, Op.23 (Krystian Zimerman)' },
     ],
   },
   {
@@ -177,7 +178,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Partita_No.2_in_D_minor,_BWV_1004_(Bach,_Johann_Sebastian)', label: 'IMSLP — Partita No. 2' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=pnK6R5ej6Hg', label: 'Bach - Violin Partita no. 2 in D minor BWV 1004 - Sato | Netherlands Bach Society' },
     ],
   },
   {
@@ -197,7 +199,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_E_minor,_Op.64_(Mendelssohn,_Felix)', label: 'IMSLP — Mendelssohn Violin Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Mendelssohn)', label: 'Wikipedia — Mendelssohn Violin Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Mendelssohn)', label: 'Wikipedia — Mendelssohn Violin Concerto' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=I03Hs6dwj7E', label: 'Ray Chen Mendelssohn Violin Concerto in E minor, Op. 64' },
     ],
   },
 
@@ -262,7 +265,8 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/The_Well-Tempered_Clavier,_Book_1,_BWV_846-869_(Bach,_Johann_Sebastian)', label: 'IMSLP — Well-Tempered Clavier I' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Well-Tempered_Clavier', label: 'Wikipedia — Well-Tempered Clavier' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Well-Tempered_Clavier', label: 'Wikipedia — Well-Tempered Clavier' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=gVah1cr3pU0', label: 'Lang Lang – Bach: The Well-Tempered Clavier: Book 1, 1.Prelude C Major, BWV 846' },
     ],
   },
 
