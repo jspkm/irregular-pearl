@@ -35,6 +35,13 @@ interface DigestMember {
   level: UserLevel | null;
 }
 
+interface WeeklySnapshot {
+  weekLabel: string; // "Mar 3"
+  registeredUsers: number;
+  activeUsers: number;
+  interactions: number;
+}
+
 interface DigestData {
   weekRange: string;
   recipientName: string;
@@ -48,6 +55,7 @@ interface DigestData {
   mostApplaudedName: string;
   mostApplaudedInstrument: string | null;
   unsubscribeUrl: string;
+  trendData: WeeklySnapshot[];
 }
 
 // ── Template loader ────────────────────────────────────────────────────────
@@ -153,6 +161,158 @@ function renderMemberRow(member: DigestMember): string {
     </td>
   </tr>
 </table>`.trim();
+}
+
+// ── Trend chart renderer (email-safe HTML bar chart) ──────────────────────
+
+const CHART_COLORS = {
+  registered: '#B45309',  // amber accent
+  active: '#0369A1',     // info blue
+  interactions: '#15803D', // success green
+};
+
+function renderTrendChart(data: WeeklySnapshot[]): string {
+  if (data.length === 0) return '';
+
+  const maxRegistered = Math.max(...data.map(d => d.registeredUsers), 1);
+  const maxActive = Math.max(...data.map(d => d.activeUsers), 1);
+  const maxInteractions = Math.max(...data.map(d => d.interactions), 1);
+
+  function sparkline(values: number[], max: number, color: string, label: string, latestValue: number): string {
+    const barWidth = Math.max(Math.floor(480 / values.length) - 1, 4);
+    const maxHeight = 40;
+    const bars = values.map((v, i) => {
+      const h = Math.max(Math.round((v / max) * maxHeight), 1);
+      const isLast = i === values.length - 1;
+      return `<td valign="bottom" style="padding: 0 ${barWidth > 6 ? '1' : '0'}px;">` +
+        `<div style="width: ${barWidth}px; height: ${h}px; background-color: ${color};` +
+        `${isLast ? ' opacity: 1;' : ' opacity: 0.6;'}` +
+        `"></div></td>`;
+    }).join('');
+
+    return `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 12px;">
+  <tr>
+    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; padding-bottom: 6px;">
+      <span style="display: inline-block; width: 8px; height: 8px; background-color: ${color}; border-radius: 2px; margin-right: 6px; vertical-align: middle;"></span>
+      ${escapeHtml(label)}
+      <span style="font-family: 'Courier New', Courier, monospace; font-size: 12px; font-weight: 400; color: ${color}; margin-left: 8px;">${latestValue}</span>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-bottom: 1px solid #E7E5E4;">
+        <tr>${bars}</tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+  }
+
+  const registeredLine = sparkline(
+    data.map(d => d.registeredUsers), maxRegistered, CHART_COLORS.registered,
+    'Registered Users', data[data.length - 1].registeredUsers
+  );
+  const activeLine = sparkline(
+    data.map(d => d.activeUsers), maxActive, CHART_COLORS.active,
+    'Weekly Active Users', data[data.length - 1].activeUsers
+  );
+  const interactionsLine = sparkline(
+    data.map(d => d.interactions), maxInteractions, CHART_COLORS.interactions,
+    'Weekly Interactions', data[data.length - 1].interactions
+  );
+
+  // X-axis labels (every 13 weeks = quarterly)
+  const labelCells = data.map((d, i) => {
+    if (i === 0 || i === Math.floor(data.length / 4) || i === Math.floor(data.length / 2) || i === Math.floor(3 * data.length / 4) || i === data.length - 1) {
+      return `<td style="font-family: 'Courier New', Courier, monospace; font-size: 9px; color: #A8A29E; text-align: center; padding-top: 4px;">${escapeHtml(d.weekLabel)}</td>`;
+    }
+    return `<td></td>`;
+  }).join('');
+
+  return `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 16px; margin-bottom: 8px;">
+  <tr><td>${registeredLine}</td></tr>
+  <tr><td>${activeLine}</td></tr>
+  <tr><td>${interactionsLine}</td></tr>
+  <tr>
+    <td>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>${labelCells}</tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+}
+
+// ── Trend data fetcher ────────────────────────────────────────────────────
+
+async function fetchTrendData(
+  supabase: SupabaseClient<Database>,
+  weeksBack: number = 52,
+): Promise<WeeklySnapshot[]> {
+  const now = new Date();
+  const snapshots: WeeklySnapshot[] = [];
+
+  for (let w = weeksBack - 1; w >= 0; w--) {
+    const weekEnd = new Date(now.getTime() - w * 7 * 24 * 60 * 60 * 1000);
+    const weekStart = new Date(weekEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const isoEnd = weekEnd.toISOString();
+    const isoStart = weekStart.toISOString();
+
+    const label = weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    // Cumulative registered users up to this week
+    const { count: registered } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .lte('created_at', isoEnd);
+
+    // Active users this week (distinct users with activity_log or discussions)
+    const { data: activeActivityRows } = await supabase
+      .from('activity_log')
+      .select('user_id')
+      .gte('created_at', isoStart)
+      .lte('created_at', isoEnd);
+
+    const { data: activeDiscussionRows } = await supabase
+      .from('discussions')
+      .select('user_id')
+      .gte('created_at', isoStart)
+      .lte('created_at', isoEnd);
+
+    const activeSet = new Set<string>();
+    for (const r of (activeActivityRows || [])) activeSet.add(r.user_id);
+    for (const r of (activeDiscussionRows || [])) if (r.user_id) activeSet.add(r.user_id);
+
+    // Interactions this week (activity_log + discussions + applause)
+    const { count: activityCount } = await supabase
+      .from('activity_log')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', isoStart)
+      .lte('created_at', isoEnd);
+
+    const { count: discussionCount } = await supabase
+      .from('discussions')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', isoStart)
+      .lte('created_at', isoEnd);
+
+    const { count: applauseCount } = await supabase
+      .from('applause' as never)
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', isoStart)
+      .lte('created_at', isoEnd);
+
+    snapshots.push({
+      weekLabel: label,
+      registeredUsers: registered ?? 0,
+      activeUsers: activeSet.size,
+      interactions: (activityCount ?? 0) + (discussionCount ?? 0) + (applauseCount ?? 0),
+    });
+  }
+
+  return snapshots;
 }
 
 // ── HTML escape ────────────────────────────────────────────────────────────
@@ -261,6 +421,9 @@ async function fetchDigestData(
     mostApplaudedInstrument = top.instrument;
   }
 
+  // Fetch 52-week trend data
+  const trendData = await fetchTrendData(supabase, 52);
+
   return {
     weekRange: formatWeekRange(weekStart, weekEnd),
     recipientName: '',
@@ -274,6 +437,7 @@ async function fetchDigestData(
     mostApplaudedName,
     mostApplaudedInstrument,
     unsubscribeUrl,
+    trendData,
   };
 }
 
@@ -334,7 +498,8 @@ function injectData(template: string, data: DigestData): string {
     .replace('{{total_members}}', String(data.totalMembers))
     .replace('{{most_discussed}}', escapeHtml(mostDiscussed))
     .replace('{{most_applauded}}', escapeHtml(mostApplauded))
-    .replace('{{unsubscribe_url}}', data.unsubscribeUrl);
+    .replace('{{unsubscribe_url}}', data.unsubscribeUrl)
+    .replace('{{trend_chart}}', renderTrendChart(data.trendData));
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
@@ -410,6 +575,22 @@ export function renderWeeklyDigestPreview(recipientName = 'Joseph'): string {
     { id: '3', display_name: 'Soo-Jin Park', instrument: 'Cello', level: 'teacher' },
   ];
 
+  // Generate sample 52-week trend data with realistic growth curves
+  const trendData: WeeklySnapshot[] = [];
+  const now = new Date();
+  for (let w = 51; w >= 0; w--) {
+    const weekDate = new Date(now.getTime() - w * 7 * 24 * 60 * 60 * 1000);
+    const label = weekDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const progress = (52 - w) / 52; // 0 to 1
+    const noise = () => Math.floor(Math.random() * 3) - 1;
+    trendData.push({
+      weekLabel: label,
+      registeredUsers: Math.floor(8 + progress * 75 + noise()),
+      activeUsers: Math.max(1, Math.floor(2 + progress * 20 + Math.sin(w * 0.3) * 4 + noise())),
+      interactions: Math.max(0, Math.floor(5 + progress * 60 + Math.sin(w * 0.5) * 10 + noise() * 3)),
+    });
+  }
+
   const data: DigestData = {
     weekRange: 'March 24 – March 30, 2026',
     recipientName,
@@ -423,6 +604,7 @@ export function renderWeeklyDigestPreview(recipientName = 'Joseph'): string {
     unsubscribeUrl: 'https://irregularpearl.org/settings#email',
     pieces,
     members,
+    trendData,
   };
 
   data.digestSummary = generateDigestSummary(data);
