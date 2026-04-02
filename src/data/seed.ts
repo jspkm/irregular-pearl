@@ -49,7 +49,12 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.1_in_G_major,_BWV_1007_(Bach,_Johann_Sebastian)', label: 'IMSLP — 12 editions available' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=PCicM6i59_I', label: 'Bach Cello Suite No.1 - Prelude' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=DwHpDOWhkGk', label: 'Bach - Cello Suite No. 1 in G Major BWV1007 - Mov. 1-3/6' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/61dYvvfIRtIDFuqZypPAta', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1FkFiOLin8DIUgIdALwO9n', label: 'Mstislav Rostropovich — Prelude' },
+      { type: 'internet_archive', url: 'https://archive.org/details/01No.1InGBwv10071.PreludeModerato', label: 'Pablo Casals — Prelude (historic recording)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-suites-for-cello-cello-bwv-1007-1012-pierre-fournier', label: 'Pierre Fournier — Complete Cello Suites' },
+      { type: 'vimeo', url: 'https://vimeo.com/557158390', label: 'Jean-Guihen Queyras — Prelude (video)' },
     ],
   },
   {
@@ -70,7 +75,12 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_in_B_minor,_Op.104_(Dvo%C5%99%C3%A1k,_Anton%C3%ADn)', label: 'IMSLP — Dvořák Cello Concerto' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=FVKb3DwPFA8', label: 'Gautier Capuçon | Dvořák: Cello Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Dvo%C5%99%C3%A1k)', label: 'Wikipedia — Dvořák Cello Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Dvo%C5%99%C3%A1k)', label: 'Wikipedia — Dvořák Cello Concerto' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0IQ2wNbgTMGCVh2R0RYtY4', label: 'Kian Soltani / Barenboim / Staatskapelle Berlin' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0nE5LAhlotmOrADLNeU5n9', label: 'Rostropovich / Karajan / Berliner Philharmoniker' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/0DQsuhP1UeQqT1ru5u7rF2', label: 'Jacqueline du Pré — Dvorak Cello Concerto' },
+      { type: 'internet_archive', url: 'https://archive.org/details/DvorakCelloConcertoInBMinorOp.104', label: 'Rostropovich / Karajan — 1968 recording' },
+      { type: 'internet_archive', url: 'https://archive.org/details/DvorakCelloConcerto-Piatigorsky', label: 'Piatigorsky / Ormandy / Philadelphia — 1946' },
     ],
   },
 
@@ -93,7 +103,12 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.14,_Op.27_No.2_(Beethoven,_Ludwig_van)', label: 'IMSLP — Moonlight Sonata' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=4Tr0otuiQuU', label: 'Beethoven - Moonlight Sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._14_(Beethoven)', label: 'Wikipedia — Moonlight Sonata' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._14_(Beethoven)', label: 'Wikipedia — Moonlight Sonata' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/4HYkUtgKploAEhKbUqHa8w', label: 'Daniel Barenboim — III. Presto agitato' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/3DNRdudZ2SstnDCVKFdXxG', label: 'Paul Lewis — I. Adagio sostenuto' },
+      { type: 'internet_archive', url: 'https://archive.org/details/beethoven-moonlight-sonata-horowitz-1947', label: 'Vladimir Horowitz — 1947 RCA (historic)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/BeethovenPianoSonataNo.14moonlightrubinstein', label: 'Arthur Rubinstein — 1962' },
+      { type: 'vimeo', url: 'https://vimeo.com/36754749', label: 'Khatia Buniatishvili — Masterclass performance' },
     ],
   },
   {
@@ -138,7 +153,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Etudes,_Op.10_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Études Op. 10' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=g0hoN6_HDVU', label: 'Chopin: Etudes Op.10 and Op.25' }
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=g0hoN6_HDVU', label: 'Chopin: Etudes Op.10 and Op.25' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/3T97YpxIHTRBfoqY5FX4AR', label: 'Maurizio Pollini — Etude No. 1' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0LwEwG9XjaVfmZ4VpOyQat', label: 'Seong-Jin Cho — Chopin Competition' },
+      { type: 'internet_archive', url: 'https://archive.org/details/20220922-chopin-etudes-opp.-10-25-maurizio-pollini', label: 'Maurizio Pollini — Complete Etudes' },
+      { type: 'internet_archive', url: 'https://archive.org/details/CHOPINEtudes-Cortot-NEWTRANSFER', label: 'Alfred Cortot — 1933 (remastered)' },
     ],
   },
   {
@@ -159,7 +178,11 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Suite_bergamasque_(Debussy,_Claude)', label: 'IMSLP — Suite bergamasque' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=CvFH_6DNRCY', label: 'CLAUDE DEBUSSY:  CLAIR DE LUNE' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Suite_bergamasque', label: 'Wikipedia — Suite bergamasque' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Suite_bergamasque', label: 'Wikipedia — Suite bergamasque' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1cmigB9I6IRpFqjIbzvSQB', label: 'Alice Sara Ott — Suite bergamasque' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0JqCZH9a6xWjiw68rNwxG2', label: 'Hayato Sumino — Clair de Lune' },
+      { type: 'internet_archive', url: 'https://archive.org/details/pascal-roge-debussy-clair-de-lune', label: 'Pascal Rogé — Clair de lune' },
+      { type: 'vimeo', url: 'https://vimeo.com/193024034', label: 'Sarah Chapeskie — Conservatory Canada Convocation 2016' },
     ],
   },
 
@@ -183,6 +206,10 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Partita_No.2_in_D_minor,_BWV_1004_(Bach,_Johann_Sebastian)', label: 'IMSLP — Partita No. 2' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=pnK6R5ej6Hg', label: 'Bach - Violin Partita no. 2 in D minor BWV 1004 - Sato | Netherlands Bach Society' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7IVkyo8IVhPsRuZwdfpoLo', label: 'Hilary Hahn — Ciaccona (1997)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0c8ylcOCPdmcQuBlULkzlx', label: 'Ray Chen — Chaconne' },
+      { type: 'internet_archive', url: 'https://archive.org/details/BachPartitaForSoloViolinNo.2InDMinorBwv1004', label: 'Jascha Heifetz — Complete Partita No. 2 (1952)' },
+      { type: 'vimeo', url: 'https://vimeo.com/113908045', label: 'Lisa Fujita — Chaconne, New England Conservatory 2014' },
     ],
   },
   {
@@ -204,6 +231,10 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_E_minor,_Op.64_(Mendelssohn,_Felix)', label: 'IMSLP — Mendelssohn Violin Concerto' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Mendelssohn)', label: 'Wikipedia — Mendelssohn Violin Concerto' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=I03Hs6dwj7E', label: 'Ray Chen Mendelssohn Violin Concerto in E minor, Op. 64' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7y9ygf5AHcHwoSlnhFvF6F', label: 'Hilary Hahn / Oslo Philharmonic' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/6poscVRRM6DOvOO92pcY1e', label: 'Ray Chen / Swedish Radio Symphony' },
+      { type: 'internet_archive', url: 'https://archive.org/details/HilaryHahnMendelssohnViolinConcertoInEMinorOp64', label: 'Hilary Hahn — Mendelssohn Violin Concerto' },
+      { type: 'internet_archive', url: 'https://archive.org/details/mend-vc-nm-bw', label: 'Nathan Milstein / Bruno Walter — Carnegie Hall 1945' },
     ],
   },
 
@@ -225,7 +256,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=YuBeBjqKSGQ', label: 'The Magic Flute – Queen of the Night aria' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Der_H%C3%B6lle_Rache_kocht_in_meinem_Herzen', label: 'Wikipedia — Queen of the Night Aria' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Der_H%C3%B6lle_Rache_kocht_in_meinem_Herzen', label: 'Wikipedia — Queen of the Night Aria' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/6DJLaCcgjdwCcxBGXJa4wH', label: 'Diana Damrau / Le Cercle De L\'Harmonie' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/2rBGaOX4RpJ223CClciFTc', label: 'Natalie Dessay / Orchestra of the Age of Enlightenment' },
+      { type: 'internet_archive', url: 'https://archive.org/details/78_queen-of-the-night-aria_lily-pons-mozart-bruno-walter_gbia0284391a', label: 'Lily Pons / Bruno Walter — 78rpm (historic)' },
     ],
   },
   {
@@ -246,7 +280,11 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Erlk%C3%B6nig,_D.328_(Schubert,_Franz)', label: 'IMSLP — Erlkönig' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=JS91p-vmSf0', label: 'Fischer-Dieskau / Moore — definitive recording' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Erlk%C3%B6nig_(Schubert)', label: 'Wikipedia — Erlkönig' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Erlk%C3%B6nig_(Schubert)', label: 'Wikipedia — Erlkönig' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0hES7IYAQSwBAPXJeLKcGN', label: 'Dietrich Fischer-Dieskau / Gerald Moore (1965)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7amy9gggHIGsU7pd8vHZEL', label: 'Ian Bostridge / Julius Drake' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/4oomOHx8NgPq2flBcGxtxD', label: 'Bryn Terfel / Malcolm Martineau' },
+      { type: 'internet_archive', url: 'https://archive.org/details/erlkonig-dfd-gm-66-68', label: 'Fischer-Dieskau / Moore — DG 1966-68' },
     ],
   },
 
