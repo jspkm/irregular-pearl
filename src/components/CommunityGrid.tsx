@@ -47,15 +47,18 @@ export default function CommunityGrid({
 }: CommunityGridProps) {
   const [filter, setFilter] = useState('All');
 
-  // Filter recently active artists by instrument
-  const filteredActive = recentlyActive
-    .map(id => artists.find(a => a.id === id)!)
-    .filter(Boolean)
-    .filter(a => {
-      if (filter === 'All') return true;
-      const instruments = (a.instrument || '').split(',').map(i => i.trim().toLowerCase());
-      return instruments.includes(filter.toLowerCase());
-    });
+  // Sort: recently active first, then everyone else
+  const activeSet = new Set(recentlyActive);
+  const sorted = [
+    ...recentlyActive.map(id => artists.find(a => a.id === id)!).filter(Boolean),
+    ...artists.filter(a => !activeSet.has(a.id)),
+  ];
+
+  const filtered = sorted.filter(a => {
+    if (filter === 'All') return true;
+    const instruments = (a.instrument || '').split(',').map(i => i.trim().toLowerCase());
+    return instruments.includes(filter.toLowerCase());
+  });
 
   const tabs = ['All', ...allInstruments.slice(0, 5)];
 
@@ -78,22 +81,22 @@ export default function CommunityGrid({
         ))}
       </div>
 
-      {/* Recently Active */}
+      {/* Members */}
       <section className="mb-10">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Recently Active</h2>
+          <h2 className="font-['Instrument_Serif'] text-xl">Members</h2>
           <span className="text-xs text-muted bg-bg border border-border px-2 py-0.5 rounded-full">
-            {filteredActive.length} musician{filteredActive.length !== 1 ? 's' : ''}
+            {filtered.length} musician{filtered.length !== 1 ? 's' : ''}
           </span>
         </div>
 
-        {filteredActive.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="border border-dashed border-border rounded-lg py-8 text-center">
-            <p className="text-sm text-muted">No recently active musicians{filter !== 'All' ? ` playing ${filter}` : ''}.</p>
+            <p className="text-sm text-muted">No musicians found{filter !== 'All' ? ` playing ${filter}` : ''}.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredActive.map(artist => (
+            {filtered.map(artist => (
               <ArtistCard
                 key={artist.id}
                 artist={artist}

@@ -39,9 +39,9 @@ describe('CommunityGrid', () => {
     expect(tabTexts).toContain('Violin');
   });
 
-  test('renders Recently Active section with count', () => {
+  test('renders Members section with count', () => {
     const { getByText } = render(<CommunityGrid {...defaultProps} />);
-    expect(getByText('Recently Active')).toBeTruthy();
+    expect(getByText('Members')).toBeTruthy();
     expect(getByText('3 musicians')).toBeTruthy();
   });
 
@@ -99,7 +99,7 @@ describe('CommunityGrid', () => {
     const tabs = container.querySelectorAll('button');
     const fluteTab = Array.from(tabs).find(t => t.textContent === 'Flute');
     fireEvent.click(fluteTab!);
-    expect(container.textContent).toContain('No recently active musicians');
+    expect(container.textContent).toContain('No musicians found');
   });
 
   test('active filter tab has accent styling', () => {
