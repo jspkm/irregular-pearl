@@ -61,7 +61,7 @@ function loadTemplate(): string {
 
 function renderPieceCard(piece: DigestPiece): string {
   const instrumentLabel = piece.instruments.slice(0, 2).join(', ');
-  const metaLabel = [instrumentLabel, piece.era].filter(Boolean).join(' · ');
+  const metaLabel = [instrumentLabel, piece.era].filter(Boolean).join(' \u00B7 ');
   const pieceUrl = `https://irregularpearl.org/piece/${piece.id}`;
 
   // Truncate description to ~140 chars at word boundary
@@ -71,32 +71,30 @@ function renderPieceCard(piece: DigestPiece): string {
 
   return `
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-  style="margin-bottom: 12px; background-color: #FFFFFF; border: 1px solid #E7E5E4; border-radius: 8px; border-left: 3px solid #B45309;">
-  <tr>
-    <td style="padding: 18px 20px;">
+  style="margin-bottom: 12px; background-color: #FFFFFF; border: 1px solid #E7E5E4; border-left: 3px solid #B45309;">
+  <!--[if mso]><tr><td style="padding: 18px 20px;"><![endif]-->
+  <!--[if !mso]><!--><tr><td style="padding: 18px 20px; border-radius: 8px;"><!--<![endif]-->
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
         <tr>
-          <td>
-            <span style="font-family: 'JetBrains Mono', 'Courier New', Courier, monospace; font-size: 10px; color: #B45309; letter-spacing: 0.06em; text-transform: uppercase;">${escapeHtml(metaLabel)}</span>
+          <td style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #B45309; letter-spacing: 0.06em; text-transform: uppercase;">
+            ${escapeHtml(metaLabel)}
           </td>
-          ${piece.catalog_number ? `<td align="right"><span style="font-family: 'JetBrains Mono', 'Courier New', Courier, monospace; font-size: 10px; color: #78716C;">${escapeHtml(piece.catalog_number)}</span></td>` : ''}
+          ${piece.catalog_number ? `<td align="right" style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #78716C;">${escapeHtml(piece.catalog_number)}</td>` : ''}
         </tr>
         <tr>
-          <td colspan="2" style="padding-top: 6px; padding-bottom: 4px;">
-            <a href="${pieceUrl}" style="text-decoration: none;" target="_blank">
-              <span style="font-family: 'Instrument Serif', Georgia, 'Times New Roman', Times, serif; font-size: 18px; font-weight: 400; color: #1C1917; line-height: 1.25;">${escapeHtml(piece.title)}</span>
-            </a>
+          <td colspan="2" style="padding-top: 6px; padding-bottom: 4px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 18px; font-weight: 400; color: #1C1917; line-height: 1.25;">
+            <a href="${pieceUrl}" style="text-decoration: none; color: #1C1917;" target="_blank">${escapeHtml(piece.title)}</a>
           </td>
         </tr>
         <tr>
-          <td colspan="2" style="padding-bottom: ${desc ? '10px' : '0'};">
-            <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C;">${escapeHtml(piece.composer_name)}</span>
+          <td colspan="2" style="padding-bottom: ${desc ? '10px' : '0'}; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C;">
+            ${escapeHtml(piece.composer_name)}
           </td>
         </tr>
         ${desc ? `
         <tr>
-          <td colspan="2">
-            <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 13px; color: #1C1917; line-height: 1.55;">${escapeHtml(desc)}</span>
+          <td colspan="2" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1C1917; line-height: 1.55;">
+            ${escapeHtml(desc)}
           </td>
         </tr>` : ''}
       </table>
@@ -129,17 +127,25 @@ function renderMemberRow(member: DigestMember): string {
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
         <tr>
           <td width="40" valign="middle" style="padding-right: 14px;">
-            <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #FEF3C7; text-align: center; line-height: 36px;">
-              <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 500; color: #B45309;">${escapeHtml(initials)}</span>
+            <!--[if mso]>
+            <v:oval style="width:36px;height:36px;" fill="t" stroke="f">
+              <v:fill color="#FEF3C7"/>
+              <v:textbox inset="0,0,0,0" style="mso-fit-shape-to-text:false;"><center style="font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:500;color:#B45309;">${escapeHtml(initials)}</center></v:textbox>
+            </v:oval>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #FEF3C7; text-align: center; line-height: 36px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; font-weight: 500; color: #B45309;">
+              ${escapeHtml(initials)}
             </div>
+            <!--<![endif]-->
           </td>
-          <td valign="middle">
-            <span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 500; color: #1C1917; display: block; line-height: 1.3;">${escapeHtml(member.display_name)}</span>
-            ${meta ? `<span style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 12px; color: #78716C;">${escapeHtml(meta)}</span>` : ''}
+          <td valign="middle" style="font-family: Arial, Helvetica, sans-serif;">
+            <div style="font-size: 14px; font-weight: 500; color: #1C1917; line-height: 1.3;">${escapeHtml(member.display_name)}</div>
+            ${meta ? `<div style="font-size: 12px; color: #78716C;">${escapeHtml(meta)}</div>` : ''}
           </td>
           <td align="right" valign="middle">
             <a href="https://irregularpearl.org/community"
-               style="display: inline-block; font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 11px; color: #B45309; text-decoration: none; border: 1px solid #B45309; border-radius: 9999px; padding: 4px 12px;"
+               style="display: inline-block; font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #B45309; text-decoration: none; border: 1px solid #B45309; border-radius: 9999px; padding: 4px 12px;"
                target="_blank">View profile</a>
           </td>
         </tr>
