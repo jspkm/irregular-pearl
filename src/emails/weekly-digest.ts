@@ -37,6 +37,8 @@ interface DigestMember {
 
 interface DigestData {
   weekRange: string;
+  recipientName: string;
+  digestSummary: string;
   pieces: DigestPiece[];
   members: DigestMember[];
   totalPieces: number;
@@ -255,6 +257,8 @@ async function fetchDigestData(
 
   return {
     weekRange: formatWeekRange(weekStart, weekEnd),
+    recipientName: '',
+    digestSummary: '',
     pieces: (newPieces ?? []) as DigestPiece[],
     members: (newMembers ?? []) as DigestMember[],
     totalPieces: totalPieces ?? 0,
@@ -265,6 +269,32 @@ async function fetchDigestData(
     mostApplaudedInstrument,
     unsubscribeUrl,
   };
+}
+
+// ── Digest summary generator ──────────────────────────────────────────────
+
+function generateDigestSummary(data: DigestData): string {
+  const parts: string[] = [];
+
+  if (data.pieces.length > 0) {
+    const composers = [...new Set(data.pieces.map(p => p.composer_name.split(' ').pop()))];
+    const instruments = [...new Set(data.pieces.flatMap(p => p.instruments))];
+    parts.push(`This week we added ${data.pieces.length} new piece${data.pieces.length !== 1 ? 's' : ''} to the catalog, including works by ${composers.slice(0, 3).join(', ')}${composers.length > 3 ? ' and others' : ''} spanning ${instruments.slice(0, 3).join(', ').toLowerCase()}.`);
+  } else {
+    parts.push('A quieter week on the catalog front, but the community has been active.');
+  }
+
+  if (data.members.length > 0) {
+    parts.push(`${data.members.length} new musician${data.members.length !== 1 ? 's' : ''} joined the community.`);
+  }
+
+  if (data.mostDiscussedTitle !== 'No discussions this week') {
+    parts.push(`The most discussed piece was ${data.mostDiscussedTitle}.`);
+  }
+
+  parts.push(`The platform now holds ${data.totalPieces} pieces across ${data.totalMembers} members.`);
+
+  return parts.join(' ');
 }
 
 // ── Template injection ─────────────────────────────────────────────────────
@@ -287,6 +317,8 @@ function injectData(template: string, data: DigestData): string {
     : data.mostApplaudedName;
 
   return template
+    .replace('{{recipient_name}}', escapeHtml(data.recipientName))
+    .replace('{{digest_summary}}', escapeHtml(data.digestSummary))
     .replace('{{week_range}}', escapeHtml(data.weekRange))
     .replace('{{new_pieces_count}}', String(data.pieces.length))
     .replace('{{new_members_count}}', String(data.members.length))
@@ -305,13 +337,15 @@ export interface RenderOptions {
   /** Override the week window. Defaults to the past 7 days ending now. */
   weekStart?: Date;
   weekEnd?: Date;
+  /** Recipient's display name for the greeting. */
+  recipientName: string;
   /** Unsubscribe link injected into the footer. */
   unsubscribeUrl?: string;
 }
 
 export async function renderWeeklyDigest(
   supabase: SupabaseClient<Database>,
-  options: RenderOptions = {},
+  options: RenderOptions,
 ): Promise<string> {
   const now = new Date();
   const weekEnd = options.weekEnd ?? now;
@@ -320,6 +354,8 @@ export async function renderWeeklyDigest(
 
   const template = loadTemplate();
   const data = await fetchDigestData(supabase, weekStart, weekEnd, unsubscribeUrl);
+  data.recipientName = options.recipientName;
+  data.digestSummary = generateDigestSummary(data);
   return injectData(template, data);
 }
 
@@ -327,11 +363,49 @@ export async function renderWeeklyDigest(
  * Render with static placeholder data — useful for design preview
  * and snapshot tests without a live database connection.
  */
-export function renderWeeklyDigestPreview(): string {
+export function renderWeeklyDigestPreview(recipientName = 'Joseph'): string {
   const template = loadTemplate();
+
+  const pieces: DigestPiece[] = [
+    {
+      id: 'beethoven-piano-sonata-op109',
+      title: 'Piano Sonata No. 30 in E major',
+      composer_name: 'Ludwig van Beethoven',
+      catalog_number: 'Op. 109',
+      instruments: ['Piano'],
+      era: 'Romantic',
+      description: 'One of the late sonatas — opens with a Vivace of startling immediacy, dissolving into variations of extraordinary tenderness in the finale.',
+    },
+    {
+      id: 'bach-cello-suite-no1',
+      title: 'Cello Suite No. 1 in G major',
+      composer_name: 'Johann Sebastian Bach',
+      catalog_number: 'BWV 1007',
+      instruments: ['Cello'],
+      era: 'Baroque',
+      description: 'The most approachable of the six suites and among the most beloved pieces in the string repertoire. The Prelude alone is a masterclass in melodic implication.',
+    },
+    {
+      id: 'ravel-string-quartet-f-major',
+      title: 'String Quartet in F major',
+      composer_name: 'Maurice Ravel',
+      catalog_number: null,
+      instruments: ['Violin', 'Viola', 'Cello'],
+      era: 'Modern',
+      description: 'A tightly constructed single-quartet work from 1903, demonstrating Ravel\'s already assured command of texture and his debt to Debussy alongside his own emerging voice.',
+    },
+  ];
+
+  const members: DigestMember[] = [
+    { id: '1', display_name: 'Margaret Kovacs', instrument: 'Violin', level: 'professional' },
+    { id: '2', display_name: 'Thomas Reiner', instrument: 'Piano', level: 'student' },
+    { id: '3', display_name: 'Soo-Jin Park', instrument: 'Cello', level: 'teacher' },
+  ];
 
   const data: DigestData = {
     weekRange: 'March 24 – March 30, 2026',
+    recipientName,
+    digestSummary: '',
     totalPieces: 247,
     totalMembers: 83,
     mostDiscussedTitle: 'Cello Suite No. 1 in G major',
@@ -339,41 +413,11 @@ export function renderWeeklyDigestPreview(): string {
     mostApplaudedName: 'Hana Novakova',
     mostApplaudedInstrument: 'Cello',
     unsubscribeUrl: 'https://irregularpearl.org/settings#email',
-    pieces: [
-      {
-        id: 'beethoven-piano-sonata-op109',
-        title: 'Piano Sonata No. 30 in E major',
-        composer_name: 'Ludwig van Beethoven',
-        catalog_number: 'Op. 109',
-        instruments: ['Piano'],
-        era: 'Romantic',
-        description: 'One of the late sonatas — opens with a Vivace of startling immediacy, dissolving into variations of extraordinary tenderness in the finale.',
-      },
-      {
-        id: 'bach-cello-suite-no1',
-        title: 'Cello Suite No. 1 in G major',
-        composer_name: 'Johann Sebastian Bach',
-        catalog_number: 'BWV 1007',
-        instruments: ['Cello'],
-        era: 'Baroque',
-        description: 'The most approachable of the six suites and among the most beloved pieces in the string repertoire. The Prelude alone is a masterclass in melodic implication.',
-      },
-      {
-        id: 'ravel-string-quartet-f-major',
-        title: 'String Quartet in F major',
-        composer_name: 'Maurice Ravel',
-        catalog_number: null,
-        instruments: ['Violin', 'Viola', 'Cello'],
-        era: 'Modern',
-        description: 'A tightly constructed single-quartet work from 1903, demonstrating Ravel\'s already assured command of texture and his debt to Debussy alongside his own emerging voice.',
-      },
-    ],
-    members: [
-      { id: '1', display_name: 'Margaret Kovacs', instrument: 'Violin', level: 'professional' },
-      { id: '2', display_name: 'Thomas Reiner', instrument: 'Piano', level: 'student' },
-      { id: '3', display_name: 'Soo-Jin Park', instrument: 'Cello', level: 'teacher' },
-    ],
+    pieces,
+    members,
   };
+
+  data.digestSummary = generateDigestSummary(data);
 
   return injectData(template, data);
 }

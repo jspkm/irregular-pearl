@@ -113,25 +113,38 @@
           <!-- HEADLINE                                                       -->
           <!-- ============================================================ -->
           <tr>
-            <td align="center" style="padding: 0 0 36px;">
-              <span class="instrument-serif" style="
-                font-family: 'Instrument Serif', Georgia, 'Times New Roman', Times, serif;
-                font-size: 26px;
-                font-weight: 400;
-                font-style: normal;
-                color: #1C1917;
-                line-height: 1.2;
-                display: block;
-                text-align: center;
-              ">This Week on Irregular Pearl</span>
+            <td style="padding: 0 0 12px;">
               <span class="dm-sans" style="
                 font-family: 'DM Sans', Arial, Helvetica, sans-serif;
-                font-size: 13px;
-                color: #78716C;
+                font-size: 15px;
+                font-weight: 400;
+                color: #1C1917;
+                line-height: 1.5;
                 display: block;
-                margin-top: 6px;
-                text-align: center;
-              ">{{week_range}}</span>
+              ">Dear {{recipient_name}},</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 0 0 28px;">
+              <span class="dm-sans" style="
+                font-family: 'DM Sans', Arial, Helvetica, sans-serif;
+                font-size: 14px;
+                font-weight: 400;
+                color: #57534E;
+                line-height: 1.65;
+                display: block;
+              ">{{digest_summary}}</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 0 0 36px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td style="border-top: 1px solid #E7E5E4;"></td>
+                </tr>
+              </table>
             </td>
           </tr>
 
