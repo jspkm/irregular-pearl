@@ -345,6 +345,8 @@ export interface RenderOptions {
   weekEnd?: Date;
   /** Recipient's display name for the greeting. */
   recipientName: string;
+  /** Custom digest summary (e.g. LLM-generated). Falls back to auto-generated if omitted. */
+  digestSummary?: string;
   /** Unsubscribe link injected into the footer. */
   unsubscribeUrl?: string;
 }
@@ -361,7 +363,7 @@ export async function renderWeeklyDigest(
   const template = loadTemplate();
   const data = await fetchDigestData(supabase, weekStart, weekEnd, unsubscribeUrl);
   data.recipientName = options.recipientName;
-  data.digestSummary = generateDigestSummary(data);
+  data.digestSummary = options.digestSummary || generateDigestSummary(data);
   return injectData(template, data);
 }
 
