@@ -2425,5 +2425,494 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "Wikipedia — Giovanni Bottesini"
       }
     ]
+  },
+  {
+    "id": "bach-organ-trio-sonata-1",
+    "title": "Trio Sonata No. 1 in E-flat major",
+    "composer_name": "Johann Sebastian Bach",
+    "catalog_number": "BWV 525",
+    "instruments": ["Organ"],
+    "era": "Baroque",
+    "form": "Trio Sonata",
+    "duration_minutes": 15,
+    "difficulty": "advanced",
+    "description": "The first of Bach's six organ trio sonatas, BWV 525 was composed in Leipzig around 1727 and is thought to have been written partly as practice material for Bach's eldest son Wilhelm Friedemann. Each of the three movements sets two independent melodic lines in the manuals against a walking bass on the pedals — demanding complete independence of both hands and feet and placing extraordinary coordination requirements on the performer. The trio sonata idiom, derived from chamber music, was entirely new to the organ when Bach adopted it, and the resulting works are among the most intellectually rigorous and expressively diverse in the solo organ canon. The opening Allegro moderato of BWV 525 balances Italianate melodic invention with Bach's characteristic contrapuntal density.",
+    "editions": [
+      {
+        "id": "e-bach-ts1-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Hermann Keller",
+        "year": 1954,
+        "description": "Part of Keller's nine-volume Peters Bach organ series; long the standard teaching text, with detailed fingering and registration suggestions."
+      },
+      {
+        "id": "e-bach-ts1-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Hans Klotz",
+        "year": 1958,
+        "description": "Critical edition using primary manuscript sources; part of the Neue Bach-Ausgabe and the scholarly standard for the six trio sonatas."
+      },
+      {
+        "id": "e-bach-ts1-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Bach-Gesellschaft",
+        "year": 1868,
+        "description": "Original Bach-Gesellschaft complete edition; the founding scholarly text, now freely available and used for historical comparison."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Trio_Sonata_No.1_in_E-flat_major,_BWV_525_(Bach,_Johann_Sebastian)",
+        "label": "IMSLP — Bach: Trio Sonata No. 1 BWV 525"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=5rSP2GcBoMo",
+        "label": "YouTube — Marie-Claire Alain, organ"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Trio_Sonatas,_BWV_525%E2%80%93530",
+        "label": "Wikipedia — Trio Sonatas BWV 525–530"
+      }
+    ]
+  },
+  {
+    "id": "widor-organ-symphony-5",
+    "title": "Symphony No. 5 for Organ in F minor",
+    "composer_name": "Charles-Marie Widor",
+    "catalog_number": "Op. 42 No. 1",
+    "instruments": ["Organ"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 35,
+    "difficulty": "professional",
+    "description": "The fifth of Widor's ten organ symphonies, composed for the great Cavaillé-Coll organ at Saint-Sulpice in Paris where Widor served as titular organist for sixty-four years. The final movement — the celebrated Toccata — has achieved iconic status independent of its parent work, but the complete symphony rewards sustained attention: its five movements chart a vast harmonic and expressive journey from a brooding Allegro vivace through a radiant Adagio and a scherzo-like Andantino, culminating in the relentless sixteenth-note perpetuum mobile of the Toccata. The work exploits the full resources of the French Romantic organ and defined the genre of the symphonie pour orgue.",
+    "editions": [
+      {
+        "id": "e-widor-os5-hamelle",
+        "publisher": "Hamelle",
+        "editor": "Charles-Marie Widor",
+        "year": 1887,
+        "description": "Original Hamelle publication; the authoritative first edition supervised by the composer and still widely used in French conservatoires."
+      },
+      {
+        "id": "e-widor-os5-leduc",
+        "publisher": "Alphonse Leduc",
+        "editor": "Charles-Marie Widor",
+        "year": 1901,
+        "description": "Revised edition incorporating Widor's own corrections and refinements; the standard performing text for much of the twentieth century."
+      },
+      {
+        "id": "e-widor-os5-schott",
+        "publisher": "Schott Music",
+        "editor": "Hans Fagius",
+        "year": 2006,
+        "description": "Modern critical edition with full scholarly commentary, fingering and registration suggestions, and historical context for Widor's organ symphony cycle."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Organ_Symphony_No.5,_Op.42/1_(Widor,_Charles-Marie)",
+        "label": "IMSLP — Widor: Organ Symphony No. 5 Op. 42/1"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Pn4b5HaVFo8",
+        "label": "YouTube — Pierre Cochereau, organ (Notre-Dame de Paris)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Organ_Symphony_No._5_(Widor)",
+        "label": "Wikipedia — Organ Symphony No. 5 (Widor)"
+      }
+    ]
+  },
+  {
+    "id": "rodrigo-aranjuez",
+    "title": "Concierto de Aranjuez",
+    "composer_name": "Joaquín Rodrigo",
+    "catalog_number": null,
+    "instruments": ["Guitar", "Orchestra"],
+    "era": "20th Century",
+    "form": "Concerto",
+    "duration_minutes": 21,
+    "difficulty": "professional",
+    "description": "Composed in 1939 and premiered in Barcelona the following year, the Concierto de Aranjuez is the most performed guitar concerto in the repertoire and one of the most frequently performed concertos of any kind. Rodrigo, blind since the age of three, drew on the landscape and royal gardens of Aranjuez for its evocative imagery. The central Adagio — built on a haunting cor anglais theme and a deeply expressive guitar response — has transcended the classical world, inspiring Miles Davis's Sketches of Spain and countless popular arrangements. The outer movements balance brilliance and lightness with a deep Castilian character rooted in Spanish folk idiom.",
+    "editions": [
+      {
+        "id": "e-rodrigo-ca-schott",
+        "publisher": "Schott Music (Chester Music)",
+        "editor": "Pepe Romero",
+        "year": 1991,
+        "description": "Authorised performing edition prepared in collaboration with Pepe Romero, incorporating Rodrigo's own performance markings and endorsed by the Rodrigo Foundation."
+      },
+      {
+        "id": "e-rodrigo-ca-ediciones",
+        "publisher": "Ediciones Joaquín Rodrigo",
+        "editor": "Cecilia Rodrigo",
+        "year": 2003,
+        "description": "Definitive edition overseen by the composer's daughter, with detailed editorial notes, facsimile pages, and the authoritative guitar part with optional fingerings."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=9KRNSHGdOZM",
+        "label": "YouTube — Pepe Romero, guitar; Neville Marriner, ASMF"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Concierto_de_Aranjuez",
+        "label": "Wikipedia — Concierto de Aranjuez"
+      }
+    ]
+  },
+  {
+    "id": "berlioz-harold-en-italie",
+    "title": "Harold en Italie",
+    "composer_name": "Hector Berlioz",
+    "catalog_number": "Op. 16",
+    "instruments": ["Viola", "Orchestra"],
+    "era": "Romantic",
+    "form": "Symphony",
+    "duration_minutes": 43,
+    "difficulty": "professional",
+    "description": "Commissioned by Paganini in 1834 for a Stradivari viola he had recently acquired, Harold en Italie was inspired by Byron's Childe Harold and premiered in Paris that November. Paganini himself never played it — complaining that the solo part was too retiring — yet it became one of the great works combining viola and orchestra. Like the Symphonie fantastique, it deploys a recurring idée fixe (the Harold theme) that threads through all four movements representing the brooding, romantic wanderer. The viola acts less as a concerto soloist than as a poetic protagonist embedded in the orchestral landscape: the Pilgrims' March, the Serenade of an Abruzzi mountaineer, and the Brigands' Orgy all frame the viola's meditations. The work presents extraordinary demands of tone, legato, and expressive depth.",
+    "editions": [
+      {
+        "id": "e-berlioz-hi-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Paul Banks",
+        "year": 1998,
+        "description": "New Berlioz Edition (NBE) volume 17; critical text based on all autograph and print sources, with full scholarly apparatus and performance notes."
+      },
+      {
+        "id": "e-berlioz-hi-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Charles Malherbe",
+        "year": 1904,
+        "description": "Part of the Breitkopf Berlioz complete edition; long the standard orchestral performing text and widely available as a study score."
+      },
+      {
+        "id": "e-berlioz-hi-kalmus",
+        "publisher": "Edwin F. Kalmus",
+        "editor": "Charles Malherbe",
+        "year": 1972,
+        "description": "Affordable Kalmus reprint of the Breitkopf orchestral score; widely used by students, conductors, and orchestras as a study and rehearsal score."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Harold_en_Italie,_Op.16_(Berlioz,_Hector)",
+        "label": "IMSLP — Berlioz: Harold en Italie Op. 16"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=lS8GBTdVYSE",
+        "label": "YouTube — Yuri Bashmet, viola; Seiji Ozawa, Boston Symphony"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Harold_en_Italie",
+        "label": "Wikipedia — Harold en Italie"
+      }
+    ]
+  },
+  {
+    "id": "debussy-danses-harp",
+    "title": "Danses (Danse sacrée et danse profane)",
+    "composer_name": "Claude Debussy",
+    "catalog_number": "L. 103",
+    "instruments": ["Harp", "String Orchestra"],
+    "era": "Impressionist",
+    "form": "Suite",
+    "duration_minutes": 10,
+    "difficulty": "professional",
+    "description": "Commissioned in 1904 by the Pleyel company to demonstrate the capabilities of their newly developed chromatic harp — an instrument with a separate string for each semitone — the two Danses were premiered in Brussels that year. Though the chromatic harp fell from favour, the work became a cornerstone of the standard pedal harp repertoire. The Danse sacrée unfolds with grave, archaic solemnity derived from a theme by the Belgian composer Francisco de Lacerda; the Danse profane follows with light, arabesque figuration of quintessential Impressionist delicacy. The string orchestra provides an atmospheric halo while the harp part displays the full range of the instrument's idiomatic techniques.",
+    "editions": [
+      {
+        "id": "e-debussy-dh-durand",
+        "publisher": "Durand",
+        "editor": "Claude Debussy",
+        "year": 1904,
+        "description": "Original Durand edition, supervised by the composer; remains the standard performing text and is widely reprinted."
+      },
+      {
+        "id": "e-debussy-dh-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Vera Badings",
+        "year": 1978,
+        "description": "Peters edition with revised harp part and new editorial annotations; useful for its alternative fingerings and extended performance notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Danses_(Debussy,_Claude)",
+        "label": "IMSLP — Debussy: Danses (Danse sacrée et danse profane)"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=WFfbXvJXiGQ",
+        "label": "YouTube — Marielle Nordmann, harp; Jean-Pierre Rampal"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Danses_(Debussy)",
+        "label": "Wikipedia — Danses (Debussy)"
+      }
+    ]
+  },
+  {
+    "id": "tchaikovsky-piano-concerto-1",
+    "title": "Piano Concerto No. 1 in B-flat minor",
+    "composer_name": "Pyotr Ilyich Tchaikovsky",
+    "catalog_number": "Op. 23",
+    "instruments": ["Piano", "Orchestra"],
+    "era": "Romantic",
+    "form": "Concerto",
+    "duration_minutes": 34,
+    "difficulty": "professional",
+    "description": "One of the most celebrated and technically demanding piano concertos in the repertoire, Tchaikovsky's First was composed in 1874–75 and dedicated to Hans von Bülow after Nikolai Rubinstein famously rejected it as 'unplayable'. Von Bülow premiered it triumphantly in Boston in 1875, and the work quickly became a cornerstone of the virtuoso concert repertoire. Its opening movement begins with one of the most famous statements in all music — a broad, hymn-like theme in the full orchestra answered by massive chords in the piano — before giving way to an energetic Allegro. The lyrical Andantino semplice and rambunctious Finale complete a work of sweep, passion, and bravura that has defined the Romantic concerto tradition. Tchaikovsky revised the work twice; the third version (1879–89) is now standard.",
+    "editions": [
+      {
+        "id": "e-tchk-pc1-jurgenson",
+        "publisher": "Jurgenson (Kalmus reprint)",
+        "editor": "Pyotr Ilyich Tchaikovsky",
+        "year": 1879,
+        "description": "Reprint of Tchaikovsky's own revised edition; the text closest to his final intentions and the basis for most twentieth-century performances."
+      },
+      {
+        "id": "e-tchk-pc1-eulenburg",
+        "publisher": "Eulenburg",
+        "editor": "Richard Clarke",
+        "year": 2002,
+        "description": "Pocket score with critical preface and performance notes; the standard miniature score for students and score-readers."
+      },
+      {
+        "id": "e-tchk-pc1-henle",
+        "publisher": "G. Henle",
+        "editor": "Pavel Lampl",
+        "year": 2019,
+        "description": "Urtext critical edition based on all autograph and print sources; the most authoritative modern performing text with full critical commentary."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Concerto_No.1,_Op.23_(Tchaikovsky,_Pyotr)",
+        "label": "IMSLP — Tchaikovsky: Piano Concerto No. 1 Op. 23"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=TEB4MiHtxA4",
+        "label": "YouTube — Van Cliburn, piano; Kiril Kondrashin (RCA Victor)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Concerto_No._1_(Tchaikovsky)",
+        "label": "Wikipedia — Piano Concerto No. 1 (Tchaikovsky)"
+      }
+    ]
+  },
+  {
+    "id": "brahms-piano-trio-1",
+    "title": "Piano Trio No. 1 in B major",
+    "composer_name": "Johannes Brahms",
+    "catalog_number": "Op. 8",
+    "instruments": ["Piano", "Violin", "Cello"],
+    "era": "Romantic",
+    "form": "Piano Trio",
+    "duration_minutes": 38,
+    "difficulty": "advanced",
+    "description": "Brahms composed the original version of this trio in 1854 at age twenty-one, and radically revised it in 1889 — one of the rare cases in music history where a composer substantially rewrote a mature work decades after its premiere. The 1889 revision, published by Simrock, reduced the work from four to three movements while dramatically compressing and clarifying the argument. The result is one of the most emotionally generous works in the chamber repertoire: the opening movement's vast melodic paragraphs, the scherzo's rhythmic energy, and the finale's passionate drive culminate in music of autumnal richness. Both versions are now performed, offering a remarkable window into Brahms's compositional development across thirty-five years.",
+    "editions": [
+      {
+        "id": "e-brahms-pt1-henle",
+        "publisher": "G. Henle",
+        "editor": "Norbert Müllemann",
+        "year": 2000,
+        "description": "Urtext edition presenting the revised 1889 version with critical commentary; the standard modern performing edition with clear notation and editorial restraint."
+      },
+      {
+        "id": "e-brahms-pt1-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Max Vogrich",
+        "year": 1900,
+        "description": "Historical Peters edition of the revised version; long a standard reference, now supplemented by more recent Urtext sources."
+      },
+      {
+        "id": "e-brahms-pt1-breitkopf",
+        "publisher": "Breitkopf & Härtel",
+        "editor": "Hans Gál",
+        "year": 1927,
+        "description": "Part of the Brahms complete works edition; includes both the 1854 original and 1889 revision in a single volume with scholarly notes."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Trio_No.1,_Op.8_(Brahms,_Johannes)",
+        "label": "IMSLP — Brahms: Piano Trio No. 1 Op. 8"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=LiYNMjl9QoA",
+        "label": "YouTube — Heifetz, Rubinstein, Piatigorsky (RCA Victor)"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._1_(Brahms)",
+        "label": "Wikipedia — Piano Trio No. 1 (Brahms)"
+      }
+    ]
+  },
+  {
+    "id": "faure-piano-quartet-2",
+    "title": "Piano Quartet No. 2 in G minor",
+    "composer_name": "Gabriel Fauré",
+    "catalog_number": "Op. 45",
+    "instruments": ["Piano", "Violin", "Viola", "Cello"],
+    "era": "Romantic",
+    "form": "Piano Quartet",
+    "duration_minutes": 30,
+    "difficulty": "advanced",
+    "description": "Composed between 1885 and 1886 and premiered at the Société Nationale de Musique in Paris in 1887, Fauré's Second Piano Quartet is widely considered one of his greatest chamber works. Where the First Quartet has an impetuous Romantic urgency, the Second is more inward, harmonically daring, and structurally concentrated. The four movements are unified by a pervasive mood of restless searching: the opening Allegro molto moderato unfolds in long, sinuous lines; the Allegro molto scherzo is fleet and mercurial; the Adagio non troppo achieves a sustained serenity that places it among Fauré's most profound inspirations; and the Finale integrates all preceding material with a masterful long-range control. The work demands extraordinary balance and sensitivity from all four players and rewards prolonged study.",
+    "editions": [
+      {
+        "id": "e-faure-pq2-hamelle",
+        "publisher": "Hamelle",
+        "editor": "Gabriel Fauré",
+        "year": 1887,
+        "description": "Original Hamelle publication; the authoritative first edition approved by the composer and the foundation for all subsequent texts."
+      },
+      {
+        "id": "e-faure-pq2-peters",
+        "publisher": "C. F. Peters",
+        "editor": "Jean-Michel Nectoux",
+        "year": 1995,
+        "description": "Critical edition by the pre-eminent Fauré scholar; detailed apparatus and performance notes illuminating compositional choices and interpretive tradition."
+      },
+      {
+        "id": "e-faure-pq2-barenreiter",
+        "publisher": "Bärenreiter",
+        "editor": "Jean-Michel Nectoux",
+        "year": 2016,
+        "description": "Revised Urtext edition incorporating the latest source scholarship; now the standard professional reference for both performance and teaching."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/Piano_Quartet_No.2,_Op.45_(Fauré,_Gabriel)",
+        "label": "IMSLP — Fauré: Piano Quartet No. 2 Op. 45"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=E6cZ2cBmDls",
+        "label": "YouTube — Quatuor Ébène with Pierre-Laurent Aimard"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Piano_Quartet_No._2_(Fauré)",
+        "label": "Wikipedia — Piano Quartet No. 2 (Fauré)"
+      }
+    ]
+  },
+  {
+    "id": "hasselmans-la-source",
+    "title": "La Source",
+    "composer_name": "Alphonse Hasselmans",
+    "catalog_number": "Op. 44",
+    "instruments": ["Harp"],
+    "era": "Romantic",
+    "form": "Character Piece",
+    "duration_minutes": 5,
+    "difficulty": "advanced",
+    "description": "A staple of the harp recital repertoire and one of the most performed solo harp pieces ever written, La Source was composed by Alphonse Hasselmans — professor of harp at the Paris Conservatoire from 1884 to 1909 and teacher of Marcel Grandjany and Carlos Salzedo. The work's flowing arpeggiation and crystalline harmonics evoke a rushing spring, exploiting the instrument's unique timbral palette with idiomatic brilliance. Its technical demands — sustained melody within rapid arpeggiated accompaniment, precise pedal changes, and delicate harmonics — make it a standard teaching piece at conservatoire level while remaining musically satisfying in professional performance. The piece exemplifies the French Romantic harp tradition at its most refined.",
+    "editions": [
+      {
+        "id": "e-hass-ls-hamelle",
+        "publisher": "Hamelle",
+        "editor": "Alphonse Hasselmans",
+        "year": 1902,
+        "description": "Original Hamelle edition; the authoritative text, still widely circulated and used in conservatoire instruction."
+      },
+      {
+        "id": "e-hass-ls-imc",
+        "publisher": "International Music Company",
+        "editor": "Alphonse Hasselmans",
+        "year": 1960,
+        "description": "Standard American reprint edition based on the original Hamelle text; widely distributed and used in North American harp pedagogy throughout the later twentieth century."
+      },
+      {
+        "id": "e-hass-ls-leduc",
+        "publisher": "Alphonse Leduc",
+        "editor": "Henriette Renié",
+        "year": 1935,
+        "description": "Revised edition with fingerings and pedalling by Renié, Hasselmans's most celebrated student; invaluable for understanding the French school tradition."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "imslp",
+        "url": "https://imslp.org/wiki/La_Source,_Op.44_(Hasselmans,_Alphonse)",
+        "label": "IMSLP — Hasselmans: La Source Op. 44"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=fCRMjoNFGSQ",
+        "label": "YouTube — Marielle Nordmann, harp"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Alphonse_Hasselmans",
+        "label": "Wikipedia — Alphonse Hasselmans"
+      }
+    ]
+  },
+  {
+    "id": "varese-density-21-5",
+    "title": "Density 21.5",
+    "composer_name": "Edgard Varèse",
+    "catalog_number": null,
+    "instruments": ["Flute"],
+    "era": "20th Century",
+    "form": "Character Piece",
+    "duration_minutes": 4,
+    "difficulty": "professional",
+    "description": "Composed in 1936 for Georges Barrère and his newly acquired platinum flute — platinum having a density of 21.5 g/cm³, giving the work its title — Density 21.5 is among the most frequently performed solo flute works of the twentieth century and a foundational text of the modern extended technique repertoire. Its single uninterrupted movement explores the extremes of the instrument's range, from a brooding low D to stratospheric altissimo, deploying key-clicks, multiphonics, and abrupt dynamic contrasts that were entirely without precedent in flute writing. Varèse revised the work in 1946; the revised version is now standard. In four minutes the piece traverses an emotional journey from ritual solemnity to explosive violence and back, demanding total command of breath, embouchure, and physical projection.",
+    "editions": [
+      {
+        "id": "e-varese-d215-ricordi",
+        "publisher": "Ricordi",
+        "editor": "Chou Wen-chung",
+        "year": 1966,
+        "description": "Authorised edition prepared by Chou Wen-chung, Varèse's literary executor; the standard performing text, incorporating the composer's 1946 revisions."
+      },
+      {
+        "id": "e-varese-d215-colfranc",
+        "publisher": "Colfranc Music",
+        "editor": "Edgard Varèse",
+        "year": 1956,
+        "description": "First published edition, appearing a decade after the 1946 revision; includes the composer's performance indications and dynamic markings."
+      }
+    ],
+    "external_links": [
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=T3DNMtSaP0s",
+        "label": "YouTube — Paula Robison, flute"
+      },
+      {
+        "type": "wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Density_21.5",
+        "label": "Wikipedia — Density 21.5"
+      }
+    ]
   }
 ];
