@@ -16,7 +16,7 @@ interface User {
   is_maestro: boolean;
   managed_sections: string[];
   is_banned: boolean;
-  vanity_slug: string | null;
+  username: string | null;
   created_at: string;
 }
 
@@ -31,7 +31,7 @@ export default function AdminUserList() {
   const fetchUsers = async () => {
     if (!hasSupabase) return;
     let query = supabase.from('users')
-      .select('id, display_name, instrument, level, role, is_maestro, managed_sections, is_banned, vanity_slug, created_at')
+      .select('id, display_name, instrument, level, role, is_maestro, managed_sections, is_banned, username, created_at')
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -114,7 +114,7 @@ export default function AdminUserList() {
             {users.map(u => (
               <tr key={u.id} className="border-b border-border/50 last:border-b-0">
                 <td className="px-4 py-2">
-                  <a href={u.vanity_slug ? `/@${u.vanity_slug}` : `/profile/${u.id}`} className="font-medium text-ink no-underline hover:underline">
+                  <a href={u.username ? `/@${u.username}` : `/profile/${u.id}`} className="font-medium text-ink no-underline hover:underline">
                     {u.display_name}
                   </a>
                 </td>

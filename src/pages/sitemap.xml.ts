@@ -17,12 +17,12 @@ export const GET: APIRoute = async ({ url }) => {
 
   if (hasSupabase) {
     const [artistsRes, instrRes, eventsRes] = await Promise.allSettled([
-      supabase.from('users').select('vanity_slug').not('vanity_slug', 'is', null),
+      supabase.from('users').select('username').not('username', 'is', null),
       supabase.from('instruments').select('id').eq('privacy_level', 'public'),
       supabase.from('events').select('id'),
     ]);
     if (artistsRes.status === 'fulfilled' && artistsRes.value.data)
-      artistSlugs = artistsRes.value.data.map((r: any) => r.vanity_slug);
+      artistSlugs = artistsRes.value.data.map((r: any) => r.username);
     if (instrRes.status === 'fulfilled' && instrRes.value.data)
       instrumentIds = instrRes.value.data.map((r: any) => r.id);
     if (eventsRes.status === 'fulfilled' && eventsRes.value.data)

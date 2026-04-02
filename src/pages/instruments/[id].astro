@@ -20,7 +20,7 @@ if (!instrument) return Astro.redirect('/');
 // Fetch ownership history
 const { data: history } = await supabase
   .from('instrument_history')
-  .select('*, users!inner(display_name, vanity_slug)')
+  .select('*, users!inner(display_name, username)')
   .eq('instrument_id', id)
   .order('date_from', { ascending: false });
 
@@ -29,7 +29,7 @@ let owner: any = null;
 if (instrument.current_owner_id) {
   const { data } = await supabase
     .from('users')
-    .select('id, display_name, vanity_slug')
+    .select('id, display_name, username')
     .eq('id', instrument.current_owner_id)
     .single();
   owner = data;
@@ -38,7 +38,7 @@ if (instrument.current_owner_id) {
 // Fetch performances involving this instrument
 const { data: performances } = await supabase
   .from('event_performances')
-  .select('events!inner(id, title, venue, city, event_date), users!inner(display_name, vanity_slug), pieces(title)')
+  .select('events!inner(id, title, venue, city, event_date), users!inner(display_name, username), pieces(title)')
   .eq('instrument_id', id)
   .order('created_at', { ascending: false })
   .limit(20);
@@ -94,7 +94,7 @@ const breadcrumbLd = {
       {owner && (
         <p class="text-sm text-muted mt-2">
           Current player:
-          <a href={owner.vanity_slug ? `/@${owner.vanity_slug}` : `/profile/${owner.id}`} class="text-ink font-medium no-underline hover:underline ml-1">{owner.display_name}</a>
+          <a href={owner.username ? `/@${owner.username}` : `/profile/${owner.id}`} class="text-ink font-medium no-underline hover:underline ml-1">{owner.display_name}</a>
         </p>
       )}
       <InstrumentActions
@@ -129,7 +129,7 @@ const breadcrumbLd = {
               </div>
               <div>
                 <div class="text-sm font-medium text-ink">
-                  <a href={owner.vanity_slug ? `/@${owner.vanity_slug}` : `/profile/${owner.id}`} class="text-ink no-underline hover:underline">{owner.display_name}</a>
+                  <a href={owner.username ? `/@${owner.username}` : `/profile/${owner.id}`} class="text-ink no-underline hover:underline">{owner.display_name}</a>
                   <span class="text-[10px] bg-[#FEF3C7] text-accent px-2 py-0.5 rounded-full ml-2 font-medium">Current</span>
                 </div>
                 <div class="font-mono text-[11px] text-[#A8A29E]">
@@ -148,8 +148,8 @@ const breadcrumbLd = {
               </div>
               <div>
                 <div class="text-sm font-medium text-ink">
-                  {h.users?.vanity_slug ? (
-                    <a href={`/@${h.users.vanity_slug}`} class="text-ink no-underline hover:underline">{h.users.display_name}</a>
+                  {h.users?.username ? (
+                    <a href={`/@${h.users.username}`} class="text-ink no-underline hover:underline">{h.users.display_name}</a>
                   ) : (
                     <span>{h.users?.display_name || 'Unknown'}</span>
                   )}

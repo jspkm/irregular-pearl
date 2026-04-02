@@ -17,7 +17,7 @@ if (!event) return Astro.redirect('/');
 
 const { data: performances } = await supabase
   .from('event_performances')
-  .select('*, users(id, display_name, vanity_slug), pieces(id, title, composer_name), instruments(id, type, maker)')
+  .select('*, users(id, display_name, username), pieces(id, title, composer_name), instruments(id, type, maker)')
   .eq('event_id', id);
 
 const seoDescription = `${event.title} — ${event.venue || ''}${event.city ? `, ${event.city}` : ''} on ${new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
@@ -100,7 +100,7 @@ const jsonLd = {
             )}
             <div class="flex gap-3 mt-1 text-xs text-muted">
               {p.users && (
-                <a href={p.users.vanity_slug ? `/@${p.users.vanity_slug}` : `/profile/${p.users.id}`} class="text-muted no-underline hover:underline">
+                <a href={p.users.username ? `/@${p.users.username}` : `/profile/${p.users.id}`} class="text-muted no-underline hover:underline">
                   {p.users.display_name}
                 </a>
               )}

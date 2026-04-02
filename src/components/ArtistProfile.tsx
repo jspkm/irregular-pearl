@@ -4,7 +4,7 @@ import { useAuth } from '../lib/useAuth';
 import { formatDate, ACTIVITIES, randomNoteStarter, normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import { VENUES } from '../data/venues';
 import GenerativeAvatar from './GenerativeAvatar';
-import VanitySlugEditor from './VanitySlugEditor';
+import UsernameEditor from './UsernameEditor';
 import ApplaudButton from './ApplaudButton';
 
 interface ProfileData {
@@ -13,7 +13,7 @@ interface ProfileData {
   instrument: string | null;
   level: string | null;
   avatar_url: string | null;
-  vanity_slug: string | null;
+  username: string | null;
   bio: string;
   website: string | null;
   social_links: Record<string, string>;
@@ -270,10 +270,10 @@ export default function ArtistProfile({ userId }: { userId: string }) {
           </div>
           {isOwnProfile && (
             <div className="mt-2">
-              <VanitySlugEditor
+              <UsernameEditor
                 userId={userId}
-                currentSlug={(profile as any).vanity_slug || null}
-                onSlugChange={(slug) => setProfile({ ...profile, vanity_slug: slug } as ProfileData)}
+                currentUsername={profile.username || null}
+                onUsernameChange={(username) => setProfile({ ...profile, username } as ProfileData)}
               />
             </div>
           )}

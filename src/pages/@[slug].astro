@@ -13,7 +13,7 @@ if (!hasSupabase || !slug) return Astro.redirect('/');
 const { data: user } = await supabase
   .from('users')
   .select('*')
-  .eq('vanity_slug', slug)
+  .eq('username', slug)
   .single();
 
 if (!user) return Astro.redirect('/');

@@ -7,7 +7,7 @@ let events: any[] = [];
 if (hasSupabase) {
   const { data } = await supabase
     .from('events')
-    .select('*, event_performances(users(display_name, vanity_slug), pieces(title))')
+    .select('*, event_performances(users(display_name, username), pieces(title))')
     .gte('event_date', new Date().toISOString().split('T')[0])
     .neq('title', '')
     .order('event_date', { ascending: true })

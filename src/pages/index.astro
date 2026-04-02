@@ -12,7 +12,7 @@ const filterType = Astro.url.searchParams.get('type') || ''; // 'instrument', 'c
 
 // Apply filters
 let displayPieces = seedPieces;
-let searchArtists: { id: string; display_name: string; instrument: string | null; vanity_slug: string | null }[] = [];
+let searchArtists: { id: string; display_name: string; instrument: string | null; username: string | null }[] = [];
 let searchInstruments: { id: string; type: string; maker: string | null; maker_year: number | null }[] = [];
 
 if (query) {
@@ -21,9 +21,9 @@ if (query) {
     const [piecesResult, artistsResult, instrumentsResult] = await Promise.allSettled([
       supabase.from('pieces').select('id')
         .textSearch('fts', query, { type: 'websearch' }).limit(20),
-      supabase.from('users').select('id, display_name, instrument, vanity_slug')
+      supabase.from('users').select('id, display_name, instrument, username')
         .textSearch('fts', query, { type: 'websearch' })
-        .not('vanity_slug', 'is', null).limit(5),
+        .not('username', 'is', null).limit(5),
       supabase.from('instruments').select('id, type, maker, maker_year')
         .textSearch('fts', query, { type: 'websearch' })
         .eq('privacy_level', 'public').limit(5),
@@ -228,7 +228,7 @@ const itemListLd = {
           <h2 class="font-display text-lg mb-3">Artists</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {searchArtists.map((artist) => (
-              <a href={`/@${artist.vanity_slug}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
+              <a href={`/@${artist.username}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-sm text-muted flex-shrink-0">
                   {artist.display_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </div>

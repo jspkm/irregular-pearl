@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { validateSlug } from '../lib/helpers';
 
-interface VanitySlugEditorProps {
+interface UsernameEditorProps {
   userId: string;
-  currentSlug: string | null;
-  onSlugChange: (slug: string) => void;
+  currentUsername: string | null;
+  onUsernameChange: (username: string) => void;
 }
 
-export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: VanitySlugEditorProps) {
+export default function UsernameEditor({ userId, currentUsername, onUsernameChange }: UsernameEditorProps) {
   const [editing, setEditing] = useState(false);
-  const [slug, setSlug] = useState(currentSlug || '');
+  const [username, setUsername] = useState(currentUsername || '');
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -19,7 +19,7 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
 
   const handleSave = async () => {
     setError(null);
-    const trimmed = slug.trim().toLowerCase();
+    const trimmed = username.trim().toLowerCase();
 
     if (!trimmed) {
       setError('Username cannot be empty');
@@ -36,7 +36,7 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
 
     const { error: dbError } = await supabase
       .from('users')
-      .update({ vanity_slug: trimmed })
+      .update({ username: trimmed })
       .eq('id', userId);
 
     if (dbError) {
@@ -52,27 +52,27 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
     setSaving(false);
     setSaved(true);
     setEditing(false);
-    onSlugChange(trimmed);
+    onUsernameChange(trimmed);
     setTimeout(() => setSaved(false), 3000);
   };
 
   if (!editing) {
     return (
       <div className="flex items-center gap-2 mb-4">
-        {currentSlug ? (
+        {currentUsername ? (
           <>
             <span className="font-mono text-xs text-[#A8A29E]">
-              irregularpearl.org/@{currentSlug}
+              irregularpearl.org/@{currentUsername}
             </span>
             <a
-              href={`/@${currentSlug}`}
+              href={`/@${currentUsername}`}
               className="text-[11px] text-accent hover:underline no-underline"
             >
               View
             </a>
             <span className="text-[11px] text-[#E7E5E4]">·</span>
             <button
-              onClick={() => { setEditing(true); setSlug(currentSlug); }}
+              onClick={() => { setEditing(true); setUsername(currentUsername); }}
               className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0"
             >
               Change username
@@ -94,15 +94,15 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
   return (
     <div className="mb-4 p-4 bg-surface border border-border rounded-lg">
       <label className="block text-xs font-medium text-ink mb-2">
-        {currentSlug ? 'Change your username' : 'Choose your username'}
+        {currentUsername ? 'Change your username' : 'Choose your username'}
       </label>
       <div className="flex items-center gap-1 mb-2">
         <span className="text-xs text-muted">irregularpearl.org/@</span>
         <input
           type="text"
-          value={slug}
+          value={username}
           onChange={(e) => {
-            setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+            setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
             setError(null);
           }}
           placeholder="your-username"
@@ -116,13 +116,13 @@ export default function VanitySlugEditor({ userId, currentSlug, onSlugChange }: 
       <div className="flex gap-2">
         <button
           onClick={handleSave}
-          disabled={saving || !slug.trim()}
+          disabled={saving || !username.trim()}
           className="px-3 py-1.5 bg-[#1C1917] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>
         <button
-          onClick={() => { setEditing(false); setError(null); setSlug(currentSlug || ''); }}
+          onClick={() => { setEditing(false); setError(null); setUsername(currentUsername || ''); }}
           className="px-3 py-1.5 text-xs text-muted hover:text-ink bg-transparent border border-border rounded-lg cursor-pointer"
         >
           Cancel

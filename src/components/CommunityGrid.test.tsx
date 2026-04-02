@@ -5,9 +5,9 @@ import { render, fireEvent, cleanup } from '@testing-library/react';
 import CommunityGrid from './CommunityGrid';
 
 const mockArtists = [
-  { id: 'a1', display_name: 'Yuja Kim', instrument: 'Piano', level: 'professional', avatar_url: null, vanity_slug: 'yuja', created_at: new Date().toISOString() },
-  { id: 'a2', display_name: 'Daniel Lee', instrument: 'Cello', level: 'student', avatar_url: null, vanity_slug: 'daniel', created_at: new Date().toISOString() },
-  { id: 'a3', display_name: 'Sofia Martinez', instrument: 'Violin', level: 'teacher', avatar_url: null, vanity_slug: 'sofia', created_at: new Date().toISOString() },
+  { id: 'a1', display_name: 'Yuja Kim', instrument: 'Piano', level: 'professional', avatar_url: null, username: 'yuja', created_at: new Date().toISOString() },
+  { id: 'a2', display_name: 'Daniel Lee', instrument: 'Cello', level: 'student', avatar_url: null, username: 'daniel', created_at: new Date().toISOString() },
+  { id: 'a3', display_name: 'Sofia Martinez', instrument: 'Violin', level: 'teacher', avatar_url: null, username: 'sofia', created_at: new Date().toISOString() },
 ];
 
 const mockApplause = { a1: 47, a2: 1 };

@@ -16,7 +16,7 @@ if (hasSupabase) {
   // Get all public profiles
   const { data: users } = await supabase
     .from('users')
-    .select('id, display_name, instrument, level, avatar_url, vanity_slug, created_at')
+    .select('id, display_name, instrument, level, avatar_url, username, created_at')
     .not('display_name', 'is', null)
     .order('created_at', { ascending: false });
 
@@ -101,7 +101,7 @@ const seoDescription = 'Meet the musicians of Irregular Pearl — classical musi
         <h2 class="font-display text-xl mb-4">Featured Artists</h2>
         <div class="flex gap-4 overflow-x-auto pb-4" style="scrollbar-width: thin;">
           {featured.map((artist) => (
-            <a href={artist.vanity_slug ? `/@${artist.vanity_slug}` : `/profile/${artist.id}`} class="bg-surface border border-border rounded-xl p-5 min-w-[180px] text-center flex-shrink-0 hover:border-accent transition-all no-underline">
+            <a href={artist.username ? `/@${artist.username}` : `/profile/${artist.id}`} class="bg-surface border border-border rounded-xl p-5 min-w-[180px] text-center flex-shrink-0 hover:border-accent transition-all no-underline">
               <div class="mx-auto mb-2.5 w-14 h-14">
                 {artist.avatar_url ? (
                   <img src={artist.avatar_url} alt="" class="w-14 h-14 rounded-full object-cover" />

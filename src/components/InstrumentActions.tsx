@@ -55,7 +55,7 @@ export default function InstrumentActions({ instrumentId, currentOwnerId, onOwne
     const { data: recipient, error: findError } = await supabase
       .from('users')
       .select('id, display_name')
-      .eq('vanity_slug', recipientSlug.toLowerCase().replace('@', ''))
+      .eq('username', recipientSlug.toLowerCase().replace('@', ''))
       .single();
 
     if (findError || !recipient) {

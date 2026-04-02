@@ -6,7 +6,7 @@ interface Report {
   reason: string;
   created_at: string;
   discussion_id: string;
-  reporter: { display_name: string; vanity_slug: string | null };
+  reporter: { display_name: string; username: string | null };
   discussion: { text: string; piece_id: string; user: { display_name: string } };
 }
 
@@ -27,7 +27,7 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
         .from('reports')
         .select(`
           id, reason, created_at, discussion_id,
-          users!reporter_user_id(display_name, vanity_slug),
+          users!reporter_user_id(display_name, username),
           discussions!inner(text, piece_id, users!inner(display_name))
         `)
         .order('created_at', { ascending: false });
@@ -38,7 +38,7 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
           reason: r.reason,
           created_at: r.created_at,
           discussion_id: r.discussion_id,
-          reporter: r.users || { display_name: 'Unknown', vanity_slug: null },
+          reporter: r.users || { display_name: 'Unknown', username: null },
           discussion: {
             text: r.discussions?.text || '',
             piece_id: r.discussions?.piece_id || '',
