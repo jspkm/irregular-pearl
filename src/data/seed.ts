@@ -116,6 +116,9 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Ballade_No.1,_Op.23_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Ballade No. 1' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Ballade_No._1_(Chopin)', label: 'Wikipedia — Chopin Ballade No. 1' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=BSFNl4roGlI', label: 'Chopin - Ballade No.1 in G minor, Op.23 (Krystian Zimerman)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7pLC3L3hscXCEA5iCKY4EN', label: 'Seong-Jin Cho — 2015 Chopin Competition winner' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/5Ks5ENUFNQDfaqxjZnCkVJ', label: 'Krystian Zimerman' },
+      { type: 'internet_archive', url: 'https://archive.org/details/ChopinBalladeNo.1InGMinorOp.23richterPrague1960', label: 'Sviatoslav Richter — Live Prague 1960 (landmark)' },
     ],
   },
   {
@@ -309,7 +312,13 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-elgar-cc-barenreiter', publisher: 'Bärenreiter', editor: 'Jonathan Del Mar', year: 2020, description: 'New critical edition correcting errors in previous printings. The most accurate modern source.' }
     ],
     external_links: [
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Elgar)', label: 'Wikipedia — Elgar Cello Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Elgar)', label: 'Wikipedia — Elgar Cello Concerto' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/3PwJLGFcKrecmaRbJQYMSg', label: 'Sheku Kanneh-Mason / LSO / Rattle — BBC Young Musician winner (2020)' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/4cIcY14P7NSdOvpW1wJMev', label: 'Jacqueline du Pré / LSO / Barbirolli — Landmark recording' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/0O62RntbSupfaZeryUMml5', label: 'Alisa Weilerstein / Staatskapelle Berlin / Barenboim' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/77rF1FKgWjluNtGCTs8YUz', label: 'Sol Gabetta — Live: Elgar & Martinů' },
+      { type: 'internet_archive', url: 'https://archive.org/details/j.duprej.barbirolliliveatprague03011967elgarcelloconcerto', label: 'Jacqueline du Pré / Barbirolli — Live Prague 1967' },
+      { type: 'vimeo', url: 'https://vimeo.com/212893480', label: 'Truls Mørk / Concertgebouw — Live Amsterdam 2017' },
     ],
   },
 
@@ -331,7 +340,12 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_major,_Op.35_(Tchaikovsky,_Pyotr)', label: 'IMSLP — Tchaikovsky Violin Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Tchaikovsky)', label: 'Wikipedia — Tchaikovsky Violin Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Tchaikovsky)', label: 'Wikipedia — Tchaikovsky Violin Concerto' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/5Iijzf1oBpKJwatVUb2P7o', label: 'Hilary Hahn / Royal Liverpool PO — Grammy Award winner' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/1yI084e5Lz0yNVQNBT4sNa', label: 'Nicola Benedetti / Czech Philharmonic / Hrůša' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0V6V6fwKxTHDrsLLmgW432', label: 'Itzhak Perlman / Philadelphia Orchestra / Ormandy' },
+      { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Heifetz-NEWTRANSFER', label: 'Jascha Heifetz — Landmark recording (remastered)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Milstein-NewTransfer', label: 'Nathan Milstein — Historic recording (remastered)' },
     ],
   },
 
@@ -354,7 +368,11 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.2,_Op.18_(Rachmaninoff,_Sergei)', label: 'IMSLP — Rachmaninoff Piano Concerto No. 2' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=rEGOihjqO9w', label: 'Rachmaninoff: Piano Concerto No. 2 — Anna Fedorova' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Rachmaninoff)', label: 'Wikipedia — Rachmaninoff Piano Concerto No. 2' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Rachmaninoff)', label: 'Wikipedia — Rachmaninoff Piano Concerto No. 2' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/0v3T6fPnrptRXOrd854hIl', label: 'Yuja Wang / LA Philharmonic / Dudamel (2023)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7fcDQg8prLdJwim6Ey7neB', label: 'Khatia Buniatishvili / Czech Philharmonic / Järvi' },
+      { type: 'internet_archive', url: 'https://archive.org/details/RACHMANINOFFPianoConcertoNo.2-Richter', label: 'Sviatoslav Richter — Landmark recording' },
+      { type: 'internet_archive', url: 'https://archive.org/details/RACHMANINOFFPianoConcertoNo.2InCMinor-NEWTRANSFER', label: 'Rachmaninoff / Philadelphia Orchestra / Stokowski — 1929 historic' },
     ],
   },
 
@@ -377,7 +395,13 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.2_in_D_minor,_BWV_1008_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 2' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/3oXgDnhVSSNEwWCdobzliC', label: 'Anastasia Kobekina — Prelude (2025)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/2vO5wNNXjXU28OWp5gyHEO', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/79IIPSm0SPeUf4axiNTopk', label: 'Mstislav Rostropovich — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/2CAPFGnqtqzx5LjuWILaC9', label: 'Alisa Weilerstein — Complete Cello Suites (2020)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-unaccompanied-violoncello-no-1_pablo-casals-johann-sebastian-bach', label: 'Pablo Casals — Suites No. 1 & 2 (historic LP)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/bachcellosuites_rostropovich', label: 'Mstislav Rostropovich — Complete Bach Cello Suites' },
     ],
   },
   {
@@ -398,7 +422,12 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.3_in_C_major,_BWV_1009_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 3' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=mGQLXRTl3Z0', label: 'Mischa Maisky plays Bach Cello Suite No.1 in G' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/6CBJw0LW0MRwNcmqQ3KBNd', label: 'Steven Isserlis — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/4HBGaiBz5jIN3qwf6xACmH', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/2CAPFGnqtqzx5LjuWILaC9', label: 'Alisa Weilerstein — Complete Cello Suites (2020)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-cello-unaccompanied-no-3-in-c-m_johann-sebastian-bach-pablo-casals', label: 'Pablo Casals — Suites No. 3 & 4 (historic LP)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-suites-for-cello-cello-bwv-1007-1012-pierre-fournier', label: 'Pierre Fournier — Complete Cello Suites' },
     ],
   },
   {
@@ -419,7 +448,12 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.4_in_E-flat_major,_BWV_1010_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 4' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0dDcSr2vBxvILNB8oTpI01', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/1AxgfOUwe0LCmQiwxElEzb', label: 'Anastasia Kobekina — Bach Cello Suites (2025)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0krN1xBgSqDHCNV3dPADZn', label: 'Emmanuelle Bertrand — Prelude' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-cello-unaccompanied-no-3-in-c-m_johann-sebastian-bach-pablo-casals', label: 'Pablo Casals — Suites No. 3 & 4 (historic LP)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_intgrale-des-six-suites-pour-violoncelle-s_johann-sebastian-bach-janos-starker', label: 'János Starker — Complete Suites (historic)' },
     ],
   },
   {
@@ -439,7 +473,12 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.5_in_C_minor,_BWV_1011_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 5' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7ekIYM7PEFS47LwMes5Y5g', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/265LZkpBksnPVvE80mkwOz', label: 'Bruno Philippe — Prelude (2022)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0SvpN8VUVlR0LmZhiz7zue', label: 'Jean-Guihen Queyras — Prelude (2024)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/suite-no.-5-in-c-minor-for-cello', label: 'Frans Helmerson — Suite No. 5 (1974)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-the-six-suites-for-violoncelo-solo-bwv-1007-1012-nikolaus-harnoncourt-dvg', label: 'Nikolaus Harnoncourt — Complete Suites (baroque cello)' },
     ],
   },
   {
@@ -460,7 +499,12 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.6_in_D_major,_BWV_1012_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 6' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7j8Zvc4SWkmjohXxuraria', label: 'Yo-Yo Ma — Prelude' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/3h5asYrn0bnWSlhfPdzrCh', label: 'Pieter Wispelwey — Sarabande' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/395a36jZL57W6VKFHSMxWX', label: 'Steven Isserlis — Sarabande' },
+      { type: 'vimeo', url: 'https://vimeo.com/channels/earlymusic/29470725', label: 'William Skeen — Gavotte (baroque cello)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/01-alc-02-bach-cello-suites-2-5-6', label: 'Dimitry Markevitch — Cello Suites 2, 5 & 6' },
     ],
   },
   {
@@ -481,7 +525,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_No.1_in_C_major,_Hob.VIIb:1_(Haydn,_Joseph)', label: 'IMSLP — Haydn Cello Concerto No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Haydn)', label: 'Wikipedia — Haydn Cello Concerto No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Haydn)', label: 'Wikipedia — Haydn Cello Concerto No. 1' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/5lIyZy3BA2mzcQjgobHQva', label: 'Gautier Capuçon / Mahler Chamber Orchestra / Harding' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/5Dcrc4FKYFZ1K2X29d0UpM', label: 'Mstislav Rostropovich / ASMF — Cadenza by Britten' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/07Oij3AVn2iUvRZOq9I8bb', label: 'Yo-Yo Ma / English Chamber Orchestra' },
+      { type: 'internet_archive', url: 'https://archive.org/details/HaydnCelloConcertoNo.1InCMajorHob.Viib1', label: 'Mstislav Rostropovich / ASMF (1988)' },
     ],
   },
   {
@@ -501,7 +549,12 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_No.2_in_D_major,_Hob.VIIb:2_(Haydn,_Joseph)', label: 'IMSLP — Haydn Cello Concerto No. 2' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._2_(Haydn)', label: 'Wikipedia — Haydn Cello Concerto No. 2' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._2_(Haydn)', label: 'Wikipedia — Haydn Cello Concerto No. 2' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/5lIyZy3BA2mzcQjgobHQva', label: 'Gautier Capuçon / Mahler Chamber Orchestra / Harding' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/4YjekQXLEgXAUtIT9u5I3r', label: 'Jacqueline du Pré / LSO / Barbirolli' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7tiAXCvYvxbuqA1pwU0QDn', label: 'Steven Isserlis / COE / Norrington' },
+      { type: 'internet_archive', url: 'https://archive.org/details/haydn-cello-concertos-nos.-1-2', label: 'Lynn Harrell / ASMF / Marriner' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_haydn-cello-concerto-in-c-boccherini-cell_jacqueline-du-pr-daniel-barenboim-joseph-h', label: 'Jacqueline du Pré / Barenboim — Haydn & Boccherini (LP)' },
     ],
   },
   {
@@ -522,7 +575,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_in_A_minor,_Op.129_(Schumann,_Robert)', label: 'IMSLP — Schumann Cello Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Schumann)', label: 'Wikipedia — Schumann Cello Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_(Schumann)', label: 'Wikipedia — Schumann Cello Concerto' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/7o54pvt3DHOw6CUgXbMznF', label: 'Gautier Capuçon / Haitink / Chamber Orchestra of Europe — Live (2019)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1D18l8wZj2PZ4nzXTYo8ln', label: 'Jacqueline du Pré / Barenboim / New Philharmonia' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_cello-concerto-five-pieces-in-folk-style_robert-schumann-pablo-casals-prades-festiv', label: 'Pablo Casals — Prades Festival (historic)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_cello-concerto-schelomo-rhapsody-for-ce_leonard-rose-robert-schumann-leonard-berns', label: 'Leonard Rose / Bernstein / New York Philharmonic' },
     ],
   },
   {
@@ -543,7 +600,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Concerto_No.1,_Op.33_(Saint-Sa%C3%ABns,_Camille)', label: 'IMSLP — Saint-Saëns Cello Concerto No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Saint-Sa%C3%ABns)', label: 'Wikipedia — Saint-Saëns Cello Concerto No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Saint-Sa%C3%ABns)', label: 'Wikipedia — Saint-Saëns Cello Concerto No. 1' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7fypWvEPty7DCveyRNamTN', label: 'Gautier Capuçon / Bringuier / Orchestre Philharmonique de Radio France' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1sIHqy6vKF4GVsOGrR8H8a', label: 'Han-Na Chang / Rostropovich / LSO' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_two-great-cello-concertos_camille-saintsans-douard-lalo-andr-navarra', label: 'André Navarra / Münch / Orchestre des Concerts Lamoureux' },
+      { type: 'internet_archive', url: 'https://archive.org/details/nobel-prize-concert-2021', label: 'Sol Gabetta — 2021 Nobel Prize Concert' },
     ],
   },
   {
@@ -563,7 +624,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Sonata_No.1,_Op.38_(Brahms,_Johannes)', label: 'IMSLP — Brahms Cello Sonata No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Sonata_No._1_(Brahms)', label: 'Wikipedia — Brahms Cello Sonata No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Sonata_No._1_(Brahms)', label: 'Wikipedia — Brahms Cello Sonata No. 1' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/51om33yZB4mzqP287DSSn2', label: 'Yo-Yo Ma / Emanuel Ax' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0ZtgCxmIDZG1aAs1SEt1FQ', label: 'Jacqueline du Pré / Barenboim' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/3gXrLgst05Onm15YgFv7d7', label: 'Jean-Guihen Queyras / Alexandre Tharaud' },
+      { type: 'internet_archive', url: 'https://archive.org/details/20220922-brahms-cello-sonatas-opp.-38-99-mstislav-rostropovich', label: 'Mstislav Rostropovich / Rudolf Serkin' },
     ],
   },
   {
@@ -582,7 +647,11 @@ export const seedPieces: SeedPiece[] = [
       { id: 'e-shost-cc1-boosey', publisher: 'Boosey & Hawkes', editor: 'Licensed reprint', year: 1960, description: 'Western distribution edition. Clear engraving based on the original Muzyka plates.' }
     ],
     external_links: [
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Shostakovich)', label: 'Wikipedia — Shostakovich Cello Concerto No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Concerto_No._1_(Shostakovich)', label: 'Wikipedia — Shostakovich Cello Concerto No. 1' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/5YbrLDgDvaC5i5JqY6fBou', label: 'Sol Gabetta / Lorin Maazel' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0EFVPhrcAJxu4r65BjkveH', label: 'Gautier Capuçon / Gergiev / Mariinsky Orchestra' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/4dLVUG0RvDi1DmwWr48UcP', label: 'Yo-Yo Ma / Nelsons / Boston Symphony' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_concerto-for-cello-in-e-flat-op-107-symph_dmitri-shostakovich-mstislav-rostropovich_0', label: 'Mstislav Rostropovich / Ormandy — 1959 premiere recording' },
     ],
   },
   {
@@ -621,7 +690,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Sonata,_Op.8_(Kod%C3%A1ly,_Zolt%C3%A1n)', label: 'IMSLP — Kodály Solo Cello Sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonata_for_Solo_Cello_(Kod%C3%A1ly)', label: 'Wikipedia — Kodály Solo Cello Sonata' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonata_for_Solo_Cello_(Kod%C3%A1ly)', label: 'Wikipedia — Kodály Solo Cello Sonata' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0FQhbYzkI5XiGkjmdBNsII', label: 'Gautier Capuçon' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7plpqyCO2HlNi4fhIrKctj', label: 'Alisa Weilerstein' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_kodaly-sonata-for-solo-cello-starker-duo_zoltn-kodly-janos-starker-arnold-eidus', label: 'János Starker — Landmark recording' },
     ],
   },
   {
@@ -642,7 +714,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Sonata_No.3,_Op.69_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Cello Sonata No. 3' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Sonata_No._3_(Beethoven)', label: 'Wikipedia — Beethoven Cello Sonata No. 3' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Sonata_No._3_(Beethoven)', label: 'Wikipedia — Beethoven Cello Sonata No. 3' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1e15iKuVlLHPlSoVmpLTHQ', label: 'Mischa Maisky / Martha Argerich' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1fqodfB87Tx5Y7ZZ9zi0XY', label: 'Jacqueline du Pré / Barenboim' },
+      { type: 'internet_archive', url: 'https://archive.org/details/janos-starker-rudolf-buchbinder-beethoven-cello-sonata-no.-3-in-a-major-op.-69-0', label: 'János Starker / Rudolf Buchbinder' },
+      { type: 'internet_archive', url: 'https://archive.org/details/lp_sonatas-for-cello-piano-complete_ludwig-van-beethoven-gregor-piatigorsky-so', label: 'Gregor Piatigorsky — Complete Cello Sonatas' },
     ],
   },
   {
@@ -663,7 +739,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/%C3%89l%C3%A9gie,_Op.24_(Faur%C3%A9,_Gabriel)', label: 'IMSLP — Fauré Élégie' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/%C3%89l%C3%A9gie_(Faur%C3%A9)', label: 'Wikipedia — Fauré Élégie' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/%C3%89l%C3%A9gie_(Faur%C3%A9)', label: 'Wikipedia — Fauré Élégie' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0ltuoiadYI1yt88tz2otOk', label: 'Julia Hagen / Renaud Capuçon — Rising star (2024)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/5JCFv9UugPZSY8b9VrGBqm', label: 'Steven Isserlis / Pascal Devoyon' },
+      { type: 'internet_archive', url: 'https://archive.org/details/faure-elegie-rose-ormandy', label: 'Leonard Rose / Ormandy / Philadelphia Orchestra (1967)' },
     ],
   },
   {
@@ -765,7 +844,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=cWc7vYjgnTs', label: 'Luciano Pavarotti sings "Nessun dorma" from Turandot' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nessun_dorma', label: 'Wikipedia — Nessun dorma' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nessun_dorma', label: 'Wikipedia — Nessun dorma' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/6zagJMi6gpqVQSX8yWNe3F', label: 'Jonathan Tetelman / PKF Prague Philharmonia — Rising star tenor' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/74WjYdm3Lvbwnds4thYPUU', label: 'Luciano Pavarotti / Mehta / LPO' },
+      { type: 'internet_archive', url: 'https://archive.org/details/78_nessun-dorma-none-shall-sleep_jussi-bjrling-adami-simoni-puccini-nils-grevilli_gbia7015432a', label: 'Jussi Björling — 1946 historic landmark' },
     ],
   },
   {
@@ -825,7 +907,10 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=8A3zetSuYRg', label: 'Rigoletto La Dona e mobile' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=xCFEk6Y8TmM', label: 'Luciano Pavarotti - La Donna È Mobile' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile', label: 'Wikipedia — La donna è mobile' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/La_donna_%C3%A8_mobile', label: 'Wikipedia — La donna è mobile' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/25ZYvZ2qFw7XCu8nzUxxmU', label: 'Luciano Pavarotti / Bonynge / LSO' },
+      { type: 'internet_archive', url: 'https://archive.org/details/78_la-donna-mobile-woman-is-fickle_enrico-caruso-verdi_gbia7023700b', label: 'Enrico Caruso — 1904 historic landmark (78rpm)' },
+      { type: 'internet_archive', url: 'https://archive.org/details/78_la-donna--mobile-woman-is-fickle_mario-lanza-rca-victor-orchestra-constantine-ca_gbia0002571b', label: 'Mario Lanza / RCA Victor Orchestra (1951)' },
     ],
   },
   {
@@ -995,7 +1080,10 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Clarinet_Concerto_in_A_major,_K.622_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Clarinet Concerto' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=YT_63UntRJE', label: 'Wolfgang Amadeus Mozart: Clarinet Concerto in A major, K.622' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=iCEDfZgDPS8', label: 'Mussorgsky - Night on Bald Mountain' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Concerto_(Mozart)', label: 'Wikipedia — Mozart Clarinet Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Concerto_(Mozart)', label: 'Wikipedia — Mozart Clarinet Concerto' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/1BeNBCYGOGcuwLCDPnAoVE', label: 'Martin Fröst / Deutsche Kammerphilharmonie — Gramophone Award winner' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0XVmCzfPj8fT2xpQQnFA8I', label: 'Sabine Meyer / Abbado / Berliner Philharmoniker' },
+      { type: 'internet_archive', url: 'https://archive.org/details/MozartClarinetConcertoInAMajorK.622', label: 'Alfred Prinz / Böhm / Wiener Philharmoniker (1974)' },
     ],
   },
   {
@@ -1036,7 +1124,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Syrinx_(Debussy,_Claude)', label: 'IMSLP — Syrinx' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Syrinx_(Debussy)', label: 'Wikipedia — Syrinx' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Syrinx_(Debussy)', label: 'Wikipedia — Syrinx' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/5UgMumN4UnkUharjmOafoM', label: 'Emmanuel Pahud — Principal flute, Berlin Philharmonic' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/40D08AuKJo3IUDZaIh6pIo', label: 'Vincent Lucas — Principal flute, Orchestre de Paris' },
+      { type: 'internet_archive', url: 'https://archive.org/details/Syrinx', label: 'Debussy Syrinx — Internet Archive recording' },
     ],
   },
   {
@@ -1057,7 +1148,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Flute_Sonata_in_B_minor,_BWV_1030_(Bach,_Johann_Sebastian)', label: 'IMSLP — Bach Flute Sonata BWV 1030' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonata_in_B_minor_for_flute_and_harpsichord', label: 'Wikipedia — Bach Flute Sonata BWV 1030' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonata_in_B_minor_for_flute_and_harpsichord', label: 'Wikipedia — Bach Flute Sonata BWV 1030' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/5braP1h19lbvUvUZODlP3S', label: 'Emmanuel Pahud / Trevor Pinnock' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/7dQGhoFB2FLtOMw7PX6Yzm', label: 'Jean-Pierre Rampal / Robert Veyron-Lacroix' },
+      { type: 'internet_archive', url: 'https://archive.org/details/20220123-bach-j.s.-o-flute-sonatas-vol.-1-janet-see-davitt-moroney', label: 'Janet See / Davitt Moroney — Baroque flute (1991)' },
     ],
   },
   {
@@ -1159,7 +1253,10 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Variations_on_a_Rococo_Theme,_Op.33_(Tchaikovsky,_Pyotr)', label: 'IMSLP — Rococo Variations' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Variations_on_a_Rococo_Theme', label: 'Wikipedia — Rococo Variations' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Variations_on_a_Rococo_Theme', label: 'Wikipedia — Rococo Variations' },
+      { type: 'spotify', url: 'https://open.spotify.com/album/6sRM5rPMc3O9eYlzRa1PcD', label: 'Edgar Moreau / Sanderling / Luzerner Sinfonieorchester — Young artist (2024)' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0PyM6Lhy4WSoANmO6wT97O', label: 'Steven Isserlis / Gardiner / COE — Original version' },
+      { type: 'internet_archive', url: 'https://archive.org/details/rococo-vars-meneses-talvi-rtve-sp-2008', label: 'Antonio Meneses / Talmi / RTVE Symphony (2008)' },
     ],
   },
   {
@@ -1199,7 +1296,11 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Kol_Nidrei,_Op.47_(Bruch,_Max)', label: 'IMSLP — Kol Nidrei' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kol_Nidrei_(Bruch)', label: 'Wikipedia — Bruch Kol Nidrei' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kol_Nidrei_(Bruch)', label: 'Wikipedia — Bruch Kol Nidrei' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/6hQJzzgY7wh5drvunqqm8V', label: 'Mischa Maisky / Bychkov / Orchestre de Paris' },
+      { type: 'spotify', url: 'https://open.spotify.com/track/0NyJTVJV1s6p5RHij1PcGU', label: 'Jacqueline du Pré / Barenboim / Israel Philharmonic' },
+      { type: 'internet_archive', url: 'https://archive.org/details/BruchKolNidreiOp.47', label: 'Matt Haimovitz / Levine / Chicago Symphony' },
+      { type: 'internet_archive', url: 'https://archive.org/details/KolNidreiOp.47starkerDorati', label: 'János Starker / Dorati / LSO (1962)' },
     ],
   },
   {
