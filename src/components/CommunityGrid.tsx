@@ -116,7 +116,7 @@ export default function CommunityGrid({
             {newMembers.map(m => (
               <a
                 key={m.id}
-                href={`/@${m.vanity_slug}`}
+                href={m.vanity_slug ? `/@${m.vanity_slug}` : `/profile/${m.id}`}
                 className="flex items-center gap-2 px-3 py-1.5 pl-1.5 bg-surface border border-border rounded-full text-xs font-medium text-ink hover:border-accent transition-all no-underline"
               >
                 <div className="w-6 h-6 flex-shrink-0">
@@ -150,7 +150,7 @@ function ArtistCard({
 
   return (
     <div className="bg-surface border border-border rounded-lg p-5 hover:border-accent transition-all">
-      <a href={`/@${artist.vanity_slug}`} className="no-underline">
+      <a href={artist.vanity_slug ? `/@${artist.vanity_slug}` : `/profile/${artist.id}`} className="no-underline">
         <div className="flex gap-3 items-start mb-3">
           <div className="w-12 h-12 flex-shrink-0">
             {artist.avatar_url ? (
