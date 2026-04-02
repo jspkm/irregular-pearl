@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import ProfileOwnerBar from '../components/ProfileOwnerBar';
+import ApplaudButton from '../components/ApplaudButton';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { ACTIVITIES, normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 
@@ -95,6 +96,9 @@ const breadcrumbLd = {
             {user.location && (
               <span class="text-xs text-muted">{user.location}</span>
             )}
+          </div>
+          <div class="mt-2">
+            <ApplaudButton artistId={user.id} client:load />
           </div>
         </div>
       </div>

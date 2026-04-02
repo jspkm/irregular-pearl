@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import GenerativeAvatar from '../components/GenerativeAvatar';
+import ApplaudButton from '../components/ApplaudButton';
+import { supabase, hasSupabase } from '../lib/supabase';
+import { ACTIVITIES } from '../lib/helpers';
+
+// Fetch all users with vanity slugs (public profiles)
+let artists: any[] = [];
+let applauseCounts: Record<string, number> = {};
+let recentActivity: Record<string, { piece_title: string; activity: string; created_at: string }> = {};
+
+if (hasSupabase) {
+  // Get all public profiles
+  const { data: users } = await supabase
+    .from('users')
+    .select('id, display_name, instrument, level, avatar_url, vanity_slug, created_at')
+    .not('vanity_slug', 'is', null)
+    .not('display_name', 'is', null)
+    .order('created_at', { ascending: false });
+
+  artists = users || [];
+
+  // Get applause counts for all artists
+  if (artists.length > 0) {
+    const artistIds = artists.map(a => a.id);
+    const { data: applauseData } = await supabase
+      .from('applause')
+      .select('artist_id');
+
+    if (applauseData) {
+      for (const row of applauseData) {
+        applauseCounts[row.artist_id] = (applauseCounts[row.artist_id] || 0) + 1;
+      }
+    }
+
+    // Get most recent activity per user
+    const { data: activityData } = await supabase
+      .from('activity_log')
+      .select('user_id, activity, created_at, pieces!inner(title)')
+      .in('user_id', artistIds)
+      .order('created_at', { ascending: false })
+      .limit(200);
+
+    if (activityData) {
+      for (const a of activityData) {
+        if (!recentActivity[a.user_id]) {
+          recentActivity[a.user_id] = {
+            piece_title: (a as any).pieces?.title || '',
+            activity: a.activity,
+            created_at: a.created_at,
+          };
+        }
+      }
+    }
+  }
+}
+
+// Sort featured by applause count (top 10)
+const featured = [...artists]
+  .sort((a, b) => (applauseCounts[b.id] || 0) - (applauseCounts[a.id] || 0))
+  .filter(a => (applauseCounts[a.id] || 0) > 0)
+  .slice(0, 10);
+
+// Recently active: users with activity in last 30 days
+const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+const recentlyActive = artists
+  .filter(a => recentActivity[a.id] && recentActivity[a.id].created_at > thirtyDaysAgo)
+  .sort((a, b) => (recentActivity[b.id]?.created_at || '').localeCompare(recentActivity[a.id]?.created_at || ''));
+
+// New members: joined in last 30 days
+const newMembers = artists
+  .filter(a => a.created_at > thirtyDaysAgo)
+  .slice(0, 10);
+
+// All unique instruments for filter tabs
+const allInstruments = [...new Set(
+  artists
+    .flatMap(a => (a.instrument || '').split(',').map((i: string) => i.trim()))
+    .filter(Boolean)
+)].sort();
+
+function applauseText(count: number): string {
+  if (count === 0) return '';
+  return count === 1 ? '1 applause' : `${count} applause`;
+}
+
+const seoDescription = 'Meet the musicians of Irregular Pearl — classical musicians, students, and music lovers sharing their musical journey.';
+---
+<Layout title="Community — Irregular Pearl" description={seoDescription}>
+  <Navbar />
+
+  <div class="max-w-[1100px] mx-auto px-4 md:px-8 py-6 md:py-8">
+    <h1 class="font-display text-[28px] mb-1">Community</h1>
+    <p class="text-sm text-muted mb-8">Musicians, students, and music lovers sharing their classical music journey.</p>
+
+    {/* Featured Artists */}
+    {featured.length > 0 && (
+      <section class="mb-10">
+        <h2 class="font-display text-xl mb-4">Featured Artists</h2>
+        <div class="flex gap-4 overflow-x-auto pb-4" style="scrollbar-width: thin;">
+          {featured.map((artist) => (
+            <a href={`/@${artist.vanity_slug}`} class="bg-surface border border-border rounded-xl p-5 min-w-[180px] text-center flex-shrink-0 hover:border-accent transition-all no-underline">
+              <div class="mx-auto mb-2.5 w-14 h-14">
+                {artist.avatar_url ? (
+                  <img src={artist.avatar_url} alt="" class="w-14 h-14 rounded-full object-cover" />
+                ) : (
+                  <GenerativeAvatar userId={artist.id} size={56} client:idle />
+                )}
+              </div>
+              <div class="font-display text-[15px] text-ink">{artist.display_name}</div>
+              <div class="text-[11px] text-muted mt-1 mb-2">
+                {artist.instrument?.split(',')[0]?.trim() || 'Musician'}
+              </div>
+              {applauseCounts[artist.id] > 0 && (
+                <div class="text-xs text-muted">{applauseText(applauseCounts[artist.id])}</div>
+              )}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {/* Filter + Grid — React island for client-side filtering */}
+    <CommunityGrid
+      artists={artists}
+      applauseCounts={applauseCounts}
+      recentActivity={recentActivity}
+      recentlyActive={recentlyActive.map(a => a.id)}
+      allInstruments={allInstruments}
+      newMembers={newMembers}
+      client:load
+    />
+  </div>
+</Layout>
+
+<script>
+  // No additional scripts needed — filtering handled by React island
+</script>

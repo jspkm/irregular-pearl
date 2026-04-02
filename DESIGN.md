@@ -83,6 +83,43 @@
 - **Duration:** micro(50-100ms for hover) short(150ms for tabs/toggles) medium(250ms for panels)
 - **Rules:** No bouncy animations. No entrance animations on page load. Smooth tab transitions. Subtle hover color shifts on cards and buttons.
 
+## Community Section
+
+### Community Page (`/community`)
+- **Purpose:** Browsable directory of registered musicians
+- **Layout:** Three-column card grid (desktop), two-column (tablet), single (mobile)
+- **Sections (top to bottom):**
+  1. **Featured Artists** — horizontal scroll strip, top 5-10 most applauded. Each card: avatar, name, instrument, applause count.
+  2. **Filter tabs** — All, Piano, Violin, Cello, Voice, Winds. Pill-style, amber fill on active.
+  3. **Recently Active** — card grid sorted by recent activity_log entries. Badge shows total count.
+  4. **New Members** — chip-style row with mini avatars, recently joined users.
+- **Artist card contents:** Generative avatar, display name (Instrument Serif), instrument, level badge, "Working on [piece]" snippet, applause count, Applaud button.
+
+### Applause Feature
+- **Terminology:** "Applaud" (action), "Applauding" (active state), "applause" (count noun). NOT "follow/followers."
+- **Pluralization:** "1 applause" (singular), "47 applause" (plural). Zero applause shows nothing — no count, no text.
+- **No icon.** Applause count is text-only. No emoji, no SVG icon.
+- **Button states:**
+  - Default: amber outline, text "Applaud"
+  - Hover: solid amber fill, white text
+  - Active: solid amber fill, white text "Applauding ✓"
+  - Logged out: 50% opacity, disabled, links to sign-in on click
+- **Button style:** pill shape (border-radius: 9999px), DM Sans medium, 12px on cards / 13px on profiles
+- **Profile display:** Applause count + Applaud button in a row below the user details. Below that, a row of mini avatars (28px) showing who applauded, with "+N more" overflow text.
+- **Realtime:** Count updates via Supabase realtime subscriptions.
+- **DB table:** `applause` — columns: `user_id`, `artist_id`, `created_at`. Unique constraint on `(user_id, artist_id)`.
+
+### Profile Page Layout (updated)
+- **Two-column layout** on tablet+ (single column on mobile, sidebar below content)
+- **Left column (main content):** Bio (pre-formatted text), social links, training timeline, performances, instruments
+- **Right column (sidebar, 300px):** Collapsible sections for Working On, Discussions, Reviews
+  - Each section: card with header (title + count badge + chevron), click to toggle open/closed
+  - Working On: open by default
+  - Discussions, Reviews: collapsed by default
+  - Header hover: subtle background fill (var(--bg))
+  - Chevron rotates 180deg on open (200ms ease transition)
+- **Level badges:** Student/Amateur = default gray, Professional = amber light bg, Teacher = green light bg
+
 ## Decisions Log
 | Date | Decision | Rationale |
 |------|----------|-----------|
@@ -90,3 +127,8 @@
 | 2026-03-28 | Amber accent over blue/red | Every classical music site uses blue or red. Amber signals warmth, tradition, and concert hall glow. |
 | 2026-03-28 | No dark mode (Phase 1) | Primary users on iPads in lit practice rooms. Dark mode deferred to Phase 2. |
 | 2026-03-28 | Instrument Serif italic for logo | Inspired by the old AI Studio prototype's Playfair Display italic wordmark. Instrument Serif is more contemporary. |
+| 2026-04-02 | "Applause" over "Follow/Followers" | Classical music social connection should use performance-world language. "Applaud" is warm, respectful, unmistakably musical. |
+| 2026-04-02 | No icon on applause count | Text-only count is cleaner and more typographic. No emoji, no SVG. |
+| 2026-04-02 | Zero applause = hidden | Don't show "0 applause". New users shouldn't see an empty vanity metric. |
+| 2026-04-02 | Two-column profile with collapsible sidebar | Bio, training, performances on the left (the permanent identity). Working On, Discussions, Reviews on the right as collapsible sections (the active/changing content). |
+| 2026-04-02 | Community page added | Browsable directory at /community with featured artists, instrument filters, recently active grid, new members. |

@@ -5,6 +5,7 @@ import { formatDate, ACTIVITIES, randomNoteStarter, normalizeSocialUrl, getSocia
 import { VENUES } from '../data/venues';
 import GenerativeAvatar from './GenerativeAvatar';
 import VanitySlugEditor from './VanitySlugEditor';
+import ApplaudButton from './ApplaudButton';
 
 interface ProfileData {
   id: string;
@@ -220,7 +221,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="max-w-[720px] mx-auto px-6 md:px-10 py-10">
+    <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-10">
       {/* Header */}
       <div className="flex items-start gap-5 mb-6">
         <div className="relative flex-shrink-0">
@@ -264,6 +265,9 @@ export default function ArtistProfile({ userId }: { userId: string }) {
             {profile.location && <span className="text-xs">· {profile.location}</span>}
           </div>
           <div className="text-xs text-muted mt-1">Joined {formatDate(profile.created_at)}</div>
+          <div className="mt-2">
+            <ApplaudButton artistId={userId} />
+          </div>
           {isOwnProfile && (
             <div className="mt-2">
               <VanitySlugEditor
@@ -395,6 +399,12 @@ export default function ArtistProfile({ userId }: { userId: string }) {
 
       {/* Divider before sections */}
       <div className="border-t border-border mb-10" />
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8 items-start">
+
+        {/* LEFT: Main content */}
+        <div className="min-w-0">
 
       {/* Performances */}
       <section className="mb-10">
@@ -548,31 +558,6 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         )}
       </section>
 
-      {/* Activity Log */}
-      <section className="mb-10">
-        <h2 className="font-['Instrument_Serif'] text-xl mb-4">Activity</h2>
-        {workingOn.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Log activity on pieces from any piece page." : "No activity yet."}
-          />
-        ) : (
-          <div className="space-y-2">
-            {workingOn.map(w => {
-              const act = ACTIVITIES.find(a => a.type === w.activity);
-              return (
-                <a key={`${w.piece_id}-${w.created_at}`} href={`/piece/${w.piece_id}`} className="block bg-surface border border-border rounded-lg px-4 py-3 hover:border-muted transition-all no-underline">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted">{act ? `${act.emoji} ${act.label}` : w.activity}</span>
-                  </div>
-                  <div className="text-sm font-medium text-ink">{w.pieces.title}</div>
-                  <div className="text-xs text-muted">{w.pieces.composer_name}{w.pieces.catalog_number ? ` · ${w.pieces.catalog_number}` : ''}</div>
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
       {/* Discography */}
       <section className="mb-10">
         <div className="flex justify-between items-center mb-4">
@@ -610,53 +595,77 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         )}
       </section>
 
-      {/* Edition Reviews */}
-      <section className="mb-10">
-        <h2 className="font-['Instrument_Serif'] text-xl mb-4">Edition Reviews</h2>
-        {reviews.length === 0 ? (
-          <EmptyState message={isOwnProfile ? "Rate editions from any piece page to build your review history." : "No reviews yet."} />
-        ) : (
-          <div className="space-y-3">
-            {reviews.map(r => (
-              <div key={r.id} className="bg-surface border border-border rounded-lg px-4 py-3">
-                <div className="flex justify-between items-start mb-1">
-                  <div>
-                    <span className="text-sm font-medium text-ink">{r.editions.publisher}</span>
-                    <span className="text-xs text-muted ml-2">for {r.editions.pieces.title}</span>
-                  </div>
-                  <span className="text-star">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
-                </div>
-                {r.text && <p className="text-xs text-muted leading-relaxed">{r.text}</p>}
-                <div className="text-[11px] text-muted mt-1">{formatDate(r.created_at)}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Discussion Contributions */}
-      <section className="mb-10">
-        <h2 className="font-['Instrument_Serif'] text-xl mb-4">Discussions</h2>
-        {posts.length === 0 ? (
-          <EmptyState message={isOwnProfile ? "Join a discussion on any piece page. Your contributions show up here." : "No posts yet."} />
-        ) : (
-          <div className="space-y-3">
-            {posts.map(p => (
-              <a key={p.id} href={`/piece/${p.piece_id}`} className="block bg-surface border border-border rounded-lg px-4 py-3 hover:border-muted transition-all no-underline">
-                <div className="text-xs text-muted mb-1">{p.pieces.title} · {formatDate(p.created_at)}</div>
-                <p className="text-sm text-ink leading-relaxed">{p.text.length > 200 ? p.text.slice(0, 200) + '...' : p.text}</p>
-              </a>
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* Sign Out */}
       {isOwnProfile && (
         <div className="border-t border-border pt-6">
           <button onClick={handleSignOut} className="text-sm text-muted hover:text-ink bg-transparent border-none cursor-pointer p-0">Sign out</button>
         </div>
       )}
+
+        </div>{/* /LEFT */}
+
+        {/* RIGHT: Collapsible sidebar */}
+        <div className="flex flex-col gap-3">
+
+          {/* Working On */}
+          <CollapsibleSection title="Working On" count={workingOn.length} defaultOpen>
+            {workingOn.length === 0 ? (
+              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Log activity on pieces from any piece page.' : 'No activity yet.'}</p>
+            ) : (
+              <div className="space-y-0">
+                {workingOn.slice(0, 10).map(w => {
+                  const act = ACTIVITIES.find(a => a.type === w.activity);
+                  return (
+                    <a key={`${w.piece_id}-${w.created_at}`} href={`/piece/${w.piece_id}`} className="block py-2 border-b border-border last:border-b-0 no-underline hover:bg-bg -mx-4 px-4 transition-colors">
+                      <div className="text-xs font-medium text-ink">{w.pieces.title}</div>
+                      <div className="text-[11px] text-muted mt-0.5">
+                        {act ? `${act.emoji} ${act.label}` : w.activity}
+                        {' · '}
+                        {new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </CollapsibleSection>
+
+          {/* Discussions */}
+          <CollapsibleSection title="Discussions" count={posts.length}>
+            {posts.length === 0 ? (
+              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Join a discussion on any piece page.' : 'No posts yet.'}</p>
+            ) : (
+              <div className="space-y-0">
+                {posts.slice(0, 5).map(p => (
+                  <a key={p.id} href={`/piece/${p.piece_id}`} className="block py-2 border-b border-border last:border-b-0 no-underline hover:bg-bg -mx-4 px-4 transition-colors">
+                    <div className="text-xs text-ink leading-relaxed line-clamp-2">{p.text}</div>
+                    <div className="text-[11px] text-muted mt-0.5">on {p.pieces.title} · {formatDate(p.created_at)}</div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </CollapsibleSection>
+
+          {/* Reviews */}
+          <CollapsibleSection title="Reviews" count={reviews.length}>
+            {reviews.length === 0 ? (
+              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Rate editions from any piece page.' : 'No reviews yet.'}</p>
+            ) : (
+              <div className="space-y-0">
+                {reviews.slice(0, 5).map(r => (
+                  <div key={r.id} className="py-2 border-b border-border last:border-b-0">
+                    <div className="text-[11px] text-star tracking-wide">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
+                    {r.text && <div className="text-xs text-ink leading-relaxed mt-0.5 line-clamp-2">{r.text}</div>}
+                    <div className="text-[11px] text-muted mt-0.5">{r.editions.publisher} · {r.editions.pieces.title}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CollapsibleSection>
+
+        </div>{/* /RIGHT */}
+
+      </div>{/* /two-column grid */}
     </div>
   );
 
@@ -713,6 +722,44 @@ export default function ArtistProfile({ userId }: { userId: string }) {
       if (data) setDiscography(prev => [data as DiscographyItem, ...prev]);
     });
   }
+}
+
+// --- Collapsible Section ---
+
+function CollapsibleSection({ title, count, defaultOpen = false, children }: {
+  title: string;
+  count: number;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="bg-surface border border-border rounded-lg overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex justify-between items-center px-4 py-3 cursor-pointer bg-transparent border-none hover:bg-bg transition-colors"
+      >
+        <span className="text-[13px] font-semibold text-ink flex items-center gap-1.5">
+          {title}
+          {count > 0 && (
+            <span className="text-[10px] font-medium text-muted bg-bg border border-border px-1.5 py-0 rounded-full">{count}</span>
+          )}
+        </span>
+        <svg
+          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={`text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div className="px-4 pb-3 border-t border-border">
+          {children}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // --- Empty State ---
