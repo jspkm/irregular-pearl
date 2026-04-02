@@ -125,6 +125,60 @@
           </tr>
 
           <!-- ============================================================ -->
+          <!-- SECTION: COMMUNITY HIGHLIGHTS (At a Glance)                   -->
+          <!-- ============================================================ -->
+          <tr>
+            <td class="wrapper-inner" style="padding: 0 24px 40px;">
+
+              <!-- Section header -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td style="padding-bottom: 16px; border-bottom: 1px solid #E7E5E4;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #B45309; letter-spacing: 0.12em; text-transform: uppercase;">At a Glance</div>
+                    <div style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 20px; font-weight: 400; color: #1C1917; margin-top: 2px; line-height: 1.2;">Community Highlights</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- 52-week trend chart -->
+              {{trend_chart}}
+
+              <!-- Stat grid — 2x2 table -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 16px;">
+                <tr>
+                  <!-- Stat 1: Total pieces -->
+                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 12px 16px 0; border-right: 1px solid #E7E5E4; border-bottom: 1px solid #E7E5E4;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Total Pieces</div>
+                    <div style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 400; color: #B45309; line-height: 1;">{{total_pieces}}</div>
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #78716C; margin-top: 4px;">in the catalog</div>
+                  </td>
+
+                  <!-- Stat 2: Total members -->
+                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 0 16px 12px; border-bottom: 1px solid #E7E5E4;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Total Members</div>
+                    <div style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 400; color: #B45309; line-height: 1;">{{total_members}}</div>
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #78716C; margin-top: 4px;">registered musicians</div>
+                  </td>
+                </tr>
+                <tr>
+                  <!-- Stat 3: Most discussed -->
+                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 12px 8px 0; border-right: 1px solid #E7E5E4;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Most Discussed</div>
+                    <div style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; font-weight: 400; color: #1C1917; line-height: 1.35;">{{most_discussed}}</div>
+                  </td>
+
+                  <!-- Stat 4: Most applauded artist -->
+                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 0 8px 12px;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Most Applauded</div>
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 500; color: #1C1917; line-height: 1.35;">{{most_applauded}}</div>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ============================================================ -->
           <!-- SECTION: NEW PIECES                                           -->
           <!-- ============================================================ -->
           <tr>
@@ -199,60 +253,6 @@
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 4px;">
                 <tr>
                   <td>{{members_html}}</td>
-                </tr>
-              </table>
-
-            </td>
-          </tr>
-
-          <!-- ============================================================ -->
-          <!-- SECTION: COMMUNITY HIGHLIGHTS                                 -->
-          <!-- ============================================================ -->
-          <tr>
-            <td class="wrapper-inner" style="padding: 0 24px 40px;">
-
-              <!-- Section header -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td style="padding-bottom: 16px; border-bottom: 1px solid #E7E5E4;">
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #B45309; letter-spacing: 0.12em; text-transform: uppercase;">At a Glance</div>
-                    <div style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 20px; font-weight: 400; color: #1C1917; margin-top: 2px; line-height: 1.2;">Community Highlights</div>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- 52-week trend chart -->
-              {{trend_chart}}
-
-              <!-- Stat grid — 2x2 table -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 16px;">
-                <tr>
-                  <!-- Stat 1: Total pieces -->
-                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 12px 16px 0; border-right: 1px solid #E7E5E4; border-bottom: 1px solid #E7E5E4;">
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Total Pieces</div>
-                    <div style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 400; color: #B45309; line-height: 1;">{{total_pieces}}</div>
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #78716C; margin-top: 4px;">in the catalog</div>
-                  </td>
-
-                  <!-- Stat 2: Total members -->
-                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 0 16px 12px; border-bottom: 1px solid #E7E5E4;">
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Total Members</div>
-                    <div style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 400; color: #B45309; line-height: 1;">{{total_members}}</div>
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #78716C; margin-top: 4px;">registered musicians</div>
-                  </td>
-                </tr>
-                <tr>
-                  <!-- Stat 3: Most discussed -->
-                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 12px 8px 0; border-right: 1px solid #E7E5E4;">
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Most Discussed</div>
-                    <div style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 15px; font-weight: 400; color: #1C1917; line-height: 1.35;">{{most_discussed}}</div>
-                  </td>
-
-                  <!-- Stat 4: Most applauded artist -->
-                  <td class="stat-cell" width="50%" valign="top" style="padding: 16px 0 8px 12px;">
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">Most Applauded</div>
-                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 500; color: #1C1917; line-height: 1.35;">{{most_applauded}}</div>
-                  </td>
                 </tr>
               </table>
 
