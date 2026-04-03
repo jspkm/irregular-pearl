@@ -14,19 +14,23 @@ const filterType = Astro.url.searchParams.get('type') || ''; // 'instrument', 'c
 let displayPieces = seedPieces;
 let searchArtists: { id: string; display_name: string; instrument: string | null; username: string | null }[] = [];
 let searchInstruments: { id: string; type: string; maker: string | null; maker_year: number | null }[] = [];
+let searchEvents: { id: string; title: string; venue: string | null; city: string | null; event_date: string; event_type: string }[] = [];
 
 if (query) {
   if (hasSupabase) {
-    // Unified search: pieces + artists + instruments (parallel, fault-tolerant)
-    const [piecesResult, artistsResult, instrumentsResult] = await Promise.allSettled([
+    // Unified search: pieces + artists + instruments + events (parallel, fault-tolerant)
+    const [piecesResult, artistsResult, instrumentsResult, eventsResult] = await Promise.allSettled([
       supabase.from('pieces').select('id')
         .textSearch('fts', query, { type: 'websearch' }).limit(20),
       supabase.from('users').select('id, display_name, instrument, username')
         .textSearch('fts', query, { type: 'websearch' })
-        .not('username', 'is', null).limit(5),
+        .limit(10),
       supabase.from('instruments').select('id, type, maker, maker_year')
         .textSearch('fts', query, { type: 'websearch' })
         .eq('privacy_level', 'public').limit(5),
+      supabase.from('events').select('id, title, venue, city, event_date, event_type')
+        .textSearch('fts', query, { type: 'websearch' })
+        .order('event_date', { ascending: false }).limit(5),
     ]);
 
     const pieceData = piecesResult.status === 'fulfilled' ? piecesResult.value.data : null;
@@ -43,6 +47,9 @@ if (query) {
     }
     if (instrumentsResult.status === 'fulfilled' && instrumentsResult.value.data) {
       searchInstruments = instrumentsResult.value.data as typeof searchInstruments;
+    }
+    if (eventsResult.status === 'fulfilled' && eventsResult.value.data) {
+      searchEvents = eventsResult.value.data as typeof searchEvents;
     }
   } else {
     // Fallback: client-side substring search (pieces only)
@@ -228,7 +235,7 @@ const itemListLd = {
           <h2 class="font-display text-lg mb-3">Artists</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {searchArtists.map((artist) => (
-              <a href={`/@${artist.username}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
+              <a href={artist.username ? `/@${artist.username}` : `/profile/${artist.id}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-sm text-muted flex-shrink-0">
                   {artist.display_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </div>
@@ -254,6 +261,29 @@ const itemListLd = {
                 <div class="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
                 <div class="font-display text-base text-ink">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
                 <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full mt-1 inline-block">{inst.type}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Event results */}
+      {searchEvents.length > 0 && (
+        <section class="mb-8">
+          <h2 class="font-display text-lg mb-3">Events</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {searchEvents.map((evt) => (
+              <a href={`/events/${evt.id}`} class="block bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full capitalize">{evt.event_type}</span>
+                  <span class="font-mono text-[11px] text-muted">
+                    {new Date(evt.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </div>
+                <div class="font-display text-base text-ink">{evt.title}</div>
+                {(evt.venue || evt.city) && (
+                  <div class="text-xs text-muted mt-0.5">{[evt.venue, evt.city].filter(Boolean).join(' · ')}</div>
+                )}
               </a>
             ))}
           </div>
