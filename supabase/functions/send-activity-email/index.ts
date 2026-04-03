@@ -308,9 +308,15 @@ Deno.serve(async (req) => {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("display_name")
+    .select("display_name, email_activity")
     .eq("id", record.user_id)
     .single();
+
+  // Check email preference
+  if (profile && profile.email_activity === false) {
+    console.log(`Activity emails disabled for user ${record.user_id}, skipping.`);
+    return new Response(JSON.stringify({ skipped: true, reason: "email_activity disabled" }), { status: 200 });
+  }
 
   // Get piece info
   const { data: piece } = await supabase
