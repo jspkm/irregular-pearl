@@ -179,6 +179,11 @@ function getEmbedUrl(url: string, type: string): string | null {
   if (type === 'bandcamp') {
     return null; // Bandcamp embeds need album/track IDs, link out instead
   }
+  if (type === 'internet_archive') {
+    // https://archive.org/details/XXX → https://archive.org/embed/XXX
+    const m = url.match(/archive\.org\/details\/([^\/?#]+)/);
+    return m ? `https://archive.org/embed/${m[1]}` : null;
+  }
   if (type === 'vimeo') {
     const m = url.match(/vimeo\.com\/(\d+)/);
     return m ? `https://player.vimeo.com/video/${m[1]}?autoplay=1` : null;
