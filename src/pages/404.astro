@@ -17,22 +17,34 @@ const messages = [
   { quote: "This rest lasts longer than Cage's 4'33\".", note: "And unlike that piece, nothing is supposed to happen here." },
 ];
 
+// SVG musical symbols that render on all browsers
 const symbols = [
-  '\uD834\uDD1E', // treble clef 𝄞
-  '\uD834\uDD22', // bass clef 𝄢
-  '\uD834\uDD23', // C clef 𝄣
+  // Treble clef
+  `<svg viewBox="0 0 100 200" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M52.5 2c-1.5 0-3 .8-4 2.2C42 14 36 32 36 50c0 12 3 23 8 33-8 4-14 10-17 18-4 10-3 21 2 30 6 10 16 16 27 16 4 0 7-.5 10-1.5 0 6-.5 12-2 17-2 8-6 15-12 19-4 2-8 4-12 4-3 0-5 1-5 3s2 3 5 3c6 0 12-2 17-6 8-6 13-15 16-25 2-7 3-14 3-22v-4c8-5 13-14 13-24 0-8-3-15-8-20-4-4-9-6-14-7 1-8 1-16 1-24 0-15-3-30-8-42-2-5-4-9-6-12-1-2-3-3-5-3zm3 20c3 10 5 22 5 34 0 6 0 12-1 18-6 1-11 4-14 9-3 4-4 9-4 14 0 7 3 13 7 17 3 3 6 5 10 6-3 4-7 6-12 7-8 2-16-1-21-8-4-6-5-14-2-21 3-8 9-14 17-17l2-1c-7-14-11-28-11-42 0-13 4-27 8-36 2-4 4-7 5-8 2 6 5 16 7 25zm-2 78c-5-3-8-9-8-16 0-4 1-7 3-10 2-4 6-6 10-7 0 5-1 10-1 15 0 6 0 12-1 18h-3z"/></svg>`,
+  // Bass clef
+  `<svg viewBox="0 0 120 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 28c0-8 4-15 10-20C28 2 36 0 44 0c12 0 22 5 30 14 7 8 11 18 11 30 0 14-5 27-16 38-8 8-18 15-30 20-4 2-7 1-8-2-1-3 0-6 3-7 10-5 18-11 24-18 9-10 14-21 14-33 0-10-3-18-9-24-5-6-12-10-20-10-6 0-11 2-15 5-4 4-6 9-6 14 0 4 1 7 4 10 3 3 6 4 10 4 3 0 6-1 8-3 2-2 3-5 3-8 0-4-2-7-5-9-1-1-1-2 0-3 2-1 4-1 6 0 5 2 8 6 8 12 0 5-2 10-6 13-4 3-9 5-14 5-7 0-13-3-17-8-4-5-6-12-6-19zM88 28c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7zm0 28c0-4 3-7 7-7s7 3 7 7-3 7-7 7-7-3-7-7z"/></svg>`,
+  // Whole rest
+  `<svg viewBox="0 0 80 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="80" height="2"/><rect x="20" y="2" width="40" height="14"/></svg>`,
+  // Quarter rest
+  `<svg viewBox="0 0 40 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M22 0L8 28l16 16-16 20c4 8 10 14 16 18l-4 10c-1 3-4 8-4 14 0 6 4 12 10 14 2-4 3-8 3-12 0-6-2-10-5-14l4-10 4-8-14-16L30 40z"/></svg>`,
+  // Fermata
+  `<svg viewBox="0 0 120 80" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M60 0C30 0 4 22 4 50h6c0-24 22-44 50-44s50 20 50 44h6C116 22 90 0 60 0z"/><circle cx="60" cy="62" r="8"/></svg>`,
+  // Sharp sign
+  `<svg viewBox="0 0 60 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="0" width="4" height="120"/><rect x="38" y="0" width="4" height="120"/><rect x="0" y="28" width="60" height="8" transform="rotate(-10 30 32)"/><rect x="0" y="68" width="60" height="8" transform="rotate(-10 30 72)"/></svg>`,
+  // Flat sign
+  `<svg viewBox="0 0 50 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="0" width="4" height="120"/><path d="M10 58c10-12 24-16 30-8 6 8 0 22-12 32-6 5-12 8-18 10V58z"/></svg>`,
+  // Natural sign
+  `<svg viewBox="0 0 40 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="0" width="3" height="90"/><rect x="33" y="30" width="3" height="90"/><path d="M7 30l29-12v16L7 46V30z"/><path d="M7 74l29-12v16L7 90V74z"/></svg>`,
 ];
 
 const pick = messages[Math.floor(Math.random() * messages.length)];
-const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+const symbolIdx = Math.floor(Math.random() * symbols.length);
 ---
 <Layout title="Page Not Found — Irregular Pearl">
   <Navbar />
 
   <div class="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4 text-center">
-    <div class="text-[100px] md:text-[160px] leading-none select-none mb-4 opacity-20">
-      {symbol}
-    </div>
+    <div class="w-24 h-24 md:w-36 md:h-36 mb-6 text-accent/15" set:html={symbols[symbolIdx]} />
 
     <h1 class="font-display italic text-2xl md:text-3xl text-ink mb-3 max-w-md">
       {pick.quote}
