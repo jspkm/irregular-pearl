@@ -17,14 +17,26 @@ const messages = [
   { quote: "This rest lasts longer than Cage's 4'33\".", note: "And unlike that piece, nothing is supposed to happen here." },
 ];
 
+const symbols = [
+  '\uD834\uDD1E', // treble clef 𝄞
+  '\uD834\uDD22', // bass clef 𝄢
+  '\uD834\uDD23', // C clef 𝄣
+  '\uD834\uDD3B', // whole rest 𝄻
+  '\uD834\uDD3C', // half rest 𝄼
+  '\uD834\uDD3E', // quarter rest 𝄾
+  '\uD834\uDD1F', // turn 𝄟
+  '\uD834\uDD0E', // fermata 𝄎
+];
+
 const pick = messages[Math.floor(Math.random() * messages.length)];
+const symbol = symbols[Math.floor(Math.random() * symbols.length)];
 ---
 <Layout title="Page Not Found — Irregular Pearl">
   <Navbar />
 
   <div class="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4 text-center">
-    <div class="font-mono text-[80px] md:text-[120px] font-bold text-accent/20 leading-none select-none mb-4">
-      404
+    <div class="text-[100px] md:text-[160px] leading-none select-none mb-4 opacity-20">
+      {symbol}
     </div>
 
     <h1 class="font-display italic text-2xl md:text-3xl text-ink mb-3 max-w-md">
