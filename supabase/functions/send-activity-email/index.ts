@@ -17,35 +17,54 @@ interface ActivityConfig {
   cta: { text: string; url: (pieceId: string) => string };
 }
 
+// Subject emojis rotated per activity type
+const SUBJECT_EMOJIS: Record<string, string[]> = {
+  performed: ['\uD83C\uDFB6', '\uD83C\uDF1F', '\uD83C\uDF89', '\u2728', '\uD83D\uDC4F', '\uD83C\uDFBB'],
+  practiced: ['\uD83C\uDFB5', '\uD83D\uDCAA', '\u2B50', '\uD83C\uDFBC', '\uD83D\uDD25', '\uD83C\uDFB9'],
+  working_on: ['\uD83C\uDFB6', '\u2728', '\uD83D\uDE80', '\uD83C\uDF1F', '\uD83C\uDFBC', '\uD83D\uDCDA'],
+  listened: ['\uD83C\uDFA7', '\uD83C\uDFB5', '\u2764\uFE0F', '\u2728', '\uD83C\uDFB6', '\uD83D\uDC42'],
+  sight_read: ['\uD83C\uDFBC', '\uD83D\uDC40', '\u2B50', '\uD83C\uDFB5', '\uD83D\uDE80', '\u2728'],
+  took_lesson: ['\uD83D\uDCDA', '\uD83C\uDFB6', '\u2764\uFE0F', '\u2B50', '\uD83C\uDFBB', '\u2728'],
+};
+
+function pickEmoji(activity: string): string {
+  const emojis = SUBJECT_EMOJIS[activity] || ['\uD83C\uDFB6'];
+  return emojis[Math.floor(Math.random() * emojis.length)];
+}
+
+const PARAGRAPH_INSTRUCTION = `
+
+FORMATTING: Write exactly TWO paragraphs separated by a blank line. First paragraph: the warm acknowledgment and piece-specific insight. Second paragraph: the tip, suggestion, or encouragement to engage with the community. Each paragraph should be 2-3 sentences. Do not use emojis. Do not include a greeting or sign-off. Plain text only, no markdown. Separate paragraphs with two newlines.`;
+
 const ACTIVITY_CONFIGS: Record<string, ActivityConfig> = {
   performed: {
-    subject: "How was your performance? 🎶",
-    prompt: `The user just performed a classical music piece live. Write a warm, enthusiastic 2-3 sentence email body congratulating them on the performance. Ask them how it went — the venue, the audience reaction, any unexpected moments. End by encouraging them to share their experience with the community on the piece page. Include a specific, interesting observation about performing this particular piece or composer (something a fellow musician would appreciate). Vary your tone — sometimes more excited, sometimes reflective, sometimes with dry humor. Never use the same opening twice.`,
+    subject: "How was your performance?",
+    prompt: `The user just performed a classical music piece live. Write a warm, enthusiastic email body congratulating them. Include a specific, interesting observation about performing this particular piece or composer (something a fellow musician would appreciate). In the second paragraph, ask them how it went — the venue, the audience reaction, any unexpected moments — and encourage them to share their experience with the community on the piece page. Vary your tone — sometimes more excited, sometimes reflective, sometimes with dry humor. Never use the same opening twice.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "Tell the community about it", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
   practiced: {
-    subject: "Great practice session 🎶",
-    prompt: `The user just logged a practice session on a classical music piece. Write a warm 2-3 sentence email body acknowledging their practice. Include ONE specific, actionable practice tip relevant to this piece or its composer's style — something a conservatory teacher might suggest (slow practice, section isolation, rhythmic variation, singing the line, practicing difficult passages backward, etc.). Make each tip different and genuinely useful. Vary your tone — sometimes encouraging, sometimes conspiratorial ("here's a trick that works"), sometimes reflective on the craft. Never repeat the same tip structure.`,
+    subject: "Great practice session",
+    prompt: `The user just logged a practice session on a classical music piece. Write a warm email body acknowledging their dedication. In the first paragraph, include ONE specific, actionable practice tip relevant to this piece or its composer's style — something a conservatory teacher might suggest (slow practice, section isolation, rhythmic variation, singing the line, practicing difficult passages backward, etc.). In the second paragraph, encourage them to keep the momentum going and mention how tracking practice on the piece page helps them see progress over time. Make each tip different and genuinely useful. Vary your tone — sometimes encouraging, sometimes conspiratorial ("here's a trick that works"), sometimes reflective on the craft.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "View your practice log", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
   working_on: {
-    subject: "New piece in progress 🎶",
-    prompt: `The user just marked a classical music piece as "working on" — they're starting to learn or prepare it. Write a warm 2-3 sentence email body acknowledging this exciting new undertaking. Share ONE interesting historical or musical insight about this specific piece or composer that would motivate and inspire a musician beginning work on it — a backstory, a famous interpretation, what makes this piece special. End by encouraging them to check out the editions and recordings on the piece page. Vary your approach — sometimes share history, sometimes quote a famous performer on the piece, sometimes highlight a musical detail to listen for.`,
+    subject: "New piece in progress",
+    prompt: `The user just marked a classical music piece as "working on" — they're starting to learn or prepare it. In the first paragraph, share ONE interesting historical or musical insight about this specific piece or composer that would motivate and inspire a musician beginning work on it — a backstory, a famous interpretation, what makes this piece special. In the second paragraph, encourage them to explore the editions and recordings on the piece page to find their interpretation, and mention the community discussions. Vary your approach — sometimes share history, sometimes quote a famous performer on the piece, sometimes highlight a musical detail to listen for.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "Explore editions and recordings", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
   listened: {
-    subject: "Good ear 🎶",
-    prompt: `The user just logged that they listened to or studied a classical music piece. Write a warm 2-3 sentence email body acknowledging their listening. Include ONE specific listening suggestion for this piece — a particular recording worth comparing, a detail to listen for in a specific passage, or a way this piece connects to another work. Make it feel like a recommendation from a knowledgeable friend, not a textbook. Vary your approach widely — sometimes suggest a surprising recording, sometimes point out a hidden detail in the score, sometimes connect it to a bigger musical story.`,
+    subject: "Good ear",
+    prompt: `The user just logged that they listened to or studied a classical music piece. In the first paragraph, acknowledge their listening and include ONE specific listening suggestion — a particular recording worth comparing, a detail to listen for in a specific passage, or a way this piece connects to another work. Make it feel like a recommendation from a knowledgeable friend. In the second paragraph, encourage them to check out other recordings on the piece page or share their listening impressions in the discussion. Vary your approach widely — sometimes suggest a surprising recording, sometimes point out a hidden detail, sometimes connect it to a bigger musical story.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "See all recordings", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
   sight_read: {
-    subject: "First read-through 🎶",
-    prompt: `The user just sight-read a classical music piece for the first time. Write a warm 2-3 sentence email body about the thrill of a first read-through. Include ONE specific sight-reading tip or observation about this piece — what makes it tricky to sight-read, what to focus on the second time through, or how the structure reveals itself once you've seen it. Be encouraging about the messy, exciting nature of sight-reading. Vary your tone — sometimes excited, sometimes philosophical about first encounters with music, sometimes practical.`,
+    subject: "First read-through",
+    prompt: `The user just sight-read a classical music piece for the first time. In the first paragraph, capture the thrill of a first read-through and include ONE specific sight-reading tip or observation about this piece — what makes it tricky to sight-read, what to focus on the second time through, or how the structure reveals itself once you've seen it. In the second paragraph, be encouraging about the messy, exciting nature of sight-reading and suggest checking the edition recommendations on the piece page for a cleaner score. Vary your tone — sometimes excited, sometimes philosophical about first encounters with music, sometimes practical.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "Check edition recommendations", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
   took_lesson: {
-    subject: "Lesson logged 🎶",
-    prompt: `The user just had a lesson on a classical music piece. Write a warm 2-3 sentence email body acknowledging the lesson. Include ONE thoughtful observation about studying this particular piece with a teacher — what aspects of this piece or composer's work benefit most from guided instruction, a famous teacher-student story related to this repertoire, or encouragement about the teacher-student dynamic in classical music. End by encouraging them to note what they learned in the piece discussion. Vary your approach — sometimes reflective on pedagogy, sometimes share a famous teaching anecdote, sometimes focus on what makes this piece a great lesson piece.`,
+    subject: "Lesson logged",
+    prompt: `The user just had a lesson on a classical music piece. In the first paragraph, include ONE thoughtful observation about studying this particular piece with a teacher — what aspects of this piece or composer's work benefit most from guided instruction, a famous teacher-student story related to this repertoire, or what makes this piece a great lesson piece. In the second paragraph, encourage them to jot down key takeaways in the piece discussion so they can reference them later and help other musicians studying the same work. Vary your approach — sometimes reflective on pedagogy, sometimes share a famous teaching anecdote, sometimes focus on craft.` + PARAGRAPH_INSTRUCTION,
     cta: { text: "Share what you learned", url: (id) => `https://irregularpearl.org/piece/${id}` },
   },
 };
@@ -118,12 +137,12 @@ function renderActivityEmail(
             </td>
           </tr>
 
-          <!-- BODY (LLM-generated) -->
-          <tr>
-            <td class="wrapper-inner" style="padding:0 24px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#57534E;line-height:1.65;">
-              ${body}
+          <!-- BODY (LLM-generated, multi-paragraph) -->
+          ${body.split(/\n\n+/).filter(p => p.trim()).map(p => `<tr>
+            <td class="wrapper-inner" style="padding:0 24px 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#57534E;line-height:1.65;">
+              ${p.trim()}
             </td>
-          </tr>
+          </tr>`).join('\n')}
 
           <!-- CTA -->
           <tr>
@@ -249,14 +268,14 @@ async function composeEmailBody(
 
 function getFallbackBody(activity: string, piece: string, composer: string): string {
   const fallbacks: Record<string, string> = {
-    performed: `Congratulations on performing ${piece} by ${composer}! We'd love to hear how it went. Head over to the piece page and share your experience with the community.`,
-    practiced: `Great work putting time into ${piece} by ${composer}. Consistent practice is where the magic happens. Try isolating the most challenging passage and practicing it at half tempo before building back up.`,
-    working_on: `Exciting to see you starting work on ${piece} by ${composer}. This is a wonderful piece to have in your repertoire. Check out the editions and recordings on the piece page to find the right interpretation for you.`,
-    listened: `Good listening session with ${piece} by ${composer}. Active listening is one of the best ways to deepen your understanding. Try comparing two different recordings and noting where the interpretations diverge.`,
-    sight_read: `You just sight-read ${piece} by ${composer} for the first time. That first read-through is always an adventure. Now that you've seen the whole landscape, go back to the spots that surprised you.`,
-    took_lesson: `Lesson on ${piece} by ${composer} logged. Working with a teacher on this repertoire is invaluable. Consider jotting down the key takeaways in the piece discussion so you can reference them later.`,
+    performed: `Congratulations on performing ${piece} by ${composer}! There's nothing quite like bringing a piece to life in front of an audience, and this one has a special kind of energy that only reveals itself on stage.\n\nWe'd love to hear how it went. Head over to the piece page and share your experience with the community — the venue, the moments that surprised you, what you'd do differently next time.`,
+    practiced: `Great work putting time into ${piece} by ${composer}. Consistent practice is where the magic happens, and this piece rewards every minute you give it.\n\nHere's a tip: try isolating the most challenging passage and practicing it at half tempo before building back up. You'll be surprised how much clarity that brings to the full-speed run.`,
+    working_on: `Exciting to see you starting work on ${piece} by ${composer}. This is a wonderful piece to have in your repertoire, and the journey of learning it is one of the best parts.\n\nCheck out the editions and recordings on the piece page to find the right interpretation for you. The community discussions often have great insights from musicians who've lived with this piece for years.`,
+    listened: `Good listening session with ${piece} by ${composer}. Active listening is one of the best ways to deepen your understanding of a work, and this piece has layers that reveal themselves over time.\n\nTry comparing two different recordings and noting where the interpretations diverge — you'll start hearing choices you never noticed before. The recordings tab on the piece page has some excellent options.`,
+    sight_read: `You just sight-read ${piece} by ${composer} for the first time. That first read-through is always an adventure — half discovery, half survival.\n\nNow that you've seen the whole landscape, go back to the spots that surprised you. Check the edition recommendations on the piece page for a score that might make the second read smoother.`,
+    took_lesson: `Lesson on ${piece} by ${composer} logged. Working with a teacher on this repertoire is invaluable — there are things about this piece that only come through in guided study.\n\nConsider jotting down the key takeaways in the piece discussion so you can reference them later. Other musicians studying the same work will appreciate your insights too.`,
   };
-  return fallbacks[activity] || `You logged activity on ${piece} by ${composer}. Keep it up!`;
+  return fallbacks[activity] || `You logged activity on ${piece} by ${composer}. Keep it up!\n\nHead over to the piece page to see what others in the community are saying about this work.`;
 }
 
 // ── Edge Function handler ────────────────────────────────────────────
@@ -319,7 +338,7 @@ Deno.serve(async (req) => {
     body: JSON.stringify({
       from: "Irregular Pearl <hello@irregularpearl.org>",
       to: [authUser.email],
-      subject: config.subject,
+      subject: `${config.subject} ${pickEmoji(record.activity)}`,
       html,
     }),
   });
