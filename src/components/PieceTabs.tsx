@@ -50,6 +50,54 @@ export default function PieceTabs({ piece }: PieceTabsProps) {
             {piece.description}
           </p>
 
+          {/* Movement indicator for pieces that are single movements of larger works */}
+          {piece.movementNumber && !piece.movements && (
+            <div className="mb-8 text-xs text-muted italic border-l-2 border-accent pl-3">
+              Movement {piece.movementNumber} of the larger work
+            </div>
+          )}
+
+          {/* Movements */}
+          {piece.movements && piece.movements.length > 0 && (
+            <section className="mb-8">
+              <h2 className="text-base font-semibold mb-3">Movements</h2>
+              <div className="bg-surface border border-border rounded-lg overflow-hidden">
+                {piece.movements.map((m, i) => {
+                  const isSelf = m.pieceId === piece.id;
+                  const inner = (
+                    <div className={`flex items-center gap-3 px-4 py-2.5 ${i > 0 ? 'border-t border-border' : ''} ${isSelf ? 'bg-accent-light' : ''}`}>
+                      <span className={`font-mono text-xs ${isSelf ? 'text-accent font-medium' : 'text-muted'}`}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <span className={`text-sm ${isSelf ? 'text-accent font-medium' : 'text-ink'}`}>
+                        {m.name}
+                      </span>
+                      {isSelf && (
+                        <span className="text-[10px] text-accent bg-white border border-accent-border px-1.5 py-0.5 rounded-full ml-auto">
+                          this piece
+                        </span>
+                      )}
+                    </div>
+                  );
+
+                  if (m.pieceId && !isSelf) {
+                    return (
+                      <a key={i} href={`/piece/${m.pieceId}`} className="block no-underline hover:bg-bg transition-colors">
+                        {inner}
+                      </a>
+                    );
+                  }
+                  return <div key={i}>{inner}</div>;
+                })}
+              </div>
+              {piece.movementNumber && (
+                <p className="text-xs text-muted mt-2 italic">
+                  Movement {piece.movementNumber} of the larger work
+                </p>
+              )}
+            </section>
+          )}
+
           {/* Editions preview */}
           <section className="mb-8">
             <h2 className="text-base font-semibold mb-3">Editions</h2>

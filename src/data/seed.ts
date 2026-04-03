@@ -25,6 +25,16 @@ export interface SeedPiece {
     url: string;
     label: string;
   }[];
+  /** Movement list for multi-movement works. Each entry has a name and optional pieceId if that movement exists as its own piece in the catalog. */
+  movements?: {
+    name: string;
+    /** ID of this movement's piece in the catalog, if it exists */
+    pieceId?: string;
+  }[];
+  /** If this piece IS a movement of a larger work, the parent work's piece ID */
+  parentWorkId?: string;
+  /** If this piece IS a movement, its 1-based movement number */
+  movementNumber?: number;
 }
 
 export const seedPieces: SeedPiece[] = [
@@ -56,6 +66,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-suites-for-cello-cello-bwv-1007-1012-pierre-fournier', label: 'Pierre Fournier — Complete Cello Suites' },
       { type: 'vimeo', url: 'https://vimeo.com/557158390', label: 'Jean-Guihen Queyras — Prelude (video)' },
     ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Menuet I & II' },
+      { name: 'VI. Gigue' },
+    ],
   },
   {
     id: 'dvorak-cello-concerto',
@@ -81,6 +99,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/album/0DQsuhP1UeQqT1ru5u7rF2', label: 'Jacqueline du Pré — Dvorak Cello Concerto' },
       { type: 'internet_archive', url: 'https://archive.org/details/DvorakCelloConcertoInBMinorOp.104', label: 'Rostropovich / Karajan — 1968 recording' },
       { type: 'internet_archive', url: 'https://archive.org/details/DvorakCelloConcerto-Piatigorsky', label: 'Piatigorsky / Ormandy / Philadelphia — 1946' },
+    ],
+    movements: [
+      { name: 'I. Allegro' },
+      { name: 'II. Adagio, ma non troppo' },
+      { name: 'III. Finale: Allegro moderato' },
     ],
   },
 
@@ -109,6 +132,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/beethoven-moonlight-sonata-horowitz-1947', label: 'Vladimir Horowitz — 1947 RCA (historic)' },
       { type: 'internet_archive', url: 'https://archive.org/details/BeethovenPianoSonataNo.14moonlightrubinstein', label: 'Arthur Rubinstein — 1962' },
       { type: 'vimeo', url: 'https://vimeo.com/36754749', label: 'Khatia Buniatishvili — Masterclass performance' },
+    ],
+    movements: [
+      { name: 'I. Adagio sostenuto' },
+      { name: 'II. Allegretto' },
+      { name: 'III. Presto agitato' },
     ],
   },
   {
@@ -184,6 +212,7 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/pascal-roge-debussy-clair-de-lune', label: 'Pascal Rogé — Clair de lune' },
       { type: 'vimeo', url: 'https://vimeo.com/193024034', label: 'Sarah Chapeskie — Conservatory Canada Convocation 2016' },
     ],
+    movementNumber: 3,
   },
 
   // === VIOLIN ===
@@ -211,6 +240,13 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/BachPartitaForSoloViolinNo.2InDMinorBwv1004', label: 'Jascha Heifetz — Complete Partita No. 2 (1952)' },
       { type: 'vimeo', url: 'https://vimeo.com/113908045', label: 'Lisa Fujita — Chaconne, New England Conservatory 2014' },
     ],
+    movements: [
+      { name: 'I. Allemanda' },
+      { name: 'II. Corrente' },
+      { name: 'III. Sarabanda' },
+      { name: 'IV. Giga' },
+      { name: 'V. Ciaccona' },
+    ],
   },
   {
     id: 'mendelssohn-violin-concerto',
@@ -235,6 +271,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/6poscVRRM6DOvOO92pcY1e', label: 'Ray Chen / Swedish Radio Symphony' },
       { type: 'internet_archive', url: 'https://archive.org/details/HilaryHahnMendelssohnViolinConcertoInEMinorOp64', label: 'Hilary Hahn — Mendelssohn Violin Concerto' },
       { type: 'internet_archive', url: 'https://archive.org/details/mend-vc-nm-bw', label: 'Nathan Milstein / Bruno Walter — Carnegie Hall 1945' },
+    ],
+    movements: [
+      { name: 'I. Allegro molto appassionato' },
+      { name: 'II. Andante' },
+      { name: 'III. Allegretto non troppo — Allegro molto vivace' },
     ],
   },
 
@@ -309,6 +350,10 @@ export const seedPieces: SeedPiece[] = [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Well-Tempered_Clavier', label: 'Wikipedia — Well-Tempered Clavier' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=gVah1cr3pU0', label: 'Lang Lang – Bach: The Well-Tempered Clavier: Book 1, 1.Prelude C Major, BWV 846' },
     ],
+    movements: [
+      { name: 'Prelude in C major' },
+      { name: 'Fugue in C major' },
+    ],
   },
 
   // === FLUTE ===
@@ -358,6 +403,12 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/j.duprej.barbirolliliveatprague03011967elgarcelloconcerto', label: 'Jacqueline du Pré / Barbirolli — Live Prague 1967' },
       { type: 'vimeo', url: 'https://vimeo.com/212893480', label: 'Truls Mørk / Concertgebouw — Live Amsterdam 2017' },
     ],
+    movements: [
+      { name: 'I. Adagio — Moderato' },
+      { name: 'II. Lento — Allegro molto' },
+      { name: 'III. Adagio' },
+      { name: 'IV. Allegro — Moderato — Allegro, ma non troppo' },
+    ],
   },
 
   // === MORE VIOLIN ===
@@ -385,6 +436,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Heifetz-NEWTRANSFER', label: 'Jascha Heifetz — Landmark recording (remastered)' },
       { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Milstein-NewTransfer', label: 'Nathan Milstein — Historic recording (remastered)' },
     ],
+    movements: [
+      { name: 'I. Allegro moderato' },
+      { name: 'II. Canzonetta: Andante' },
+      { name: 'III. Finale: Allegro vivacissimo' },
+    ],
   },
 
   // === MORE PIANO ===
@@ -411,6 +467,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/7fcDQg8prLdJwim6Ey7neB', label: 'Khatia Buniatishvili / Czech Philharmonic / Järvi' },
       { type: 'internet_archive', url: 'https://archive.org/details/RACHMANINOFFPianoConcertoNo.2-Richter', label: 'Sviatoslav Richter — Landmark recording' },
       { type: 'internet_archive', url: 'https://archive.org/details/RACHMANINOFFPianoConcertoNo.2InCMinor-NEWTRANSFER', label: 'Rachmaninoff / Philadelphia Orchestra / Stokowski — 1929 historic' },
+    ],
+    movements: [
+      { name: 'I. Moderato' },
+      { name: 'II. Adagio sostenuto' },
+      { name: 'III. Allegro scherzando' },
     ],
   },
 
@@ -441,6 +502,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-unaccompanied-violoncello-no-1_pablo-casals-johann-sebastian-bach', label: 'Pablo Casals — Suites No. 1 & 2 (historic LP)' },
       { type: 'internet_archive', url: 'https://archive.org/details/bachcellosuites_rostropovich', label: 'Mstislav Rostropovich — Complete Bach Cello Suites' },
     ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Menuet I & II' },
+      { name: 'VI. Gigue' },
+    ],
   },
   {
     id: 'bach-cello-suite-3',
@@ -466,6 +535,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/album/2CAPFGnqtqzx5LjuWILaC9', label: 'Alisa Weilerstein — Complete Cello Suites (2020)' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-cello-unaccompanied-no-3-in-c-m_johann-sebastian-bach-pablo-casals', label: 'Pablo Casals — Suites No. 3 & 4 (historic LP)' },
       { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-suites-for-cello-cello-bwv-1007-1012-pierre-fournier', label: 'Pierre Fournier — Complete Cello Suites' },
+    ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Bourrée I & II' },
+      { name: 'VI. Gigue' },
     ],
   },
   {
@@ -493,6 +570,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/lp_suites-for-cello-unaccompanied-no-3-in-c-m_johann-sebastian-bach-pablo-casals', label: 'Pablo Casals — Suites No. 3 & 4 (historic LP)' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_intgrale-des-six-suites-pour-violoncelle-s_johann-sebastian-bach-janos-starker', label: 'János Starker — Complete Suites (historic)' },
     ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Bourrée I & II' },
+      { name: 'VI. Gigue' },
+    ],
   },
   {
     id: 'bach-cello-suite-5',
@@ -517,6 +602,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/0SvpN8VUVlR0LmZhiz7zue', label: 'Jean-Guihen Queyras — Prelude (2024)' },
       { type: 'internet_archive', url: 'https://archive.org/details/suite-no.-5-in-c-minor-for-cello', label: 'Frans Helmerson — Suite No. 5 (1974)' },
       { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-the-six-suites-for-violoncelo-solo-bwv-1007-1012-nikolaus-harnoncourt-dvg', label: 'Nikolaus Harnoncourt — Complete Suites (baroque cello)' },
+    ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Gavotte I & II' },
+      { name: 'VI. Gigue' },
     ],
   },
   {
@@ -544,6 +637,14 @@ export const seedPieces: SeedPiece[] = [
       { type: 'vimeo', url: 'https://vimeo.com/channels/earlymusic/29470725', label: 'William Skeen — Gavotte (baroque cello)' },
       { type: 'internet_archive', url: 'https://archive.org/details/01-alc-02-bach-cello-suites-2-5-6', label: 'Dimitry Markevitch — Cello Suites 2, 5 & 6' },
     ],
+    movements: [
+      { name: 'I. Prelude' },
+      { name: 'II. Allemande' },
+      { name: 'III. Courante' },
+      { name: 'IV. Sarabande' },
+      { name: 'V. Gavotte I & II' },
+      { name: 'VI. Gigue' },
+    ],
   },
   {
     id: 'haydn-cello-concerto-1',
@@ -568,6 +669,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/5Dcrc4FKYFZ1K2X29d0UpM', label: 'Mstislav Rostropovich / ASMF — Cadenza by Britten' },
       { type: 'spotify', url: 'https://open.spotify.com/track/07Oij3AVn2iUvRZOq9I8bb', label: 'Yo-Yo Ma / English Chamber Orchestra' },
       { type: 'internet_archive', url: 'https://archive.org/details/HaydnCelloConcertoNo.1InCMajorHob.Viib1', label: 'Mstislav Rostropovich / ASMF (1988)' },
+    ],
+    movements: [
+      { name: 'I. Moderato' },
+      { name: 'II. Adagio' },
+      { name: 'III. Allegro molto' },
     ],
   },
   {
@@ -594,6 +700,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'internet_archive', url: 'https://archive.org/details/haydn-cello-concertos-nos.-1-2', label: 'Lynn Harrell / ASMF / Marriner' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_haydn-cello-concerto-in-c-boccherini-cell_jacqueline-du-pr-daniel-barenboim-joseph-h', label: 'Jacqueline du Pré / Barenboim — Haydn & Boccherini (LP)' },
     ],
+    movements: [
+      { name: 'I. Allegro moderato' },
+      { name: 'II. Adagio' },
+      { name: 'III. Rondo: Allegro' },
+    ],
   },
   {
     id: 'schumann-cello-concerto',
@@ -618,6 +729,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/1D18l8wZj2PZ4nzXTYo8ln', label: 'Jacqueline du Pré / Barenboim / New Philharmonia' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_cello-concerto-five-pieces-in-folk-style_robert-schumann-pablo-casals-prades-festiv', label: 'Pablo Casals — Prades Festival (historic)' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_cello-concerto-schelomo-rhapsody-for-ce_leonard-rose-robert-schumann-leonard-berns', label: 'Leonard Rose / Bernstein / New York Philharmonic' },
+    ],
+    movements: [
+      { name: 'I. Nicht zu schnell' },
+      { name: 'II. Langsam' },
+      { name: 'III. Sehr lebhaft' },
     ],
   },
   {
@@ -668,6 +784,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/3gXrLgst05Onm15YgFv7d7', label: 'Jean-Guihen Queyras / Alexandre Tharaud' },
       { type: 'internet_archive', url: 'https://archive.org/details/20220922-brahms-cello-sonatas-opp.-38-99-mstislav-rostropovich', label: 'Mstislav Rostropovich / Rudolf Serkin' },
     ],
+    movements: [
+      { name: 'I. Allegro non troppo' },
+      { name: 'II. Allegretto quasi menuetto' },
+      { name: 'III. Allegro' },
+    ],
   },
   {
     id: 'shostakovich-cello-concerto-1',
@@ -690,6 +811,12 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/0EFVPhrcAJxu4r65BjkveH', label: 'Gautier Capuçon / Gergiev / Mariinsky Orchestra' },
       { type: 'spotify', url: 'https://open.spotify.com/track/4dLVUG0RvDi1DmwWr48UcP', label: 'Yo-Yo Ma / Nelsons / Boston Symphony' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_concerto-for-cello-in-e-flat-op-107-symph_dmitri-shostakovich-mstislav-rostropovich_0', label: 'Mstislav Rostropovich / Ormandy — 1959 premiere recording' },
+    ],
+    movements: [
+      { name: 'I. Allegretto' },
+      { name: 'II. Moderato' },
+      { name: 'III. Cadenza' },
+      { name: 'IV. Allegro con moto' },
     ],
   },
   {
@@ -733,6 +860,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/7plpqyCO2HlNi4fhIrKctj', label: 'Alisa Weilerstein' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_kodaly-sonata-for-solo-cello-starker-duo_zoltn-kodly-janos-starker-arnold-eidus', label: 'János Starker — Landmark recording' },
     ],
+    movements: [
+      { name: 'I. Allegro maestoso ma appassionato' },
+      { name: 'II. Adagio (con grand espressione)' },
+      { name: 'III. Allegro molto vivace' },
+    ],
   },
   {
     id: 'beethoven-cello-sonata-3',
@@ -757,6 +889,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/1fqodfB87Tx5Y7ZZ9zi0XY', label: 'Jacqueline du Pré / Barenboim' },
       { type: 'internet_archive', url: 'https://archive.org/details/janos-starker-rudolf-buchbinder-beethoven-cello-sonata-no.-3-in-a-major-op.-69-0', label: 'János Starker / Rudolf Buchbinder' },
       { type: 'internet_archive', url: 'https://archive.org/details/lp_sonatas-for-cello-piano-complete_ludwig-van-beethoven-gregor-piatigorsky-so', label: 'Gregor Piatigorsky — Complete Cello Sonatas' },
+    ],
+    movements: [
+      { name: 'I. Allegro, ma non tanto' },
+      { name: 'II. Scherzo: Allegro molto' },
+      { name: 'III. Adagio cantabile — Allegro vivace' },
     ],
   },
   {
@@ -1123,6 +1260,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/0XVmCzfPj8fT2xpQQnFA8I', label: 'Sabine Meyer / Abbado / Berliner Philharmoniker' },
       { type: 'internet_archive', url: 'https://archive.org/details/MozartClarinetConcertoInAMajorK.622', label: 'Alfred Prinz / Böhm / Wiener Philharmoniker (1974)' },
     ],
+    movements: [
+      { name: 'I. Allegro' },
+      { name: 'II. Adagio' },
+      { name: 'III. Rondo: Allegro' },
+    ],
   },
   {
     id: 'weber-clarinet-concerto-1',
@@ -1191,6 +1333,11 @@ export const seedPieces: SeedPiece[] = [
       { type: 'spotify', url: 'https://open.spotify.com/track/7dQGhoFB2FLtOMw7PX6Yzm', label: 'Jean-Pierre Rampal / Robert Veyron-Lacroix' },
       { type: 'internet_archive', url: 'https://archive.org/details/20220123-bach-j.s.-o-flute-sonatas-vol.-1-janet-see-davitt-moroney', label: 'Janet See / Davitt Moroney — Baroque flute (1991)' },
     ],
+    movements: [
+      { name: 'I. Andante' },
+      { name: 'II. Largo e dolce' },
+      { name: 'III. Presto' },
+    ],
   },
   {
     id: 'ibert-flute-concerto',
@@ -1248,6 +1395,11 @@ export const seedPieces: SeedPiece[] = [
     external_links: [
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=e9RS4biqyAc', label: 'Paco de Lucía Concierto Aranjuez - Adagio' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Concierto_de_Aranjuez', label: 'Wikipedia — Concierto de Aranjuez' }
+    ],
+    movements: [
+      { name: 'I. Allegro con spirito' },
+      { name: 'II. Adagio' },
+      { name: 'III. Allegro gentile' },
     ],
   },
   {
