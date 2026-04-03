@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+
+const messages = [
+  { quote: "This page has gone tacet.", note: "Even the rests are part of the music." },
+  { quote: "You've wandered into an unwritten cadenza.", note: "Time to find your way back to the score." },
+  { quote: "This movement doesn't exist yet.", note: "Perhaps the composer had other plans." },
+  { quote: "Lost like a fermata with no resolution.", note: "Let's bring you back to the tonic." },
+  { quote: "The page you're looking for took a deceptive cadence.", note: "It went somewhere unexpected." },
+  { quote: "Nothing here but a grand pause.", note: "The music continues on the main stage." },
+  { quote: "This URL hit a wrong note.", note: "It happens to the best of us, even in concert." },
+  { quote: "You've reached the end of the manuscript.", note: "But the catalog has plenty more to explore." },
+  { quote: "This passage has been cut from the program.", note: "The conductor sends their apologies." },
+  { quote: "Like a missing page in a first edition.", note: "The good stuff is still in the library." },
+  { quote: "Somewhere, a cellist is tuning. This isn't that page either.", note: "But we know where the rehearsal is." },
+  { quote: "This rest lasts longer than Cage's 4'33\".", note: "And unlike that piece, nothing is supposed to happen here." },
+];
+
+const pick = messages[Math.floor(Math.random() * messages.length)];
+---
+<Layout title="Page Not Found — Irregular Pearl">
+  <Navbar />
+
+  <div class="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4 text-center">
+    <div class="font-mono text-[80px] md:text-[120px] font-bold text-accent/20 leading-none select-none mb-4">
+      404
+    </div>
+
+    <h1 class="font-display italic text-2xl md:text-3xl text-ink mb-3 max-w-md">
+      {pick.quote}
+    </h1>
+
+    <p class="text-sm text-muted mb-8 max-w-sm">
+      {pick.note}
+    </p>
+
+    <a
+      href="/"
+      class="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors no-underline"
+    >
+      Back to the main stage
+    </a>
+  </div>
+</Layout>
