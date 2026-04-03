@@ -51,6 +51,25 @@ if (query) {
     if (eventsResult.status === 'fulfilled' && eventsResult.value.data) {
       searchEvents = eventsResult.value.data as typeof searchEvents;
     }
+
+    // Fuzzy fallback: if full-text search found nothing, try trigram similarity
+    if (displayPieces.length === 0 && searchArtists.length === 0 && searchInstruments.length === 0 && searchEvents.length === 0) {
+      const { data: fuzzyData } = await supabase.rpc('fuzzy_search', { search_query: query });
+      if (fuzzyData && fuzzyData.length > 0) {
+        const fuzzyPieceIds = fuzzyData.filter((r: any) => r.match_type === 'piece').map((r: any) => r.match_id);
+        if (fuzzyPieceIds.length > 0) {
+          displayPieces = fuzzyPieceIds
+            .map((id: string) => seedPieces.find(p => p.id === id))
+            .filter(Boolean) as typeof seedPieces;
+        }
+        searchArtists = fuzzyData
+          .filter((r: any) => r.match_type === 'artist')
+          .map((r: any) => ({ id: r.match_id, display_name: r.match_title, instrument: r.match_subtitle || null, username: null }));
+        searchEvents = fuzzyData
+          .filter((r: any) => r.match_type === 'event')
+          .map((r: any) => ({ id: r.match_id, title: r.match_title, venue: r.match_subtitle || null, city: null, event_date: '', event_type: '' }));
+      }
+    }
   } else {
     // Fallback: client-side substring search (pieces only)
     const q = query.toLowerCase();
