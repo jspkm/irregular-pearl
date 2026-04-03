@@ -118,6 +118,42 @@ export function normalizeWebsiteUrl(url: string): string {
   return `https://${v}`;
 }
 
+// ── Fuzzy search result mapping ──
+
+export interface FuzzyRow {
+  match_type: string;
+  match_id: string;
+  match_title: string;
+  match_subtitle: string;
+  similarity: number;
+}
+
+export interface FuzzyResults {
+  pieceIds: string[];
+  artists: { id: string; display_name: string; instrument: string | null; username: null }[];
+  events: { id: string; title: string; venue: string | null; city: null; event_date: string; event_type: string }[];
+}
+
+export function mapFuzzyResults(rows: FuzzyRow[]): FuzzyResults {
+  return {
+    pieceIds: rows.filter(r => r.match_type === 'piece').map(r => r.match_id),
+    artists: rows.filter(r => r.match_type === 'artist').map(r => ({
+      id: r.match_id,
+      display_name: r.match_title,
+      instrument: r.match_subtitle || null,
+      username: null,
+    })),
+    events: rows.filter(r => r.match_type === 'event').map(r => ({
+      id: r.match_id,
+      title: r.match_title,
+      venue: r.match_subtitle || null,
+      city: null,
+      event_date: '',
+      event_type: '',
+    })),
+  };
+}
+
 // ── Slug validation ──
 
 const RESERVED_SLUGS = [
