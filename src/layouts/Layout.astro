@@ -8,6 +8,7 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   ogType?: string;
   hideFooter?: boolean;
+  noindex?: boolean;
 }
 
 const {
@@ -17,6 +18,7 @@ const {
   jsonLd,
   ogType = 'website',
   hideFooter = false,
+  noindex = false,
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
@@ -44,6 +46,7 @@ const canonicalUrl = canonical || Astro.url.href;
   <!-- SEO -->
   <title>{fullTitle}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex" />}
   <link rel="canonical" href={canonicalUrl} />
 
   <!-- Open Graph -->

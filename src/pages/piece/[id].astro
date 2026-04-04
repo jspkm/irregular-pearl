@@ -2,17 +2,21 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import PiecePageLayout from '../../components/PiecePageLayout';
-import { seedPieces } from '../../data/seed';
+import StubPageLayout from '../../components/StubPageLayout.astro';
+import { getPieceFull, isStub } from '../../lib/pieces';
 
 const { id } = Astro.params;
-const piece = seedPieces.find(p => p.id === id);
+const piece = await getPieceFull(id || '');
 
 if (!piece) {
   return Astro.redirect('/');
 }
 
+const stub = isStub(piece);
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
-const seoDescription = `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — compare ${piece.editions.length} editions, listen to recordings, and discuss with musicians. ${piece.description.slice(0, 120)}`;
+const seoDescription = stub
+  ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`
+  : `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — compare ${piece.editions.length} editions, listen to recordings, and discuss with musicians. ${piece.description.slice(0, 120)}`;
 
 const youtubeLinks = piece.external_links.filter(l => l.type === 'youtube');
 
@@ -73,6 +77,7 @@ const breadcrumbLd = {
   description={seoDescription}
   ogType="music.song"
   jsonLd={[jsonLd, breadcrumbLd]}
+  noindex={stub}
 >
   <Navbar />
 
@@ -87,6 +92,11 @@ const breadcrumbLd = {
     ))}
   </div>
 
-  <!-- Main resizable layout (React island) -->
-  <PiecePageLayout piece={piece} client:load />
+  {stub ? (
+    <!-- Stub page: illustration + inline contribution forms -->
+    <StubPageLayout piece={piece} />
+  ) : (
+    <!-- Full page: React island with editions, discussions, etc. -->
+    <PiecePageLayout piece={piece} client:load />
+  )}
 </Layout>
