@@ -9,29 +9,38 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import { getStaffUser, canManageSection } from '../../lib/admin';
+import { createClient } from '@supabase/supabase-js';
 
 const staffUser = await getStaffUser(Astro.cookies);
 if (!staffUser || !canManageSection(staffUser.profile, 'events')) {
   return Astro.redirect('/');
 }
 
-const { supabase } = staffUser;
+// Admin pages use service role key to bypass RLS (auth already checked above).
+// Falls back to the cookie-based client if service key isn't available.
+const serviceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = serviceKey
+  ? createClient(import.meta.env.PUBLIC_SUPABASE_URL, serviceKey)
+  : staffUser.supabase;
 
 // Fetch queued events (pending review)
+// Skip the users join — scraped events have created_by=NULL and the join
+// can cause issues. We show source instead of submitter name.
 const statusFilter = Astro.url.searchParams.get('status') || 'queued';
-const { data: events } = await supabase
+const { data: events, error: eventsError } = await supabase
   .from('events')
-  .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderated_by, moderated_at, moderation_note, users!events_created_by_fkey!left(display_name)')
+  .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderated_by, moderated_at, moderation_note')
   .eq('status', statusFilter)
   .order('created_at', { ascending: true })
   .limit(50);
+
+if (eventsError) console.error('[admin/events] Query error:', eventsError.message);
 
 const queuedEvents = (events || []) as Array<{
   id: string; title: string; venue: string | null; city: string | null;
   event_date: string; event_type: string; source: string; status: string;
   created_by: string | null; created_at: string;
   moderated_by: string | null; moderated_at: string | null; moderation_note: string | null;
-  users: { display_name: string } | null;
 }>;
 
 // Count by status for tabs
@@ -92,7 +101,7 @@ const { count: rejectedCount } = await supabase
                 </a>
                 <div class="text-xs text-muted mt-0.5">
                   {event.venue}{event.city ? `, ${event.city}` : ''}
-                  {event.users?.display_name && <span> &middot; submitted by {event.users.display_name}</span>}
+                  {event.created_by && <span> &middot; user submitted</span>}
                 </div>
                 <div class="text-[10px] text-[#A8A29E] mt-1">
                   Submitted {new Date(event.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
