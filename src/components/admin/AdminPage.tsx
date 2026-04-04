@@ -4,8 +4,9 @@ import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminReportList from './AdminReportList';
 import AdminPlaylist from './AdminPlaylist';
+import AdminEventQueue from './AdminEventQueue';
 
-type Tab = 'dashboard' | 'users' | 'reports' | 'playlist';
+type Tab = 'dashboard' | 'users' | 'reports' | 'events' | 'playlist';
 
 interface StaffProfile {
   id: string;
@@ -66,6 +67,7 @@ export default function AdminPage({ initialTab }: Props) {
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
     { id: 'reports' as Tab, label: 'Reports', show: isAdmin || profile.role === 'firstchair' },
+    { id: 'events' as Tab, label: 'Events', show: isAdmin || (profile.role === 'firstchair' && (profile.managed_sections || []).includes('events')) },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
   ].filter(t => t.show);
 
@@ -78,6 +80,7 @@ export default function AdminPage({ initialTab }: Props) {
     dashboard: 'Dashboard',
     users: 'User Management',
     reports: 'Reports',
+    events: 'Moderate Events',
     playlist: 'Maestro Playlist',
   };
 
@@ -122,6 +125,7 @@ export default function AdminPage({ initialTab }: Props) {
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}
         {activeTab === 'reports' && <AdminReportList isAdmin={isAdmin} managedSections={profile.managed_sections} />}
+        {activeTab === 'events' && <AdminEventQueue userId={profile.id} />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
       </div>
     </div>
