@@ -21,8 +21,23 @@
 import type { ScraperAdapter, ScraperResult, EventCandidate } from './types';
 
 const BACHTRACK_BASE = 'https://bachtrack.com/search-concerts';
-const REQUEST_DELAY_MS = 1000;
+const REQUEST_DELAY_MS = 1500;
 const FETCH_TIMEOUT_MS = 30000;
+const MAX_PER_CITY_PER_DAY = 5;
+
+// US cities: slug (Bachtrack URL) → display name
+const US_CITIES: Record<string, string> = {
+  'new-york-city': 'New York',
+  'boston': 'Boston',
+  'san-francisco': 'San Francisco',
+  'los-angeles': 'Los Angeles',
+  'chicago': 'Chicago',
+  'philadelphia': 'Philadelphia',
+  'washington': 'Washington DC',
+  'houston': 'Houston',
+  'seattle': 'Seattle',
+  'cleveland': 'Cleveland',
+};
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -79,7 +94,7 @@ function parseBachtrackDate(dataDates: string, dateText: string): { event_date: 
 /**
  * Parse Bachtrack listing blocks from HTML.
  */
-export function parseEventListing(html: string): EventCandidate[] {
+export function parseEventListing(html: string, fallbackCity?: string): EventCandidate[] {
   const candidates: EventCandidate[] = [];
 
   // Match full listing blocks: from <div data-id="X"> to <li data-id="X">
@@ -142,7 +157,7 @@ export function parseEventListing(html: string): EventCandidate[] {
     candidates.push({
       title,
       venue: venue || 'Unknown venue',
-      city: city || 'Unknown',
+      city: city || fallbackCity || 'Unknown',
       event_date: parsed.event_date,
       start_time: parsed.start_time,
       event_type: inferEventType(title),
@@ -155,6 +170,18 @@ export function parseEventListing(html: string): EventCandidate[] {
   return candidates;
 }
 
+/**
+ * Cap events to MAX_PER_CITY_PER_DAY per city per date for variety.
+ */
+function capPerCityPerDay(candidates: EventCandidate[]): EventCandidate[] {
+  const counts: Record<string, number> = {};
+  return candidates.filter(c => {
+    const key = `${c.city}|${c.event_date}`;
+    counts[key] = (counts[key] || 0) + 1;
+    return counts[key] <= MAX_PER_CITY_PER_DAY;
+  });
+}
+
 export class BachtrackScraper implements ScraperAdapter {
   readonly source = 'bachtrack';
 
@@ -163,52 +190,78 @@ export class BachtrackScraper implements ScraperAdapter {
     let allCandidates: EventCandidate[] = [];
 
     const today = new Date().toISOString().split('T')[0];
-    const twoWeeks = new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0];
-    const url = `${BACHTRACK_BASE}?date_from=${today}&date_to=${twoWeeks}&genre=1`;
+    const twoMonths = new Date(Date.now() + 60 * 86400000).toISOString().split('T')[0];
+
+    // Bachtrack loads most listings via JS, so we need a headless browser
+    let chromium: any;
+    let browser: any;
 
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml',
-          'Accept-Language': 'en-US,en;q=0.9',
-        },
-      });
-
-      clearTimeout(timeout);
-
-      if (response.status === 429) {
-        errors.push('Rate limited by Bachtrack (429). Will retry next run.');
-        return { source: this.source, candidates: [], errors };
+      const pw = await import('playwright');
+      chromium = pw.chromium;
+    } catch {
+      // Fallback to fetch (gets only 4 promoted events per city)
+      errors.push('Playwright not installed. Run: bunx playwright install chromium. Falling back to fetch (limited results).');
+      for (const [citySlug, cityName] of Object.entries(US_CITIES)) {
+        try {
+          const url = `${BACHTRACK_BASE}/city/${citySlug}?date_from=${today}&date_to=${twoMonths}&genre=1`;
+          const response = await fetch(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36', 'Accept': 'text/html' },
+          });
+          if (response.ok) {
+            const html = await response.text();
+            allCandidates.push(...parseEventListing(html, cityName));
+          }
+          await sleep(REQUEST_DELAY_MS);
+        } catch {}
       }
-
-      if (response.status === 403) {
-        errors.push('Blocked by Bachtrack (403). Try running from a different IP.');
-        return { source: this.source, candidates: [], errors };
-      }
-
-      if (!response.ok) {
-        errors.push(`Bachtrack returned ${response.status}: ${response.statusText}`);
-        return { source: this.source, candidates: [], errors };
-      }
-
-      const html = await response.text();
-      allCandidates = parseEventListing(html);
-
-      await sleep(REQUEST_DELAY_MS);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('abort')) {
-        errors.push('Bachtrack request timed out after 30s');
-      } else {
-        errors.push(`Bachtrack fetch error: ${msg}`);
-      }
+      const capped = capPerCityPerDay(allCandidates);
+      return { source: this.source, candidates: capped, errors };
     }
 
-    return { source: this.source, candidates: allCandidates, errors };
+    try {
+      browser = await chromium.launch({ headless: true });
+    } catch (err) {
+      errors.push(`Failed to launch browser: ${err instanceof Error ? err.message : String(err)}`);
+      return { source: this.source, candidates: [], errors };
+    }
+
+    try {
+      const context = await browser.newContext({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        locale: 'en-US',
+      });
+
+      for (const [citySlug, cityName] of Object.entries(US_CITIES)) {
+        try {
+          const page = await context.newPage();
+          const url = `${BACHTRACK_BASE}/city/${citySlug}?date_from=${today}&date_to=${twoMonths}&genre=1`;
+
+          await page.goto(url, { waitUntil: 'networkidle', timeout: FETCH_TIMEOUT_MS });
+          await page.waitForTimeout(2000);
+
+          const html = await page.content();
+          const cityCandidates = parseEventListing(html, cityName);
+          allCandidates.push(...cityCandidates);
+
+          console.log(`[bachtrack] ${cityName}: ${cityCandidates.length} events`);
+          await page.close();
+          await sleep(REQUEST_DELAY_MS);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          errors.push(`Bachtrack error for ${cityName}: ${msg}`);
+        }
+      }
+
+      await context.close();
+    } finally {
+      await browser?.close();
+    }
+
+    // Cap to MAX_PER_CITY_PER_DAY for variety across dates
+    const capped = capPerCityPerDay(allCandidates);
+    console.log(`[bachtrack] ${allCandidates.length} total, ${capped.length} after cap (max ${MAX_PER_CITY_PER_DAY}/city/day)`);
+
+    return { source: this.source, candidates: capped, errors };
   }
 }
