@@ -11,6 +11,8 @@ interface QueuedEvent {
   event_date: string;
   event_type: string;
   source: string;
+  url: string | null;
+  poster_url: string | null;
   status: EventStatus;
   created_by: string | null;
   created_at: string;
@@ -40,7 +42,7 @@ export default function AdminEventQueue({ userId }: Props) {
     setLoading(true);
     const { data } = await supabase
       .from('events')
-      .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderation_note')
+      .select('id, title, venue, city, event_date, event_type, source, url, poster_url, status, created_by, created_at, moderation_note')
       .eq('status', status)
       .order('created_at', { ascending: true })
       .limit(50);
@@ -116,6 +118,11 @@ export default function AdminEventQueue({ userId }: Props) {
           {events.map(event => (
             <div key={event.id} className="bg-white border border-[#E7E5E4] rounded-lg p-5">
               <div className="flex items-start justify-between gap-4">
+                {event.poster_url && (
+                  <div className="flex-shrink-0 w-16 h-20 rounded overflow-hidden bg-[#FAF8F5]">
+                    <img src={event.poster_url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] text-[#78716C] bg-[#FAF8F5] border border-[#E7E5E4] px-2 py-0.5 rounded capitalize">
@@ -126,13 +133,19 @@ export default function AdminEventQueue({ userId }: Props) {
                       {new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
-                  <a href={`/events/${event.id}`} className="font-serif text-lg text-[#1C1917] no-underline hover:underline" target="_blank">
+                  <div className="font-serif text-lg text-[#1C1917]">
                     {event.title}
-                  </a>
+                  </div>
                   <div className="text-xs text-[#78716C] mt-0.5">
                     {event.venue}{event.city ? `, ${event.city}` : ''}
                     {event.created_by && <span> &middot; user submitted</span>}
                   </div>
+                  {event.url && (
+                    <a href={event.url} target="_blank" rel="noopener noreferrer"
+                      className="inline-block mt-1 text-xs text-[#B45309] no-underline hover:underline">
+                      View source &rarr;
+                    </a>
+                  )}
                   <div className="text-[10px] text-[#A8A29E] mt-1">
                     Submitted {new Date(event.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </div>

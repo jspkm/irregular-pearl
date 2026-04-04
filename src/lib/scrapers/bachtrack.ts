@@ -82,8 +82,8 @@ function parseBachtrackDate(dataDates: string, dateText: string): { event_date: 
 export function parseEventListing(html: string): EventCandidate[] {
   const candidates: EventCandidate[] = [];
 
-  // Match wrapper divs with data-id and data-dates
-  const listingPattern = /<div\s+data-id="(\d+)"[^>]*data-dates="([^"]*)"[^>]*>([\s\S]*?)<\/div>\s*<li\s+data-id="\1"/gi;
+  // Match full listing blocks: from <div data-id="X"> to <li data-id="X">
+  const listingPattern = /<div\s+data-id="(\d+)"[^>]*data-dates="([^"]*)"[^>]*>([\s\S]*?)<li\s+data-id="\1"/gi;
   let match;
 
   while ((match = listingPattern.exec(html)) !== null) {
@@ -122,9 +122,13 @@ export function parseEventListing(html: string): EventCandidate[] {
     // Skip past events
     if (new Date(parsed.event_date) < new Date(new Date().toISOString().split('T')[0])) continue;
 
-    // Extract URL from listing-more-info link
-    const urlMatch = block.match(/<a[^>]*class="listing-more-info"[^>]*href="([^"]+)"/i);
+    // Extract URL from listing-more-info link or concert-event href
+    const urlMatch = block.match(/href="(\/concert-event\/[^"]+)"/i);
     const url = urlMatch ? `https://bachtrack.com${urlMatch[1]}` : undefined;
+
+    // Extract image from listing image
+    const imgMatch = block.match(/src="(https:\/\/cdn\.bachtrack\.com\/[^"]+\.(jpg|webp|png))"/i);
+    const image_url = imgMatch ? imgMatch[1] : undefined;
 
     // Extract performers
     const performers: string[] = [];
@@ -143,6 +147,7 @@ export function parseEventListing(html: string): EventCandidate[] {
       start_time: parsed.start_time,
       event_type: inferEventType(title),
       url,
+      image_url,
       performers: performers.length > 0 ? performers : undefined,
     });
   }

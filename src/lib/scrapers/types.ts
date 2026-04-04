@@ -20,6 +20,7 @@ export interface EventCandidate {
   event_type: 'recital' | 'concert' | 'competition' | 'masterclass' | 'recording' | 'festival';
   description?: string;
   url?: string;
+  image_url?: string;
   performers?: string[]; // display names (not linked to users)
 }
 
