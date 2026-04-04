@@ -102,7 +102,7 @@ export default function Autocomplete({
       {open && filtered.length > 0 && (
         <ul
           ref={listRef}
-          className="absolute z-50 left-0 right-0 mt-1 bg-white border border-[#E7E5E4] rounded-lg shadow-sm max-h-48 overflow-y-auto"
+          className="absolute z-50 left-0 right-0 mt-1 bg-white border border-[#E7E5E4] rounded-lg shadow-sm max-h-48 overflow-y-auto list-none p-0 m-0"
         >
           {filtered.map((item, i) => (
             <li
