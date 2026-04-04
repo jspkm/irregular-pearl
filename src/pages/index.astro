@@ -163,13 +163,6 @@ for (const [name, count] of Object.entries(instrumentGroups)) {
 displayInstruments.push({ name: 'Winds & Other', count: windsCount, filter: 'flute,clarinet,guitar,string' });
 displayInstruments.sort((a, b) => b.count - a.count);
 
-const instrumentEmoji: Record<string, string> = {
-  'Piano': '🎹',
-  'Violin': '🎻',
-  'Cello': '🎻',
-  'Voice': '🧑‍🎤',
-  'Winds & Other': '🎵',
-};
 
 // Top composers
 const composerCounts: Record<string, number> = {};
@@ -405,9 +398,8 @@ const itemListLd = {
           <h2 class="font-display text-2xl mb-4">Browse by Instrument</h2>
           <div class="grid grid-cols-3 md:grid-cols-5 gap-3">
             {displayInstruments.map((inst) => (
-              <a href={`/instrument/${encodeURIComponent(inst.filter.split(',')[0].toLowerCase())}`} class="block bg-surface border border-border rounded-lg p-4 text-center hover:border-accent transition-all no-underline">
-                <div class="text-[28px] mb-2" style="filter: saturate(0.1) opacity(0.6);">{instrumentEmoji[inst.name] || '🎵'}</div>
-                <div class="text-sm font-medium text-ink">{inst.name}</div>
+              <a href={`/instrument/${encodeURIComponent(inst.filter.split(',')[0].toLowerCase())}`} class="block bg-surface border border-border rounded-lg p-4 hover:border-accent transition-all no-underline">
+                <div class="font-display text-lg text-ink">{inst.name}</div>
                 <div class="text-xs text-muted">{inst.count} pieces</div>
               </a>
             ))}
