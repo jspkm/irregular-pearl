@@ -25,9 +25,10 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
       {/* Title */}
       <div>
         <label for="title" class="block text-xs font-medium text-ink mb-1">Event Title *</label>
-        <input type="text" id="title" name="title" required maxlength="200"
+        <input type="text" id="title" name="title" required maxlength="200" list="title-suggestions" autocomplete="off"
           class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent-light font-body"
           placeholder="e.g. Bach Cello Suite Recital" />
+        <datalist id="title-suggestions"></datalist>
       </div>
 
       {/* Type + Date row */}
@@ -60,15 +61,17 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
       <div class="grid grid-cols-2 gap-3">
         <div>
           <label for="venue" class="block text-xs font-medium text-ink mb-1">Venue *</label>
-          <input type="text" id="venue" name="venue" required maxlength="200"
+          <input type="text" id="venue" name="venue" required maxlength="200" list="venue-suggestions" autocomplete="off"
             class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
             placeholder="e.g. Weill Recital Hall" />
+          <datalist id="venue-suggestions"></datalist>
         </div>
         <div>
           <label for="city" class="block text-xs font-medium text-ink mb-1">City</label>
-          <input type="text" id="city" name="city" maxlength="100"
+          <input type="text" id="city" name="city" maxlength="100" list="city-suggestions" autocomplete="off"
             class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
             placeholder="e.g. New York" />
+          <datalist id="city-suggestions"></datalist>
         </div>
       </div>
 
@@ -152,12 +155,68 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
   const errorDiv = document.getElementById('form-error') as HTMLDivElement;
 
-  // Check auth on page load — show sign-in prompt if not logged in
+  // Check auth on page load
   supabase.auth.getSession().then(({ data: { session } }) => {
     if (!session?.user) {
       form.style.display = 'none';
       errorDiv.classList.remove('hidden');
       errorDiv.innerHTML = 'You need to <a href="/login?return=/events/submit" class="text-[#B45309] underline">sign in</a> to submit an event.';
+    }
+  });
+
+  // Load autocomplete suggestions from existing events
+  async function loadSuggestions() {
+    const { data } = await supabase
+      .from('events')
+      .select('title, venue, city')
+      .not('title', 'is', null)
+      .limit(500);
+
+    if (!data) return;
+
+    const titles = [...new Set(data.map((e: any) => e.title).filter(Boolean))];
+    const venues = [...new Set(data.map((e: any) => e.venue).filter(Boolean))];
+    const cities = [...new Set(data.map((e: any) => e.city).filter(Boolean))].sort();
+
+    function fill(id: string, values: string[]) {
+      const dl = document.getElementById(id);
+      if (!dl) return;
+      dl.innerHTML = values.map(v => `<option value="${v.replace(/"/g, '&quot;')}">`).join('');
+    }
+
+    fill('title-suggestions', titles);
+    fill('venue-suggestions', venues);
+    fill('city-suggestions', cities);
+  }
+  loadSuggestions();
+
+  // Auto-fill city when a known venue is selected
+  const venueInput = document.getElementById('venue') as HTMLInputElement;
+  const cityInput = document.getElementById('city') as HTMLInputElement;
+  let venueToCity: Record<string, string> = {};
+
+  supabase.from('events').select('venue, city').not('venue', 'is', null).not('city', 'is', null).limit(500)
+    .then(({ data }) => {
+      if (!data) return;
+      for (const e of data as Array<{ venue: string; city: string }>) {
+        if (e.venue && e.city) venueToCity[e.venue] = e.city;
+      }
+    });
+
+  venueInput.addEventListener('change', () => {
+    const matchedCity = venueToCity[venueInput.value];
+    if (matchedCity && !cityInput.value) {
+      cityInput.value = matchedCity;
+    }
+  });
+
+  // Prevent past dates (belt + suspenders with the HTML min attribute)
+  const dateInput = document.getElementById('event_date') as HTMLInputElement;
+  dateInput.addEventListener('change', () => {
+    const today = new Date().toISOString().split('T')[0];
+    if (dateInput.value < today) {
+      dateInput.value = '';
+      showError('Event date cannot be in the past.');
     }
   });
 
