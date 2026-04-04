@@ -12,15 +12,12 @@ import type { ScraperAdapter, ScraperResult, EventCandidate } from './types';
 
 const REQUEST_DELAY_MS = 3000;
 
-// Cities to search — start small, expand based on user base
+// Top 20 cities for Google Events (Playwright is slow, keep this shorter than Bachtrack)
 const TARGET_CITIES = [
-  'New York',
-  'Boston',
-  'San Francisco',
-  'Los Angeles',
-  'Chicago',
-  'Philadelphia',
-  'Washington DC',
+  'New York', 'Los Angeles', 'Chicago', 'Boston', 'San Francisco',
+  'London', 'Berlin', 'Vienna', 'Paris', 'Amsterdam',
+  'Tokyo', 'Seoul', 'Sydney', 'Toronto', 'Munich',
+  'Milan', 'Prague', 'Budapest', 'Tel Aviv', 'Singapore',
 ];
 
 function sleep(ms: number): Promise<void> {

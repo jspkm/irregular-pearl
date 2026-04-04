@@ -25,8 +25,9 @@ const REQUEST_DELAY_MS = 1500;
 const FETCH_TIMEOUT_MS = 30000;
 const MAX_PER_CITY_PER_DAY = 5;
 
-// US cities: slug (Bachtrack URL) → display name
-const US_CITIES: Record<string, string> = {
+// 100 classical music cities worldwide: Bachtrack slug → display name
+const CITIES: Record<string, string> = {
+  // North America — major
   'new-york-city': 'New York',
   'boston': 'Boston',
   'san-francisco': 'San Francisco',
@@ -37,6 +38,118 @@ const US_CITIES: Record<string, string> = {
   'houston': 'Houston',
   'seattle': 'Seattle',
   'cleveland': 'Cleveland',
+  // North America — secondary
+  'detroit': 'Detroit',
+  'pittsburgh': 'Pittsburgh',
+  'baltimore': 'Baltimore',
+  'atlanta': 'Atlanta',
+  'dallas': 'Dallas',
+  'minneapolis': 'Minneapolis',
+  'st-louis': 'St. Louis',
+  'cincinnati': 'Cincinnati',
+  'san-diego': 'San Diego',
+  'denver': 'Denver',
+  'nashville': 'Nashville',
+  'new-haven': 'New Haven',
+  'ann-arbor': 'Ann Arbor',
+  'toronto': 'Toronto',
+  'montreal': 'Montreal',
+  'vancouver': 'Vancouver',
+  // UK & Ireland
+  'london': 'London',
+  'manchester': 'Manchester',
+  'birmingham': 'Birmingham',
+  'edinburgh': 'Edinburgh',
+  'glasgow': 'Glasgow',
+  'oxford': 'Oxford',
+  'cambridge': 'Cambridge',
+  'dublin': 'Dublin',
+  // Germany & Austria
+  'berlin': 'Berlin',
+  'munich': 'Munich',
+  'hamburg': 'Hamburg',
+  'cologne': 'Cologne',
+  'frankfurt': 'Frankfurt',
+  'leipzig': 'Leipzig',
+  'dresden': 'Dresden',
+  'stuttgart': 'Stuttgart',
+  'dusseldorf': 'Düsseldorf',
+  'vienna': 'Vienna',
+  'salzburg': 'Salzburg',
+  'graz': 'Graz',
+  'linz': 'Linz',
+  // France
+  'paris': 'Paris',
+  'lyon': 'Lyon',
+  'marseille': 'Marseille',
+  'toulouse': 'Toulouse',
+  'strasbourg': 'Strasbourg',
+  // Benelux
+  'amsterdam': 'Amsterdam',
+  'rotterdam': 'Rotterdam',
+  'the-hague': 'The Hague',
+  'brussels': 'Brussels',
+  'antwerp': 'Antwerp',
+  'luxembourg-city': 'Luxembourg',
+  // Switzerland
+  'zurich': 'Zurich',
+  'geneva': 'Geneva',
+  'basel': 'Basel',
+  'lucerne': 'Lucerne',
+  // Italy
+  'rome': 'Rome',
+  'milan': 'Milan',
+  'florence': 'Florence',
+  'venice': 'Venice',
+  'naples': 'Naples',
+  'turin': 'Turin',
+  // Iberia
+  'madrid': 'Madrid',
+  'barcelona': 'Barcelona',
+  'lisbon': 'Lisbon',
+  // Scandinavia
+  'copenhagen': 'Copenhagen',
+  'stockholm': 'Stockholm',
+  'oslo': 'Oslo',
+  'helsinki': 'Helsinki',
+  'gothenburg': 'Gothenburg',
+  // Central & Eastern Europe
+  'budapest': 'Budapest',
+  'prague': 'Prague',
+  'warsaw': 'Warsaw',
+  'krakow': 'Krakow',
+  'bucharest': 'Bucharest',
+  'sofia': 'Sofia',
+  'zagreb': 'Zagreb',
+  'ljubljana': 'Ljubljana',
+  // Russia & neighbors
+  'moscow': 'Moscow',
+  'st-petersburg': 'St. Petersburg',
+  // Asia
+  'tokyo': 'Tokyo',
+  'osaka': 'Osaka',
+  'seoul': 'Seoul',
+  'beijing': 'Beijing',
+  'shanghai': 'Shanghai',
+  'hong-kong': 'Hong Kong',
+  'singapore': 'Singapore',
+  'taipei': 'Taipei',
+  'mumbai': 'Mumbai',
+  'bangkok': 'Bangkok',
+  // Middle East
+  'tel-aviv': 'Tel Aviv',
+  'jerusalem': 'Jerusalem',
+  'dubai': 'Dubai',
+  'abu-dhabi': 'Abu Dhabi',
+  // Oceania
+  'sydney': 'Sydney',
+  'melbourne': 'Melbourne',
+  'auckland': 'Auckland',
+  // South America
+  'buenos-aires': 'Buenos Aires',
+  'sao-paulo': 'São Paulo',
+  'bogota': 'Bogotá',
+  'santiago': 'Santiago',
 };
 
 function sleep(ms: number): Promise<void> {
@@ -202,7 +315,7 @@ export class BachtrackScraper implements ScraperAdapter {
     } catch {
       // Fallback to fetch (gets only 4 promoted events per city)
       errors.push('Playwright not installed. Run: bunx playwright install chromium. Falling back to fetch (limited results).');
-      for (const [citySlug, cityName] of Object.entries(US_CITIES)) {
+      for (const [citySlug, cityName] of Object.entries(CITIES)) {
         try {
           const url = `${BACHTRACK_BASE}/city/${citySlug}?date_from=${today}&date_to=${twoMonths}&genre=1`;
           const response = await fetch(url, {
@@ -232,7 +345,7 @@ export class BachtrackScraper implements ScraperAdapter {
         locale: 'en-US',
       });
 
-      for (const [citySlug, cityName] of Object.entries(US_CITIES)) {
+      for (const [citySlug, cityName] of Object.entries(CITIES)) {
         try {
           const page = await context.newPage();
           const url = `${BACHTRACK_BASE}/city/${citySlug}?date_from=${today}&date_to=${twoMonths}&genre=1`;
