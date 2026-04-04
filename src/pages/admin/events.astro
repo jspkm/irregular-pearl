@@ -17,8 +17,9 @@ if (!staffUser || !canManageSection(staffUser.profile, 'events')) {
 }
 
 // Admin pages use service role key to bypass RLS (auth already checked above).
-// Falls back to the cookie-based client if service key isn't available.
-const serviceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+// On Cloudflare Pages, non-PUBLIC_ env vars are on Astro.locals.runtime.env.
+const runtime = (Astro.locals as any).runtime;
+const serviceKey = runtime?.env?.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = serviceKey
   ? createClient(import.meta.env.PUBLIC_SUPABASE_URL, serviceKey)
   : staffUser.supabase;
