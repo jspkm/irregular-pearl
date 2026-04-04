@@ -51,11 +51,11 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
         <select id="start_time" name="start_time"
           class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent bg-surface font-body">
           <option value="">Select time</option>
-          {Array.from({ length: 48 }, (_, i) => {
-            const h = Math.floor(i / 2);
+          {Array.from({ length: 31 }, (_, i) => {
+            const h = 8 + Math.floor(i / 2);
             const m = i % 2 === 0 ? '00' : '30';
             const val = `${String(h).padStart(2, '0')}:${m}`;
-            const label = `${h === 0 ? 12 : h > 12 ? h - 12 : h}:${m} ${h < 12 ? 'AM' : 'PM'}`;
+            const label = `${h > 12 ? h - 12 : h}:${m} ${h < 12 ? 'AM' : 'PM'}`;
             return <option value={val}>{label}</option>;
           })}
         </select>
