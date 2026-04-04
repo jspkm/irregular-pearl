@@ -181,21 +181,6 @@ const topComposers = Object.entries(composerCounts)
   .slice(0, 8)
   .map(([name, count]) => ({ name, count, initial: name.split(' ').pop()?.[0] || '?' }));
 
-// Eras with counts
-const eraCounts: Record<string, number> = {};
-for (const piece of seedPieces) {
-  const era = piece.era.replace(/\/.*/, '').trim(); // normalize "Classical/Romantic" to "Classical"
-  eraCounts[era] = (eraCounts[era] || 0) + 1;
-}
-const eras = [
-  { name: 'Baroque', range: 'c. 1600–1750' },
-  { name: 'Classical', range: 'c. 1750–1820' },
-  { name: 'Romantic', range: 'c. 1820–1900' },
-  { name: 'Late Romantic', range: 'c. 1850–1920' },
-  { name: 'Impressionist', range: 'c. 1890–1930' },
-  { name: '20th Century', range: 'c. 1900–2000' },
-  { name: 'Post-Romantic', range: 'c. 1880–1920' },
-].filter(e => eraCounts[e.name]).map(e => ({ ...e, count: eraCounts[e.name] || 0 }));
 
 // Most active pieces this week (by unique musicians in past 7 days)
 // Ties (including zero activity) are broken randomly
@@ -464,19 +449,6 @@ const itemListLd = {
           </div>
         </section>
 
-        <!-- Browse by Era -->
-        <section class="mb-12">
-          <h2 class="font-display text-2xl mb-4">Browse by Era</h2>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {eras.map((era) => (
-              <a href={`/?filter=${encodeURIComponent(era.name)}&type=era`} class="block bg-surface border border-border rounded-lg p-4 hover:border-muted transition-all no-underline">
-                <div class="font-display text-lg text-ink">{era.name}</div>
-                <div class="text-[11px] font-mono text-muted mb-1">{era.range}</div>
-                <div class="text-xs text-muted">{era.count} pieces</div>
-              </a>
-            ))}
-          </div>
-        </section>
       </div>
     </main>
   )}

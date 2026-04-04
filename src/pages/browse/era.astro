@@ -45,10 +45,10 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'Browse by Era — Irregular Pearl',
-  description: `Explore ${totalPieces} classical music works spanning centuries, grouped by musical era.`,
+  description: `Explore ${totalPieces} classical music pieces spanning centuries, grouped by musical era.`,
 };
 ---
-<Layout title="Browse by Era" description={`Explore ${totalPieces} classical works grouped by musical era.`} jsonLd={[jsonLd]}>
+<Layout title="Browse by Era" description={`Explore ${totalPieces} classical pieces grouped by musical era.`} jsonLd={[jsonLd]}>
   <Navbar />
 
   <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
@@ -60,7 +60,7 @@ const jsonLd = {
   <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
     <div class="mb-8">
       <h1 class="font-display text-3xl md:text-4xl italic mb-2">Browse by Era</h1>
-      <p class="text-muted text-sm">{totalPieces.toLocaleString()} works spanning 500 years of classical music</p>
+      <p class="text-muted text-sm">{totalPieces.toLocaleString()} pieces spanning 500 years</p>
     </div>
 
     {sortedEras.map(era => {
@@ -70,7 +70,7 @@ const jsonLd = {
           <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
             <svg class="w-4 h-4 text-muted transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             {era}
-            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} works)</span>
+            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} pieces)</span>
           </summary>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {pieces.slice(0, 15).map((piece: any) => (
@@ -89,7 +89,7 @@ const jsonLd = {
           </div>
           {pieces.length > 15 && (
             <p class="text-sm text-muted mt-3 italic">
-              Showing 15 of {pieces.length.toLocaleString()} {era.toLowerCase()} works.
+              Showing 15 of {pieces.length.toLocaleString()} {era.toLowerCase()} pieces.
               <a href={`/?filter=${encodeURIComponent(era)}&type=era`} class="text-accent ml-1 no-underline hover:underline">View all</a>
             </p>
           )}

@@ -40,10 +40,10 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'Browse by Form — Irregular Pearl',
-  description: `Explore ${totalPieces} classical music works grouped by musical form: sonatas, concertos, symphonies, and more.`,
+  description: `Explore ${totalPieces} classical music pieces grouped by musical form: sonatas, concertos, symphonies, and more.`,
 };
 ---
-<Layout title="Browse by Form" description={`Explore ${totalPieces} classical works grouped by musical form.`} jsonLd={[jsonLd]}>
+<Layout title="Browse by Form" description={`Explore ${totalPieces} classical pieces grouped by musical form.`} jsonLd={[jsonLd]}>
   <Navbar />
 
   <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
@@ -55,7 +55,7 @@ const jsonLd = {
   <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
     <div class="mb-8">
       <h1 class="font-display text-3xl md:text-4xl italic mb-2">Browse by Form</h1>
-      <p class="text-muted text-sm">{totalPieces.toLocaleString()} works across sonatas, concertos, symphonies, and more</p>
+      <p class="text-muted text-sm">{totalPieces.toLocaleString()} pieces across sonatas, concertos, symphonies, and more</p>
     </div>
 
     {sortedForms.map(form => {
@@ -65,7 +65,7 @@ const jsonLd = {
           <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
             <svg class="w-4 h-4 text-muted transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             {form}
-            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} works)</span>
+            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} pieces)</span>
           </summary>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {pieces.slice(0, 15).map((piece: any) => (
@@ -84,7 +84,7 @@ const jsonLd = {
           </div>
           {pieces.length > 15 && (
             <p class="text-sm text-muted mt-3 italic">
-              Showing 15 of {pieces.length.toLocaleString()} {form.toLowerCase()} works.
+              Showing 15 of {pieces.length.toLocaleString()} {form.toLowerCase()} pieces.
             </p>
           )}
         </details>

@@ -41,7 +41,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: composerName,
-  description: `Classical music composer with ${pieces.length} works on Irregular Pearl`,
+  description: `Classical music composer with ${pieces.length} pieces on Irregular Pearl`,
   url: Astro.url.href,
   mainEntityOfPage: {
     '@type': 'CollectionPage',
@@ -114,7 +114,7 @@ const breadcrumbLd = {
         </div>
         {formPieces.length > 15 && (
           <p class="text-sm text-muted mt-3 italic">
-            Showing 15 of {formPieces.length} {form.toLowerCase()} works.
+            Showing 15 of {formPieces.length} {form.toLowerCase()} pieces.
           </p>
         )}
       </details>
