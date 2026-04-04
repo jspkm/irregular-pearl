@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../../lib/supabase';
+import InlineConfirm, { InlineMessage } from './InlineConfirm';
 
 interface Report {
   id: string;
@@ -18,6 +19,8 @@ interface Props {
 export default function AdminReportList({ managedSections, isAdmin }: Props) {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
 
   useEffect(() => {
     if (!hasSupabase) { setLoading(false); return; }
@@ -56,13 +59,15 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
   const dismissReport = async (reportId: string) => {
     await supabase.from('reports').delete().eq('id', reportId);
     setReports(prev => prev.filter(r => r.id !== reportId));
+    setMessage({ text: 'Report dismissed.', type: 'success' });
   };
 
   const deleteDiscussion = async (reportId: string, discussionId: string) => {
-    if (!confirm('Delete this discussion post? This cannot be undone.')) return;
     await supabase.from('discussions').update({ is_deleted: true }).eq('id', discussionId);
     await supabase.from('reports').delete().eq('id', reportId);
     setReports(prev => prev.filter(r => r.id !== reportId));
+    setConfirmingDelete(null);
+    setMessage({ text: 'Post deleted.', type: 'success' });
   };
 
   if (loading) return <div className="text-sm text-muted">Loading...</div>;
@@ -70,7 +75,7 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
   if (reports.length === 0) {
     return (
       <div className="text-center py-16 border border-dashed border-border rounded-xl">
-        <div className="text-2xl mb-2">✓</div>
+        <div className="text-2xl mb-2">&#10003;</div>
         <p className="text-sm text-muted">No pending reports</p>
       </div>
     );
@@ -78,6 +83,7 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
 
   return (
     <div className="space-y-3">
+      {message && <InlineMessage message={message.text} type={message.type} onDismiss={() => setMessage(null)} />}
       {reports.map(r => (
         <div key={r.id} className="bg-surface border border-border rounded-xl p-5">
           <div className="flex justify-between items-start mb-3">
@@ -87,7 +93,7 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
               <span className="text-xs text-muted"> · {new Date(r.created_at).toLocaleDateString()}</span>
             </div>
             <a href={`/piece/${r.discussion.piece_id}`} className="text-[11px] text-[#B45309] no-underline hover:underline">
-              View piece →
+              View piece &rarr;
             </a>
           </div>
 
@@ -100,20 +106,30 @@ export default function AdminReportList({ managedSections, isAdmin }: Props) {
             <span className="font-medium">Reason:</span> {r.reason}
           </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => dismissReport(r.id)}
-              className="text-xs px-3 py-1.5 border border-border rounded-lg text-muted hover:text-ink bg-transparent cursor-pointer"
-            >
-              Dismiss
-            </button>
-            <button
-              onClick={() => deleteDiscussion(r.id, r.discussion_id)}
-              className="text-xs px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 cursor-pointer"
-            >
-              Delete Post
-            </button>
-          </div>
+          {confirmingDelete === r.id ? (
+            <InlineConfirm
+              message="Delete this discussion post? This cannot be undone."
+              confirmLabel="Delete Post"
+              confirmStyle="danger"
+              onConfirm={() => deleteDiscussion(r.id, r.discussion_id)}
+              onCancel={() => setConfirmingDelete(null)}
+            />
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={() => dismissReport(r.id)}
+                className="text-xs px-3 py-1.5 border border-border rounded-lg text-muted hover:text-ink bg-transparent cursor-pointer"
+              >
+                Dismiss
+              </button>
+              <button
+                onClick={() => setConfirmingDelete(r.id)}
+                className="text-xs px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 cursor-pointer"
+              >
+                Delete Post
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>

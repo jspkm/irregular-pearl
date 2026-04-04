@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import InlineConfirm, { InlineMessage } from './InlineConfirm';
 
 type EventStatus = 'queued' | 'approved' | 'rejected';
+type ConfirmAction = { type: 'single'; id: string; action: 'approve' | 'reject' | 'requeue' }
+  | { type: 'bulk'; action: 'approve' | 'reject' | 'requeue' };
 
 interface QueuedEvent {
   id: string;
@@ -29,7 +32,8 @@ export default function AdminEventQueue({ userId }: Props) {
   const [counts, setCounts] = useState({ queued: 0, approved: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [bulkLoading, setBulkLoading] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmAction | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
 
   async function fetchCounts() {
     const [q, a, r] = await Promise.all([
@@ -43,6 +47,7 @@ export default function AdminEventQueue({ userId }: Props) {
   async function fetchEvents(status: EventStatus) {
     setLoading(true);
     setSelected(new Set());
+    setPendingConfirm(null);
     const { data } = await supabase
       .from('events')
       .select('id, title, venue, city, event_date, event_type, source, url, poster_url, status, created_by, created_at, moderation_note')
@@ -75,70 +80,44 @@ export default function AdminEventQueue({ userId }: Props) {
     }
   }
 
-  async function moderate(eventId: string, action: 'approve' | 'reject' | 'requeue') {
-    const statusMap = { approve: 'approved', reject: 'rejected', requeue: 'queued' } as const;
-    let note: string | null = null;
-
-    if (action === 'reject') {
-      note = prompt('Reason for rejection (optional):');
-      if (note === null) return;
-    }
-
-    const { error } = await supabase
-      .from('events')
-      .update({
-        status: statusMap[action],
-        moderated_by: userId,
-        moderated_at: new Date().toISOString(),
-        moderation_note: note || null,
-      })
-      .eq('id', eventId);
-
-    if (error) {
-      alert(`Failed: ${error.message}`);
-      return;
-    }
-
-    setEvents(prev => prev.filter(e => e.id !== eventId));
-    setSelected(prev => { const next = new Set(prev); next.delete(eventId); return next; });
-    fetchCounts();
+  function requestAction(action: 'approve' | 'reject' | 'requeue', eventId?: string) {
+    setPendingConfirm(eventId
+      ? { type: 'single', id: eventId, action }
+      : { type: 'bulk', action }
+    );
   }
 
-  async function bulkModerate(action: 'approve' | 'reject' | 'requeue') {
-    if (selected.size === 0) return;
-
+  async function executeAction(note?: string) {
+    if (!pendingConfirm) return;
     const statusMap = { approve: 'approved', reject: 'rejected', requeue: 'queued' } as const;
-    let note: string | null = null;
+    const newStatus = statusMap[pendingConfirm.action];
 
-    if (action === 'reject') {
-      note = prompt(`Reason for rejecting ${selected.size} events (optional):`);
-      if (note === null) return;
-    }
-
-    if (!confirm(`${action === 'approve' ? 'Approve' : action === 'reject' ? 'Reject' : 'Requeue'} ${selected.size} events?`)) return;
-
-    setBulkLoading(true);
-    const ids = Array.from(selected);
+    const ids = pendingConfirm.type === 'single'
+      ? [pendingConfirm.id]
+      : Array.from(selected);
 
     const { error } = await supabase
       .from('events')
       .update({
-        status: statusMap[action],
+        status: newStatus,
         moderated_by: userId,
         moderated_at: new Date().toISOString(),
         moderation_note: note || null,
       })
       .in('id', ids);
 
-    setBulkLoading(false);
+    setPendingConfirm(null);
 
     if (error) {
-      alert(`Bulk action failed: ${error.message}`);
+      setMessage({ text: `Failed: ${error.message}`, type: 'error' });
       return;
     }
 
-    setEvents(prev => prev.filter(e => !selected.has(e.id)));
-    setSelected(new Set());
+    const count = ids.length;
+    const label = pendingConfirm.action === 'approve' ? 'approved' : pendingConfirm.action === 'reject' ? 'rejected' : 'requeued';
+    setMessage({ text: `${count} event${count !== 1 ? 's' : ''} ${label}.`, type: 'success' });
+    setEvents(prev => prev.filter(e => !ids.includes(e.id)));
+    setSelected(prev => { const next = new Set(prev); ids.forEach(id => next.delete(id)); return next; });
     fetchCounts();
   }
 
@@ -152,6 +131,8 @@ export default function AdminEventQueue({ userId }: Props) {
     }`;
 
   const allSelected = events.length > 0 && selected.size === events.length;
+  const actionLabel = (a: string) => a === 'approve' ? 'Approve' : a === 'reject' ? 'Reject' : 'Requeue';
+  const actionStyle = (a: string): 'success' | 'danger' | 'default' => a === 'approve' ? 'success' : a === 'reject' ? 'danger' : 'default';
 
   return (
     <div>
@@ -168,42 +149,52 @@ export default function AdminEventQueue({ userId }: Props) {
         </button>
       </div>
 
+      {/* Inline message */}
+      {message && <InlineMessage message={message.text} type={message.type} onDismiss={() => setMessage(null)} />}
+
       {/* Bulk actions bar */}
       {events.length > 0 && (
         <div className="flex items-center gap-3 mb-4 py-2 border-b border-[#E7E5E4]">
           <label className="flex items-center gap-2 text-xs text-[#78716C] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              onChange={toggleAll}
-              className="accent-[#B45309]"
-            />
+            <input type="checkbox" checked={allSelected} onChange={toggleAll} className="accent-[#B45309]" />
             {selected.size > 0 ? `${selected.size} selected` : 'Select all'}
           </label>
 
-          {selected.size > 0 && (
+          {selected.size > 0 && !pendingConfirm && (
             <>
               {statusFilter !== 'approved' && (
-                <button onClick={() => bulkModerate('approve')} disabled={bulkLoading}
-                  className="px-3 py-1 text-xs bg-[#15803D] text-white rounded hover:bg-[#166534] transition-colors cursor-pointer disabled:opacity-50">
+                <button onClick={() => requestAction('approve')}
+                  className="px-3 py-1 text-xs bg-[#15803D] text-white rounded hover:bg-[#166534] transition-colors cursor-pointer border-none">
                   Approve {selected.size}
                 </button>
               )}
               {statusFilter !== 'rejected' && (
-                <button onClick={() => bulkModerate('reject')} disabled={bulkLoading}
-                  className="px-3 py-1 text-xs bg-[#DC2626] text-white rounded hover:bg-[#B91C1C] transition-colors cursor-pointer disabled:opacity-50">
+                <button onClick={() => requestAction('reject')}
+                  className="px-3 py-1 text-xs bg-[#DC2626] text-white rounded hover:bg-[#B91C1C] transition-colors cursor-pointer border-none">
                   Reject {selected.size}
                 </button>
               )}
               {statusFilter !== 'queued' && (
-                <button onClick={() => bulkModerate('requeue')} disabled={bulkLoading}
-                  className="px-3 py-1 text-xs border border-[#E7E5E4] text-[#78716C] rounded hover:border-[#78716C] transition-colors cursor-pointer disabled:opacity-50">
+                <button onClick={() => requestAction('requeue')}
+                  className="px-3 py-1 text-xs border border-[#E7E5E4] text-[#78716C] rounded hover:border-[#78716C] transition-colors cursor-pointer bg-transparent">
                   Requeue {selected.size}
                 </button>
               )}
             </>
           )}
         </div>
+      )}
+
+      {/* Bulk confirm inline */}
+      {pendingConfirm?.type === 'bulk' && (
+        <InlineConfirm
+          message={`${actionLabel(pendingConfirm.action)} ${selected.size} event${selected.size !== 1 ? 's' : ''}?`}
+          confirmLabel={`${actionLabel(pendingConfirm.action)} ${selected.size}`}
+          confirmStyle={actionStyle(pendingConfirm.action)}
+          inputPlaceholder={pendingConfirm.action === 'reject' ? 'Reason for rejection (optional)...' : undefined}
+          onConfirm={(note) => executeAction(note)}
+          onCancel={() => setPendingConfirm(null)}
+        />
       )}
 
       {loading ? (
@@ -219,7 +210,6 @@ export default function AdminEventQueue({ userId }: Props) {
               selected.has(event.id) ? 'border-[#B45309] bg-[#FEF3C7]/20' : 'border-[#E7E5E4]'
             }`}>
               <div className="flex items-start gap-4">
-                {/* Checkbox */}
                 <input
                   type="checkbox"
                   checked={selected.has(event.id)}
@@ -227,14 +217,12 @@ export default function AdminEventQueue({ userId }: Props) {
                   className="mt-1 accent-[#B45309] flex-shrink-0"
                 />
 
-                {/* Poster thumbnail */}
                 {event.poster_url && (
                   <div className="flex-shrink-0 w-16 h-20 rounded overflow-hidden bg-[#FAF8F5]">
                     <img src={event.poster_url} alt="" className="w-full h-full object-cover" />
                   </div>
                 )}
 
-                {/* Event details */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] text-[#78716C] bg-[#FAF8F5] border border-[#E7E5E4] px-2 py-0.5 rounded capitalize">
@@ -245,9 +233,7 @@ export default function AdminEventQueue({ userId }: Props) {
                       {new Date(event.event_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
                   </div>
-                  <div className="font-serif text-lg text-[#1C1917]">
-                    {event.title}
-                  </div>
+                  <div className="font-serif text-lg text-[#1C1917]">{event.title}</div>
                   <div className="text-xs text-[#78716C] mt-0.5">
                     {event.venue}{event.city ? `, ${event.city}` : ''}
                     {event.created_by && <span> &middot; user submitted</span>}
@@ -266,29 +252,43 @@ export default function AdminEventQueue({ userId }: Props) {
                       Note: {event.moderation_note}
                     </div>
                   )}
+
+                  {/* Inline confirm for this event */}
+                  {pendingConfirm?.type === 'single' && pendingConfirm.id === event.id && (
+                    <InlineConfirm
+                      message={`${actionLabel(pendingConfirm.action)} this event?`}
+                      confirmLabel={actionLabel(pendingConfirm.action)}
+                      confirmStyle={actionStyle(pendingConfirm.action)}
+                      inputPlaceholder={pendingConfirm.action === 'reject' ? 'Reason for rejection (optional)...' : undefined}
+                      onConfirm={(note) => executeAction(note)}
+                      onCancel={() => setPendingConfirm(null)}
+                    />
+                  )}
                 </div>
 
-                {/* Per-item actions */}
-                <div className="flex flex-col gap-1.5 flex-shrink-0">
-                  {statusFilter !== 'approved' && (
-                    <button onClick={() => moderate(event.id, 'approve')}
-                      className="px-3 py-1 text-xs bg-[#15803D] text-white rounded hover:bg-[#166534] transition-colors cursor-pointer">
-                      Approve
-                    </button>
-                  )}
-                  {statusFilter !== 'rejected' && (
-                    <button onClick={() => moderate(event.id, 'reject')}
-                      className="px-3 py-1 text-xs bg-[#DC2626] text-white rounded hover:bg-[#B91C1C] transition-colors cursor-pointer">
-                      Reject
-                    </button>
-                  )}
-                  {statusFilter !== 'queued' && (
-                    <button onClick={() => moderate(event.id, 'requeue')}
-                      className="px-3 py-1 text-xs border border-[#E7E5E4] text-[#78716C] rounded hover:border-[#78716C] transition-colors cursor-pointer">
-                      Requeue
-                    </button>
-                  )}
-                </div>
+                {/* Per-item actions (hidden when confirm is active for this item) */}
+                {!(pendingConfirm?.type === 'single' && pendingConfirm.id === event.id) && (
+                  <div className="flex flex-col gap-1.5 flex-shrink-0">
+                    {statusFilter !== 'approved' && (
+                      <button onClick={() => requestAction('approve', event.id)}
+                        className="px-3 py-1 text-xs bg-[#15803D] text-white rounded hover:bg-[#166534] transition-colors cursor-pointer border-none">
+                        Approve
+                      </button>
+                    )}
+                    {statusFilter !== 'rejected' && (
+                      <button onClick={() => requestAction('reject', event.id)}
+                        className="px-3 py-1 text-xs bg-[#DC2626] text-white rounded hover:bg-[#B91C1C] transition-colors cursor-pointer border-none">
+                        Reject
+                      </button>
+                    )}
+                    {statusFilter !== 'queued' && (
+                      <button onClick={() => requestAction('requeue', event.id)}
+                        className="px-3 py-1 text-xs border border-[#E7E5E4] text-[#78716C] rounded hover:border-[#78716C] transition-colors cursor-pointer bg-transparent">
+                        Requeue
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
