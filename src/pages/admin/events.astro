@@ -11,7 +11,7 @@ import Navbar from '../../components/Navbar.astro';
 import { getStaffUser, canManageSection } from '../../lib/admin';
 import { createClient } from '@supabase/supabase-js';
 
-const staffUser = await getStaffUser(Astro.cookies);
+const staffUser = await getStaffUser(Astro.cookies, Astro.request);
 if (!staffUser || !canManageSection(staffUser.profile, 'events')) {
   return Astro.redirect('/');
 }
@@ -35,7 +35,14 @@ const { data: events, error: eventsError } = await supabase
   .order('created_at', { ascending: true })
   .limit(50);
 
-if (eventsError) console.error('[admin/events] Query error:', eventsError.message);
+const debugInfo = {
+  hasServiceKey: !!serviceKey,
+  hasRuntime: !!runtime,
+  runtimeKeys: runtime?.env ? Object.keys(runtime.env).filter((k: string) => k.includes('SUPA')).join(', ') : 'no runtime',
+  eventsError: eventsError?.message || null,
+  eventsCount: events?.length ?? 0,
+  statusFilter,
+};
 
 const queuedEvents = (events || []) as Array<{
   id: string; title: string; venue: string | null; city: string | null;
@@ -65,6 +72,16 @@ const { count: rejectedCount } = await supabase
 
   <main class="max-w-[900px] mx-auto px-4 md:px-6 py-6 md:py-8">
     <h1 class="font-display italic text-2xl mb-6">Moderate Events</h1>
+
+    {/* Debug info — remove after fixing */}
+    <div class="text-[10px] font-mono text-[#A8A29E] mb-4 p-2 bg-bg rounded border border-border">
+      serviceKey: {debugInfo.hasServiceKey ? 'yes' : 'no'} |
+      runtime: {debugInfo.hasRuntime ? 'yes' : 'no'} |
+      runtimeKeys: {debugInfo.runtimeKeys} |
+      error: {debugInfo.eventsError || 'none'} |
+      count: {debugInfo.eventsCount} |
+      filter: {debugInfo.statusFilter}
+    </div>
 
     {/* Status tabs */}
     <div class="flex gap-1 border border-border rounded-lg overflow-hidden text-xs mb-6 w-fit">

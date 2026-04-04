@@ -9,7 +9,7 @@ interface StaffProfile {
   display_name: string;
 }
 
-export async function getStaffUser(cookies: AstroCookies) {
+export async function getStaffUser(cookies: AstroCookies, request?: Request) {
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
   const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseKey) return null;
@@ -18,30 +18,30 @@ export async function getStaffUser(cookies: AstroCookies) {
     cookies: {
       getAll: () => {
         const all: { name: string; value: string }[] = [];
-        // Astro cookies: iterate all cookies from the request
-        const cookieHeader = (cookies as any)._request?.headers?.get?.('cookie')
-          || (cookies as any)._headers?.get?.('cookie')
-          || '';
+        // Parse raw cookie header from the request (most reliable)
+        const cookieHeader = request?.headers?.get('cookie') || '';
         if (cookieHeader) {
           for (const part of cookieHeader.split(';')) {
-            const [name, ...rest] = part.trim().split('=');
-            if (name && rest.length > 0) {
-              all.push({ name: name.trim(), value: rest.join('=').trim() });
+            const eq = part.indexOf('=');
+            if (eq > 0) {
+              all.push({
+                name: part.slice(0, eq).trim(),
+                value: part.slice(eq + 1).trim(),
+              });
             }
           }
+          return all;
         }
-        // Fallback: try known Supabase cookie names directly
-        if (all.length === 0) {
-          const sbNames = [
-            'sb-access-token', 'sb-refresh-token',
-            'sb-dwtwmpcaylxgprdwaggl-auth-token',
-            'sb-dwtwmpcaylxgprdwaggl-auth-token.0',
-            'sb-dwtwmpcaylxgprdwaggl-auth-token.1',
-          ];
-          for (const name of sbNames) {
-            const val = cookies.get(name)?.value;
-            if (val) all.push({ name, value: val });
-          }
+        // Fallback: try AstroCookies.get() with known names
+        const sbNames = [
+          'sb-access-token', 'sb-refresh-token',
+          'sb-dwtwmpcaylxgprdwaggl-auth-token',
+          'sb-dwtwmpcaylxgprdwaggl-auth-token.0',
+          'sb-dwtwmpcaylxgprdwaggl-auth-token.1',
+        ];
+        for (const name of sbNames) {
+          const val = cookies.get(name)?.value;
+          if (val) all.push({ name, value: val });
         }
         return all;
       },
