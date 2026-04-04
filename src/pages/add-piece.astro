@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import AddPieceForm from '../components/AddPieceForm';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Add a Piece — Irregular Pearl',
+  description: 'Help grow the Irregular Pearl catalog by adding a classical music piece.',
+};
+---
+<Layout title="Add a Piece" description="Help grow the Irregular Pearl catalog by adding a classical music piece." jsonLd={[jsonLd]}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">Add a Piece</span>
+  </div>
+
+  <main class="max-w-2xl mx-auto px-4 md:px-6 py-8">
+    <h1 class="font-display text-3xl italic mb-2">Add a Piece</h1>
+    <p class="text-muted text-sm mb-8">Can't find a piece in our catalog? Add it here and be the first contributor.</p>
+
+    <AddPieceForm client:load />
+  </main>
+</Layout>
