@@ -1,0 +1,100 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import PieceCard from '../../components/PieceCard.astro';
+import { seedPieces } from '../../data/seed';
+import { supabase, hasSupabase } from '../../lib/supabase';
+import { groupBy } from '../../lib/helpers';
+
+// Get era counts from Supabase (includes imported pieces)
+let eraCounts: Record<string, number> = {};
+let eraPieces: Record<string, any[]> = {};
+
+if (hasSupabase) {
+  const { data } = await supabase
+    .from('pieces')
+    .select('id, title, composer_name, catalog_number, instruments, era, difficulty, duration_minutes, description')
+    .order('composer_name');
+
+  if (data) {
+    eraPieces = groupBy(data, (p: any) => p.era || 'Unknown');
+    for (const [era, pieces] of Object.entries(eraPieces)) {
+      eraCounts[era] = pieces.length;
+    }
+  }
+}
+
+// Fallback to seed data if no Supabase
+if (Object.keys(eraCounts).length === 0) {
+  eraPieces = groupBy(seedPieces, p => p.era);
+  for (const [era, pieces] of Object.entries(eraPieces)) {
+    eraCounts[era] = pieces.length;
+  }
+}
+
+const eraOrder = ['Medieval', 'Renaissance', 'Baroque', 'Classical', 'Romantic', 'Modern', 'Contemporary'];
+const sortedEras = Object.keys(eraCounts).sort((a, b) => {
+  const ai = eraOrder.indexOf(a);
+  const bi = eraOrder.indexOf(b);
+  return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+});
+
+const totalPieces = Object.values(eraCounts).reduce((a, b) => a + b, 0);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Browse by Era — Irregular Pearl',
+  description: `Explore ${totalPieces} classical music works spanning centuries, grouped by musical era.`,
+};
+---
+<Layout title="Browse by Era" description={`Explore ${totalPieces} classical works grouped by musical era.`} jsonLd={[jsonLd]}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">Browse by Era</span>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="font-display text-3xl md:text-4xl italic mb-2">Browse by Era</h1>
+      <p class="text-muted text-sm">{totalPieces.toLocaleString()} works spanning 500 years of classical music</p>
+    </div>
+
+    {sortedEras.map(era => {
+      const pieces = eraPieces[era] || [];
+      return (
+        <details class="mb-8" open={pieces.length <= 20}>
+          <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
+            <svg class="w-4 h-4 text-muted transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            {era}
+            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} works)</span>
+          </summary>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {pieces.slice(0, 15).map((piece: any) => (
+              <PieceCard
+                id={piece.id}
+                title={piece.title}
+                composer_name={piece.composer_name}
+                catalog_number={piece.catalog_number}
+                instruments={piece.instruments || []}
+                era={piece.era}
+                difficulty={piece.difficulty || 'intermediate'}
+                duration_minutes={piece.duration_minutes}
+                description={piece.description}
+              />
+            ))}
+          </div>
+          {pieces.length > 15 && (
+            <p class="text-sm text-muted mt-3 italic">
+              Showing 15 of {pieces.length.toLocaleString()} {era.toLowerCase()} works.
+              <a href={`/?filter=${encodeURIComponent(era)}&type=era`} class="text-accent ml-1 no-underline hover:underline">View all</a>
+            </p>
+          )}
+        </details>
+      );
+    })}
+  </main>
+</Layout>

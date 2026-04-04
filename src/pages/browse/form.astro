@@ -1,0 +1,94 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import PieceCard from '../../components/PieceCard.astro';
+import { seedPieces } from '../../data/seed';
+import { supabase, hasSupabase } from '../../lib/supabase';
+import { groupBy } from '../../lib/helpers';
+
+// Get form counts from Supabase (includes imported pieces)
+let formCounts: Record<string, number> = {};
+let formPieces: Record<string, any[]> = {};
+
+if (hasSupabase) {
+  const { data } = await supabase
+    .from('pieces')
+    .select('id, title, composer_name, catalog_number, instruments, era, form, difficulty, duration_minutes, description')
+    .order('composer_name');
+
+  if (data) {
+    formPieces = groupBy(data, (p: any) => p.form || 'Other');
+    for (const [form, pieces] of Object.entries(formPieces)) {
+      formCounts[form] = pieces.length;
+    }
+  }
+}
+
+// Fallback to seed data
+if (Object.keys(formCounts).length === 0) {
+  formPieces = groupBy(seedPieces, p => p.form);
+  for (const [form, pieces] of Object.entries(formPieces)) {
+    formCounts[form] = pieces.length;
+  }
+}
+
+// Sort by count descending
+const sortedForms = Object.keys(formCounts).sort((a, b) => formCounts[b] - formCounts[a]);
+const totalPieces = Object.values(formCounts).reduce((a, b) => a + b, 0);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Browse by Form — Irregular Pearl',
+  description: `Explore ${totalPieces} classical music works grouped by musical form: sonatas, concertos, symphonies, and more.`,
+};
+---
+<Layout title="Browse by Form" description={`Explore ${totalPieces} classical works grouped by musical form.`} jsonLd={[jsonLd]}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <span class="text-muted">Browse by Form</span>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
+    <div class="mb-8">
+      <h1 class="font-display text-3xl md:text-4xl italic mb-2">Browse by Form</h1>
+      <p class="text-muted text-sm">{totalPieces.toLocaleString()} works across sonatas, concertos, symphonies, and more</p>
+    </div>
+
+    {sortedForms.map(form => {
+      const pieces = formPieces[form] || [];
+      return (
+        <details class="mb-8" open={pieces.length <= 20}>
+          <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
+            <svg class="w-4 h-4 text-muted transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            {form}
+            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} works)</span>
+          </summary>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {pieces.slice(0, 15).map((piece: any) => (
+              <PieceCard
+                id={piece.id}
+                title={piece.title}
+                composer_name={piece.composer_name}
+                catalog_number={piece.catalog_number}
+                instruments={piece.instruments || []}
+                era={piece.era}
+                difficulty={piece.difficulty || 'intermediate'}
+                duration_minutes={piece.duration_minutes}
+                description={piece.description}
+              />
+            ))}
+          </div>
+          {pieces.length > 15 && (
+            <p class="text-sm text-muted mt-3 italic">
+              Showing 15 of {pieces.length.toLocaleString()} {form.toLowerCase()} works.
+            </p>
+          )}
+        </details>
+      );
+    })}
+  </main>
+</Layout>

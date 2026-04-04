@@ -4,29 +4,36 @@ import Navbar from '../../components/Navbar.astro';
 import PieceCard from '../../components/PieceCard.astro';
 import { seedPieces } from '../../data/seed';
 import { groupBy } from '../../lib/helpers';
+import { getComposerPieces } from '../../lib/pieces';
 
 const { name } = Astro.params;
 const decodedName = decodeURIComponent(name || '');
 
-// Find pieces by this composer (case-insensitive match on last name or full name)
-const pieces = seedPieces.filter(p =>
-  p.composer_name.toLowerCase() === decodedName.toLowerCase() ||
-  p.composer_name.toLowerCase().endsWith(decodedName.toLowerCase())
-);
+// Find pieces by this composer (seed + Supabase merged)
+const allPieces = await getComposerPieces(decodedName);
 
-if (pieces.length === 0) {
-  return Astro.redirect('/');
+// Also check last-name match for seed pieces (existing behavior)
+if (allPieces.length === 0) {
+  const lastNamePieces = await getComposerPieces(
+    seedPieces.find(p => p.composer_name.toLowerCase().endsWith(decodedName.toLowerCase()))?.composer_name || decodedName
+  );
+  if (lastNamePieces.length === 0) {
+    return Astro.redirect('/');
+  }
+  allPieces.push(...lastNamePieces);
 }
 
+const pieces = allPieces;
 const composerName = pieces[0].composer_name;
 
-const byInstrument = groupBy(pieces, p => p.instruments[0] || 'Other');
+// Group by form (not instrument) for better browsing with 26K pieces
+const byForm = groupBy(pieces, p => p.form || 'Other');
 
 // Unique eras and forms
 const eras = [...new Set(pieces.map(p => p.era))];
 const forms = [...new Set(pieces.map(p => p.form))];
 const instruments = [...new Set(pieces.flatMap(p => p.instruments))];
-const editionCount = pieces.reduce((sum, p) => sum + p.editions.length, 0);
+const editionCount = 0; // Not available from basic shape
 
 const seoDescription = `${composerName} on Irregular Pearl — browse ${pieces.length} pieces across ${instruments.join(', ')}. Compare editions, listen to recordings, and discuss with musicians.`;
 
@@ -71,7 +78,7 @@ const breadcrumbLd = {
     <div class="mb-8">
       <h1 class="font-display text-3xl md:text-4xl italic mb-2">{composerName}</h1>
       <p class="text-muted text-sm md:text-base">
-        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {editionCount} editions · {eras.join(', ')}
+        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {eras.join(', ')}
       </p>
       <div class="flex flex-wrap gap-1.5 mt-3">
         {instruments.map(i => (
@@ -83,11 +90,15 @@ const breadcrumbLd = {
       </div>
     </div>
 
-    {Object.entries(byInstrument).map(([instrument, instPieces]) => (
-      <section class="mb-10">
-        <h2 class="font-display text-xl mb-4">{instrument}</h2>
+    {Object.entries(byForm).map(([form, formPieces]) => (
+      <details class="mb-8" open={formPieces.length <= 10}>
+        <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
+          <svg class="w-4 h-4 text-muted transition-transform details-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          {form}
+          <span class="text-sm font-sans text-muted font-normal">({formPieces.length})</span>
+        </summary>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {instPieces.map((piece) => (
+          {formPieces.slice(0, 15).map((piece) => (
             <PieceCard
               id={piece.id}
               title={piece.title}
@@ -95,14 +106,18 @@ const breadcrumbLd = {
               catalog_number={piece.catalog_number}
               instruments={piece.instruments}
               era={piece.era}
-              difficulty={piece.difficulty}
+              difficulty={piece.difficulty || 'intermediate'}
               duration_minutes={piece.duration_minutes}
               description={piece.description}
-              edition_count={piece.editions.length}
             />
           ))}
         </div>
-      </section>
+        {formPieces.length > 15 && (
+          <p class="text-sm text-muted mt-3 italic">
+            Showing 15 of {formPieces.length} {form.toLowerCase()} works.
+          </p>
+        )}
+      </details>
     ))}
   </main>
 </Layout>
