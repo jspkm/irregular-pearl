@@ -9,7 +9,7 @@ const event = await getEventFull(id || '');
 
 if (!event) return Astro.redirect('/events');
 
-const staffUser = await getStaffUser(Astro.cookies, Astro.request);
+const staffUser = await getStaffUser(Astro.cookies);
 const isStaff = !!staffUser;
 
 const dateObj = new Date(event.event_date + 'T00:00:00');
