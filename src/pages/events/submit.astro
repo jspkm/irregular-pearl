@@ -1,36 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import { createServerClient } from '@supabase/ssr';
 
-// Auth check: redirect unauthenticated users to login
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-let userId: string | null = null;
-
-if (supabaseUrl && supabaseKey) {
-  const supabase = createServerClient(supabaseUrl, supabaseKey, {
-    cookies: {
-      getAll: () => {
-        const all: { name: string; value: string }[] = [];
-        const sbCookies = ['sb-access-token', 'sb-refresh-token'];
-        for (const name of sbCookies) {
-          const val = Astro.cookies.get(name)?.value;
-          if (val) all.push({ name, value: val });
-        }
-        return all;
-      },
-      setAll: () => {},
-    },
-  });
-  const { data: { user } } = await supabase.auth.getUser();
-  userId = user?.id ?? null;
-}
-
-if (!userId) {
-  return Astro.redirect(`/login?return=${encodeURIComponent('/events/submit')}`);
-}
-
+// Auth is checked client-side before form submission.
+// Unauthenticated users see the form but get redirected on submit.
 const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festival'];
 ---
 <Layout title="Submit Event" description="Submit a classical music event to Irregular Pearl.">
@@ -178,6 +151,15 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
   const form = document.getElementById('event-form') as HTMLFormElement;
   const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
   const errorDiv = document.getElementById('form-error') as HTMLDivElement;
+
+  // Check auth on page load — show sign-in prompt if not logged in
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session?.user) {
+      form.style.display = 'none';
+      errorDiv.classList.remove('hidden');
+      errorDiv.innerHTML = 'You need to <a href="/login?return=/events/submit" class="text-[#B45309] underline">sign in</a> to submit an event.';
+    }
+  });
 
   function showError(msg: string) {
     errorDiv.textContent = msg;
