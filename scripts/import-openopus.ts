@@ -229,18 +229,58 @@ function buildPieceRow(composer: OOComposer, work: OOWork): PieceRow {
 // Main
 // ---------------------------------------------------------------------------
 
-async function main() {
-  console.log('Fetching composers from OpenOpus...');
-  const composersData = await fetchWithRetry(`${OPENOPUS_BASE}/composer/list/search/.json`);
+async function loadFromDump(filePath: string): Promise<{ composers: OOComposer[]; worksByComposer: Map<string, OOWork[]> }> {
+  console.log(`Loading from local dump: ${filePath}`);
+  const raw = await Bun.file(filePath).text();
+  const data = JSON.parse(raw);
 
-  // The endpoint returns { status: {...}, composers: [...] }
-  const composers: OOComposer[] = composersData?.composers;
-  if (!composers || !Array.isArray(composers)) {
-    console.error('Failed to fetch composers list. Response:', JSON.stringify(composersData).slice(0, 500));
-    process.exit(1);
+  const composers: OOComposer[] = [];
+  const worksByComposer = new Map<string, OOWork[]>();
+
+  if (data.composers && Array.isArray(data.composers)) {
+    // Dump format: { composers: [{ name, complete_name, works: [...], ... }] }
+    // Works are nested inside each composer (no separate IDs needed)
+    for (let i = 0; i < data.composers.length; i++) {
+      const c = data.composers[i];
+      const id = c.id || String(i);
+      composers.push({ ...c, id } as OOComposer);
+      worksByComposer.set(id, (c.works || []) as OOWork[]);
+    }
+  } else if (Array.isArray(data)) {
+    for (const entry of data) {
+      const c = entry.composer || entry;
+      const id = c.id || String(composers.length);
+      composers.push({ ...c, id } as OOComposer);
+      worksByComposer.set(id, (entry.works || c.works || []) as OOWork[]);
+    }
   }
 
-  console.log(`Found ${composers.length} composers.\n`);
+  return { composers, worksByComposer };
+}
+
+async function main() {
+  const dumpFile = process.env.DUMP_FILE;
+
+  let composers: OOComposer[];
+  let worksByComposer: Map<string, OOWork[]> | null = null;
+
+  if (dumpFile) {
+    const dump = await loadFromDump(dumpFile);
+    composers = dump.composers;
+    worksByComposer = dump.worksByComposer;
+    console.log(`Loaded ${composers.length} composers from dump.\n`);
+  } else {
+    console.log('Fetching composers from OpenOpus API...');
+    const composersData = await fetchWithRetry(`${OPENOPUS_BASE}/composer/list/search/.json`);
+
+    composers = composersData?.composers;
+    if (!composers || !Array.isArray(composers)) {
+      console.error('Failed to fetch composers list. Response:', JSON.stringify(composersData).slice(0, 500));
+      process.exit(1);
+    }
+
+    console.log(`Found ${composers.length} composers.\n`);
+  }
 
   let totalPieces = 0;
   let totalInserted = 0;
@@ -252,12 +292,20 @@ async function main() {
 
   for (const composer of composers) {
     try {
-      const worksData = await fetchWithRetry(
-        `${OPENOPUS_BASE}/work/list/composer/${composer.id}/genre/all.json`,
-      );
+      let works: OOWork[];
 
-      const works: OOWork[] = worksData?.works;
-      if (!works || !Array.isArray(works)) {
+      if (worksByComposer) {
+        // From local dump
+        works = worksByComposer.get(composer.id) || [];
+      } else {
+        // From API
+        const worksData = await fetchWithRetry(
+          `${OPENOPUS_BASE}/work/list/composer/${composer.id}/genre/all.json`,
+        );
+        works = worksData?.works;
+      }
+
+      if (!works || !Array.isArray(works) || works.length === 0) {
         console.error(`  [skip] No works found for ${composer.complete_name}`);
         continue;
       }
