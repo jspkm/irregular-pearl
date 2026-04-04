@@ -21,7 +21,7 @@ const { supabase } = staffUser;
 const statusFilter = Astro.url.searchParams.get('status') || 'queued';
 const { data: events } = await supabase
   .from('events')
-  .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderated_by, moderated_at, moderation_note, users!events_created_by_fkey(display_name)')
+  .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderated_by, moderated_at, moderation_note, users!events_created_by_fkey!left(display_name)')
   .eq('status', statusFilter)
   .order('created_at', { ascending: true })
   .limit(50);
