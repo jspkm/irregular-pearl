@@ -18,18 +18,31 @@ export async function getStaffUser(cookies: AstroCookies) {
     cookies: {
       getAll: () => {
         const all: { name: string; value: string }[] = [];
-        for (const [name, value] of Object.entries(cookies)) {
-          if (typeof value === 'object' && value?.value) {
-            all.push({ name, value: value.value });
+        // Astro cookies: iterate all cookies from the request
+        const cookieHeader = (cookies as any)._request?.headers?.get?.('cookie')
+          || (cookies as any)._headers?.get?.('cookie')
+          || '';
+        if (cookieHeader) {
+          for (const part of cookieHeader.split(';')) {
+            const [name, ...rest] = part.trim().split('=');
+            if (name && rest.length > 0) {
+              all.push({ name: name.trim(), value: rest.join('=').trim() });
+            }
           }
         }
-        // Try common Supabase cookie patterns
-        const sbCookies = ['sb-access-token', 'sb-refresh-token'];
-        for (const name of sbCookies) {
-          const val = cookies.get(name)?.value;
-          if (val) all.push({ name, value: val });
+        // Fallback: try known Supabase cookie names directly
+        if (all.length === 0) {
+          const sbNames = [
+            'sb-access-token', 'sb-refresh-token',
+            'sb-dwtwmpcaylxgprdwaggl-auth-token',
+            'sb-dwtwmpcaylxgprdwaggl-auth-token.0',
+            'sb-dwtwmpcaylxgprdwaggl-auth-token.1',
+          ];
+          for (const name of sbNames) {
+            const val = cookies.get(name)?.value;
+            if (val) all.push({ name, value: val });
+          }
         }
-        // Also check for project-specific cookies (sb-<ref>-auth-token)
         return all;
       },
       setAll: () => {},
