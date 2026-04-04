@@ -13,6 +13,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { ScraperAdapter, EventCandidate } from './types';
 import { BachtrackScraper } from './bachtrack';
+import { GoogleEventsScraper } from './google-events';
 
 const BATCH_SIZE = 50;
 
@@ -36,6 +37,7 @@ export async function runScrapers(): Promise<RunResult> {
   // Register adapters
   const adapters: ScraperAdapter[] = [
     new BachtrackScraper(),
+    new GoogleEventsScraper(),
   ];
 
   const allCandidates: { candidate: EventCandidate; source: string }[] = [];
