@@ -1,10 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import EventSubmitFields from '../../components/EventSubmitFields';
 
-// Auth is checked client-side before form submission.
-// Unauthenticated users see the form but get redirected on submit.
 const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festival'];
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
 ---
 <Layout title="Submit Event" description="Submit a classical music event to Irregular Pearl.">
   <Navbar />
@@ -22,14 +23,8 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
     <p class="text-sm text-muted mb-6">Share an upcoming recital, concert, or masterclass with the community. Events are reviewed before being published.</p>
 
     <form id="event-form" class="space-y-5">
-      {/* Title */}
-      <div>
-        <label for="title" class="block text-xs font-medium text-ink mb-1">Event Title *</label>
-        <input type="text" id="title" name="title" required maxlength="200" list="title-suggestions" autocomplete="off"
-          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent-light font-body"
-          placeholder="e.g. Bach Cello Suite Recital" />
-        <datalist id="title-suggestions"></datalist>
-      </div>
+      {/* Title, Venue, City — React autocomplete component */}
+      <EventSubmitFields client:load supabaseUrl={supabaseUrl} supabaseKey={supabaseKey} />
 
       {/* Type + Date row */}
       <div class="grid grid-cols-2 gap-3">
@@ -55,24 +50,6 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
         <label for="start_time" class="block text-xs font-medium text-ink mb-1">Start Time</label>
         <input type="time" id="start_time" name="start_time"
           class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body" />
-      </div>
-
-      {/* Venue + City */}
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label for="venue" class="block text-xs font-medium text-ink mb-1">Venue *</label>
-          <input type="text" id="venue" name="venue" required maxlength="200" list="venue-suggestions" autocomplete="off"
-            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
-            placeholder="e.g. Weill Recital Hall" />
-          <datalist id="venue-suggestions"></datalist>
-        </div>
-        <div>
-          <label for="city" class="block text-xs font-medium text-ink mb-1">City</label>
-          <input type="text" id="city" name="city" maxlength="100" list="city-suggestions" autocomplete="off"
-            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
-            placeholder="e.g. New York" />
-          <datalist id="city-suggestions"></datalist>
-        </div>
       </div>
 
       {/* Description */}
@@ -164,60 +141,7 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
     }
   });
 
-  // Static venue dataset (146 venues, 100+ cities worldwide)
-  import { VENUES } from '../../data/venues';
-
-  // Merge static venues with live DB data for autocomplete
-  const venueToCity: Record<string, string> = {};
-  for (const v of VENUES) {
-    venueToCity[v.venue] = v.city;
-  }
-
-  async function loadSuggestions() {
-    // Start with static data
-    const allVenues = new Set(VENUES.map(v => v.venue));
-    const allCities = new Set(VENUES.map(v => v.city));
-    const allTitles = new Set<string>();
-
-    // Merge in live DB data
-    const { data } = await supabase
-      .from('events')
-      .select('title, venue, city')
-      .not('title', 'is', null)
-      .limit(500);
-
-    if (data) {
-      for (const e of data as Array<{ title: string; venue: string; city: string }>) {
-        if (e.title) allTitles.add(e.title);
-        if (e.venue) { allVenues.add(e.venue); if (e.city) venueToCity[e.venue] = e.city; }
-        if (e.city) allCities.add(e.city);
-      }
-    }
-
-    function fill(id: string, values: string[]) {
-      const dl = document.getElementById(id);
-      if (!dl) return;
-      dl.innerHTML = values.map(v => `<option value="${v.replace(/"/g, '&quot;')}">`).join('');
-    }
-
-    fill('title-suggestions', [...allTitles].sort());
-    fill('venue-suggestions', [...allVenues].sort());
-    fill('city-suggestions', [...allCities].sort());
-  }
-  loadSuggestions();
-
-  // Auto-fill city when a known venue is typed/selected
-  const venueInput = document.getElementById('venue') as HTMLInputElement;
-  const cityInput = document.getElementById('city') as HTMLInputElement;
-
-  venueInput.addEventListener('change', () => {
-    const matchedCity = venueToCity[venueInput.value];
-    if (matchedCity && !cityInput.value) {
-      cityInput.value = matchedCity;
-    }
-  });
-
-  // Prevent past dates (belt + suspenders with the HTML min attribute)
+  // Prevent past dates
   const dateInput = document.getElementById('event_date') as HTMLInputElement;
   dateInput.addEventListener('change', () => {
     const today = new Date().toISOString().split('T')[0];
