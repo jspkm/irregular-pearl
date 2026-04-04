@@ -69,3 +69,8 @@ export function canManageSection(profile: StaffProfile, section: string): boolea
   }
   return false;
 }
+
+// 'events' section note: first chairs with 'events' in managed_sections
+// can moderate ALL events (not scoped by instrument/genre). The RLS UPDATE
+// policy grants access to all firstchair roles as a broad gate; this
+// canManageSection check provides the narrower application-level enforcement.

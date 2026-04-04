@@ -1,0 +1,312 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import { createServerClient } from '@supabase/ssr';
+
+// Auth check: redirect unauthenticated users to login
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+let userId: string | null = null;
+
+if (supabaseUrl && supabaseKey) {
+  const supabase = createServerClient(supabaseUrl, supabaseKey, {
+    cookies: {
+      getAll: () => {
+        const all: { name: string; value: string }[] = [];
+        const sbCookies = ['sb-access-token', 'sb-refresh-token'];
+        for (const name of sbCookies) {
+          const val = Astro.cookies.get(name)?.value;
+          if (val) all.push({ name, value: val });
+        }
+        return all;
+      },
+      setAll: () => {},
+    },
+  });
+  const { data: { user } } = await supabase.auth.getUser();
+  userId = user?.id ?? null;
+}
+
+if (!userId) {
+  return Astro.redirect(`/login?return=${encodeURIComponent('/events/submit')}`);
+}
+
+const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festival'];
+---
+<Layout title="Submit Event" description="Submit a classical music event to Irregular Pearl.">
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">&rsaquo;</span>
+    <a href="/events" class="text-muted no-underline hover:underline">Events</a>
+    <span class="mx-1">&rsaquo;</span>
+    <span class="text-muted">Submit</span>
+  </div>
+
+  <main class="max-w-[600px] mx-auto px-4 md:px-6 py-6 md:py-8">
+    <h1 class="font-display italic text-2xl md:text-[28px] mb-2">Submit an Event</h1>
+    <p class="text-sm text-muted mb-6">Share an upcoming recital, concert, or masterclass with the community. Events are reviewed before being published.</p>
+
+    <form id="event-form" class="space-y-5">
+      {/* Title */}
+      <div>
+        <label for="title" class="block text-xs font-medium text-ink mb-1">Event Title *</label>
+        <input type="text" id="title" name="title" required maxlength="200"
+          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent-light font-body"
+          placeholder="e.g. Bach Cello Suite Recital" />
+      </div>
+
+      {/* Type + Date row */}
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="event_type" class="block text-xs font-medium text-ink mb-1">Type *</label>
+          <select id="event_type" name="event_type" required
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent bg-surface font-body">
+            {EVENT_TYPES.map(t => (
+              <option value={t} class="capitalize">{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label for="event_date" class="block text-xs font-medium text-ink mb-1">Date *</label>
+          <input type="date" id="event_date" name="event_date" required
+            min={new Date().toISOString().split('T')[0]}
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body" />
+        </div>
+      </div>
+
+      {/* Time */}
+      <div class="w-1/2">
+        <label for="start_time" class="block text-xs font-medium text-ink mb-1">Start Time</label>
+        <input type="time" id="start_time" name="start_time"
+          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body" />
+      </div>
+
+      {/* Venue + City */}
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="venue" class="block text-xs font-medium text-ink mb-1">Venue *</label>
+          <input type="text" id="venue" name="venue" required maxlength="200"
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
+            placeholder="e.g. Weill Recital Hall" />
+        </div>
+        <div>
+          <label for="city" class="block text-xs font-medium text-ink mb-1">City</label>
+          <input type="text" id="city" name="city" maxlength="100"
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
+            placeholder="e.g. New York" />
+        </div>
+      </div>
+
+      {/* Description */}
+      <div>
+        <label for="description" class="block text-xs font-medium text-ink mb-1">Description</label>
+        <textarea id="description" name="description" rows="3" maxlength="2000"
+          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body resize-y"
+          placeholder="Program details, performers, etc."></textarea>
+      </div>
+
+      {/* Ticket info */}
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="ticket_price" class="block text-xs font-medium text-ink mb-1">Ticket Price</label>
+          <input type="text" id="ticket_price" name="ticket_price" maxlength="50"
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body font-mono"
+            placeholder='e.g. Free, $25, $15-45' />
+        </div>
+        <div>
+          <label for="ticket_url" class="block text-xs font-medium text-ink mb-1">Ticket URL</label>
+          <input type="url" id="ticket_url" name="ticket_url"
+            class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
+            placeholder="https://..." />
+        </div>
+      </div>
+
+      {/* Event website */}
+      <div>
+        <label for="url" class="block text-xs font-medium text-ink mb-1">Event Website</label>
+        <input type="url" id="url" name="url"
+          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body"
+          placeholder="https://..." />
+      </div>
+
+      {/* Poster upload */}
+      <div>
+        <label for="poster" class="block text-xs font-medium text-ink mb-1">Event Poster</label>
+        <input type="file" id="poster" name="poster" accept="image/jpeg,image/png,image/webp"
+          class="w-full text-xs text-muted file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-border file:text-xs file:font-body file:text-muted file:bg-surface hover:file:border-accent file:cursor-pointer file:transition-colors" />
+        <p class="text-[11px] text-[#A8A29E] mt-1">JPEG, PNG, or WebP. Max 2MB.</p>
+      </div>
+
+      {/* Error display */}
+      <div id="form-error" class="hidden px-4 py-2 bg-[#FEF2F2] border border-[#FECACA] rounded-lg text-xs text-[#DC2626]"></div>
+
+      {/* Submit */}
+      <button type="submit" id="submit-btn"
+        class="w-full py-2.5 bg-accent hover:bg-accent-hover text-surface font-body font-medium text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Submit for Review
+      </button>
+    </form>
+  </main>
+</Layout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) throw new Error('Supabase not configured');
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const VALID_MAGIC_BYTES: Record<string, number[][]> = {
+    'image/jpeg': [[0xFF, 0xD8, 0xFF]],
+    'image/png': [[0x89, 0x50, 0x4E, 0x47]],
+    'image/webp': [[0x52, 0x49, 0x46, 0x46]], // RIFF header
+  };
+
+  async function validateImageMagicBytes(file: File): Promise<boolean> {
+    const buffer = await file.slice(0, 4).arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const patterns = VALID_MAGIC_BYTES[file.type];
+    if (!patterns) return false;
+    return patterns.some(pattern =>
+      pattern.every((byte, i) => bytes[i] === byte)
+    );
+  }
+
+  const form = document.getElementById('event-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const errorDiv = document.getElementById('form-error') as HTMLDivElement;
+
+  function showError(msg: string) {
+    errorDiv.textContent = msg;
+    errorDiv.classList.remove('hidden');
+  }
+  function hideError() {
+    errorDiv.classList.add('hidden');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = `/login?return=${encodeURIComponent('/events/submit')}`;
+        return;
+      }
+
+      const formData = new FormData(form);
+      const title = (formData.get('title') as string)?.trim();
+      const event_type = formData.get('event_type') as string;
+      const event_date = formData.get('event_date') as string;
+      const venue = (formData.get('venue') as string)?.trim();
+
+      if (!title || !event_type || !event_date || !venue) {
+        showError('Please fill in all required fields.');
+        return;
+      }
+
+      if (new Date(event_date) < new Date(new Date().toISOString().split('T')[0])) {
+        showError('Event date must be in the future.');
+        return;
+      }
+
+      // Check rate limit: max 5 submissions per hour
+      const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
+      const { count } = await supabase
+        .from('events')
+        .select('*', { count: 'exact', head: true })
+        .eq('created_by', user.id)
+        .gte('created_at', oneHourAgo);
+
+      if ((count ?? 0) >= 5) {
+        showError('You can submit up to 5 events per hour. Please try again later.');
+        return;
+      }
+
+      // Duplicate check
+      const { data: existing } = await supabase
+        .from('events')
+        .select('id')
+        .eq('title', title)
+        .eq('venue', venue)
+        .eq('event_date', event_date)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        showError('An event with this title, venue, and date already exists.');
+        return;
+      }
+
+      // Insert event
+      const start_time = formData.get('start_time') as string || null;
+      const { data: newEvent, error: insertError } = await supabase
+        .from('events')
+        .insert({
+          title,
+          event_type,
+          event_date,
+          start_time: start_time || null,
+          venue,
+          city: (formData.get('city') as string)?.trim() || null,
+          description: (formData.get('description') as string)?.trim() || null,
+          ticket_price: (formData.get('ticket_price') as string)?.trim() || null,
+          ticket_url: (formData.get('ticket_url') as string)?.trim() || null,
+          url: (formData.get('url') as string)?.trim() || null,
+          created_by: user.id,
+          source: 'user',
+          status: 'queued',
+        })
+        .select('id')
+        .single();
+
+      if (insertError || !newEvent) {
+        showError(insertError?.message || 'Failed to submit event.');
+        return;
+      }
+
+      // Upload poster AFTER event insert (avoid orphans)
+      const posterFile = (document.getElementById('poster') as HTMLInputElement).files?.[0];
+      if (posterFile) {
+        if (posterFile.size > 2 * 1024 * 1024) {
+          showError('Poster file must be under 2MB. Event submitted without poster.');
+        } else {
+          const validMagic = await validateImageMagicBytes(posterFile);
+          if (!validMagic) {
+            showError('Invalid image file. Event submitted without poster.');
+          } else {
+            const ext = posterFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+            const path = `${newEvent.id}/poster.${ext}`;
+            const { error: uploadError } = await supabase.storage
+              .from('event-posters')
+              .upload(path, posterFile, { upsert: true });
+
+            if (!uploadError) {
+              const { data: { publicUrl } } = supabase.storage
+                .from('event-posters')
+                .getPublicUrl(path);
+
+              await supabase
+                .from('events')
+                .update({ poster_url: publicUrl })
+                .eq('id', newEvent.id);
+            }
+          }
+        }
+      }
+
+      // Success — redirect to the event page
+      window.location.href = `/events/${newEvent.id}`;
+    } catch (err) {
+      showError('Something went wrong. Please try again.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit for Review';
+    }
+  });
+</script>

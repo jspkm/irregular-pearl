@@ -42,12 +42,22 @@ interface WeeklySnapshot {
   interactions: number;
 }
 
+interface DigestEvent {
+  id: string;
+  title: string;
+  venue: string | null;
+  city: string | null;
+  event_date: string;
+  event_type: string;
+}
+
 interface DigestData {
   weekRange: string;
   recipientName: string;
   digestSummary: string;
   pieces: DigestPiece[];
   members: DigestMember[];
+  upcomingEvents: DigestEvent[];
   totalPieces: number;
   totalMembers: number;
   mostDiscussedTitle: string;
@@ -341,6 +351,7 @@ async function fetchDigestData(
   weekStart: Date,
   weekEnd: Date,
   unsubscribeUrl: string,
+  recipientCity?: string,
 ): Promise<DigestData> {
   const isoStart = weekStart.toISOString();
   const isoEnd = weekEnd.toISOString();
@@ -362,6 +373,43 @@ async function fetchDigestData(
     .lte('created_at', isoEnd)
     .order('created_at', { ascending: false })
     .limit(20);
+
+  // Fetch upcoming events in the next 7 days (gated: only include if >= 1 exists)
+  // If recipientCity is provided, prioritize local events first
+  const nextWeekEnd = new Date(weekEnd.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const todayStr = weekEnd.toISOString().split('T')[0];
+
+  let upcomingEvents: DigestEvent[] = [];
+
+  // Try local events first (from user's location field or registration city)
+  if (recipientCity) {
+    const { data: localEvents } = await supabase
+      .from('events')
+      .select('id, title, venue, city, event_date, event_type')
+      .eq('status', 'approved')
+      .eq('city', recipientCity)
+      .gte('event_date', todayStr)
+      .lte('event_date', nextWeekEnd)
+      .order('event_date', { ascending: true })
+      .limit(5);
+    upcomingEvents = (localEvents || []) as DigestEvent[];
+  }
+
+  // Fill remaining slots with any events if local < 5
+  if (upcomingEvents.length < 5) {
+    const existingIds = upcomingEvents.map(e => e.id);
+    const remaining = 5 - upcomingEvents.length;
+    const { data: moreEvents } = await supabase
+      .from('events')
+      .select('id, title, venue, city, event_date, event_type')
+      .eq('status', 'approved')
+      .gte('event_date', todayStr)
+      .lte('event_date', nextWeekEnd)
+      .not('id', 'in', `(${existingIds.map(id => `"${id}"`).join(',')})`)
+      .order('event_date', { ascending: true })
+      .limit(remaining);
+    upcomingEvents = [...upcomingEvents, ...((moreEvents || []) as DigestEvent[])];
+  }
 
   // Count totals
   const { count: totalPieces } = await supabase
@@ -430,6 +478,7 @@ async function fetchDigestData(
     digestSummary: '',
     pieces: (newPieces ?? []) as DigestPiece[],
     members: (newMembers ?? []) as DigestMember[],
+    upcomingEvents,
     totalPieces: totalPieces ?? 0,
     totalMembers: totalMembers ?? 0,
     mostDiscussedTitle,
@@ -467,6 +516,39 @@ function generateDigestSummary(data: DigestData): string {
   return parts.join(' ');
 }
 
+// ── Event row renderer (email-safe) ───────────────────────────────────────
+
+function renderEventRow(event: DigestEvent): string {
+  const dateObj = new Date(event.event_date + 'T00:00:00');
+  const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const eventUrl = `https://irregularpearl.org/events/${event.id}`;
+
+  return `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+  style="border-bottom: 1px solid #E7E5E4;">
+  <tr>
+    <td style="padding: 12px 0;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+          <td width="80" valign="top" style="font-family: 'Courier New', Courier, monospace; font-size: 11px; color: #B45309; padding-right: 12px;">
+            ${escapeHtml(dateStr)}
+          </td>
+          <td valign="top">
+            <a href="${eventUrl}" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 14px; color: #1C1917; text-decoration: none;" target="_blank">
+              ${escapeHtml(event.title)}
+            </a>
+            ${event.venue ? `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #78716C; margin-top: 2px;">${escapeHtml(event.venue)}${event.city ? `, ${escapeHtml(event.city)}` : ''}</div>` : ''}
+          </td>
+          <td width="70" align="right" valign="top" style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #78716C; text-transform: capitalize;">
+            ${escapeHtml(event.event_type)}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+}
+
 // ── Template injection ─────────────────────────────────────────────────────
 
 function injectData(template: string, data: DigestData): string {
@@ -486,6 +568,20 @@ function injectData(template: string, data: DigestData): string {
     ? `${data.mostApplaudedName} (${data.mostApplaudedInstrument})`
     : data.mostApplaudedName;
 
+  // Events section: gated, only include when >= 1 approved event exists
+  const eventsHtml = data.upcomingEvents.length > 0
+    ? data.upcomingEvents.map(renderEventRow).join('\n')
+    : '';
+
+  // Events section wrapper (entire block hidden if no events)
+  const eventsSectionHtml = data.upcomingEvents.length > 0
+    ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 24px; margin-bottom: 8px;">
+<tr><td style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 18px; color: #1C1917; padding-bottom: 12px; border-bottom: 2px solid #B45309;">This Week's Events</td></tr>
+<tr><td>${eventsHtml}</td></tr>
+<tr><td style="padding-top: 8px;"><a href="https://irregularpearl.org/events" style="font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #B45309; text-decoration: none;" target="_blank">View all events &rarr;</a></td></tr>
+</table>`
+    : '';
+
   return template
     .replace('{{recipient_name}}', escapeHtml(data.recipientName))
     .replace('{{digest_summary}}', escapeHtml(data.digestSummary))
@@ -499,7 +595,8 @@ function injectData(template: string, data: DigestData): string {
     .replace('{{most_discussed}}', escapeHtml(mostDiscussed))
     .replace('{{most_applauded}}', escapeHtml(mostApplauded))
     .replace('{{unsubscribe_url}}', data.unsubscribeUrl)
-    .replace('{{trend_chart}}', renderTrendChart(data.trendData));
+    .replace('{{trend_chart}}', renderTrendChart(data.trendData))
+    .replace('{{events_section}}', eventsSectionHtml);
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
@@ -514,6 +611,8 @@ export interface RenderOptions {
   digestSummary?: string;
   /** Unsubscribe link injected into the footer. */
   unsubscribeUrl?: string;
+  /** Recipient's city (from user.location) for location-aware event recommendations. */
+  recipientCity?: string;
 }
 
 export async function renderWeeklyDigest(
@@ -526,7 +625,7 @@ export async function renderWeeklyDigest(
   const unsubscribeUrl = options.unsubscribeUrl ?? 'https://irregularpearl.org/settings#email';
 
   const template = loadTemplate();
-  const data = await fetchDigestData(supabase, weekStart, weekEnd, unsubscribeUrl);
+  const data = await fetchDigestData(supabase, weekStart, weekEnd, unsubscribeUrl, options.recipientCity);
   data.recipientName = options.recipientName;
   data.digestSummary = options.digestSummary || generateDigestSummary(data);
   return injectData(template, data);
@@ -591,10 +690,16 @@ export function renderWeeklyDigestPreview(recipientName = 'Joseph'): string {
     });
   }
 
+  const sampleEvents: DigestEvent[] = [
+    { id: 'sample-1', title: 'Bach Cello Suite Recital', venue: 'Weill Recital Hall', city: 'New York', event_date: '2026-04-05', event_type: 'recital' },
+    { id: 'sample-2', title: 'Beethoven Piano Sonatas', venue: 'Jordan Hall', city: 'Boston', event_date: '2026-04-07', event_type: 'concert' },
+  ];
+
   const data: DigestData = {
     weekRange: 'March 24 – March 30, 2026',
     recipientName,
     digestSummary: '',
+    upcomingEvents: sampleEvents,
     totalPieces: 247,
     totalMembers: 83,
     mostDiscussedTitle: 'Cello Suite No. 1 in G major',

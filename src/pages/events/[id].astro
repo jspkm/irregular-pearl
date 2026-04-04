@@ -1,42 +1,46 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import { supabase, hasSupabase } from '../../lib/supabase';
+import { getEventFull } from '../../lib/events';
+import { getStaffUser } from '../../lib/admin';
 
 const { id } = Astro.params;
+const event = await getEventFull(id || '');
 
-if (!hasSupabase || !id) return Astro.redirect('/');
+if (!event) return Astro.redirect('/events');
 
-const { data: event } = await supabase
-  .from('events')
-  .select('*')
-  .eq('id', id)
-  .single();
+const staffUser = await getStaffUser(Astro.cookies);
+const isStaff = !!staffUser;
 
-if (!event) return Astro.redirect('/');
+const dateObj = new Date(event.event_date + 'T00:00:00');
+const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+const timeStr = event.start_time ? event.start_time.slice(0, 5) : null;
 
-const { data: performances } = await supabase
-  .from('event_performances')
-  .select('*, users(id, display_name, username), pieces(id, title, composer_name), instruments(id, type, maker)')
-  .eq('event_id', id);
-
-const seoDescription = `${event.title} — ${event.venue || ''}${event.city ? `, ${event.city}` : ''} on ${new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+const seoDescription = `${event.title} — ${event.venue || ''}${event.city ? `, ${event.city}` : ''} on ${dateStr}`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Event',
   name: event.title,
   description: event.description || seoDescription,
-  startDate: event.event_date,
+  startDate: event.start_time
+    ? `${event.event_date}T${event.start_time}`
+    : event.event_date,
   location: event.venue ? {
     '@type': 'Place',
     name: event.venue,
     address: { '@type': 'PostalAddress', addressLocality: event.city, addressCountry: event.country },
   } : undefined,
   url: Astro.url.href,
-  performer: performances?.filter((p: any) => p.users).map((p: any) => ({
+  image: event.poster_url || undefined,
+  offers: event.ticket_url ? {
+    '@type': 'Offer',
+    url: event.ticket_url,
+    price: event.ticket_price || undefined,
+  } : undefined,
+  performer: event.performers?.filter(p => p.users).map(p => ({
     '@type': 'Person',
-    name: p.users.display_name,
+    name: p.users!.display_name,
   })),
 };
 ---
@@ -45,31 +49,52 @@ const jsonLd = {
 
   <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
     <a href="/" class="hover:text-ink">Home</a>
-    <span class="mx-1">›</span>
+    <span class="mx-1">&rsaquo;</span>
     <a href="/events" class="text-muted no-underline hover:underline">Events</a>
-    <span class="mx-1">›</span>
+    <span class="mx-1">&rsaquo;</span>
     <span class="text-muted">{event.title}</span>
   </div>
 
   <main class="max-w-[800px] mx-auto px-4 md:px-6 py-6 md:py-8">
-    <div class="flex gap-4 mb-6">
-      <!-- Date column -->
-      <div class="text-center flex-shrink-0 w-14">
+    {/* Status banner for non-approved events (visible to creator/staff via RLS) */}
+    {event.status !== 'approved' && (
+      <div class:list={["px-4 py-2 rounded-lg text-xs mb-4 border",
+        event.status === 'queued' ? 'bg-[#FEFCE8] border-[#FDE68A] text-[#CA8A04]' : 'bg-[#FEF2F2] border-[#FECACA] text-[#DC2626]']}>
+        {event.status === 'queued' ? 'This event is pending review.' : 'This event has been rejected.'}
+        {event.moderation_note && <span class="ml-2 text-muted">Note: {event.moderation_note}</span>}
+      </div>
+    )}
+
+    <div class="flex gap-6 mb-6">
+      {/* Date column */}
+      <div class="text-center flex-shrink-0 w-16">
         <div class="font-mono text-[11px] text-accent uppercase tracking-wider">
-          {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+          {dateObj.toLocaleDateString('en-US', { month: 'short' })}
         </div>
         <div class="font-display text-3xl text-ink leading-tight">
-          {new Date(event.event_date).getDate()}
+          {dateObj.getDate()}
         </div>
         <div class="font-mono text-[10px] text-[#A8A29E]">
-          {new Date(event.event_date).getFullYear()}
+          {dateObj.getFullYear()}
         </div>
+        {timeStr && <div class="font-mono text-xs text-muted mt-1">{timeStr}</div>}
       </div>
 
-      <!-- Event details -->
-      <div>
-        <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded inline-block mb-2 capitalize">{event.event_type}</span>
-        <h1 class="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{event.title || 'Untitled Event'}</h1>
+      {/* Event details */}
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded capitalize">
+            {event.event_type}
+          </span>
+          {event.source !== 'user' && (
+            <span class="text-[10px] text-[#A8A29E] bg-bg border border-border px-2 py-0.5 rounded">
+              via {event.source}
+            </span>
+          )}
+        </div>
+        <h1 class="font-display italic text-2xl md:text-[28px] leading-tight mb-1">
+          {event.title || 'Untitled Event'}
+        </h1>
         {event.venue && (
           <p class="text-sm text-muted">
             {event.venue}{event.city ? `, ${event.city}` : ''}{event.country ? `, ${event.country}` : ''}
@@ -78,19 +103,41 @@ const jsonLd = {
       </div>
     </div>
 
+    {/* Poster image */}
+    {event.poster_url && (
+      <div class="mb-6 rounded-lg overflow-hidden border border-border">
+        <img src={event.poster_url} alt={`Poster for ${event.title}`} class="w-full max-h-[500px] object-contain bg-bg" />
+      </div>
+    )}
+
+    {/* Ticket info */}
+    {(event.ticket_price || event.ticket_url) && (
+      <div class="flex items-center gap-3 mb-6 p-4 bg-[#FEF3C7]/30 border border-[#FDE68A]/50 rounded-lg">
+        {event.ticket_price && (
+          <span class="font-mono text-sm text-accent font-medium">{event.ticket_price}</span>
+        )}
+        {event.ticket_url && (
+          <a href={event.ticket_url} class="text-sm text-accent no-underline hover:underline font-medium" target="_blank" rel="noopener">
+            Get Tickets &rarr;
+          </a>
+        )}
+      </div>
+    )}
+
+    {/* Description */}
     {event.description && (
       <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-6">{event.description}</p>
     )}
 
     {event.url && (
-      <a href={event.url} class="text-sm text-accent no-underline hover:underline mb-6 inline-block" target="_blank" rel="noopener">Event website →</a>
+      <a href={event.url} class="text-sm text-accent no-underline hover:underline mb-6 inline-block" target="_blank" rel="noopener">Event website &rarr;</a>
     )}
 
-    <!-- Program -->
-    {performances && performances.length > 0 && (
+    {/* Program / Performers */}
+    {event.performers && event.performers.length > 0 && (
       <section class="mt-6">
         <h2 class="font-display text-xl mb-4">Program</h2>
-        {performances.map((p: any) => (
+        {event.performers.map((p) => (
           <div class="py-3 border-b border-[#F3F2F0] last:border-b-0">
             {p.pieces && (
               <a href={`/piece/${p.pieces.id}`} class="text-sm font-medium text-ink no-underline hover:underline">
@@ -100,18 +147,28 @@ const jsonLd = {
             )}
             <div class="flex gap-3 mt-1 text-xs text-muted">
               {p.users && (
-                <a href={p.users.username ? `/@${p.users.username}` : `/profile/${p.users.id}`} class="text-muted no-underline hover:underline">
+                <a href={p.users.username ? `/@${p.users.username}` : '#'} class="text-muted no-underline hover:underline">
                   {p.users.display_name}
                 </a>
               )}
               {p.instruments && (
-                <a href={`/instruments/${p.instruments.id}`} class="text-muted no-underline hover:underline">
+                <span class="text-[#A8A29E]">
                   {p.instruments.maker} {p.instruments.type}
-                </a>
+                </span>
               )}
             </div>
           </div>
         ))}
+      </section>
+    )}
+
+    {/* Moderation audit trail (staff only) */}
+    {isStaff && event.moderated_by && (
+      <section class="mt-8 p-4 bg-bg border border-border rounded-lg text-xs text-muted">
+        <div class="font-medium text-ink mb-1">Moderation Audit</div>
+        <div>Status: <span class="capitalize font-medium">{event.status}</span></div>
+        {event.moderated_at && <div>Moderated: {new Date(event.moderated_at).toLocaleString()}</div>}
+        {event.moderation_note && <div>Note: {event.moderation_note}</div>}
       </section>
     )}
   </main>

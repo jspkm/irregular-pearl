@@ -1,0 +1,184 @@
+---
+/**
+ * Admin moderation queue for events.
+ * Staff access: admin (all events) + first chair with 'events' in managed_sections.
+ *
+ * RLS is a broad gate (all admin/firstchair can read).
+ * canManageSection('events') is the narrower application-level check.
+ */
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import { getStaffUser, canManageSection } from '../../lib/admin';
+
+const staffUser = await getStaffUser(Astro.cookies);
+if (!staffUser || !canManageSection(staffUser.profile, 'events')) {
+  return Astro.redirect('/');
+}
+
+const { supabase } = staffUser;
+
+// Fetch queued events (pending review)
+const statusFilter = Astro.url.searchParams.get('status') || 'queued';
+const { data: events } = await supabase
+  .from('events')
+  .select('id, title, venue, city, event_date, event_type, source, status, created_by, created_at, moderated_by, moderated_at, moderation_note, users!events_created_by_fkey(display_name)')
+  .eq('status', statusFilter)
+  .order('created_at', { ascending: true })
+  .limit(50);
+
+const queuedEvents = (events || []) as Array<{
+  id: string; title: string; venue: string | null; city: string | null;
+  event_date: string; event_type: string; source: string; status: string;
+  created_by: string | null; created_at: string;
+  moderated_by: string | null; moderated_at: string | null; moderation_note: string | null;
+  users: { display_name: string } | null;
+}>;
+
+// Count by status for tabs
+const { count: queuedCount } = await supabase
+  .from('events').select('*', { count: 'exact', head: true }).eq('status', 'queued');
+const { count: approvedCount } = await supabase
+  .from('events').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+const { count: rejectedCount } = await supabase
+  .from('events').select('*', { count: 'exact', head: true }).eq('status', 'rejected');
+---
+<Layout title="Moderate Events" description="Event moderation queue.">
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">&rsaquo;</span>
+    <span class="text-muted">Admin</span>
+    <span class="mx-1">&rsaquo;</span>
+    <span class="text-muted">Events</span>
+  </div>
+
+  <main class="max-w-[900px] mx-auto px-4 md:px-6 py-6 md:py-8">
+    <h1 class="font-display italic text-2xl mb-6">Moderate Events</h1>
+
+    {/* Status tabs */}
+    <div class="flex gap-1 border border-border rounded-lg overflow-hidden text-xs mb-6 w-fit">
+      <a href="/admin/events?status=queued"
+        class:list={["px-3 py-1.5 no-underline transition-colors", statusFilter === 'queued' ? 'bg-[#CA8A04] text-surface' : 'text-muted hover:text-ink']}>
+        Queued ({queuedCount ?? 0})
+      </a>
+      <a href="/admin/events?status=approved"
+        class:list={["px-3 py-1.5 no-underline transition-colors", statusFilter === 'approved' ? 'bg-[#15803D] text-surface' : 'text-muted hover:text-ink']}>
+        Approved ({approvedCount ?? 0})
+      </a>
+      <a href="/admin/events?status=rejected"
+        class:list={["px-3 py-1.5 no-underline transition-colors", statusFilter === 'rejected' ? 'bg-[#DC2626] text-surface' : 'text-muted hover:text-ink']}>
+        Rejected ({rejectedCount ?? 0})
+      </a>
+    </div>
+
+    {queuedEvents.length === 0 ? (
+      <div class="text-center py-16 text-muted">
+        <p class="text-sm">No {statusFilter} events.</p>
+      </div>
+    ) : (
+      <div class="space-y-3">
+        {queuedEvents.map((event) => (
+          <div class="bg-surface border border-border rounded-lg p-5" data-event-id={event.id}>
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded capitalize">{event.event_type}</span>
+                  <span class="text-[10px] text-[#A8A29E]">via {event.source}</span>
+                  <span class="font-mono text-[10px] text-muted">{new Date(event.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                </div>
+                <a href={`/events/${event.id}`} class="font-display text-lg text-ink no-underline hover:underline">
+                  {event.title}
+                </a>
+                <div class="text-xs text-muted mt-0.5">
+                  {event.venue}{event.city ? `, ${event.city}` : ''}
+                  {event.users?.display_name && <span> &middot; submitted by {event.users.display_name}</span>}
+                </div>
+                <div class="text-[10px] text-[#A8A29E] mt-1">
+                  Submitted {new Date(event.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div class="flex flex-col gap-1.5 flex-shrink-0">
+                {statusFilter !== 'approved' && (
+                  <button data-action="approve" data-id={event.id}
+                    class="px-3 py-1 text-xs bg-[#15803D] text-surface rounded hover:bg-[#166534] transition-colors">
+                    Approve
+                  </button>
+                )}
+                {statusFilter !== 'rejected' && (
+                  <button data-action="reject" data-id={event.id}
+                    class="px-3 py-1 text-xs bg-[#DC2626] text-surface rounded hover:bg-[#B91C1C] transition-colors">
+                    Reject
+                  </button>
+                )}
+                {statusFilter !== 'queued' && (
+                  <button data-action="requeue" data-id={event.id}
+                    class="px-3 py-1 text-xs border border-border text-muted rounded hover:border-muted transition-colors">
+                    Requeue
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Moderation note (for reject/requeue) */}
+            {event.moderation_note && (
+              <div class="mt-2 text-xs text-muted bg-bg px-3 py-2 rounded">
+                Note: {event.moderation_note}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+  </main>
+</Layout>
+
+<script>
+  import { createClient } from '@supabase/supabase-js';
+
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) throw new Error('Supabase not configured');
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  document.addEventListener('click', async (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-action]') as HTMLElement | null;
+    if (!btn) return;
+
+    const action = btn.dataset.action as 'approve' | 'reject' | 'requeue';
+    const eventId = btn.dataset.id;
+    if (!eventId) return;
+
+    let note: string | null = null;
+    if (action === 'reject') {
+      note = prompt('Reason for rejection (optional):');
+      if (note === null) return; // cancelled
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const statusMap = { approve: 'approved', reject: 'rejected', requeue: 'queued' } as const;
+
+    const { error } = await supabase
+      .from('events')
+      .update({
+        status: statusMap[action],
+        moderated_by: user.id,
+        moderated_at: new Date().toISOString(),
+        moderation_note: note || null,
+      })
+      .eq('id', eventId);
+
+    if (error) {
+      alert(`Failed: ${error.message}`);
+      return;
+    }
+
+    // Remove the card from the DOM
+    const card = btn.closest('[data-event-id]');
+    if (card) card.remove();
+  });
+</script>

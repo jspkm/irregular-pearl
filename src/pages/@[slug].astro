@@ -43,6 +43,27 @@ const { data: performances } = await supabase
   .order('date', { ascending: false })
   .limit(20);
 
+// Fetch upcoming events this user is performing in
+const { data: userEventPerfs } = await supabase
+  .from('event_performances')
+  .select('event_id')
+  .eq('artist_id', user.id);
+
+let upcomingEvents: { id: string; title: string; venue: string | null; city: string | null; event_date: string; event_type: string }[] = [];
+if (userEventPerfs && userEventPerfs.length > 0) {
+  const eventIds = userEventPerfs.map((p: { event_id: string }) => p.event_id);
+  const today = new Date().toISOString().split('T')[0];
+  const { data: events } = await supabase
+    .from('events')
+    .select('id, title, venue, city, event_date, event_type')
+    .in('id', eventIds)
+    .eq('status', 'approved')
+    .gte('event_date', today)
+    .order('event_date', { ascending: true })
+    .limit(5);
+  upcomingEvents = (events || []) as typeof upcomingEvents;
+}
+
 const trainingHistory = (user.training_history || []) as { year: string; title: string; detail: string }[];
 const seoDescription = `${user.display_name} on Irregular Pearl — ${user.instrument || 'musician'}. ${user.bio?.slice(0, 120) || ''}`;
 
@@ -168,6 +189,32 @@ const breadcrumbLd = {
           ))}
         </section>
       )}
+      <!-- Upcoming Events (from event_performances join) -->
+      {upcomingEvents.length > 0 && (
+        <section class="mb-8">
+          <h2 class="font-display text-xl mb-4">Upcoming Events</h2>
+          <div class="space-y-2">
+            {upcomingEvents.map((ev) => (
+              <a href={`/events/${ev.id}`} class="flex items-center gap-3 bg-surface border border-border rounded-lg px-5 py-3 no-underline hover:border-muted transition-colors">
+                <div class="text-center flex-shrink-0 w-10">
+                  <div class="font-mono text-[10px] text-accent uppercase">
+                    {new Date(ev.event_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short' })}
+                  </div>
+                  <div class="font-display text-lg text-ink leading-tight">
+                    {new Date(ev.event_date + 'T00:00:00').getDate()}
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-ink truncate">{ev.title}</div>
+                  {ev.venue && <div class="text-xs text-muted truncate">{ev.venue}{ev.city ? `, ${ev.city}` : ''}</div>}
+                </div>
+                <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded capitalize flex-shrink-0">{ev.event_type}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       <!-- Performances -->
       {performances && performances.length > 0 && (
         <section class="mb-8">

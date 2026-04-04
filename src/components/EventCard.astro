@@ -1,0 +1,71 @@
+---
+/**
+ * Reusable rich event card.
+ * Used on /events list, archive, and profile pages.
+ * Displays: date, poster (optional), title, venue, type badge, price, performers.
+ */
+import type { EventBasic } from '../lib/events';
+
+interface Props {
+  event: EventBasic;
+  muted?: boolean; // archive mode: grayed styling
+  performers?: string[]; // pre-resolved display names for list view
+}
+
+const { event, muted = false, performers = [] } = Astro.props;
+
+const dateObj = new Date(event.event_date + 'T00:00:00');
+const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+const day = dateObj.getDate();
+const year = dateObj.getFullYear();
+const timeStr = event.start_time ? event.start_time.slice(0, 5) : null;
+
+const mutedClass = muted ? 'opacity-60' : '';
+---
+
+<a href={`/events/${event.id}`} class:list={["flex gap-4 bg-surface border border-border rounded-lg p-5 hover:border-muted transition-all no-underline group", mutedClass]}>
+  {/* Date column */}
+  <div class="text-center flex-shrink-0 w-14">
+    <div class="font-mono text-[11px] text-accent uppercase tracking-wider">{month}</div>
+    <div class="font-display text-[28px] text-ink leading-tight">{day}</div>
+    <div class="font-mono text-[10px] text-[#A8A29E]">{year}</div>
+    {timeStr && <div class="font-mono text-[10px] text-muted mt-0.5">{timeStr}</div>}
+  </div>
+
+  {/* Poster thumbnail (optional) */}
+  {event.poster_url && (
+    <div class="flex-shrink-0 w-16 h-20 rounded overflow-hidden bg-bg">
+      <img
+        src={event.poster_url}
+        alt=""
+        class="w-full h-full object-cover"
+        loading="lazy"
+      />
+    </div>
+  )}
+
+  {/* Event details */}
+  <div class="flex-1 min-w-0">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-[10px] text-muted bg-bg border border-border px-2 py-0.5 rounded capitalize">
+        {event.event_type}
+      </span>
+      {event.ticket_price && (
+        <span class="text-[10px] font-mono text-accent">{event.ticket_price}</span>
+      )}
+    </div>
+    <div class="font-display text-lg text-ink mb-0.5 truncate group-hover:text-accent transition-colors">
+      {event.title || 'Untitled Event'}
+    </div>
+    {event.venue && (
+      <div class="text-xs text-muted truncate">
+        {event.venue}{event.city ? `, ${event.city}` : ''}
+      </div>
+    )}
+    {performers.length > 0 && (
+      <div class="text-xs text-[#57534E] mt-1 truncate">
+        {performers.join(', ')}
+      </div>
+    )}
+  </div>
+</a>
