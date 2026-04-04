@@ -2,9 +2,10 @@ import { describe, test, expect } from 'bun:test';
 import { parseEventListing } from './bachtrack';
 
 // Fixture: real Bachtrack HTML structure (as of 2026-04)
+// Each listing has a desktop <div data-id> block followed by a mobile <li data-id> block
 const FIXTURE_HTML = `
 <div data-id="433573" data-type="nothing" data-fkmyevent="" data-dates="1775296800">
-<div class="listing-shortform data-sfdate='2026-03-25 14:04:44' listing-medium-1">
+<div class="listing-shortform listing-medium-1">
 <div class="listing-shortform-left">
 <div class="listing-shortform-dates">Sat  4 Apr at 11:00</div>
 </div>
@@ -24,14 +25,20 @@ const FIXTURE_HTML = `
 </div>
 </div>
 </div>
-<li data-id="433573" data-type="nothing" data-dates="1775296800"><div class="listing-ms"></div></li>
+<li data-id="433573" data-dates="1775296800"><div class="listing-ms"><div class="listing-ms-right">
+<div class="listing-ms-venue">Wigmore Hall</div>
+<div class="listing-ms-city">London</div>
+<div class="listing-ms-dates">Sat  4 Apr at 11:00</div>
+<div class="listing-ms-main">Schütz, Schein, Scheidt</div>
+<div class="listing-ms-performers">McLorinan, Paul, Daniels</div>
+</div></div></li>
 <div data-id="423604" data-type="nothing" data-fkmyevent="" data-dates="1775304900">
-<div class="listing-shortform data-sfdate='2026-03-23 07:46:36' listing-medium-1">
+<div class="listing-shortform listing-medium-1">
 <div class="listing-shortform-left">
 <div class="listing-shortform-dates">Sat  4 Apr at 14:15</div>
 </div>
 <div class="listing-shortform-middle">
-<div class="li-shortform-venue"><h2 class="li-shortform-venue"><a href="/venue/concertgebouw-main-hall">Concertgebouw: Main Hall</a>, <a href="/city/amsterdam">Amsterdam</a></h2></div>
+<div class="li-shortform-venue"><h2 class="li-shortform-venue"><a href="/venue/concertgebouw">Concertgebouw: Main Hall</a>, <a href="/city/amsterdam">Amsterdam</a></h2></div>
 <div class="listing-shortform-lowermid">
 <div class="li-shortform-title">The Bach Choir &amp; Orchestra of the Netherlands: St Matthew Passion</div>
 <a class="listing-more-info" href="/concert-event/bach-st-matthew-passion-concertgebouw-4-april-2026/423604">More info</a>
@@ -45,7 +52,13 @@ const FIXTURE_HTML = `
 </div>
 </div>
 </div>
-<li data-id="423604" data-type="nothing" data-dates="1775304900"><div class="listing-ms"></div></li>
+<li data-id="423604" data-dates="1775304900"><div class="listing-ms"><div class="listing-ms-right">
+<div class="listing-ms-venue">Concertgebouw: Main Hall</div>
+<div class="listing-ms-city">Amsterdam</div>
+<div class="listing-ms-dates">Sat  4 Apr at 14:15</div>
+<div class="listing-ms-main">St Matthew Passion, BWV244</div>
+<div class="listing-ms-performers">Leusink, Bach Orchestra of the Netherlands</div>
+</div></div></li>
 `;
 
 describe('Bachtrack parser', () => {
@@ -68,18 +81,16 @@ describe('Bachtrack parser', () => {
     expect(candidates[1].city).toBe('Amsterdam');
   });
 
-  test('parses date from data-dates unix timestamp', () => {
+  test('parses date from displayed text', () => {
     const candidates = parseEventListing(FIXTURE_HTML);
-    // 1775296800 = 2026-04-02 or similar (depends on TZ)
-    expect(candidates[0].event_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(candidates[0].event_date).toMatch(/^\d{4}-04-04$/);
+    expect(candidates[1].event_date).toMatch(/^\d{4}-04-04$/);
   });
 
-  test('extracts start_time from timestamp', () => {
+  test('extracts start_time from displayed text', () => {
     const candidates = parseEventListing(FIXTURE_HTML);
-    // Should have a time component
-    if (candidates[0].start_time) {
-      expect(candidates[0].start_time).toMatch(/^\d{2}:\d{2}$/);
-    }
+    expect(candidates[0].start_time).toBe('11:00');
+    expect(candidates[1].start_time).toBe('14:15');
   });
 
   test('extracts URL with bachtrack domain', () => {
@@ -102,13 +113,27 @@ describe('Bachtrack parser', () => {
     expect(candidates[1].title).not.toContain('&amp;');
   });
 
+  test('falls back to listing-ms-city when venue link has no city', () => {
+    const html = `
+<div data-id="999" data-dates="1775296800">
+<div class="listing-shortform"><div class="listing-shortform-dates">Sat  4 Apr at 19:00</div>
+<div class="li-shortform-venue"><h2 class="li-shortform-venue">Opéra de Monte-Carlo</h2></div>
+<div class="li-shortform-title">Test Event</div></div></div>
+<li data-id="999" data-dates="1775296800"><div class="listing-ms"><div class="listing-ms-right">
+<div class="listing-ms-venue">Opéra de Monte-Carlo</div>
+<div class="listing-ms-city">Monaco</div>
+</div></div></li>
+`;
+    const candidates = parseEventListing(html);
+    expect(candidates.length).toBe(1);
+    expect(candidates[0].city).toBe('Monaco');
+  });
+
   test('returns empty array for non-matching HTML', () => {
-    const candidates = parseEventListing('<div>No listings here</div>');
-    expect(candidates).toEqual([]);
+    expect(parseEventListing('<div>No listings</div>')).toEqual([]);
   });
 
   test('returns empty array for empty string', () => {
-    const candidates = parseEventListing('');
-    expect(candidates).toEqual([]);
+    expect(parseEventListing('')).toEqual([]);
   });
 });
