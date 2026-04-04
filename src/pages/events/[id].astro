@@ -2,15 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import { getEventFull } from '../../lib/events';
-import { getStaffUser } from '../../lib/admin';
 
 const { id } = Astro.params;
 const event = await getEventFull(id || '');
 
 if (!event) return Astro.redirect('/events');
-
-const staffUser = await getStaffUser(Astro.cookies);
-const isStaff = !!staffUser;
 
 const dateObj = new Date(event.event_date + 'T00:00:00');
 const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -162,14 +158,5 @@ const jsonLd = {
       </section>
     )}
 
-    {/* Moderation audit trail (staff only) */}
-    {isStaff && event.moderated_by && (
-      <section class="mt-8 p-4 bg-bg border border-border rounded-lg text-xs text-muted">
-        <div class="font-medium text-ink mb-1">Moderation Audit</div>
-        <div>Status: <span class="capitalize font-medium">{event.status}</span></div>
-        {event.moderated_at && <div>Moderated: {new Date(event.moderated_at).toLocaleString()}</div>}
-        {event.moderation_note && <div>Note: {event.moderation_note}</div>}
-      </section>
-    )}
   </main>
 </Layout>

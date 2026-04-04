@@ -35,10 +35,11 @@ export default function EventSubmitFields({ supabaseUrl, supabaseKey }: Props) {
           const venues = new Set(venueOptions);
           const cities = new Set(cityOptions);
           const titles = new Set(titleOptions);
+          const clean = (s: string) => s.replace(/\.+$/, '').trim();
           for (const e of data as Array<{ title: string; venue: string; city: string }>) {
-            if (e.title) titles.add(e.title);
-            if (e.venue) { venues.add(e.venue); if (e.city) venueToCity[e.venue] = e.city; }
-            if (e.city) cities.add(e.city);
+            if (e.title) titles.add(clean(e.title));
+            if (e.venue) { const v = clean(e.venue); venues.add(v); if (e.city) venueToCity[v] = clean(e.city); }
+            if (e.city) cities.add(clean(e.city));
           }
           setVenueOptions([...venues].sort());
           setCityOptions([...cities].sort());

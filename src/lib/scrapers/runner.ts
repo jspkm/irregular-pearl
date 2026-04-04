@@ -108,7 +108,6 @@ export async function runScrapers(): Promise<RunResult> {
           start_time: candidate.start_time || null,
           event_type: candidate.event_type,
           description: candidate.description || null,
-          url: candidate.url || null,
           poster_url: candidate.image_url || null,
           source,
           status: 'queued',
