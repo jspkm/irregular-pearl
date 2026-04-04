@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import PieceCard from '../components/PieceCard.astro';
+import MostWanted from '../components/MostWanted';
 import { seedPieces } from '../data/seed';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { groupBy, mapFuzzyResults } from '../lib/helpers';
@@ -418,6 +419,23 @@ const itemListLd = {
                 <div class="text-xs text-muted">{inst.count} pieces</div>
               </a>
             ))}
+          </div>
+        </section>
+
+        <!-- Most Wanted (search analytics) -->
+        <MostWanted client:idle />
+
+        <!-- Browse by Era / Form links -->
+        <section class="mb-12">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a href="/browse/era" class="block bg-surface border border-border rounded-xl p-5 hover:border-accent transition-all no-underline">
+              <h3 class="font-display text-lg text-ink mb-1">Browse by Era</h3>
+              <p class="text-xs text-muted">Baroque, Classical, Romantic, Modern, Contemporary</p>
+            </a>
+            <a href="/browse/form" class="block bg-surface border border-border rounded-xl p-5 hover:border-accent transition-all no-underline">
+              <h3 class="font-display text-lg text-ink mb-1">Browse by Form</h3>
+              <p class="text-xs text-muted">Sonatas, concertos, symphonies, and more</p>
+            </a>
           </div>
         </section>
 
