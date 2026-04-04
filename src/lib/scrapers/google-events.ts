@@ -1,18 +1,16 @@
 /**
- * Google Events scraper.
+ * Google Events scraper using Playwright.
  *
- * Searches Google for "classical music events [city] this week" and parses
- * the structured event cards from the HTML response. Runs locally (home IP)
- * to avoid cloud IP blocking.
+ * Searches Google Events for "classical music concerts [city]" and extracts
+ * structured event data from the rendered page. Uses a headless browser
+ * because Google Events is client-side rendered (no JSON-LD in initial HTML).
  *
- * Google event cards use structured data (JSON-LD) embedded in the page,
- * which is more stable than Bachtrack's custom HTML classes.
+ * Runs on GitHub Actions (Playwright installed) or locally.
  */
 
 import type { ScraperAdapter, ScraperResult, EventCandidate } from './types';
 
-const FETCH_TIMEOUT_MS = 30000;
-const REQUEST_DELAY_MS = 2000; // be respectful, 1 query per 2 seconds
+const REQUEST_DELAY_MS = 3000;
 
 // Cities to search — start small, expand based on user base
 const TARGET_CITIES = [
@@ -39,13 +37,11 @@ function inferEventType(text: string): EventCandidate['event_type'] {
 }
 
 /**
- * Parse JSON-LD event data from Google search results.
- * Google embeds Event schema.org objects in script tags.
+ * Parse JSON-LD Event objects from rendered HTML.
  */
 export function parseGoogleEvents(html: string, city: string): EventCandidate[] {
   const candidates: EventCandidate[] = [];
 
-  // Extract JSON-LD blocks
   const jsonLdPattern = /<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi;
   let match;
 
@@ -60,42 +56,24 @@ export function parseGoogleEvents(html: string, city: string): EventCandidate[] 
         const title = item.name?.trim();
         if (!title) continue;
 
-        // Extract date
         const startDate = item.startDate || '';
         const dateMatch = startDate.match(/^(\d{4}-\d{2}-\d{2})/);
         if (!dateMatch) continue;
         const event_date = dateMatch[1];
 
-        // Skip past events
         if (new Date(event_date) < new Date(new Date().toISOString().split('T')[0])) continue;
 
-        // Extract time
         const timeMatch = startDate.match(/T(\d{2}:\d{2})/);
         const start_time = timeMatch ? timeMatch[1] : undefined;
 
-        // Extract venue
         const location = item.location;
         const venue = typeof location === 'string'
           ? location
           : location?.name || location?.address?.name || 'Unknown venue';
-
         const venueCity = location?.address?.addressLocality || city;
 
-        // Extract URL
         const url = item.url || undefined;
 
-        // Extract ticket price
-        let ticket_price: string | undefined;
-        if (item.offers) {
-          const offers = Array.isArray(item.offers) ? item.offers : [item.offers];
-          const prices = offers
-            .filter((o: any) => o.price)
-            .map((o: any) => `$${o.price}`);
-          if (prices.length > 0) ticket_price = prices.join('-');
-          else if (offers.some((o: any) => o.price === 0 || o.price === '0')) ticket_price = 'Free';
-        }
-
-        // Extract performers
         const performers: string[] = [];
         if (item.performer) {
           const perfs = Array.isArray(item.performer) ? item.performer : [item.performer];
@@ -118,35 +96,7 @@ export function parseGoogleEvents(html: string, city: string): EventCandidate[] 
         });
       }
     } catch {
-      // JSON parse error — skip this block
-    }
-  }
-
-  // Fallback: parse event cards from HTML if no JSON-LD found
-  if (candidates.length === 0) {
-    const eventCardPattern = /<div[^>]*data-ved[^>]*>[\s\S]*?<div[^>]*class="[^"]*YOGjf[^"]*"[^>]*>([\s\S]*?)<\/div>[\s\S]*?<div[^>]*class="[^"]*cEZxRc[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
-    let cardMatch;
-
-    while ((cardMatch = eventCardPattern.exec(html)) !== null) {
-      const title = cardMatch[1].replace(/<[^>]+>/g, '').trim();
-      const meta = cardMatch[2].replace(/<[^>]+>/g, '').trim();
-      if (!title) continue;
-
-      // Try to extract date from meta text
-      const dateStr = meta.match(/(\w+ \d{1,2},? \d{4})/)?.[1];
-      if (!dateStr) continue;
-
-      const parsed = new Date(dateStr);
-      if (isNaN(parsed.getTime())) continue;
-      const event_date = parsed.toISOString().split('T')[0];
-
-      candidates.push({
-        title,
-        venue: 'See event details',
-        city,
-        event_date,
-        event_type: inferEventType(title),
-      });
+      // JSON parse error, skip
     }
   }
 
@@ -165,41 +115,58 @@ export class GoogleEventsScraper implements ScraperAdapter {
     const errors: string[] = [];
     const allCandidates: EventCandidate[] = [];
 
-    for (const city of this.cities) {
-      try {
-        const query = encodeURIComponent(`classical music concerts ${city} this week`);
-        const url = `https://www.google.com/search?q=${query}&ibp=htl;events`;
+    let chromium: any;
+    let browser: any;
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      // Dynamic import so the module still loads if playwright isn't installed
+      const pw = await import('playwright');
+      chromium = pw.chromium;
+    } catch {
+      errors.push('Playwright not installed. Run: bun add -d playwright && bunx playwright install chromium');
+      return { source: 'google', candidates: [], errors };
+    }
 
-        const response = await fetch(url, {
-          signal: controller.signal,
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml',
-            'Accept-Language': 'en-US,en;q=0.9',
-          },
-        });
+    try {
+      browser = await chromium.launch({ headless: true });
+    } catch (err) {
+      errors.push(`Failed to launch browser: ${err instanceof Error ? err.message : String(err)}. Run: bunx playwright install chromium`);
+      return { source: 'google', candidates: [], errors };
+    }
 
-        clearTimeout(timeout);
+    try {
+      const context = await browser.newContext({
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        locale: 'en-US',
+      });
 
-        if (!response.ok) {
-          errors.push(`Google returned ${response.status} for ${city}`);
+      for (const city of this.cities) {
+        try {
+          const page = await context.newPage();
+          const query = encodeURIComponent(`classical music concerts ${city}`);
+          const url = `https://www.google.com/search?q=${query}&ibp=htl;events`;
+
+          await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+
+          // Wait for event cards to render
+          await page.waitForTimeout(2000);
+
+          const html = await page.content();
+          const cityEvents = parseGoogleEvents(html, city);
+          allCandidates.push(...cityEvents);
+
+          console.log(`[google-events] ${city}: ${cityEvents.length} events found`);
+          await page.close();
           await sleep(REQUEST_DELAY_MS);
-          continue;
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          errors.push(`Google fetch error for ${city}: ${msg}`);
         }
-
-        const html = await response.text();
-        const cityEvents = parseGoogleEvents(html, city);
-        allCandidates.push(...cityEvents);
-
-        console.log(`[google-events] ${city}: ${cityEvents.length} events found`);
-        await sleep(REQUEST_DELAY_MS);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        errors.push(`Google fetch error for ${city}: ${msg}`);
       }
+
+      await context.close();
+    } finally {
+      await browser?.close();
     }
 
     return { source: 'google', candidates: allCandidates, errors };
