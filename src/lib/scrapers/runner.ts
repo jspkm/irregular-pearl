@@ -131,7 +131,8 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
     .then(result => {
       if (result.errors.length > 0) {
         console.error('[scraper] Errors:', result.errors);
-        process.exit(result.inserted === 0 && result.total_candidates === 0 ? 1 : 0);
+        // Exit 0 even with errors — scraping is experimental, not a launch dependency.
+        // Errors are logged and visible in GH Actions output.
       }
     })
     .catch(err => {
