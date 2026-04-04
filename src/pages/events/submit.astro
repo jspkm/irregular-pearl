@@ -164,19 +164,35 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
     }
   });
 
-  // Load autocomplete suggestions from existing events
+  // Static venue dataset (146 venues, 100+ cities worldwide)
+  import { VENUES } from '../../data/venues';
+
+  // Merge static venues with live DB data for autocomplete
+  const venueToCity: Record<string, string> = {};
+  for (const v of VENUES) {
+    venueToCity[v.venue] = v.city;
+  }
+
   async function loadSuggestions() {
+    // Start with static data
+    const allVenues = new Set(VENUES.map(v => v.venue));
+    const allCities = new Set(VENUES.map(v => v.city));
+    const allTitles = new Set<string>();
+
+    // Merge in live DB data
     const { data } = await supabase
       .from('events')
       .select('title, venue, city')
       .not('title', 'is', null)
       .limit(500);
 
-    if (!data) return;
-
-    const titles = [...new Set(data.map((e: any) => e.title).filter(Boolean))];
-    const venues = [...new Set(data.map((e: any) => e.venue).filter(Boolean))];
-    const cities = [...new Set(data.map((e: any) => e.city).filter(Boolean))].sort();
+    if (data) {
+      for (const e of data as Array<{ title: string; venue: string; city: string }>) {
+        if (e.title) allTitles.add(e.title);
+        if (e.venue) { allVenues.add(e.venue); if (e.city) venueToCity[e.venue] = e.city; }
+        if (e.city) allCities.add(e.city);
+      }
+    }
 
     function fill(id: string, values: string[]) {
       const dl = document.getElementById(id);
@@ -184,24 +200,15 @@ const EVENT_TYPES = ['recital', 'concert', 'masterclass', 'competition', 'festiv
       dl.innerHTML = values.map(v => `<option value="${v.replace(/"/g, '&quot;')}">`).join('');
     }
 
-    fill('title-suggestions', titles);
-    fill('venue-suggestions', venues);
-    fill('city-suggestions', cities);
+    fill('title-suggestions', [...allTitles].sort());
+    fill('venue-suggestions', [...allVenues].sort());
+    fill('city-suggestions', [...allCities].sort());
   }
   loadSuggestions();
 
-  // Auto-fill city when a known venue is selected
+  // Auto-fill city when a known venue is typed/selected
   const venueInput = document.getElementById('venue') as HTMLInputElement;
   const cityInput = document.getElementById('city') as HTMLInputElement;
-  let venueToCity: Record<string, string> = {};
-
-  supabase.from('events').select('venue, city').not('venue', 'is', null).not('city', 'is', null).limit(500)
-    .then(({ data }) => {
-      if (!data) return;
-      for (const e of data as Array<{ venue: string; city: string }>) {
-        if (e.venue && e.city) venueToCity[e.venue] = e.city;
-      }
-    });
 
   venueInput.addEventListener('change', () => {
     const matchedCity = venueToCity[venueInput.value];
