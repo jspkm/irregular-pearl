@@ -13,7 +13,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { ScraperAdapter, EventCandidate } from './types';
 import { BachtrackScraper } from './bachtrack';
-import { GoogleEventsScraper } from './google-events';
 
 const BATCH_SIZE = 50;
 
@@ -35,10 +34,17 @@ export async function runScrapers(): Promise<RunResult> {
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // Register adapters
+  // Google Events requires Playwright (headless browser) — only runs on CI.
+  // Locally, Bachtrack alone is sufficient.
   const adapters: ScraperAdapter[] = [
     new BachtrackScraper(),
-    new GoogleEventsScraper(),
   ];
+
+  const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+  if (isCI) {
+    const { GoogleEventsScraper } = await import('./google-events');
+    adapters.push(new GoogleEventsScraper());
+  }
 
   const allCandidates: { candidate: EventCandidate; source: string }[] = [];
   const allErrors: string[] = [];
