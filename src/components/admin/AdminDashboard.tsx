@@ -13,6 +13,7 @@ export default function AdminDashboard({ isAdmin }: Props) {
     totalInteractions: 0,
     totalDiscussions: 0,
     pendingReports: 0,
+    pendingEvents: 0,
   });
   const [recentUsers, setRecentUsers] = useState<{ id: string; display_name: string; instrument: string | null; level: string | null; created_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,12 +25,13 @@ export default function AdminDashboard({ isAdmin }: Props) {
     if (!hasSupabase) { setLoading(false); return; }
 
     const fetchStats = async () => {
-      const [usersRes, newUsersRes, activityRes, discussionsRes, reportsRes, recentRes] = await Promise.allSettled([
+      const [usersRes, newUsersRes, activityRes, discussionsRes, reportsRes, eventsRes, recentRes] = await Promise.allSettled([
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
         supabase.from('activity_log').select('id', { count: 'exact', head: true }),
         supabase.from('discussions').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
         supabase.from('reports').select('id', { count: 'exact', head: true }),
+        supabase.from('events').select('id', { count: 'exact', head: true }).eq('status', 'queued'),
         isAdmin ? supabase.from('users').select('id, display_name, instrument, level, created_at').order('created_at', { ascending: false }).limit(10) : Promise.resolve({ data: [] }),
       ]);
 
@@ -39,6 +41,7 @@ export default function AdminDashboard({ isAdmin }: Props) {
         totalInteractions: activityRes.status === 'fulfilled' ? (activityRes.value.count ?? 0) : 0,
         totalDiscussions: discussionsRes.status === 'fulfilled' ? (discussionsRes.value.count ?? 0) : 0,
         pendingReports: reportsRes.status === 'fulfilled' ? (reportsRes.value.count ?? 0) : 0,
+        pendingEvents: eventsRes.status === 'fulfilled' ? (eventsRes.value.count ?? 0) : 0,
       });
 
       if (isAdmin && recentRes.status === 'fulfilled' && (recentRes.value as any).data) {
@@ -61,6 +64,7 @@ export default function AdminDashboard({ isAdmin }: Props) {
     { label: 'Interactions', value: stats.totalInteractions },
     { label: 'Discussions', value: stats.totalDiscussions },
     { label: 'Pending Reports', value: stats.pendingReports, accent: stats.pendingReports > 0 },
+    { label: 'Pending Events', value: stats.pendingEvents, accent: stats.pendingEvents > 0 },
     { label: 'Pieces', value: seedPieces.length },
     ...(isAdmin ? [
       { label: 'Composers', value: composerCount },
