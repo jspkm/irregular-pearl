@@ -27,7 +27,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const SPOTIFY_SEARCH_URL = 'https://api.spotify.com/v1/search';
-const MIN_POPULARITY = 20; // Skip matches below this popularity score
+const MIN_POPULARITY = 1; // Classical tracks have low popularity scores on Spotify
 const RATE_LIMIT_DELAY_MS = 40; // ~25 req/s
 const BATCH_SIZE = parseInt(process.env.BATCH || '100', 10);
 const OFFSET = parseInt(process.env.OFFSET || '0', 10);

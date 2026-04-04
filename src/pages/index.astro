@@ -137,6 +137,13 @@ if (query) {
 const isFiltered = !!(query || filter);
 const hasSearchResults = displayPieces.length > 0 || searchArtists.length > 0 || searchInstruments.length > 0;
 
+// Total piece count (for hero/JSON-LD)
+let totalPieceCount = seedPieces.length;
+if (hasSupabase) {
+  const { count } = await supabase.from('pieces').select('id', { count: 'exact', head: true });
+  if (count) totalPieceCount = count;
+}
+
 // Group instruments with counts
 const instrumentGroups: Record<string, number> = {};
 for (const piece of seedPieces) {
@@ -234,7 +241,7 @@ const homeLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Irregular Pearl',
-  description: `A collaborative platform for classical music knowledge. ${seedPieces.length} pieces with editions, recordings, and community discussion.`,
+  description: `A collaborative platform for classical music knowledge. ${totalPieceCount.toLocaleString()} pieces with editions, recordings, and community discussion.`,
   url: Astro.url.origin,
   potentialAction: {
     '@type': 'SearchAction',
@@ -259,8 +266,8 @@ const itemListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Classical Music Pieces',
-  description: `${seedPieces.length} classical music works with editions, recordings, and community discussion`,
-  numberOfItems: seedPieces.length,
+  description: `${totalPieceCount.toLocaleString()} classical music works with editions, recordings, and community discussion`,
+  numberOfItems: totalPieceCount,
   itemListElement: seedPieces.slice(0, 30).map((piece, i) => ({
     '@type': 'ListItem',
     position: i + 1,
