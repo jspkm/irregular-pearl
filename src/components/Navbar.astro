@@ -2,7 +2,7 @@
 import AuthButton from './AuthButton';
 ---
 <nav class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border bg-surface sticky top-0 z-50">
-  <a href="/" class="no-underline">
+  <a href="/" class="no-underline shrink-0">
     <img src="/logo.svg" alt="Irregular Pearl" class="h-6 w-auto" />
   </a>
 
@@ -17,8 +17,34 @@ import AuthButton from './AuthButton';
     </form>
   </div>
 
-  <div class="flex items-center gap-4 text-sm text-muted">
-    <a href="/events" class="hidden sm:inline text-muted hover:text-ink no-underline font-body text-sm transition-colors">Events</a>
+  <!-- Desktop nav -->
+  <div class="hidden sm:flex items-center gap-4 text-sm text-muted">
+    <a href="/events" class="text-muted hover:text-ink no-underline font-body text-sm transition-colors">Events</a>
     <AuthButton client:load />
   </div>
+
+  <!-- Mobile: auth + hamburger -->
+  <div class="flex sm:hidden items-center gap-3">
+    <AuthButton client:load />
+    <button id="mobile-menu-btn" class="p-1 text-muted hover:text-ink transition-colors bg-transparent border-none cursor-pointer" aria-label="Menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+  </div>
 </nav>
+
+<!-- Mobile dropdown menu -->
+<div id="mobile-menu" class="hidden sm:hidden border-b border-border bg-surface px-4 py-3">
+  <a href="/events" class="block py-2 text-sm text-muted hover:text-ink no-underline font-body transition-colors">Events</a>
+</div>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+</script>
