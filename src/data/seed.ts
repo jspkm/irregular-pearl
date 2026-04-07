@@ -1545,3 +1545,6 @@ import { expansionPieces13 } from './seed-expansion-13';
 seedPieces.push(...expansionPieces13);
 import { expansionPieces14 } from './seed-expansion-14';
 seedPieces.push(...expansionPieces14);
+
+import { expansionPieces15 } from './seed-expansion-15';
+seedPieces.push(...expansionPieces15);
