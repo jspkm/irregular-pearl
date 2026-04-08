@@ -111,8 +111,10 @@ if (query) {
       }
     }
 
-    // Log search query for "Most Wanted" analytics (fire-and-forget)
-    supabase.from('search_queries').insert({ query, result_count: displayPieces.length }).then(() => {});
+    // Log search query for "Most Wanted" analytics (fire-and-forget, skip bot/placeholder queries)
+    if (!query.includes('{') && !query.includes('}')) {
+      supabase.from('search_queries').insert({ query, result_count: displayPieces.length }).then(() => {});
+    }
   } else {
     // Fallback: client-side substring search (pieces only)
     const q = query.toLowerCase();

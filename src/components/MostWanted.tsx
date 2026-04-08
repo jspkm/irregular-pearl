@@ -30,7 +30,7 @@ export default function MostWanted() {
         const counts: Record<string, number> = {};
         for (const row of data) {
           const q = row.query.toLowerCase().trim();
-          if (q.length < 2) continue;
+          if (q.length < 2 || q.includes('{') || q.includes('}')) continue;
           counts[q] = (counts[q] || 0) + 1;
         }
 
