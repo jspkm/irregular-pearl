@@ -219,10 +219,13 @@ async function fetchOgImage(url: string): Promise<string | null> {
 }
 
 async function enrichPosters(candidates: EventCandidate[], errors: string[]): Promise<void> {
+  const { findWikipediaImage, buildVenueImageCounts, isVenueFallbackImage } = await import('./poster-enrichment');
+
+  // Step 1: pull og:image from each bachtrack detail page.
   const targets = candidates.filter((c) => c.url && c.url.includes('bachtrack.com'));
-  const CONC = 4;
+  let ogUpdated = 0;
   let i = 0;
-  let updated = 0;
+  const CONC = 4;
   await Promise.all(
     Array.from({ length: CONC }, async () => {
       while (true) {
@@ -232,15 +235,50 @@ async function enrichPosters(candidates: EventCandidate[], errors: string[]): Pr
         const og = await fetchOgImage(c.url!);
         if (og) {
           c.image_url = og;
-          updated++;
+          ogUpdated++;
         }
         await sleep(500);
       }
     })
   );
-  console.log(`[bachtrack] enriched ${updated}/${targets.length} poster_urls from detail pages`);
-  if (updated < targets.length / 2) {
-    errors.push(`Poster enrichment low yield: ${updated}/${targets.length}`);
+  console.log(`[bachtrack] og:image enriched ${ogUpdated}/${targets.length}`);
+
+  // Step 2: replace with Wikipedia performer/ensemble image when there is one.
+  let wikiHit = 0;
+  let wikiIdx = 0;
+  await Promise.all(
+    Array.from({ length: CONC }, async () => {
+      while (true) {
+        const idx = wikiIdx++;
+        if (idx >= candidates.length) return;
+        const c = candidates[idx];
+        const img = await findWikipediaImage(c.title);
+        if (img) {
+          c.image_url = img;
+          wikiHit++;
+        }
+        await sleep(200);
+      }
+    })
+  );
+  console.log(`[bachtrack] wikipedia matched ${wikiHit}/${candidates.length}`);
+
+  // Step 3: null out images that look like venue stock fallbacks
+  // (same image URL reused across multiple events at the same venue).
+  const counts = buildVenueImageCounts(
+    candidates.map((c) => ({ venue: c.venue ?? null, poster_url: c.image_url ?? null }))
+  );
+  let nulled = 0;
+  for (const c of candidates) {
+    if (isVenueFallbackImage(c.venue, c.image_url, counts)) {
+      c.image_url = undefined;
+      nulled++;
+    }
+  }
+  console.log(`[bachtrack] nulled ${nulled} venue-fallback poster_urls`);
+
+  if (ogUpdated < targets.length / 2 && wikiHit === 0) {
+    errors.push(`Poster enrichment low yield (og:${ogUpdated}/${targets.length}, wiki:${wikiHit})`);
   }
 }
 
