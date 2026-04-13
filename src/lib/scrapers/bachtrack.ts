@@ -199,6 +199,51 @@ function capPerCityPerDay(candidates: EventCandidate[]): EventCandidate[] {
   });
 }
 
+async function fetchOgImage(url: string): Promise<string | null> {
+  try {
+    const r = await fetch(url, {
+      signal: AbortSignal.timeout(15_000),
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+      },
+    });
+    if (!r.ok) return null;
+    const html = await r.text();
+    const m = html.match(/<meta[^>]+property=['"]og:image['"][^>]+content=['"]([^'"]+)['"]/i)
+      ?? html.match(/<meta[^>]+content=['"]([^'"]+)['"][^>]+property=['"]og:image['"]/i);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+async function enrichPosters(candidates: EventCandidate[], errors: string[]): Promise<void> {
+  const targets = candidates.filter((c) => c.url && c.url.includes('bachtrack.com'));
+  const CONC = 4;
+  let i = 0;
+  let updated = 0;
+  await Promise.all(
+    Array.from({ length: CONC }, async () => {
+      while (true) {
+        const idx = i++;
+        if (idx >= targets.length) return;
+        const c = targets[idx];
+        const og = await fetchOgImage(c.url!);
+        if (og) {
+          c.image_url = og;
+          updated++;
+        }
+        await sleep(500);
+      }
+    })
+  );
+  console.log(`[bachtrack] enriched ${updated}/${targets.length} poster_urls from detail pages`);
+  if (updated < targets.length / 2) {
+    errors.push(`Poster enrichment low yield: ${updated}/${targets.length}`);
+  }
+}
+
 export class BachtrackScraper implements ScraperAdapter {
   readonly source = 'bachtrack';
 
@@ -207,7 +252,7 @@ export class BachtrackScraper implements ScraperAdapter {
     let allCandidates: EventCandidate[] = [];
 
     const today = new Date().toISOString().split('T')[0];
-    const twoMonths = new Date(Date.now() + 60 * 86400000).toISOString().split('T')[0];
+    const twoMonths = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
 
     // Bachtrack's global search (no city filter) returns 50 events per page
     // with full worldwide coverage. City-filtered searches only return ~4
@@ -290,6 +335,10 @@ export class BachtrackScraper implements ScraperAdapter {
     // Cap to MAX_PER_CITY_PER_DAY for variety across dates
     const capped = capPerCityPerDay(allCandidates);
     console.log(`[bachtrack] ${allCandidates.length} total, ${capped.length} after cap (max ${MAX_PER_CITY_PER_DAY}/city/day)`);
+
+    // Enrich poster_url from each event's detail page (og:image is the
+    // event-specific poster; the listing thumbnail is often a venue logo).
+    await enrichPosters(capped, errors);
 
     return { source: this.source, candidates: capped, errors };
   }

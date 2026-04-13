@@ -5,7 +5,7 @@
 # Setup:
 #   1. Create .env.local with SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
 #   2. crontab -e, add:
-#      0 3 * * * /Users/jspkm/dev/irregular-pearl/scripts/scrape-events.sh >> /tmp/scrape-events.log 2>&1
+#      0 3 */3 * * /Users/jspkm/dev/irregular-pearl/scripts/scrape-events.sh >> /tmp/scrape-events.log 2>&1
 
 cd /Users/jspkm/dev/irregular-pearl
 
