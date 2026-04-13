@@ -10,7 +10,8 @@
     "check": "astro check",
     "test": "bun test src/lib src/data src/components src/tests",
     "test:e2e": "bun test src/e2e",
-    "test:all": "bun run test && bun run test:e2e"
+    "test:all": "bun run test && bun run test:e2e",
+    "validate:urls": "bun run scripts/validate-seed-urls.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.0.0",

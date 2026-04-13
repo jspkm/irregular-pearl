@@ -13,6 +13,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { ScraperAdapter, EventCandidate } from './types';
 import { BachtrackScraper } from './bachtrack';
+import { resolveVenueUrl } from '../../data/venue-urls';
 
 const BATCH_SIZE = 50;
 
@@ -95,7 +96,11 @@ export async function runScrapers(): Promise<RunResult> {
         continue;
       }
 
-      // Insert as queued
+      // Prefer the venue's official site over the aggregator's listing page.
+      const venueUrl = resolveVenueUrl(candidate.venue);
+      const finalUrl = venueUrl ?? candidate.url ?? null;
+      const ticketUrl = venueUrl && candidate.url ? candidate.url : null;
+
       const { error } = await supabase
         .from('events')
         .insert({
@@ -104,13 +109,14 @@ export async function runScrapers(): Promise<RunResult> {
           city: candidate.city,
           country: candidate.country || null,
           event_date: candidate.event_date,
-          url: candidate.url || null,
+          url: finalUrl,
+          ticket_url: ticketUrl,
           start_time: candidate.start_time || null,
           event_type: candidate.event_type,
           description: candidate.description || null,
           poster_url: candidate.image_url || null,
           source,
-          status: 'queued',
+          status: 'approved',
           created_by: null,
         });
 
