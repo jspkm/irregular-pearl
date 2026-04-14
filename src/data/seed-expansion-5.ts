@@ -39,16 +39,6 @@ export const expansionPieces5: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Pi%C3%A8ces_de_fantaisie,_Op.54_(Vierne,_Louis)",
-        "label": "IMSLP — Vierne: Pièces de fantaisie Op. 54"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=z4RFOEh2iFU",
-        "label": "YouTube — Marie-Claire Alain, Notre-Dame de Paris"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Pi%C3%A8ces_de_fantaisie",
         "label": "Wikipedia — Pièces de fantaisie (Vierne)"
@@ -92,16 +82,6 @@ export const expansionPieces5: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Nocturnal_after_John_Dowland,_Op.70_(Britten,_Benjamin)",
-        "label": "IMSLP — Britten: Nocturnal Op. 70"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=mG5rOtMXaas",
-        "label": "YouTube — Julian Bream, 1966 recording"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Nocturnal_after_John_Dowland",
@@ -153,16 +133,6 @@ export const expansionPieces5: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Danses_sacr%C3%A9e_et_profane_(Debussy,_Claude)",
-        "label": "IMSLP — Debussy: Danses sacrée et profane"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=G4LPq2BbOIg",
-        "label": "YouTube — Fabrice Pierre, harp"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Danses_sacr%C3%A9e_et_profane",
         "label": "Wikipedia — Danses sacrée et profane"
@@ -213,11 +183,6 @@ export const expansionPieces5: SeedPiece[] = [
         "label": "IMSLP — Dragonetti: Double Bass Concerto in A"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=ckIBuCyMhZ8",
-        "label": "YouTube — Chi-chi Nwanoku, double bass"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Domenico_Dragonetti",
         "label": "Wikipedia — Domenico Dragonetti"
@@ -258,11 +223,6 @@ export const expansionPieces5: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Ionisation_(Var%C3%A8se,_Edgard)",
         "label": "IMSLP — Varèse: Ionisation"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=bGBNQBaLPpI",
-        "label": "YouTube — Ensemble InterContemporain, Boulez"
       },
       {
         "type": "wikipedia",
@@ -310,25 +270,10 @@ export const expansionPieces5: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Quintet_in_G_minor,_Op.57_(Shostakovich,_Dmitri)",
-        "label": "IMSLP — Shostakovich: Piano Quintet Op. 57"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=nCgSKE_qsDc",
-        "label": "YouTube — Sviatoslav Richter & Borodin Quartet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quintet_(Shostakovich)",
         "label": "Wikipedia — Shostakovich Piano Quintet"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/297082441",
-        "label": "Vimeo — Takács Quartet & Garrick Ohlsson"
-      }
     ]
   },
   {
@@ -374,20 +319,10 @@ export const expansionPieces5: SeedPiece[] = [
         "label": "IMSLP — Beethoven: String Quartet Op. 131"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=UBnQmMhGNK8",
-        "label": "YouTube — Quartetto Italiano"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Quartet_No._14_(Beethoven)",
         "label": "Wikipedia — Beethoven String Quartet No. 14"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/214694281",
-        "label": "Vimeo — Takács Quartet live performance"
-      }
     ]
   },
   {
@@ -431,11 +366,6 @@ export const expansionPieces5: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Academic_Festival_Overture,_Op.80_(Brahms,_Johannes)",
         "label": "IMSLP — Brahms: Academic Festival Overture Op. 80"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Y9RpRgMDCTY",
-        "label": "YouTube — Carlos Kleiber, Concertgebouw"
       },
       {
         "type": "wikipedia",
@@ -487,11 +417,6 @@ export const expansionPieces5: SeedPiece[] = [
         "label": "IMSLP — Sibelius: Finlandia Op. 26"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=qMxs-USCBEA",
-        "label": "YouTube — Paavo Berglund, Helsinki Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Finlandia",
         "label": "Wikipedia — Finlandia (Sibelius)"
@@ -541,25 +466,10 @@ export const expansionPieces5: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Appalachian_Spring_(Copland,_Aaron)",
-        "label": "IMSLP — Copland: Appalachian Spring"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=_tYNrAN_S3Q",
-        "label": "YouTube — Leonard Bernstein, New York Philharmonic"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Appalachian_Spring",
         "label": "Wikipedia — Appalachian Spring"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/142734491",
-        "label": "Vimeo — Martha Graham Dance Company, original ballet"
-      }
     ]
   }
 ];

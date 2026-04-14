@@ -41,7 +41,6 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-bach-pass-henle', publisher: 'Henle Verlag', editor: 'Jean-Claude Zehnder', year: 2010, description: 'Urtext edition with practical performance suggestions.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Passacaglia_and_Fugue_in_C_minor,_BWV_582_(Bach,_Johann_Sebastian)', label: 'IMSLP — editions available' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Passacaglia_and_Fugue_in_C_minor,_BWV_582', label: 'Wikipedia — Passacaglia BWV 582' }
     ],
   },
@@ -62,7 +61,6 @@ export const expansionPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Organ_Symphony_No.5,_Op.42_No.1_(Widor,_Charles-Marie)', label: 'IMSLP — editions available' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Widor)', label: 'Wikipedia — Widor Symphony No. 5' }
     ],
   },
   {
@@ -143,7 +141,6 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-ravel-q-durand', publisher: 'Durand', editor: 'Maurice Ravel', year: 1904, description: 'Original publication. The standard performing edition for decades.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet_(Ravel,_Maurice)', label: 'IMSLP — editions available' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_(Ravel)', label: 'Wikipedia — Ravel String Quartet' }
     ],
   },
@@ -163,7 +160,6 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-debussy-q-durand', publisher: 'Durand', editor: 'Claude Debussy', year: 1894, description: 'Original edition.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet,_Op.10_(Debussy,_Claude)', label: 'IMSLP — editions available' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_(Debussy)', label: 'Wikipedia — Debussy String Quartet' }
     ],
   },
@@ -226,7 +222,6 @@ export const expansionPieces: SeedPiece[] = [
       { id: 'e-schub-trio2-baren', publisher: 'Bärenreiter', editor: 'Martin Chusid', year: 2003, description: 'New Schubert Edition critical text.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Trio_No.2,_D.929_(Schubert,_Franz)', label: 'IMSLP — editions available' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Trio_No._2_(Schubert)', label: 'Wikipedia — Schubert Piano Trio No. 2' }
     ],
   },

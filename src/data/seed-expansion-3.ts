@@ -40,6 +40,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Concerto_No._1_(Chopin)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=ZR9HayZcZ2o",
+        "label": "EuroArtsChannel — Evgeny Kissin: Chopin - Piano Concerto No. 1, Op 11 (Tel Aviv, 2011)"
       }
     ]
   },
@@ -82,6 +87,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Chopin)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=ucEoszfu9_E",
+        "label": "Peter Chen 2.0 — Yuja Wang: Chopin Piano Concerto No. 2 in F minor Op. 21 [HD]"
       }
     ]
   },
@@ -124,6 +134,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Concerto_(Schumann)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=cRNWaTJW-24",
+        "label": "DW Classical Music — Schumann: Piano Concerto | Martha Argerich, Riccardo Chailly & Gewandhausorchester Leipzig"
       }
     ]
   },
@@ -158,14 +173,14 @@ export const expansionPieces3: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Sonata_No.11,_K.331/300i_(Mozart,_Wolfgang_Amadeus)",
-        "label": "IMSLP"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Sonata_No._11_(Mozart)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=SQh1zztmpEk",
+        "label": "TzviErez — Mozart: ALLA TURCA from Sonata No. 11 in A major, K.331 | Tzvi Erez"
       }
     ]
   },
@@ -196,6 +211,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Prokofiev)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=ozvTHD63di8",
+        "label": "Prok Prok — Prokofiev Violin Concerto No. 1 in D Major, Op. 19 (Fischer)"
       }
     ]
   },
@@ -241,6 +261,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._3_(Beethoven)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=DWwppYEEdcI",
+        "label": "DW Classical Music — Beethoven: Symphony No. 3 Eroica | Michael Boder & ORF Vienna Radio Symphony Orchestra"
       }
     ]
   },
@@ -279,6 +304,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._7_(Beethoven)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Rd0HnxWm5CY",
+        "label": "DW Classical Music — Beethoven: Symphony No. 7 | Bernard Haitink & the Royal Concertgebouw Orchestra"
       }
     ]
   },
@@ -317,6 +347,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._9_(Beethoven)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=ChygZLpJDNE",
+        "label": "engchi93 — Beethoven Symphony No. 9 - Mvt. 4 - Barenboim/West-Eastern Divan Orchestra"
       }
     ]
   },
@@ -410,6 +445,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Ein_deutsches_Requiem",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=ZXU9vqVdudM",
+        "label": "hr-Sinfonieorchester – Frankfurt Radio Symphony — Brahms: Ein deutsches Requiem ∙ hr-Sinfonieorchester ∙ MDR-Rundfunkchor ∙ Solisten ∙ David Zinman"
       }
     ]
   },
@@ -450,6 +490,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Requiem_(Verdi)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Nlq9lJRElBk",
+        "label": "hr-Sinfonieorchester – Frankfurt Radio Symphony — Verdi: Messa da Requiem ∙ hr-Sinfonieorchester ∙ MDR Rundfunkchor ∙ Solisten ∙ Andrés Orozco-Estrada"
       }
     ]
   },
@@ -567,6 +612,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Scheherazade_(Rimsky-Korsakov)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=zY4w4_W30aQ",
+        "label": "SinfonicadeGalicia — Rimsky-Korsakov: Scheherazade op.35 - Leif Segerstam - Sinfónica de Galicia"
       }
     ]
   },
@@ -640,6 +690,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Bol%C3%A9ro",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Dh9bUD-hC0A",
+        "label": "Musiké XXI Music Education — MAURICE RAVEL - Bolero"
       }
     ]
   },
@@ -714,6 +769,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Pictures_at_an_Exhibition",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=XwJMpQiqCm4",
+        "label": "Oslo Philharmonic — Pictures at an Exhibition (complete) / Modest Mussorgsky / Semyon Bychkov / Oslo Philharmonic"
       }
     ]
   },
@@ -752,6 +812,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/The_Marriage_of_Figaro",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=pb1tlh9xn38",
+        "label": "GreatPerformers1 — MOZART - \"Le Nozze di Figaro\" Overture - BARENBOIM / East-West Divan"
       }
     ]
   },
@@ -782,6 +847,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Flute_Concerto_(Nielsen)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=C47qZY65HLs",
+        "label": "Mattia Carugno (tema) — Sébastian Jacot- Nielsen Flute Concerto FS 119"
       }
     ]
   },
@@ -810,14 +880,14 @@ export const expansionPieces3: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Concerto_for_Flute,_Harp_and_Orchestra,_K.299/297c_(Mozart,_Wolfgang_Amadeus)",
-        "label": "IMSLP"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Concerto_for_Flute,_Harp,_and_Orchestra_(Mozart)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=nheif2BuFz0",
+        "label": "Art Of Sound And Vision — Mozart Concerto for Flute  Harp and Orchestra in C major, K 299 - complete - LIVE"
       }
     ]
   },
@@ -850,9 +920,9 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Fantasia_and_Fugue_in_G_minor,_BWV_542",
-        "label": "Wikipedia"
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=tgDE3klkmtQ",
+        "label": "Netherlands Bach Society — Bach - Fantasia and fugue in G minor BWV 542 - Van Doeselaar | Netherlands Bach Society"
       }
     ]
   },
@@ -892,9 +962,9 @@ export const expansionPieces3: SeedPiece[] = [
         "label": "IMSLP"
       },
       {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Estampes_(Debussy)",
-        "label": "Wikipedia"
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Gd5kUWDGyUs",
+        "label": "Ashish Xiangyi Kumar — Debussy: Estampes, L.100 (Perianes, Goerner)"
       }
     ]
   },
@@ -937,6 +1007,11 @@ export const expansionPieces3: SeedPiece[] = [
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Polonaise_in_A-flat_major,_Op._53_(Chopin)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=p_iI1J0bALE",
+        "label": "Rousseau — Chopin - Heroic Polonaise (Op. 53 in A Flat Major)"
       }
     ]
   },
@@ -964,14 +1039,14 @@ export const expansionPieces3: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Prelude_in_C-sharp_minor,_Op.3_No.2_(Rachmaninoff,_Sergei)",
-        "label": "IMSLP"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Prelude_in_C-sharp_minor_(Rachmaninoff)",
         "label": "Wikipedia"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=sCtixpIWBto",
+        "label": "Rousseau — Rachmaninoff - Prelude in C Sharp Minor (Op. 3 No. 2)"
       }
     ]
   }
