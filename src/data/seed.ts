@@ -399,7 +399,6 @@ export const seedPieces: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Tchaikovsky)', label: 'Wikipedia — Tchaikovsky Violin Concerto' },
-      { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Heifetz-NEWTRANSFER', label: 'Jascha Heifetz — Landmark recording (remastered)' },
       { type: 'internet_archive', url: 'https://archive.org/details/TCHAIKOVSKYViolinConcerto-Milstein-NewTransfer', label: 'Nathan Milstein — Historic recording (remastered)' },
     ],
     movements: [
@@ -551,7 +550,6 @@ export const seedPieces: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Cello_Suite_No.5_in_C_minor,_BWV_1011_(Bach,_Johann_Sebastian)', label: 'IMSLP — Cello Suite No. 5' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Cello_Suites_(Bach)', label: 'Wikipedia — Bach Cello Suites' },
       { type: 'internet_archive', url: 'https://archive.org/details/suite-no.-5-in-c-minor-for-cello', label: 'Frans Helmerson — Suite No. 5 (1974)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/bach-j.s.-the-six-suites-for-violoncelo-solo-bwv-1007-1012-nikolaus-harnoncourt-dvg', label: 'Nikolaus Harnoncourt — Complete Suites (baroque cello)' },
     ],
     movements: [
       { name: 'I. Prelude' },
@@ -952,7 +950,6 @@ export const seedPieces: SeedPiece[] = [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nessun_dorma', label: 'Wikipedia — Nessun dorma' },
       { type: 'spotify', url: 'https://open.spotify.com/track/6zagJMi6gpqVQSX8yWNe3F', label: 'Jonathan Tetelman / PKF Prague Philharmonia — Rising star tenor' },
       { type: 'spotify', url: 'https://open.spotify.com/track/74WjYdm3Lvbwnds4thYPUU', label: 'Luciano Pavarotti / Mehta / LPO' },
-      { type: 'internet_archive', url: 'https://archive.org/details/78_nessun-dorma-none-shall-sleep_jussi-bjrling-adami-simoni-puccini-nils-grevilli_gbia7015432a', label: 'Jussi Björling — 1946 historic landmark' },
     ],
   },
   {

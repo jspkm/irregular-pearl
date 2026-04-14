@@ -42,11 +42,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'IMSLP — Castelnuovo-Tedesco: Guitar Concerto No. 1 Op. 99',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/guitar-concertos/castelnuovo-tedesco-concerto-1',
-        label: 'Conservatory competition performance — guitar and piano',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=dJt12W7_gdY",
         "label": "Rodders — Mario Castelnuovo-Tedesco : Concerto No. 1 in D major for guitar and orchestra Op. 99 (1939)"
@@ -88,11 +83,6 @@ export const expansionPieces8: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/guitar-masters/villa-lobos-preludes-complete',
-        label: 'Student recital — Royal College of Music',
-      },
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=9q7UlMiMQ-s",
@@ -141,11 +131,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Federico Moreno Torroba',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/classicalguitar/torroba-sonatina-recital',
-        label: 'RCM guitar diploma recital performance',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=fi3E9fLP4bk",
         "label": "SiccasGuitars — Ana Vidovic plays Sonatina by Federico Moreno Torroba"
@@ -191,11 +176,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'imslp',
         url: 'https://imslp.org/wiki/Homenaje_(Falla,_Manuel_de)',
         label: 'IMSLP — de Falla: Homenaje pour le tombeau de Debussy',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/guitarrecitals/de-falla-homenaje',
-        label: 'Conservatory diploma recital recording',
       },
     ],
   },
@@ -245,11 +225,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Johann Baptist Vanhal',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/doublebasstudio/vanhal-concerto-d-major',
-        label: 'ISB Competition semifinal recording',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=Dt-bNf6h0tI",
         "label": "London Symphony Orchestra — Vanhal Double Bass Concerto in D Major // Rinat Ibragimov, double bass"
@@ -297,11 +272,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Domenico Dragonetti',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/bassrecitals/dragonetti-tarantella-recital',
-        label: 'Conservatoire de Paris student recital',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=hhUyEO3WwMk",
         "label": "Mikyung Sung — \"Dragonetti\" Nanny Double Bass Concerto - I (Mikyung Sung double bass, Inja Choi piano)"
@@ -344,11 +314,6 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/organrecitals/reubke-94th-psalm-cathedral',
-        label: 'Prizewinner — Chartres International Organ Competition',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=U9gCvM7PaYA",
         "label": "organwizard — Gillian Weir- Sonata on the 94th Psalm, by Julius Reubke"
@@ -390,11 +355,6 @@ export const expansionPieces8: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/organworks/durufle-suite-op5-toccata',
-        label: 'Laureate — St Albans International Organ Competition',
-      },
       {
         type: 'vimeo',
         url: 'https://vimeo.com/344122901',
@@ -443,11 +403,6 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/organcompetition/alain-litanies-prizewinner',
-        label: 'Finalist — Calgary International Organ Competition',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/389274012',
         label: 'Anna Lapwood — King\'s College Cambridge',
@@ -494,11 +449,6 @@ export const expansionPieces8: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/organrecital/mendelssohn-sonata-3-recital',
-        label: 'FRCO examination recital — Royal College of Organists',
-      },
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=hhMvETANi5o",
@@ -599,11 +549,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Fauré harp works',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/harprecitals/faure-impromptu-op86',
-        label: 'Conservatoire National Supérieur student recital',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=Imiky1nEx-A",
         "label": "Harpist Hyejin Kim | 하피스트 김혜진 — Gabriel Fauré: Impromptu pour harpe, op. 86"
@@ -649,11 +594,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Louis_Spohr',
         label: 'Wikipedia — Louis Spohr',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/harpcompetition/spohr-fantasy-35-semifinal',
-        label: 'World Harp Congress competition semifinal',
       },
       {
         "type": "youtube",
@@ -708,11 +648,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Hindemith chamber music',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/harpmasterworks/hindemith-sonata-harp',
-        label: 'Finalist — Israel International Harp Contest',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=T_YrDOH9ECg",
         "label": "George N. Gianopoulos, composer — Paul Hindemith - Sonata for Harp (1939) [Score-Video]"
@@ -758,11 +693,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Darius_Milhaud#Concertos',
         label: 'Wikipedia — Milhaud concertos',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/percussionworks/milhaud-marimba-concerto-comp',
-        label: 'World Marimba Competition finalist — Stuttgart',
       },
       {
         type: 'vimeo',
@@ -817,11 +747,6 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Paul Creston',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/marimbacompetitions/creston-concertino-semifinal',
-        label: 'PASIC Young Artist Competition finalist',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/389451203',
         label: 'Timothy Deighton — NMC Recordings premiere session',
@@ -867,11 +792,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Andr%C3%A9_Jolivet',
         label: 'Wikipedia — André Jolivet',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/percussionsolos/jolivet-concerto-perc-chamber',
-        label: 'CNSM Paris student competition recording',
       },
       {
         "type": "youtube",
