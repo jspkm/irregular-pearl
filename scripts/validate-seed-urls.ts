@@ -147,16 +147,44 @@ if (fix) {
     const abs = resolve(ROOT, file);
     let src = await readFile(abs, 'utf8');
     for (const f of list) {
-      // Match a single object-literal line like: { type: 'x', url: '<url>', label: '...' },?
-      // Escape URL for regex.
       const u = f.entry.link.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp(`^[ \\t]*\\{[^\\n]*url:\\s*['\"\`]${u}['\"\`][^\\n]*\\},?\\s*\\n`, 'm');
-      const next = src.replace(re, '');
+      // Single-line: { type: 'x', url: '<url>', label: '...' },
+      const singleRe = new RegExp(`^[ \\t]*\\{[^\\n]*["'\`]?url["'\`]?:\\s*['\"\`]${u}['\"\`][^\\n]*\\},?\\s*\\n`, 'm');
+      let next = src.replace(singleRe, '');
+      if (next === src) {
+        // Multi-line: find the url line, walk backward to `{`, forward to matching `},` or `}`.
+        const urlLineRe = new RegExp(`^[ \\t]*["'\`]?url["'\`]?:\\s*['\"\`]${u}['\"\`],?\\s*$`, 'm');
+        const m = urlLineRe.exec(src);
+        if (m) {
+          // Walk back to opening `{` on its own line (possibly `      {`)
+          let start = src.lastIndexOf('{', m.index);
+          // back up to start-of-line
+          while (start > 0 && src[start - 1] !== '\n') start--;
+          // Walk forward to matching `}` by brace counting from the `{`.
+          let depth = 0;
+          let i = src.indexOf('{', m.index === start ? start : start);
+          // find the opening brace position
+          let openIdx = src.indexOf('{', start);
+          i = openIdx;
+          for (; i < src.length; i++) {
+            if (src[i] === '{') depth++;
+            else if (src[i] === '}') {
+              depth--;
+              if (depth === 0) { i++; break; }
+            }
+          }
+          // consume trailing `,` and newline
+          if (src[i] === ',') i++;
+          while (src[i] === ' ' || src[i] === '\t') i++;
+          if (src[i] === '\n') i++;
+          next = src.slice(0, start) + src.slice(i);
+        }
+      }
       if (next !== src) {
         removed++;
         src = next;
       } else {
-        console.error(`  WARN: could not match single-line entry for ${f.entry.link.url} in ${file}`);
+        console.error(`  WARN: could not match entry for ${f.entry.link.url} in ${file}`);
       }
     }
     await writeFile(abs, src);
