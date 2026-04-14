@@ -44,11 +44,6 @@ export const expansionPieces12: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Concerto_for_Orchestra,_Sz.116_(Bart%C3%B3k,_B%C3%A9la)', label: 'IMSLP — Concerto for Orchestra, Sz. 116' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Concerto_for_Orchestra_(Bart%C3%B3k)', label: 'Wikipedia — Concerto for Orchestra (Bartók)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Zn5m2kkXK0s', label: 'Fritz Reiner / Chicago Symphony Orchestra — RCA Living Stereo (1955)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=cPkO5dCB18M', label: 'Iván Fischer / Budapest Festival Orchestra — Philips (1997)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5MsROKzekDJJPgxFMN8fDO', label: 'Fritz Reiner / Chicago Symphony Orchestra — RCA Living Stereo' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6Gy16DvqNsxlU30aJrMT7W', label: 'Iván Fischer / Budapest Festival Orchestra — Philips' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BartokConcertoForOrchestraKoussevitzkyBSO1944', label: 'Serge Koussevitzky / Boston Symphony Orchestra — World Premiere broadcast (1944)' },
     ],
     movements: [
       { name: 'I. Introduzione — Andante non troppo; Allegro vivace' },
@@ -87,13 +82,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.5_in_E-flat_major,_Op.82_(Sibelius,_Jean)', label: 'IMSLP — Symphony No. 5, Op. 82' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Sibelius)', label: 'Wikipedia — Symphony No. 5 (Sibelius)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=q3KXLXL8QRE', label: 'Colin Davis / London Symphony Orchestra — Philips (1976)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=lAiHQVpBqc0', label: 'Osmo Vänskä / Minnesota Orchestra — BIS (2011)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4xQoxMX1vMKoQ6NiGT0G5T', label: 'Colin Davis / London Symphony Orchestra — Philips' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5eXwrNuYBgDVjh3L5G5bG3', label: 'Paavo Järvi / Gothenburg Symphony Orchestra — Deutsche Grammophon' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SibeliusSymphony5BeechamRPO1955', label: 'Thomas Beecham / Royal Philharmonic Orchestra — 1955 studio recording' },
     ],
     movements: [
       { name: 'I. Tempo molto moderato — Largamente — Allegro moderato — Presto' },
@@ -130,13 +119,8 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/M%C3%A1_vlast_(Smetana,_Bed%C5%99ich)', label: 'IMSLP — Má vlast (Smetana)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/The_Moldau', label: 'Wikipedia — The Moldau (Vltava)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=nKSqR1dn3bI', label: 'Rafael Kubelík / Czech Philharmonic — Supraphon (1990 Prague Spring Concert)' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=l4zkc7KEvYM', label: 'Václav Neumann / Czech Philharmonic — Complete Má vlast (1982)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0DFNQl9k4JJGzWqhyxclsR', label: 'Rafael Kubelík / Czech Philharmonic — Supraphon (1990)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0FpvCXNj9kPUxN0JDHPzSM', label: 'George Szell / Cleveland Orchestra — Epic/Sony' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SmetanaMaVlastTalichCzechPhilharmonic1941', label: 'Václav Talich / Czech Philharmonic — Historic 1941 recording' },
     ],
   },
 // Schumann Symphony No. 4
@@ -168,13 +152,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.4_in_D_minor,_Op.120_(Schumann,_Robert)', label: 'IMSLP — Symphony No. 4, Op. 120' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._4_(Schumann)', label: 'Wikipedia — Symphony No. 4 (Schumann)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=XKRkHTiIFJw', label: 'Carlos Kleiber / Vienna Philharmonic — 1979 broadcast (1851 version)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SJSk3VzVCNs', label: 'Leonard Bernstein / Vienna Philharmonic — Deutsche Grammophon (1984)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1EiOIaVwi4Nf4DWvbklzh4', label: 'Leonard Bernstein / Vienna Philharmonic — Deutsche Grammophon (1984)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4ybkFe2JAj5k0xGqBLBs4E', label: 'Christian Thielemann / Wiener Philharmoniker — Deutsche Grammophon' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SchumannSymphony4FurtwanglerBPO1953', label: 'Wilhelm Furtwängler / Berlin Philharmonic — 1953 studio recording' },
     ],
     movements: [
       { name: 'I. Ziemlich langsam — Lebhaft' },
@@ -220,12 +198,6 @@ export const expansionPieces12: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.41_in_C_major,_K.551_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Symphony No. 41 "Jupiter", K. 551' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._41_(Mozart)', label: 'Wikipedia — Symphony No. 41 (Mozart)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SiX3z_quf54', label: 'Karl Böhm / Berlin Philharmonic — Deutsche Grammophon (1961)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=IqQ3EyCTEOw', label: 'Charles Mackerras / Prague Chamber Orchestra — Telarc (1988)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=9Q5LhFBFBOA', label: 'René Jacobs / Akademie für Alte Musik Berlin — Harmonia Mundi (2009)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0s9G7KHIjFnMSdLFNOjqfG', label: 'Karl Böhm / Berlin Philharmonic — Deutsche Grammophon (1961)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6QcFiQRHtgPD3oCYDgRHHO', label: 'René Jacobs / Akademie für Alte Musik Berlin — Harmonia Mundi (2009)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/mozart-symphony-41-jupiter-bruno-walter', label: 'Bruno Walter / Columbia Symphony Orchestra — historic broadcast recording' },
     ],
     movements: [
       { name: 'I. Allegro vivace' },
@@ -271,14 +243,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.5_in_B-flat_major,_Op.100_(Prokofiev,_Sergei)', label: 'IMSLP — Symphony No. 5, Op. 100' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Prokofiev)', label: 'Wikipedia — Symphony No. 5 (Prokofiev)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8RMRqE0FPDU', label: 'Yevgeny Mravinsky / Leningrad Philharmonic — Melodiya (1961)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mM4FdMtLfCE', label: 'Valery Gergiev / Mariinsky Orchestra — Philips (2004)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3DXzORSFKUU', label: 'Seiji Ozawa / Boston Symphony Orchestra — Deutsche Grammophon (1987)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5GzqRQl9VHI6yHMqHJ9J8T', label: 'Valery Gergiev / Mariinsky Orchestra — Philips (2004)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1UKMOBpJGXfK6rIY1RHKPX', label: 'Seiji Ozawa / Boston Symphony Orchestra — Deutsche Grammophon (1987)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/prokofiev-symphony-5-mravinsky-leningrad-1961', label: 'Yevgeny Mravinsky / Leningrad Philharmonic — 1961 historic broadcast' },
     ],
     movements: [
       { name: 'I. Andante' },
@@ -327,13 +292,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet_No.7_in_F_major,_Op.59_No.1_(Beethoven,_Ludwig_van)', label: 'IMSLP — String Quartet Op. 59 No. 1' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._7_(Beethoven)', label: 'Wikipedia — String Quartet Op. 59 No. 1 (Beethoven)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=SHMi6N1PGAI', label: 'Emerson String Quartet — Deutsche Grammophon (1997)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=yiTjGXVRKP4', label: 'Budapest String Quartet — CBS/Sony (1952 studio recording)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4dCpAFQyX0hwDW1Kpf8hKw', label: 'Emerson String Quartet — Deutsche Grammophon (1997)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/7nk0noCuYYiIRMd5Z8Uqyh', label: 'Alban Berg Quartett — EMI (1980)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BeethovenOp59No1BudapestStringQuartet1952', label: 'Budapest String Quartet — 1952 historic recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -371,13 +330,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet_No.2_in_D_major_(Borodin,_Alexander)', label: 'IMSLP — String Quartet No. 2 (Borodin)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._2_(Borodin)', label: 'Wikipedia — String Quartet No. 2 (Borodin)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KeK8mBHoMOA', label: 'Borodin Quartet — EMI (1982)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=l-gRFGjCfU8', label: 'Emerson String Quartet — Deutsche Grammophon (live)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5JYFfpJLSNR4nKXwgSPOe8', label: 'Borodin Quartet — EMI Classics (1982)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6Q1KWnFREtN0lh23Vs0pzZ', label: 'Brodsky Quartet — Chandos (1991)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BorodinStringQuartet2BudapestQuartet1956', label: 'Budapest String Quartet — 1956 historic studio recording' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -415,13 +368,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Quartet_No.1_in_G_minor,_Op.25_(Brahms,_Johannes)', label: 'IMSLP — Piano Quartet No. 1, Op. 25' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Quartet_No._1_(Brahms)', label: 'Wikipedia — Piano Quartet No. 1 (Brahms)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YpJxPl0nqUo', label: 'Menahem Pressler / Emerson String Quartet — Deutsche Grammophon (2012)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KSmNfWUDzAo', label: 'Maurizio Pollini / Quartetto Italiano — Deutsche Grammophon (1979)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0O2LBNeyMK8dCHuvgqKlte', label: 'Menahem Pressler / Emerson String Quartet — Deutsche Grammophon (2012)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5R7mVcnlr8tYHbqEiH3RO4', label: 'Maurizio Pollini / Quartetto Italiano — Deutsche Grammophon (1979)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BrahmsOp25IstominSternRoseBernstein1964', label: 'Istomin/Stern/Rose/Bernstein — Sony (1964 live recording)' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -465,14 +412,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Trio_No.5_in_D_major,_Op.70_No.1_(Beethoven,_Ludwig_van)', label: 'IMSLP — Piano Trio Op. 70 No. 1 "Ghost"' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Trio_No._5_(Beethoven)', label: 'Wikipedia — Piano Trio No. 5 "Ghost" (Beethoven)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=nJCmk3rxo_0', label: 'Vladimir Ashkenazy / Itzhak Perlman / Lynn Harrell — EMI (1981)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=v8tX2K-wkgQ', label: 'Beaux Arts Trio — Philips (1966)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=2KQHiGPV5jE', label: 'Florestan Trio — Hyperion (2007)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3u7EBbO1LkuELpBBMVB8cM', label: 'Vladimir Ashkenazy / Perlman / Harrell — EMI (1981)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5IECLfSVTFAnGkjGR7f15T', label: 'Florestan Trio — Hyperion (2007)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/beethoven-ghost-trio-op70-casals-istomin-stern-rose', label: 'Casals / Istomin / Stern / Rose — historic festival recording' },
     ],
     movements: [
       { name: 'I. Allegro vivace e con brio' },
@@ -517,13 +457,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Clarinet_Sonata_No.1_in_F_minor,_Op.120_No.1_(Brahms,_Johannes)', label: 'IMSLP — Clarinet Sonata Op. 120 No. 1' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Sonatas_(Brahms)', label: 'Wikipedia — Clarinet Sonatas (Brahms)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=qcEFr2Bt8xM', label: 'Sabine Meyer / Bruno Canino — EMI (1989)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=9W1nGtQFRNs', label: 'Karl Leister / Christoph Eschenbach — Deutsche Grammophon (1979)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=vWJBl5j1ots', label: 'Richard Stoltzman / Richard Goode — RCA (1995)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5FbXBuXJBLHIPBOt1PLsG8', label: 'Sabine Meyer / Bruno Canino — EMI (1989)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/7c1jJxZhE0wSOe9qYakHMP', label: 'Richard Stoltzman / Richard Goode — RCA (1995)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/classical-music/brahms-clarinet-sonata-op120-1', label: 'Brahms Clarinet Sonata No. 1 — excerpt' },
     ],
     movements: [
@@ -573,12 +507,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Organ_Sonata_No.1_in_G_major,_Op.28_(Elgar,_Edward)', label: 'IMSLP — Organ Sonata No. 1, Op. 28' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Organ_Sonata_No._1_(Elgar)', label: 'Wikipedia — Organ Sonata No. 1 (Elgar)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8fL8fGq0PSU', label: 'Thomas Trotter — Decca (1994)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=M3M0MnXMkDQ', label: 'Christopher Herrick — Hyperion (1993)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4YnMdMFIVOOgdnFU2vIWZH', label: 'Thomas Trotter — Decca (1994)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/7KFl7LCE18vBb3MHlKMJtP', label: 'Christopher Herrick — Hyperion Records (1993)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/elgar-society/elgar-organ-sonata-op28-trotter', label: 'Thomas Trotter — Live recital recording' },
     ],
     movements: [
@@ -617,12 +546,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Toccata,_Fugue_and_Hymn_on_%22Ave_Maris_Stella%22,_Op.28_(Peeters,_Flor)', label: 'IMSLP — Toccata, Fugue and Hymn, Op. 28' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Flor_Peeters', label: 'Wikipedia — Flor Peeters' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=pVkjGl8WKBA', label: 'Ton Koopman — Novalis (live recital)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YBxPsxaMiZk', label: 'Ben van Oosten — Dabringhaus und Grimm (2003)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4HbHOCJNdN3MqcC0cWpbIm', label: 'Ben van Oosten — Dabringhaus und Grimm (2003)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2rh0OJT6p1IDXpIXX0Oqrn', label: 'Marie-Claire Alain — Erato complete organ works' },
       { type: 'soundcloud', url: 'https://soundcloud.com/organ-music/peeters-toccata-fugue-hymn-ave-maris-stella', label: 'Student recital — Royal Flemish Conservatory' },
     ],
     movements: [
@@ -659,13 +583,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Les_Corps_glorieux_(Messiaen,_Olivier)', label: 'IMSLP — Les Corps Glorieux' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Les_Corps_glorieux', label: 'Wikipedia — Les Corps Glorieux (Messiaen)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=6uh5fZ2rnSk', label: 'Olivier Latry — Deutsche Grammophon (2013)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=1WkUJ5Y9hEI', label: 'Jennifer Bate — Unicorn-Kanchana (1988)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6X6d2OmZBi4LoIGCxEOB3s', label: 'Olivier Latry — Deutsche Grammophon complete Messiaen organ works' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0HJrRWixYKy2TjBiBGFjkZ', label: 'Jennifer Bate — Unicorn-Kanchana Messiaen organ cycle' },
-      { type: 'internet_archive', url: 'https://archive.org/details/messiaen-corps-glorieux-pierre-cochereau-notre-dame', label: 'Pierre Cochereau — Notre-Dame de Paris historic broadcast' },
     ],
     movements: [
       { name: 'I. Subtilité des Corps Glorieux' },
@@ -714,13 +632,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Concert-St%C3%BCck,_Op.39_(Piern%C3%A9,_Gabriel)', label: 'IMSLP — Concertstück, Op. 39' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gabriel_Piern%C3%A9#Works', label: 'Wikipedia — Gabriel Pierné works' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=U7NhmSFHFqw', label: 'Marielle Nordmann — Erato harp concertos' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YTwcWnDKBiI', label: 'Susanna Mildonian — BIS (1998)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=K8b9Yh7Hfas', label: 'Isabelle Moretti — harp recital' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2M5aNqq9y3fC8dXj04ZRjQ', label: 'Susanna Mildonian — BIS harp concertos (1998)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3rK1e5u4pClPq2bBHNgLVT', label: 'Isabelle Moretti — French harp concertos' },
       { type: 'soundcloud', url: 'https://soundcloud.com/classical-harp/pierne-concertstuck-nordmann', label: 'Marielle Nordmann — Concertstück excerpt' },
     ],
   },
@@ -757,13 +669,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Harp_Sonata_in_E_minor,_Op.167_(Reinecke,_Carl)', label: 'IMSLP — Harp Sonata "Undine", Op. 167' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Carl_Reinecke', label: 'Wikipedia — Carl Reinecke' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=lA5vhm9dVGQ', label: 'Nicanor Zabaleta — Deutsche Grammophon (1979)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=WnqTLBZCe7s', label: 'Isabelle Moretti — Alpha Classics recital (2009)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3YmE0sK6nQ7LqmqIJVxWPl', label: 'Nicanor Zabaleta — Deutsche Grammophon (1979)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6XeQ3YaNKYBqZ4TkM1NaO2', label: 'Marielle Nordmann — Erato harp recital' },
-      { type: 'internet_archive', url: 'https://archive.org/details/ReineckeHarpSonataUndineZabaleta', label: 'Nicanor Zabaleta — Archival broadcast recording' },
     ],
     movements: [
       { name: 'I. Allegro agitato' },
@@ -801,12 +707,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Sonatine_en_trio_(Damase,_Jean-Michel)', label: 'IMSLP — Sonatine en Trio' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jean-Michel_Damase', label: 'Wikipedia — Jean-Michel Damase' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3hV9dEF7kQo', label: 'Ensemble Calliopée — Paris recital' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=yT5fzM3UmFQ', label: 'Solistes des Berliner Philharmoniker — chamber concert' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5kRb0ZoJFP9wNBfYNKTM3H', label: 'Ensemble Calliopée — Zig-Zag Territoires' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1r9xKYJVfZb3MN2uHyCsXT', label: 'Emmanuel Pahud / Marie-Pierre Langlamet / Emmanuel Pahud trio — DG' },
       { type: 'soundcloud', url: 'https://soundcloud.com/conservatoire-paris/damase-sonatine-en-trio-conservatoire', label: 'Conservatoire National Supérieur de Paris — student recital' },
     ],
     movements: [
@@ -849,13 +750,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Concerto_for_Marimba_and_String_Orchestra_(S%C3%A9journ%C3%A9,_Emmanuel)', label: 'IMSLP — Concerto for Marimba (Séjourné)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Emmanuel_S%C3%A9journ%C3%A9', label: 'Wikipedia — Emmanuel Séjourné' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=AJBJv_0fT5k', label: 'Katarzyna Myćka / Bamberg Symphony — Sony Classical (ICMA Award recording)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8pJAJvdUAZo', label: 'Jean Geoffroy — Zig-Zag Territoires (2007)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2eG8PjOkbPn8YXL6VNqzN1', label: 'Katarzyna Myćka / Bamberg Symphony — Sony Classical (ICMA Award)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0GAtGnqBv07xJHsBGjJOKr', label: 'Jean Geoffroy — Zig-Zag Territoires (2007)' },
-      { type: 'vimeo', url: 'https://vimeo.com/247381059', label: 'Fumito Nunoya — ARD International Music Competition finalist recital' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -892,12 +787,6 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Funny_Marimba_(Živković,_Nebojša_Jovan)', label: 'IMSLP — Funny Marimba' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Nebojs%CC%8Ca_Jovan_Z%CC%8Civkovic%CC%81', label: 'Wikipedia — Nebojša Jovan Živković' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=J5tXh3rP8Ys', label: 'Katarzyna Myćka — solo recital (2009)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=UPqn4zXHLcg', label: 'Simon Aldrich — NMC Recordings (competition performance)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3fJ0xG4RTH1YLaD1OB9rTe', label: 'Katarzyna Myćka — Sony Classical' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0TJaXHNTYlXX0Mxp1nFMxj', label: 'Various soloists — Marimba Festival anthology' },
       { type: 'soundcloud', url: 'https://soundcloud.com/marimba-competition/zivkovic-funny-marimba-competition', label: 'International Marimba Competition finalist — competition recording' },
     ],
     movements: [
@@ -946,13 +835,6 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/5_Preludes_(Villa-Lobos,_Heitor)', label: 'IMSLP — Five Preludes (Villa-Lobos)' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Five_Preludes_(Villa-Lobos)', label: 'Wikipedia — Five Preludes (Villa-Lobos)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=B7pQytF2FG0', label: 'Julian Bream — RCA (1977)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=JO1bwfxEi34', label: 'John Williams — Sony Classical (1990)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=HtovW3bSgm4', label: 'Xuefei Yang — EMI Classics (2009)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4sFnZmIkqkBPAqVLrWXYLw', label: 'Julian Bream — RCA guitar recital (1977)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2Lk2XLh2KFfAV9jbAtPmVH', label: 'John Williams — Sony Classical guitar recital' },
       { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/villa-lobos-prelude-1-yang', label: 'Xuefei Yang — Prelude No. 1 excerpt' },
     ],
   },
@@ -986,13 +868,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Guitar_Sonata_No.3_(Ponce,_Manuel_Mar%C3%ADa)', label: 'IMSLP — Guitar Sonata No. 3 "Guitarra"' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Manuel_Ponce#Guitar_music', label: 'Wikipedia — Manuel Ponce guitar works' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=qLBMkG2rh6E', label: 'Narciso Yepes — Deutsche Grammophon (1978)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=PtpAChJUZmA', label: 'Anders Miolin — BIS (1997)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Gv0kCeUBEJo', label: 'Manuel Barrueco — EMI Classics (1989)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5tDf1pxVzn01Sh2s1hH4w7', label: 'Narciso Yepes — Deutsche Grammophon guitar recital (1978)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2YD8dFMYx0Bxj1FNQWR4OA', label: 'Manuel Barrueco — EMI Classics guitar sonatas' },
       { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/ponce-sonata-guitarra-miolin', label: 'Anders Miolin — Ponce Sonata excerpt' },
     ],
     movements: [
@@ -1031,13 +907,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Guitar_Sonata_(Omaggio_a_Boccherini),_Op.77_(Castelnuovo-Tedesco,_Mario)', label: 'IMSLP — Guitar Sonata Op. 77 "Omaggio a Boccherini"' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Mario_Castelnuovo-Tedesco#Guitar_sonata', label: 'Wikipedia — Mario Castelnuovo-Tedesco guitar works' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=F6a1E1ZhEQs', label: 'Julian Bream — RCA (1958)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=kEL5XdF4z4U', label: 'Eliot Fisk — Orfeo (1988)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=HWPn5fkU0FE', label: 'Manuel Barrueco — guitar recital' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/47OhFtKnJZE1JW1XGQrOaj', label: 'Julian Bream — RCA Castelnuovo-Tedesco guitar sonata (1958)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3WzNVw6l7B1d0BrBXMI0Kx', label: 'Eliot Fisk — Orfeo guitar recital (1988)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/castelnuovo-tedesco-sonata-barrueco', label: 'Manuel Barrueco — Sonata Op. 77 excerpt' },
     ],
     movements: [
@@ -1084,14 +954,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Fantasia_on_Norma_(Bottesini,_Giovanni)', label: 'IMSLP — Fantasia on Norma (Bottesini)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Giovanni_Bottesini#Solo_works', label: 'Wikipedia — Giovanni Bottesini solo works' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Dm_L2_kbFQQ', label: 'Gary Karr — double bass recital' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=TXwrfyMrVnQ', label: 'Rinat Ibragimov — Bottesini Fantasia on Norma' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=CdT3Ef7BwG4', label: 'Rodion Azarkhin — double bass showpieces' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0OLlP9nVgM6b8FD8xkSwBr', label: 'Gary Karr — double bass Bottesini collection' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2fxBQe6bOdLtaU8LFr9sWT', label: 'Rinat Ibragimov — Bottesini opera fantasies' },
-      { type: 'internet_archive', url: 'https://archive.org/details/bottesini-fantasia-norma-koussevitzky-historic', label: 'Serge Koussevitzky — historic double bass recording' },
     ],
   },
 
@@ -1127,13 +990,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Double_Bass_Concerto_in_D_major_(Hoffmeister,_Franz_Anton)', label: 'IMSLP — Double Bass Concerto in D major (Hoffmeister)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Franz_Anton_Hoffmeister', label: 'Wikipedia — Franz Anton Hoffmeister' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=0SvCLz7bHe0', label: 'Gary Karr / Zimbler Sinfonietta — Decca (1968)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=rTsPFUGXTQQ', label: 'Dominik Wagner — Oehms Classics (2017)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1aTpNYWpF2GzNQpN5CDOTs', label: 'Gary Karr — Decca Archiv (historic recording)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2oQtpCkwkOZ7vF7kZ1Xk8n', label: 'Dominik Wagner — Oehms Classics (2017)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/HoffmeisterDBConcertoKarrZimbler1968', label: 'Gary Karr / Zimbler Sinfonietta — Decca (1968 landmark recording)' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -1170,13 +1027,7 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Double_Bass_Concerto_(Pichl,_V%C3%A1clav)', label: 'IMSLP — Double Bass Concerto (Pichl)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/V%C3%A1clav_Pichl', label: 'Wikipedia — Václav Pichl' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=p4pFjPNvn8E', label: 'Duncan McTier — Nimbus (1992)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=KQ8F8YkGmLY', label: 'Nils Börnig — MDG (2006)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6g3WXBqNzTF5TI5POp1Q8k', label: 'Duncan McTier — Nimbus Records (1992)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4iRL5G2Fku5RKXt2VH2a8j', label: 'Nils Börnig — MDG Gold (2006)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/PichlDBConcertoMcTierNimbus1992', label: 'Duncan McTier — Nimbus Records (1992) archival' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },

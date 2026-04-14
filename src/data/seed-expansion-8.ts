@@ -42,40 +42,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'IMSLP — Castelnuovo-Tedesco: Guitar Concerto No. 1 Op. 99',
       },
       {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Guitar_Concerto_No._1_(Castelnuovo-Tedesco)',
-        label: 'Wikipedia — Guitar Concerto No. 1 (Castelnuovo-Tedesco)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=aAHDoHslYHQ',
-        label: 'Andrés Segovia — 1954 recording (historic premiere performer)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=YT_k0DPoANA',
-        label: 'Sharon Isbin — Grammy Award recording, NYPO',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/2kzPBBMsblQmhGikM7PBFZ',
-        label: 'Sharon Isbin / NYPO — Grammy Award recording',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/3FkRcYKT3GRg8nOO6V7nwR',
-        label: 'Pepe Romero / Academy of St Martin in the Fields — Philips',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/CastelnuovoTedescoGuitarConcerto1Segovia',
-        label: 'Andrés Segovia — 1954 historic recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/guitar-concertos/castelnuovo-tedesco-concerto-1',
         label: 'Conservatory competition performance — guitar and piano',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=dJt12W7_gdY",
+        "label": "Rodders — Mario Castelnuovo-Tedesco : Concerto No. 1 in D major for guitar and orchestra Op. 99 (1939)"
+      }
     ],
   },
   {
@@ -114,40 +89,15 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/5_Preludes_(Villa-Lobos,_Heitor)',
-        label: 'IMSLP — Villa-Lobos: 5 Preludes',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Preludes_(Villa-Lobos)',
-        label: 'Wikipedia — Preludes (Villa-Lobos)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=Nh5GBSKnYQ8',
-        label: 'John Williams — complete Five Preludes',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=oRIbNFgVzhs',
-        label: 'Julian Bream — Prelude No. 1',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/1XZ5AJvPJVQbNTCIGcsMUb',
-        label: 'John Williams — Sony Classical recording',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/VillaLobos5PrelJohnWilliamsGuitar',
-        label: 'John Williams — historic studio recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/guitar-masters/villa-lobos-preludes-complete',
         label: 'Student recital — Royal College of Music',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=9q7UlMiMQ-s",
+        "label": "SiccasGuitars — Five Preludes by Heitor Villa-Lobos | Siccas Guitars"
+      }
     ],
   },
   {
@@ -186,40 +136,20 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Sonatina_(Moreno_Torroba,_Federico)',
-        label: 'IMSLP — Torroba: Sonatina for Guitar',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Federico_Moreno_Torroba',
         label: 'Wikipedia — Federico Moreno Torroba',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=yZnPiHCXebs',
-        label: 'Andrés Segovia — historic recording (dedicatee)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=CdCb9Cqc7co',
-        label: 'Pepe Romero — complete Sonatina',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/4FX5nfvLMBlvVhR3kW7Grx',
-        label: 'Andrés Segovia — Deutsche Grammophon Archiv',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/TorrobaSonatinaSegovia',
-        label: 'Andrés Segovia — 1952 recording',
       },
       {
         type: 'soundcloud',
         url: 'https://soundcloud.com/classicalguitar/torroba-sonatina-recital',
         label: 'RCM guitar diploma recital performance',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=fi3E9fLP4bk",
+        "label": "SiccasGuitars — Ana Vidovic plays Sonatina by Federico Moreno Torroba"
+      }
     ],
   },
   {
@@ -261,31 +191,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'imslp',
         url: 'https://imslp.org/wiki/Homenaje_(Falla,_Manuel_de)',
         label: 'IMSLP — de Falla: Homenaje pour le tombeau de Debussy',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Homenaje_(de_Falla)',
-        label: 'Wikipedia — Homenaje (de Falla)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=NkgeMkizxJY',
-        label: 'Andrés Segovia — historic recording',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=3YTRY1DXAig',
-        label: 'Julian Bream — EMI recording',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/0cPOq77KJsVg5DxGJ6hQf6',
-        label: 'Julian Bream — EMI Classics collection',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/FallaHomenajeSegovia',
-        label: 'Andrés Segovia — 1950s recording',
       },
       {
         type: 'soundcloud',
@@ -340,35 +245,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Johann Baptist Vanhal',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=6fIihSuvR9E',
-        label: 'Klaus Stoll — Berlin Philharmonic principal bass',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=X2GBxnGaLUw',
-        label: 'Chi-chi Nwanoku — BBC Proms performance',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5rFhQ2WyGAlMD6sQmH7z3G',
-        label: 'Chi-chi Nwanoku / Academy of Ancient Music — L\'Oiseau-Lyre',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/VanhalDoubleBassConerto',
-        label: 'Gary Karr — historic recording with orchestra',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/doublebasstudio/vanhal-concerto-d-major',
         label: 'ISB Competition semifinal recording',
       },
       {
-        type: 'vimeo',
-        url: 'https://vimeo.com/312847562',
-        label: 'Young soloist — European String Teachers Association competition',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Dt-bNf6h0tI",
+        "label": "London Symphony Orchestra — Vanhal Double Bass Concerto in D Major // Rinat Ibragimov, double bass"
+      }
     ],
   },
   {
@@ -407,40 +292,20 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Tarantella_(Dragonetti,_Domenico)',
-        label: 'IMSLP — Dragonetti: Tarantella for Double Bass',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Domenico_Dragonetti',
         label: 'Wikipedia — Domenico Dragonetti',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=kNQ5pTnKhbg',
-        label: 'Chi-chi Nwanoku — concert performance',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=4TsS3UmPqYo',
-        label: 'ISB Young Artists Competition finalist',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/1jDL2REJe5QUfB7d3RZaRh',
-        label: 'Chi-chi Nwanoku — Hyperion Records',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/DragonettiPiecesForDoubleBass',
-        label: 'Ludwig Streicher — historic Viennese recording',
       },
       {
         type: 'soundcloud',
         url: 'https://soundcloud.com/bassrecitals/dragonetti-tarantella-recital',
         label: 'Conservatoire de Paris student recital',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=hhUyEO3WwMk",
+        "label": "Mikyung Sung — \"Dragonetti\" Nanny Double Bass Concerto - I (Mikyung Sung double bass, Inja Choi piano)"
+      }
     ],
   },
   {
@@ -479,45 +344,15 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Organ_Sonata_on_the_94th_Psalm_(Reubke,_Julius)',
-        label: 'IMSLP — Reubke: Sonata on the 94th Psalm',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Organ_Sonata_on_the_94th_Psalm',
-        label: 'Wikipedia — Organ Sonata on the 94th Psalm',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=zWCgMbBCH8I',
-        label: 'Olivier Latry — Notre-Dame de Paris (grand-orgue)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=VJFxlVT7fy8',
-        label: 'Ben van Oosten — Merseburg Cathedral',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/6iRgJMlwQCsY2FBmvsMnhb',
-        label: 'Olivier Latry — Deutsche Grammophon',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/ReubkePsalmSonata94',
-        label: 'Karl Richter — historic 1960s recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/organrecitals/reubke-94th-psalm-cathedral',
         label: 'Prizewinner — Chartres International Organ Competition',
       },
       {
-        type: 'vimeo',
-        url: 'https://vimeo.com/278834901',
-        label: 'Ben Bloor — St Paul\'s Cathedral, London',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=U9gCvM7PaYA",
+        "label": "organwizard — Gillian Weir- Sonata on the 94th Psalm, by Julius Reubke"
+      }
     ],
   },
   {
@@ -556,36 +391,6 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Suite,_Op.5_(Durufl%C3%A9,_Maurice)',
-        label: 'IMSLP — Duruflé: Suite Op. 5',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Suite_(Durufl%C3%A9)',
-        label: 'Wikipedia — Suite (Duruflé)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=0yw3NqVyMGo',
-        label: 'Marie-Claire Alain — complete Suite Op. 5',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=9FpqRyXS_0Y',
-        label: 'Olivier Latry — Toccata (St-Étienne-du-Mont, Paris)',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/4dQfmAF4EV1eMHsW7JHYHU',
-        label: 'Marie-Claire Alain — Erato Records',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/DurufleOrganWorks',
-        label: 'Maurice Duruflé — self-conducted 1950s recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/organworks/durufle-suite-op5-toccata',
         label: 'Laureate — St Albans International Organ Competition',
@@ -595,6 +400,11 @@ export const expansionPieces8: SeedPiece[] = [
         url: 'https://vimeo.com/344122901',
         label: 'Anna Lapwood — Pembroke College Cambridge',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=94ybEIYYA1w",
+        "label": "David Bendix Nielsen — Maurice Duruflé: Suite for Organ, Op. 5"
+      }
     ],
   },
   {
@@ -633,36 +443,6 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Litanies,_Op.79_(Alain,_Jehan)',
-        label: 'IMSLP — Alain: Litanies Op. 79',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Litanies_(Alain)',
-        label: 'Wikipedia — Litanies (Alain)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=_CXWaovgP9Y',
-        label: 'Marie-Claire Alain — St-Nicolas-de-Coutances',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=zk0OjrISHos',
-        label: 'Olivier Latry — Notre-Dame de Paris',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/4LLjzBRUTfzWzBZUGVA2ot',
-        label: 'Marie-Claire Alain — Erato complete organ works',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/AlainOrganWorksMarieClaire',
-        label: 'Marie-Claire Alain — 1960s recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/organcompetition/alain-litanies-prizewinner',
         label: 'Finalist — Calgary International Organ Competition',
@@ -672,6 +452,11 @@ export const expansionPieces8: SeedPiece[] = [
         url: 'https://vimeo.com/389274012',
         label: 'Anna Lapwood — King\'s College Cambridge',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Mvs7w4OqJro",
+        "label": "Sir Philip Ledger - Topic — Litanies, Op.79"
+      }
     ],
   },
   {
@@ -710,40 +495,15 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/6_Sonatas,_Op.65_(Mendelssohn,_Felix)',
-        label: 'IMSLP — Mendelssohn: 6 Organ Sonatas Op. 65',
-      },
-      {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/6_Organ_Sonatas_(Mendelssohn)',
-        label: 'Wikipedia — 6 Organ Sonatas (Mendelssohn)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=7r0LBdQ-moo',
-        label: 'Peter Hurford — St Albans Abbey',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=EBFfLMmPxps',
-        label: 'Simon Preston — Westminster Abbey',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/51tVEEDo2bLzY7cGFpRDVf',
-        label: 'Peter Hurford — Decca complete organ sonatas',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/MendelssohnOrganSonatas',
-        label: 'E. Power Biggs — historic recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/organrecital/mendelssohn-sonata-3-recital',
         label: 'FRCO examination recital — Royal College of Organists',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=hhMvETANi5o",
+        "label": "Akademia Filmu i Telewizji — Felix  Mendelssohn - Bartholdy, Sonata No. 3 in A Major op. 65"
+      }
     ],
   },
   {
@@ -787,40 +547,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'IMSLP — Debussy: Sonata for Flute, Viola and Harp',
       },
       {
-        type: 'wikipedia',
-        url: 'https://en.wikipedia.org/wiki/Sonata_for_Flute,_Viola_and_Harp_(Debussy)',
-        label: 'Wikipedia — Sonata for Flute, Viola and Harp (Debussy)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=aXhGFMJ1mDA',
-        label: 'Emmanuel Pahud / Tabea Zimmermann / Marie-Pierre Langlamet',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=3oUSqPiAJfY',
-        label: 'William Bennett / Cecil Aronowitz / Osian Ellis — historic recording',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/4Dt8VKTBZ0A4lV01SiyGEh',
-        label: 'Pahud / Zimmermann / Langlamet — EMI Classics',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/3sK1fT9zYXjdL9c5mPuQ4H',
-        label: 'Nash Ensemble — Hyperion Records',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/DebussySonataFluteViolaHarpMelos',
-        label: 'Melos Ensemble — 1960s recording',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/241673012',
         label: 'Trio competition semifinal — Geneva International Music Competition',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=mI-wlmMNU6c",
+        "label": "olla-vogala — Claude Debussy - Sonata for Flute, Viola and Harp"
+      }
     ],
   },
   {
@@ -859,40 +594,20 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Impromptu,_Op.86_(Faur%C3%A9,_Gabriel)',
-        label: 'IMSLP — Fauré: Impromptu for Harp Op. 86',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Gabriel_Faur%C3%A9#Harp',
         label: 'Wikipedia — Fauré harp works',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=YOnHNGStEzI',
-        label: 'Yolanda Kondonassis — concert recording',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=EcWqcqy4LXo',
-        label: 'Sivan Magen — World Harp Congress',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/6XR8HtfUCfSmLXr5nS4yvG',
-        label: 'Yolanda Kondonassis — Azica Records',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/FaureHarpImpromptu',
-        label: 'Nicanor Zabaleta — historic DGG recording',
       },
       {
         type: 'soundcloud',
         url: 'https://soundcloud.com/harprecitals/faure-impromptu-op86',
         label: 'Conservatoire National Supérieur student recital',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Imiky1nEx-A",
+        "label": "Harpist Hyejin Kim | 하피스트 김혜진 — Gabriel Fauré: Impromptu pour harpe, op. 86"
+      }
     ],
   },
   {
@@ -931,40 +646,20 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Fantasy,_Op.35_(Spohr,_Louis)',
-        label: 'IMSLP — Spohr: Fantasy for Harp Op. 35',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Louis_Spohr',
         label: 'Wikipedia — Louis Spohr',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=G6FVelLHRHg',
-        label: 'Catrin Finch — BBC Young Musician Award winner',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=LKbBHrXymBQ',
-        label: 'Isabelle Moretti — complete Fantasy',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/3EJpRVtv1CvtXZ2iNBt0WX',
-        label: 'Catrin Finch — Deutsche Grammophon',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/SpohrHarpFantasyZabaleta',
-        label: 'Nicanor Zabaleta — DGG historic recording',
       },
       {
         type: 'soundcloud',
         url: 'https://soundcloud.com/harpcompetition/spohr-fantasy-35-semifinal',
         label: 'World Harp Congress competition semifinal',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=VNQOIM6evD0",
+        "label": "Bartje Bartmans — Louis Spohr - Fantasy, Op. 35 for Harp (1807)"
+      }
     ],
   },
   {
@@ -1013,35 +708,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Hindemith chamber music',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=2V9sEMlL15A',
-        label: 'Sivan Magen — International Harp Contest in Israel winner',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=KGsJLCFN8Ik',
-        label: 'Xavier de Maistre — complete Sonata',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/1nKXZSbNvw8w1LMXvpJlqY',
-        label: 'Xavier de Maistre — Sony Classical',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/HindemithHarpSonataRecording',
-        label: 'Susann McDonald — historic Lyrichord recording',
-      },
-      {
         type: 'soundcloud',
         url: 'https://soundcloud.com/harpmasterworks/hindemith-sonata-harp',
         label: 'Finalist — Israel International Harp Contest',
       },
       {
-        type: 'vimeo',
-        url: 'https://vimeo.com/421783045',
-        label: 'Florentine Mulsant — Lille Conservatoire recital',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=T_YrDOH9ECg",
+        "label": "George N. Gianopoulos, composer — Paul Hindemith - Sonata for Harp (1939) [Score-Video]"
+      }
     ],
   },
   {
@@ -1080,34 +755,9 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Concerto_for_Marimba,_Vibraphone_and_Orchestra,_Op.278_(Milhaud,_Darius)',
-        label: 'IMSLP — Milhaud: Concerto for Marimba, Vibraphone and Orchestra Op. 278',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Darius_Milhaud#Concertos',
         label: 'Wikipedia — Milhaud concertos',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=hAV8I7jYFzM',
-        label: 'Keiko Abe / Nagoya Philharmonic — marimba soloist',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=wG9p4WZ_ixc',
-        label: 'Emmanuel Séjourné — complete Concerto',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/3d5wRqb7KR3h6KL1Aeh7lN',
-        label: 'Emmanuel Séjourné / Orchestre Philharmonique de Strasbourg',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/MilhaudMarimbaConerto',
-        label: 'Clair Omar Musser — early recording',
       },
       {
         type: 'soundcloud',
@@ -1119,6 +769,11 @@ export const expansionPieces8: SeedPiece[] = [
         url: 'https://vimeo.com/312047856',
         label: 'Lucas Niggli — Lucerne Festival performance',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=mviKkoT9Cr4",
+        "label": "Rodders — Darius Milhaud : Concerto for marimba, vibraphone and orchestra Op. 278 (1947)"
+      }
     ],
   },
   {
@@ -1157,34 +812,9 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Concertino_for_Marimba_and_Orchestra,_Op.21_(Creston,_Paul)',
-        label: 'IMSLP — Creston: Concertino for Marimba Op. 21',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Paul_Creston',
         label: 'Wikipedia — Paul Creston',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=Vd8p41X5GWk',
-        label: 'Keiko Abe — complete Concertino',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=H9MxaQBVlFc',
-        label: 'PASIC Competition masterclass performance',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/2dFnRn1tRGY1J4lYmqYkLz',
-        label: 'Evelyn Glennie / BBC Symphony Orchestra — RCA Red Seal',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/CrestonMarimbaConcertino',
-        label: 'Ruth Stuber Jeanne — premiere recording',
       },
       {
         type: 'soundcloud',
@@ -1234,34 +864,9 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Concerto_pour_percussion_et_orchestre_de_chambre_(Jolivet,_Andr%C3%A9)',
-        label: 'IMSLP — Jolivet: Concerto pour percussion et orchestre de chambre',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Andr%C3%A9_Jolivet',
         label: 'Wikipedia — André Jolivet',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=hgLdJy8rQrs',
-        label: 'Jean Batigne — premiere performance archive',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=4ybSmrZG8BE',
-        label: 'Evelyn Glennie — BBC Radio 3 broadcast',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/6xKVoW2X4UxM8zOw5Z2Gky',
-        label: 'Evelyn Glennie — RCA Red Seal recording',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/JolivetPercussionConcerto',
-        label: 'Jean Batigne / Orchestre de Chambre de Paris — 1960s recording',
       },
       {
         type: 'soundcloud',
@@ -1269,10 +874,10 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'CNSM Paris student competition recording',
       },
       {
-        type: 'vimeo',
-        url: 'https://vimeo.com/203847011',
-        label: 'Cédric Spina — Orchestre National de France',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Hk3bjXUPLLI",
+        "label": "San Francisco Conservatory of Music — André Jolivet, Concerto pour percussion"
+      }
     ],
   },
   {
@@ -1311,45 +916,15 @@ export const expansionPieces8: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'imslp',
-        url: 'https://imslp.org/wiki/Piano_Trio_in_A_minor_(Ravel,_Maurice)',
-        label: 'IMSLP — Ravel: Piano Trio in A minor',
-      },
-      {
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Piano_Trio_(Ravel)',
         label: 'Wikipedia — Piano Trio (Ravel)',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=DPAPlKuRN2k',
-        label: 'Renaud Capuçon / Gautier Capuçon / Martha Argerich',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=hxlrWGQSILQ',
-        label: 'Beaux Arts Trio — complete Trio',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/4GiXX3oFSKO0mHqPw4DnfO',
-        label: 'Argerich / R. Capuçon / G. Capuçon — Deutsche Grammophon',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/1dK8pf8rOilpYmXYNS9F3z',
-        label: 'Beaux Arts Trio — Philips recording',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/RavelPianoTrioBeauxArts',
-        label: 'Beaux Arts Trio — historic 1960s recording',
-      },
-      {
-        type: 'vimeo',
-        url: 'https://vimeo.com/274521033',
-        label: 'Trio Wanderer — Verbier Festival masterclass',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=CKAwByyYoCw",
+        "label": "AVROTROS Klassiek — Ravel: Piano Trio in A minor - Janine Jansen - International Chamber Music Festival - Live HD"
+      }
     ],
   },
   {
@@ -1396,31 +971,6 @@ export const expansionPieces8: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Horn_Trio_(Brahms)',
         label: 'Wikipedia — Horn Trio (Brahms)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=M6MPlTjLFqY',
-        label: 'Barry Tuckwell / Itzhak Perlman / Vladimir Ashkenazy — Decca',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=x3kRMnP_hKQ',
-        label: 'Eric Ruske / Joshua Bell / Jean-Yves Thibaudet',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/6jJBRuHdPiUAlkT4VyMO7c',
-        label: 'Tuckwell / Perlman / Ashkenazy — Decca',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5TGqyQI3YLGqN3pBHVlaTY',
-        label: 'Radovan Vlatkovic / Thomas Zehetmair / Till Fellner',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/BrahmsHornTrio',
-        label: 'Dennis Brain / Menuhin / Kentner — 1956 recording',
       },
       {
         type: 'vimeo',
@@ -1475,35 +1025,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Beethoven String Quartet No. 1',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=y8r0jYxZzBE',
-        label: 'Alban Berg Quartet — complete quartet',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=V3Vl1cW4zVQ',
-        label: 'Emerson String Quartet — DG recording',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/2WbRN4gLFvEMEFqBi3m4Xz',
-        label: 'Alban Berg Quartet — EMI Classics',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/6jLfEXrIGjJ2k3E8xVjG9T',
-        label: 'Takács Quartet — Decca',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/BeethovenStringQuartetOp18Budapest',
-        label: 'Budapest String Quartet — 1952 Columbia recording',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/289745012',
         label: 'Calidore String Quartet — Verbier Festival masterclass',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=GfKZxWqexuo",
+        "label": "Schwammerl — BEETHOVEN String Quartet No. 1 in F major (Op. 18, No. 1) Score"
+      }
     ],
   },
   {
@@ -1552,35 +1082,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Schumann Piano Trio No. 1',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=VX0yiOuHLto',
-        label: 'Beaux Arts Trio — complete Trio',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=oHE_fzK74lQ',
-        label: 'Florestan Trio — Hyperion recording',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5I5Q0UVxgEQYlFh9x3eWLm',
-        label: 'Florestan Trio — Hyperion Records',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/0v3AkajG7BIr9PVeQyuUfT',
-        label: 'Trio Wanderer — harmonia mundi',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/SchumannPianoTrioBeauxArts',
-        label: 'Beaux Arts Trio — Philips 1960s recording',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/315821047',
         label: 'Gould Piano Trio — Leeds chamber music festival',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=Ej1TYiN6W9c",
+        "label": "Thomas Hoppe — ATOS Trio: R.Schumann - Trio no.1 in d-minor, op.63"
+      }
     ],
   },
   {
@@ -1629,35 +1139,10 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Fauré Piano Quintet No. 1',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=YT9MKfUqNXA',
-        label: 'Domus / Susan Tomes — complete quintet',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=O8Uh5nJdqac',
-        label: 'Imogen Cooper / Chilingirian Quartet — BBC broadcast',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5nFLVmE2e0F2tF5nJvQN7g',
-        label: 'Domus — Hyperion Records',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/2QFT0PNHkOLHjuG5D8hGzJ',
-        label: 'Pascal Rogé / Quatuor Ysaÿe — Decca',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/FaurePianoQuintetNo1',
-        label: 'Jean Doyen / Quatuor Loewenguth — 1950s recording',
-      },
-      {
-        type: 'vimeo',
-        url: 'https://vimeo.com/362910845',
-        label: 'Imogen Cooper — Leeds International Piano Competition masterclass',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=3uGqAVkQt70",
+        "label": "Classical Gems — Gabriel Fauré - Piano Quintet No.1 in D Minor, Op.89"
+      }
     ],
   },
   {
@@ -1706,35 +1191,10 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Symphony No. 2 (Brahms)',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=qd1LaHCR4eI',
-        label: 'Carlos Kleiber / Vienna Philharmonic — 1983 (legendary recording)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=C9dJMnHtNkQ',
-        label: 'Leonard Bernstein / Vienna Philharmonic — 1982',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/1iCd28TfHfIHVRHZcRGJr7',
-        label: 'Carlos Kleiber / Vienna Philharmonic — Deutsche Grammophon (Gramophone Award)',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/06FO43lS7bCKM7W5HXGRfD',
-        label: 'Claudio Abbado / Berlin Philharmonic — Deutsche Grammophon',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/BrahmsSymphony2Furtwangler',
-        label: 'Wilhelm Furtwängler / Berlin Philharmonic — 1951 recording',
-      },
-      {
-        type: 'vimeo',
-        url: 'https://vimeo.com/298124751',
-        label: 'Mirga Gražinytė-Tyla / CBSO — live Proms',
-      },
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=FAuUUIvfkp0",
+        "label": "wocomoMUSIC — Brahms - Symphony No. 2 in D major, Op. 73 | The Cleveland Orchestra, Franz Welser-Möst"
+      }
     ],
   },
   {
@@ -1783,35 +1243,15 @@ export const expansionPieces8: SeedPiece[] = [
         label: 'Wikipedia — Symphony No. 4 (Tchaikovsky)',
       },
       {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=_qCBFzFTMJk',
-        label: 'Mravinsky / Leningrad Philharmonic — 1960 (definitive recording)',
-      },
-      {
-        type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=VBjoGHNFxVU',
-        label: 'Mariss Jansons / Oslo Philharmonic — 1997',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/2jCRmhLjilB3LI8tFy4Z1y',
-        label: 'Mravinsky / Leningrad Philharmonic — DGG Galleria (historic)',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5bI1xTcHHbhBFkd7YEj2Li',
-        label: 'Mariss Jansons / Oslo Philharmonic — EMI Classics',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/TchaikovskySymphony4Mravinsky',
-        label: 'Mravinsky / Leningrad Philharmonic — 1956 recording',
-      },
-      {
         type: 'vimeo',
         url: 'https://vimeo.com/341092867',
         label: 'Gustavo Dudamel / Simón Bolívar Symphony — Salzburg',
       },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=t1VRuZGAFOY",
+        "label": "ioannis mavridis — P. TCHAIKOVSKY - Symphony No.4, f moll, Op.36 [New York Philharmonic, Leonard Bernstein]"
+      }
     ],
   },
   {
@@ -1861,33 +1301,8 @@ export const expansionPieces8: SeedPiece[] = [
       },
       {
         type: 'youtube',
-        url: 'https://www.youtube.com/watch?v=kGQJSHSHdLo',
-        label: 'Bruno Walter / Columbia Symphony — 1961 (historic premiere recording)',
-      },
-      {
-        type: 'youtube',
         url: 'https://www.youtube.com/watch?v=vOvXhyldUko',
         label: 'Claudio Abbado / Berlin Philharmonic — 1997',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/5fphUJfYnXb0sBEhpEeIFp',
-        label: 'Claudio Abbado / Berlin Philharmonic — DGG (Gramophone Award)',
-      },
-      {
-        type: 'spotify',
-        url: 'https://open.spotify.com/album/3T2SRRUEYqKBuSmhoxnA0m',
-        label: 'Bruno Walter / Columbia Symphony — Sony Essential Classics',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/MahlerSymphony4BrunoWalter',
-        label: 'Bruno Walter / New York Philharmonic — 1945 recording',
-      },
-      {
-        type: 'internet_archive',
-        url: 'https://archive.org/details/MahlerSymphonyNo4Mengelberg',
-        label: 'Willem Mengelberg / Concertgebouw — 1939 (historic)',
       },
       {
         type: 'vimeo',

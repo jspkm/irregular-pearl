@@ -39,16 +39,6 @@ export const expansionPieces7: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Grand_Sonata,_Op.22_(Sor,_Fernando)",
-        "label": "IMSLP — Sor: Grand Sonata Op. 22"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=GqS3CW_KXNI",
-        "label": "YouTube — Julian Bream, guitar"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Fernando_Sor",
         "label": "Wikipedia — Fernando Sor"
@@ -99,11 +89,6 @@ export const expansionPieces7: SeedPiece[] = [
         "label": "IMSLP — Bottesini: Double Bass Concerto No. 1"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=rXKQM7aLBfU",
-        "label": "YouTube — Franco Petracchi, double bass"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Giovanni_Bottesini",
         "label": "Wikipedia — Giovanni Bottesini"
@@ -147,21 +132,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/L%27Apparition_de_l%27%C3%89glise_%C3%A9ternelle_(Messiaen,_Olivier)",
-        "label": "IMSLP — Messiaen: L'Apparition de l'Église éternelle"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=eC3T6jF8Kp8",
-        "label": "YouTube — Olivier Latry, Notre-Dame de Paris"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/L%27Apparition_de_l%27%C3%89glise_%C3%A9ternelle",
-        "label": "Wikipedia — L'Apparition de l'Église éternelle"
-      }
     ]
   },
   {
@@ -194,16 +164,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Rhapsody,_Op.10_(Grandjany,_Marcel)",
-        "label": "IMSLP — Grandjany: Rhapsody Op. 10"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Qx5HQl7vMHQ",
-        "label": "YouTube — Yolanda Kondonassis, harp"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Marcel_Grandjany",
@@ -241,16 +201,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Psappha_(Xenakis,_Iannis)",
-        "label": "IMSLP — Xenakis: Psappha"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=x2LgBKS1Wco",
-        "label": "YouTube — Sylvio Gualda, percussion"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Psappha_(Xenakis)",
@@ -295,21 +245,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Variations_on_a_Theme_by_Haydn,_Op.56a_(Brahms,_Johannes)",
-        "label": "IMSLP — Brahms: Variations on a Theme by Haydn Op. 56a"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=VpVS4bvLSnM",
-        "label": "YouTube — Carlos Kleiber, Vienna Philharmonic"
-      },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/143517422",
-        "label": "Vimeo — Berlin Philharmonic, live performance"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Variations_on_a_Theme_by_Haydn",
@@ -356,21 +291,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Trio_No.1_in_B-flat_major,_D.898_(Schubert,_Franz)",
-        "label": "IMSLP — Schubert: Piano Trio D. 898"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=XYy3pS8_fTU",
-        "label": "YouTube — Beaux Arts Trio"
-      },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/254818430",
-        "label": "Vimeo — Florestan Trio, live performance"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._1_(Schubert)",
@@ -419,11 +339,6 @@ export const expansionPieces7: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Symphony_No.101_in_D_major,_Hob.I:101_(Haydn,_Joseph)",
         "label": "IMSLP — Haydn: Symphony No. 101 'The Clock'"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=1Q9NglLBB6A",
-        "label": "YouTube — Leonard Bernstein, Vienna Philharmonic"
       },
       {
         "type": "vimeo",
@@ -480,16 +395,6 @@ export const expansionPieces7: SeedPiece[] = [
         "label": "IMSLP — Dvořák: String Quartet Op. 96 'American'"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Hpz3dap2ZBc",
-        "label": "YouTube — Emerson String Quartet"
-      },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/301452178",
-        "label": "Vimeo — Belcea Quartet, live performance"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Quartet_No._12_(Dvo%C5%99%C3%A1k)",
         "label": "Wikipedia — Dvořák String Quartet No. 12"
@@ -535,21 +440,6 @@ export const expansionPieces7: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Trio_No.2,_Op.67_(Shostakovich,_Dmitri)",
-        "label": "IMSLP — Shostakovich: Piano Trio No. 2 Op. 67"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=SH3nSHr4_KE",
-        "label": "YouTube — Beaux Arts Trio"
-      },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/380174523",
-        "label": "Vimeo — Trio Wanderer, live performance"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._2_(Shostakovich)",

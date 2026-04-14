@@ -31,11 +31,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Romeo_and_Juliet,_Op.64_(Prokofiev,_Sergei)', label: 'IMSLP — Romeo and Juliet, Op. 64' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Romeo_and_Juliet_(Prokofiev)', label: 'Wikipedia — Romeo and Juliet (Prokofiev)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=M23BKo7PMUI', label: 'Claudio Abbado — Berlin Philharmonic (DG, 1996)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Wfxj7nBT_lI', label: 'Gustavo Dudamel — LA Philharmonic (2015)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2q95Y1wbkiC0JvUqRLROEl', label: 'Claudio Abbado / Berlin Philharmonic — Deutsche Grammophon' },
-      { type: 'internet_archive', url: 'https://archive.org/details/ProkofievRomeoAndJulietSuiteMravinskyLeningrad', label: 'Yevgeny Mravinsky / Leningrad Philharmonic — 1965 recording' },
-      { type: 'vimeo', url: 'https://vimeo.com/330894126', label: 'Semyon Bychkov — Czech Philharmonic (Prague 2019)' },
     ],
     movements: [
       { name: 'I. Montagues and Capulets' },
@@ -75,12 +70,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/The_Young_Person%27s_Guide_to_the_Orchestra,_Op.34_(Britten,_Benjamin)', label: "IMSLP — The Young Person\'s Guide to the Orchestra, Op. 34" },
       { type: 'wikipedia', url: "https://en.wikipedia.org/wiki/The_Young_Person%27s_Guide_to_the_Orchestra", label: "Wikipedia — The Young Person\'s Guide to the Orchestra" },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8syNgbX3sFc', label: 'Benjamin Britten — London Symphony Orchestra (composer-conducted, 1963)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=pqLMPO8p8bQ', label: 'Leonard Bernstein — New York Philharmonic (with narration, 1963)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/09v6gKvRdovGHN40gTK8q1', label: 'Benjamin Britten / London Symphony Orchestra — Decca (composer-conducted)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BrittenYoungPersonsGuideBritten1946', label: 'Original 1946 film soundtrack — Instruments of the Orchestra' },
     ],
   },
   {
@@ -118,14 +108,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quintet_in_C_major,_D.956_(Schubert,_Franz)', label: 'IMSLP — String Quintet in C major, D. 956' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quintet_(Schubert)', label: 'Wikipedia — String Quintet (Schubert)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=AAPH81LQCS4', label: 'Casals Festival — Marlboro Music (1959, historic)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=hRBv7xJiFOw', label: 'Alban Berg Quartet / Heinrich Schiff — EMI (1984)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/70s9AxZvJhMFl7mHnPvZmM', label: 'Isaac Stern / Yo-Yo Ma / Emanuel Ax / Jaime Laredo / Sharon Robinson — Sony' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1h4GG0nNFaVdQ34Y2h2m1g', label: 'Alban Berg Quartet / Heinrich Schiff — EMI Classics' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SchubertStringQuintetBudapestQuartet1952', label: 'Budapest String Quartet — Columbia Masterworks (1952)' },
-      { type: 'vimeo', url: 'https://vimeo.com/241847622', label: 'Quatuor Ebène / Gautier Capuçon — Verbier Festival 2017' },
     ],
     movements: [
       { name: 'I. Allegro ma non troppo' },
@@ -164,10 +147,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Clarinet_Quintet_in_A_major,_K.581_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Clarinet Quintet, K. 581' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Quintet_(Mozart)', label: 'Wikipedia — Clarinet Quintet (Mozart)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=ZvoCrzp4Jy8', label: 'Karl Leister / Berlin Philharmonic Chamber Players — DG' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=G6ixFk9K-2s', label: 'Sabine Meyer / Berlin Philharmonic String Quartet — live recording' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4hcD9IZkJiZ6PBOMLF2AhP', label: 'Karl Leister / Berlin Philharmonic Chamber Players — Deutsche Grammophon' },
-      { type: 'internet_archive', url: 'https://archive.org/details/MozartClaQuintetK581ReginaldKell1950', label: 'Reginald Kell / Busch Quartet — 1950 Decca recording' },
       { type: 'soundcloud', url: 'https://soundcloud.com/wienerphilharmoniker/mozart-clarinet-quintet-k581', label: 'Vienna Philharmonic Chamber Concert — live recording' },
     ],
     movements: [
@@ -205,12 +184,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Praeludium_in_D_minor,_BuxWV_140_(Buxtehude,_Dieterich)', label: 'IMSLP — Praeludium BuxWV 140' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Dieterich_Buxtehude', label: 'Wikipedia — Dieterich Buxtehude' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=TGBEqGHMLNE', label: 'Ton Koopman — Grote Kerk Maassluis (historical instrument)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=JB-RVTLR3Ko', label: 'Harald Vogel — Arp Schnitger organ, Norden' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6t1yUlh8ZFv8jmFUhpMo9k', label: 'Ton Koopman — Complete Organ Works (Novalis)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BuxtehudePraeludioBuxWV140Schweitzer', label: 'Albert Schweitzer — Buxtehude organ works (historic recording)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/buxtehude-praeludium-buxwv-140-organ-concertgebouw', label: 'Concertgebouw organ recital — live recording' },
     ],
   },
@@ -251,11 +225,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Toccata,_Adagio_and_Fugue_in_C_major,_BWV_564_(Bach,_Johann_Sebastian)', label: 'IMSLP — Toccata, Adagio and Fugue BWV 564' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Toccata,_Adagio_and_Fugue_in_C_major,_BWV_564', label: 'Wikipedia — Toccata, Adagio and Fugue, BWV 564' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=HXPR_tJGHUo', label: 'Karl Richter — Munich Hochschule organ (1969 recording)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=M5dJKYT1rOc', label: 'Peter Hurford — Our Lady of Sion, Reading (Decca, 1978)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5z2CJNM03aOhJyG3VQGxWg', label: 'Karl Richter — Complete Organ Works (Archiv Produktion)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4QNRoQmzF04cNJKuJmumvA', label: 'Peter Hurford — Bach Organ Works (Decca)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BachBWV564ToccataAdagioFugueSchweitzer', label: 'Albert Schweitzer — Bach organ recordings (Zürich, 1935–36)' },
     ],
     movements: [
       { name: 'I. Toccata' },
@@ -291,13 +260,8 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Fantaisie,_Op.101_(Saint-Sa%C3%ABns,_Camille)', label: 'IMSLP — Fantaisie Op. 101' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Camille_Saint-Sa%C3%ABns', label: 'Wikipedia — Camille Saint-Saëns' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=QxM1y-s30rE', label: 'Olivier Latry — Notre-Dame de Paris (2014)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=TlYBa1glPYQ', label: 'Marie-Claire Alain — complete Saint-Saëns organ works' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0zNeKrUgKwWmMJaR4RVVW4', label: 'Olivier Latry — Saint-Saëns Organ Works (Deutsche Grammophon)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/saint-saens-fantaisie-op101-organ-live', label: 'Concertgebouw organ — live recital recording' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SaintSaensOrganWorksPicardyBardon', label: 'Jean-Baptiste Robin — Saint-Saëns organ works (archive recording)' },
     ],
   },
   {
@@ -330,8 +294,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Aria_in_Classic_Style_(Grandjany,_Marcel)', label: 'IMSLP — Aria in Classic Style' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Marcel_Grandjany', label: 'Wikipedia — Marcel Grandjany' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=I6wt9XmFdwI', label: 'Emily Levin — Dallas Symphony principal harp' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=8Rm2MxT4Krc', label: 'Hannah Roberts — Juilliard student recital' },
       { type: 'soundcloud', url: 'https://soundcloud.com/american-harp-society/grandjany-aria-in-classic-style-live', label: 'American Harp Society — live competition recording' },
       { type: 'vimeo', url: 'https://vimeo.com/305012847', label: 'International Harp Contest in Israel — semi-final round' },
     ],
@@ -364,12 +326,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/A_Ceremony_of_Carols,_Op.28_(Britten,_Benjamin)', label: 'IMSLP — A Ceremony of Carols, Op. 28' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/A_Ceremony_of_Carols', label: 'Wikipedia — A Ceremony of Carols' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3P3I0MxoFCQ', label: 'Choir of King\'s College Cambridge / Stephen Cleobury (Decca, 2008)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mh0pGNVqEOk', label: 'Tenebrae / Nigel Short — live recording (Wigmore Hall)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2rnl2FZnzR9biR7z3Qhh9Z', label: "Choir of King\'s College Cambridge / Stephen Cleobury — Decca" },
-      { type: 'internet_archive', url: 'https://archive.org/details/BrittenCeremonyOfCarolsMorleyColl1945', label: 'Morley College Choir (early recording, c.1945)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/bbc-radio-3/britten-ceremony-of-carols-op28', label: 'BBC Singers — BBC Radio 3 broadcast' },
     ],
   },
@@ -401,11 +358,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Au_Matin,_Op.22_(Tournier,_Marcel)', label: 'IMSLP — Au Matin, Op. 22' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Marcel_Tournier', label: 'Wikipedia — Marcel Tournier' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=1N3UtYbbUmk', label: 'Fabrice Pierre — live concert (Paris, 2018)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=fAoBa0wJl_c', label: 'Valérie Milot — Quebec harp recital' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2hfOIUuXHSwEVTv60Wq1wZ', label: 'Fabrice Pierre — French Harp Music (Naïve)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/paris-conservatoire-harp/tournier-au-matin-competition-2019', label: 'Paris Conservatoire Harp Competition — 2019 finalist recording' },
       { type: 'vimeo', url: 'https://vimeo.com/294857602', label: 'World Harp Congress — live round recording' },
     ],
@@ -440,11 +393,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Music_for_Strings,_Percussion_and_Celesta_(Bart%C3%B3k,_B%C3%A9la)', label: 'IMSLP — Music for Strings, Percussion and Celesta' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Music_for_Strings,_Percussion_and_Celesta', label: 'Wikipedia — Music for Strings, Percussion and Celesta' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=aA3V_1Qzb9Q', label: 'Fritz Reiner — Chicago Symphony Orchestra (RCA Living Stereo, 1958)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=j5JlVnBokmQ', label: 'Ivan Fischer — Budapest Festival Orchestra (2011)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0OiVxS5RoCmM7SFSPNrGun', label: 'Fritz Reiner / Chicago Symphony — RCA Living Stereo (Grammy Hall of Fame)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3dFbVl7gRxIvQFVcR6MViz', label: 'Georg Solti / Chicago Symphony — Decca' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BartokMusicStringsPercCelestaSacherBasel1937', label: 'Paul Sacher / Basel Chamber Orchestra — 1937 premiere recording' },
     ],
     movements: [
       { name: 'I. Andante tranquillo' },
@@ -481,13 +429,8 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Elegia_(Bottesini,_Giovanni)', label: 'IMSLP — Elegia (Bottesini)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Giovanni_Bottesini', label: 'Wikipedia — Giovanni Bottesini' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=bblWU-8Ufzw', label: 'Renaud Garcia-Fons — live performance (Paris, 2015)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mhT2H8ZaJZk', label: 'Chi-chi Nwanoku — BBC Young Musician Competition (1984)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2cKgW1oH6V8gFh6cWwnTjX', label: 'Rinat Ibragimov — Bottesini: Music for Double Bass (Naxos)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/bbc-radio-3/bottesini-elegy-db-recital', label: 'Leon Bosch — BBC Radio 3 recital' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BottesiniElegiaDKarr1968', label: 'Gary Karr — historic recital recording (1968)' },
     ],
   },
   {
@@ -520,11 +463,7 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Gran_Duo_Concertante_(Bottesini,_Giovanni)', label: 'IMSLP — Gran Duo Concertante' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Giovanni_Bottesini', label: 'Wikipedia — Giovanni Bottesini' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=YaBQQaxuC-c', label: 'Vincenzo Mariozzi / Massimo Giorgi — live recording (Rome, 2017)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=9XfFxO8vDrQ', label: 'Francois Rabbath / Salvatore Accardo — live recording' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2cKgW1oH6V8gFh6cWwnTjX', label: 'Rinat Ibragimov / Kyoko Takezawa — Naxos Bottesini Collection' },
       { type: 'soundcloud', url: 'https://soundcloud.com/ard-competition/bottesini-gran-duo-ard-double-bass', label: 'ARD Munich Competition — double bass final (live)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BottesiniGranDuoConcertanteLiveRecital', label: 'Gary Karr / Arthur Haas — Carnegie Hall (1970s archive)' },
     ],
   },
   // === ORCHESTRAL ===
@@ -556,13 +495,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.8_in_B_minor,_D.759_(Schubert,_Franz)', label: 'IMSLP — Symphony No. 8 in B minor, D. 759' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._8_(Schubert)', label: 'Wikipedia — Symphony No. 8 (Schubert)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=M8N5nqBGF0E', label: 'Carlos Kleiber — Vienna Philharmonic (DG, 1979)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=LZgMdCQT7_4', label: 'Leonard Bernstein — Vienna Philharmonic' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0b8yBkELXoJv5B6Nzm1Kyw', label: 'Carlos Kleiber / Vienna Philharmonic — Deutsche Grammophon (legendary recording)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0GE4gvhFMJDvhb2Gf3NPIY', label: 'René Jacobs / Freiburger Barockorchester — Harmonia Mundi' },
-      { type: 'internet_archive', url: 'https://archive.org/details/SchubertSymphony8UnfinishedFurtwaengler1950', label: 'Wilhelm Furtwängler / Vienna Philharmonic — 1950 broadcast' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -606,11 +539,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.2,_Op.83_(Brahms,_Johannes)', label: 'IMSLP — Piano Concerto No. 2, Op. 83' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._2_(Brahms)', label: 'Wikipedia — Piano Concerto No. 2 (Brahms)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Bt1OPHCHxY8', label: 'Emil Gilels / Reiner / Chicago Symphony — RCA Living Stereo (1958)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=mQZNtanEoU8', label: 'Martha Argerich / Claudio Abbado — Berlin Philharmonic' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/0H7FNWWnuJOJrLzqb3kFkL', label: 'Emil Gilels / Reiner / Chicago Symphony — RCA Living Stereo' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4MDSA1oP7MCtWjcGKPUoEG', label: 'Martha Argerich / Claudio Abbado — Berlin Philharmonic (DG)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BrahmsPianoConc2BackhausKnappertsbusch1952', label: 'Wilhelm Backhaus / Knappertsbusch — 1952 Decca recording' },
     ],
     movements: [
       { name: 'I. Allegro non troppo' },
@@ -650,10 +578,6 @@ export const expansionPieces10: SeedPiece[] = [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.5,_Op.64_(Tchaikovsky,_Pyotr)', label: 'IMSLP — Symphony No. 5, Op. 64' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._5_(Tchaikovsky)', label: 'Wikipedia — Symphony No. 5 (Tchaikovsky)' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=a_B02BZp-5Y', label: 'Evgeny Mravinsky — Leningrad Philharmonic (1960, DG)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=BnFBLBIH9sQ', label: 'Mariss Jansons — Oslo Philharmonic' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1lVL0j7QMpfvfLBsK7AQGl', label: 'Evgeny Mravinsky / Leningrad Philharmonic — Deutsche Grammophon (1960)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5bfSLYAfp0lKn2dMaF9jId', label: 'Mariss Jansons / Oslo Philharmonic — EMI Classics' },
-      { type: 'internet_archive', url: 'https://archive.org/details/TchaikovskySym5MravinskiLeningrad1938', label: 'Evgeny Mravinsky / Leningrad Philharmonic — 1938 recording' },
     ],
     movements: [
       { name: 'I. Andante — Allegro con anima' },
@@ -692,12 +616,6 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet_No.75_in_D_minor,_Op.76_No.2_(Haydn,_Joseph)', label: 'IMSLP — String Quartet Op. 76 No. 2 "Fifths"' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._75_(Haydn)', label: 'Wikipedia — String Quartet No. 75, Op. 76 No. 2' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=cVQXYLlz4Vw', label: 'Kodály Quartet — complete Op. 76 (Naxos)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=oVYb_EGiqnk', label: 'Tokyo String Quartet — live performance' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/7JiMnOV1pQ2YeKqlDQ3Fcw', label: 'Kodály Quartet — Haydn Op. 76 Quartets (Naxos)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/HaydnOp76QuartetsHungarianQuartet1958', label: 'Hungarian String Quartet — 1958 recording' },
       { type: 'soundcloud', url: 'https://soundcloud.com/wigmore-hall/haydn-string-quartet-op76-fifths-live', label: 'Belcea Quartet — Wigmore Hall live recording' },
     ],
     movements: [
@@ -737,11 +655,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/String_Quartet_No.6,_Sz.114_(Bart%C3%B3k,_B%C3%A9la)', label: 'IMSLP — String Quartet No. 6, Sz. 114' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._6_(Bart%C3%B3k)', label: 'Wikipedia — String Quartet No. 6 (Bartók)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=h7T7KqC9FNo', label: 'Emerson String Quartet — Deutsche Grammophon (complete quartets)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3v9FijZI6pQ', label: 'Takács Quartet — Wigmore Hall live' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3mEqnLbf7FdlBr0jLuBqf8', label: 'Emerson String Quartet — Deutsche Grammophon (Grammy Award)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1REX7mU5PqLiSa4QkJPRhE', label: 'Takács Quartet — Hyperion Records' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BartokSQ6JuilliardString1950', label: 'Juilliard String Quartet — 1950 recording' },
     ],
     movements: [
       { name: 'I. Mesto — Vivace' },
@@ -781,11 +694,7 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Suite_gothique,_Op.25_(Bo%C3%ABllmann,_L%C3%A9on)', label: 'IMSLP — Suite gothique, Op. 25' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Suite_gothique', label: 'Wikipedia — Suite gothique' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=aMeMaEPsLEI', label: 'Olivier Latry — Notre-Dame de Paris (live performance)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=FGXPXV75CoQ', label: 'Pierre Pincemaille — Saint-Denis Basilica' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/1hxsEDDDfKuHMBVmIlwHjn', label: 'Olivier Latry — French Organ Music (Deutsche Grammophon)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/boellmann-suite-gothique-live-recital', label: 'Ben van Oosten — Netherlands Organ concert recording' },
-      { type: 'internet_archive', url: 'https://archive.org/details/BoellmannSuiteGothiqueRecital1960s', label: 'Marie-Claire Alain — French organ recording' },
     ],
     movements: [
       { name: 'I. Introduction-Choral' },
@@ -824,11 +733,7 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Esquisses_byzantines_(Mulet,_Henri)', label: 'IMSLP — Esquisses byzantines (incl. Tu es Petra)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henri_Mulet', label: 'Wikipedia — Henri Mulet' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=eLlTr5N2JTY', label: 'Olivier Latry — Cathédrale Notre-Dame de Paris (2018)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=OzNRkdGIywY', label: 'Thierry Escaich — Saint-Étienne-du-Mont Paris (live)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/3sMkJDJNMRl3bqHGD9SCQW', label: 'Thierry Escaich — French Organ Music (Sony Classical)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/paris-conservatoire-organ/mulet-tu-es-petra-live-recital', label: 'International Organ Competition — recital recording' },
-      { type: 'vimeo', url: 'https://vimeo.com/215837480', label: 'Wayne Marshall — Leeds Town Hall (2017 recital)' },
     ],
   },
 
@@ -861,11 +766,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Impromptu-Caprice,_Op.9_(Piern%C3%A9,_Gabriel)', label: 'IMSLP — Impromptu-Caprice, Op. 9' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gabriel_Piern%C3%A9', label: 'Wikipedia — Gabriel Pierné' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=qPmN84Bmy3Y', label: 'Yolanda Kondonassis — live recital performance' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=JYGi7t0Ke7M', label: 'Catrin Finch — BBC Proms recital' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2EFLJiZAXFYg7MWCDoGaRR', label: 'Yolanda Kondonassis — Harp (Telarc)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/american-harp-society/pierne-impromptu-caprice-competition', label: 'American Harp Society National Competition — semi-final round' },
       { type: 'vimeo', url: 'https://vimeo.com/189654023', label: 'International Harp Contest in Israel — round recording' },
     ],
@@ -900,13 +801,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Zyklus_(Stockhausen,_Karlheinz)', label: 'IMSLP — Zyklus' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Zyklus_(Stockhausen)', label: 'Wikipedia — Zyklus (Stockhausen)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=HPlNQ21_VCo', label: 'Christoph Caskel — premiere performance (Darmstadt, 1959)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=Tp6JdgMRMCI', label: 'Colin Currie — Aldeburgh Music (2015, live)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2Iu1nV3cF0p53G3kMO1A22', label: 'Max Neuhaus — Stockhausen: Percussion Works (Columbia Masterworks)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/ircam-paris/stockhausen-zyklus-solo-perc-live', label: 'IRCAM — live performance recording (Paris)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/StockhausenZyklusChristophCaskel1961', label: 'Christoph Caskel — Deutsche Grammophon, 1961' },
     ],
   },
 
@@ -939,13 +834,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Sonata_Rom%C3%A1ntica_(Ponce,_Manuel)', label: 'IMSLP — Sonata Romántica' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Manuel_Ponce', label: 'Wikipedia — Manuel Ponce' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=A0hBqjp30KY', label: 'Andrés Segovia — DG studio recording (historic)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3hTGqK8BPiI', label: 'Ana Vidovic — live recital performance' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/4X5XPX5pGVGT1bw5bkFvFI', label: 'Andrés Segovia — The Complete Mercury Masters (DG)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/5MFqRbTl8YnZi5kMKLDkSi', label: 'Julian Bream — Ponce Guitar Works (RCA)' },
-      { type: 'vimeo', url: 'https://vimeo.com/304892711', label: 'Guitar Foundation of America Competition — semi-final recital' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -982,13 +871,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Tres_piezas_espa%C3%B1olas_(Rodrigo,_Joaqu%C3%ADn)', label: 'IMSLP — Tres piezas españolas' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Joaqu%C3%ADn_Rodrigo', label: 'Wikipedia — Joaquín Rodrigo' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=3bQcJp4T2Lw', label: 'Andrés Segovia — DG studio recording (1958)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=HMa3B7SyiJE', label: 'David Russell — live performance (Gramophone Award-winning guitarist)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2tqkEZaMjV3oiN3QgJ4mAO', label: 'David Russell — Rodrigo: Guitar Music (Telarc, Gramophone Award)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/6BXUQX7hekJBm4SIbVrOJX', label: 'Pepe Romero — Rodrigo: Piezas para guitarra (Philips)' },
-      { type: 'internet_archive', url: 'https://archive.org/details/RodrigoTresPiezasSegovia1958', label: 'Andrés Segovia — 1958 Deutsche Grammophon recording' },
     ],
     movements: [
       { name: 'I. Fandango' },
@@ -1026,11 +909,7 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Intermezzo_and_Tarantella,_Op.9_(Gli%C3%A8re,_Reinhold)', label: 'IMSLP — Intermezzo and Tarantella, Op. 9' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Reinhold_Gliere', label: 'Wikipedia — Reinhold Glière' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=vJ5n8k1jb5c', label: 'Rinat Ibragimov — BBC Young Musician Competition (live)' },
-      { type: 'youtube', url: 'https://www.youtube.com/watch?v=hPb3Wp5ZxNE', label: 'Chi-chi Nwanoku — live recital performance (London)' },
-      { type: 'spotify', url: 'https://open.spotify.com/album/2cKgW1oH6V8gFh6cWwnTjX', label: 'Rinat Ibragimov — Double Bass Works (Naxos)' },
       { type: 'soundcloud', url: 'https://soundcloud.com/ard-competition/gliere-intermezzo-tarantella-ard-double-bass', label: 'ARD International Music Competition — double bass round (live)' },
       { type: 'vimeo', url: 'https://vimeo.com/224789115', label: 'BBC Young Musician — double bass category final' },
     ],

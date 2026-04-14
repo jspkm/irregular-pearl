@@ -42,7 +42,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.23,_Op.57_(Beethoven,_Ludwig_van)', label: 'IMSLP — Appassionata Sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._23_(Beethoven)', label: 'Wikipedia — Appassionata Sonata' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._23_(Beethoven)', label: 'Wikipedia — Appassionata Sonata' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=0Ak_7tTxZrk", "label": "Ahmed Barod — Beethoven Sonata N° 23 'Appassionata'   Daniel Barenboim" }
     ],
   },
   {
@@ -125,7 +126,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Scherzo_No.2,_Op.31_(Chopin,_Fr%C3%A9d%C3%A9ric)', label: 'IMSLP — Scherzo No. 2' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Scherzo_No._2_(Chopin)', label: 'Wikipedia — Chopin Scherzo No. 2' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Scherzo_No._2_(Chopin)', label: 'Wikipedia — Chopin Scherzo No. 2' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=OCUSalQf-jY", "label": "Deutsche Grammophon - DG — Seong-Jin Cho – Chopin: Scherzo No. 2 in B Flat Minor, Op. 31" }
     ],
   },
   {
@@ -208,7 +210,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Italian_Concerto,_BWV_971_(Bach,_Johann_Sebastian)', label: 'IMSLP — Italian Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Italian_Concerto', label: 'Wikipedia — Italian Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Italian_Concerto', label: 'Wikipedia — Italian Concerto' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=ghTitIMtTCM", "label": "o_o — András Schiff - Bach. Italian Concerto in F BWV971" }
     ],
   },
   {
@@ -312,7 +315,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Jeux_d%27eau_(Ravel,_Maurice)', label: 'IMSLP — Jeux d\'eau' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jeux_d%27eau_(Ravel)', label: 'Wikipedia — Jeux d\'eau' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jeux_d%27eau_(Ravel)', label: 'Wikipedia — Jeux d\'eau' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=Z1QrFd7lNcU", "label": "Deutsche Grammophon - DG — Seong-Jin Cho - Ravel: Jeux D'Eau, M.30" }
     ],
   },
   {
@@ -353,7 +357,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Carnaval,_Op.9_(Schumann,_Robert)', label: 'IMSLP — Carnaval' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Carnaval_(Schumann)', label: 'Wikipedia — Carnaval' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Carnaval_(Schumann)', label: 'Wikipedia — Carnaval' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=LNo2aiKV-a0", "label": "Arthur Rubinstein — Schumann - Carnaval, op. 9 - Boris Giltburg" }
     ],
   },
   {
@@ -413,7 +418,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Concerto_No.21_in_C_major,_K.467_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Piano Concerto No. 21' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._21_(Mozart)', label: 'Wikipedia — Mozart Piano Concerto No. 21' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Concerto_No._21_(Mozart)', label: 'Wikipedia — Mozart Piano Concerto No. 21' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=CVKpvD3X6EM", "label": "TheFbiFilesRepeat — Mozart - Piano concerto No 21, Elvira Madigan - Best-of Classical Music" }
     ],
   },
   {
@@ -433,7 +439,6 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/4_Impromptus,_D.899_(Schubert,_Franz)', label: 'IMSLP — Impromptus D. 899' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/4_Impromptus,_Op._90_(Schubert)', label: 'Wikipedia — Schubert Impromptus Op. 90' }
     ],
   },
   {
@@ -454,7 +459,6 @@ export const pianoViolinNew: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_in_B-flat_major,_D.960_(Schubert,_Franz)', label: 'IMSLP — Schubert Sonata D. 960' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=MAZ8PA5_gVA', label: 'Schubert: Piano Sonata in B-flat Major, D.960' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_in_B-flat_major,_D._960_(Schubert)', label: 'Wikipedia — Schubert Sonata D. 960' }
     ],
   },
   {
@@ -474,7 +478,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.7,_Op.83_(Prokofiev,_Sergei)', label: 'IMSLP — Prokofiev Sonata No. 7' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._7_(Prokofiev)', label: 'Wikipedia — Prokofiev Sonata No. 7' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._7_(Prokofiev)', label: 'Wikipedia — Prokofiev Sonata No. 7' },
+      { type: 'youtube', url: 'https://www.youtube.com/watch?v=h21KSLqj7HA', label: 'Prok Prok — Prokofiev Piano Sonata No. 7 in B-flat Major, Op. 83, "Stalingrad" (Pollini)' }
     ],
   },
 
@@ -496,7 +501,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Sonata_No.1_in_G_minor,_BWV_1001_(Bach,_Johann_Sebastian)', label: 'IMSLP — Violin Sonata BWV 1001' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Sonatas_and_Partitas_for_Solo_Violin_(Bach)', label: 'Wikipedia — Bach Solo Violin Works' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=MRKy3kX8XUM", "label": "Netherlands Bach Society — Bach - Violin Sonata no. 1 in G minor BWV 1001 - Sato | Netherlands Bach Society" }
     ],
   },
   {
@@ -516,7 +522,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_A_minor,_BWV_1041_(Bach,_Johann_Sebastian)', label: 'IMSLP — Bach Violin Concerto BWV 1041' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_in_A_minor_(Bach)', label: 'Wikipedia — Bach Violin Concerto in A minor' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_in_A_minor_(Bach)', label: 'Wikipedia — Bach Violin Concerto in A minor' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=Q3-5144TaYg", "label": "Bachology — Hilary Hahn plays J.S.Bach Violin Concerto No.1 in a minor BWV1041-Deutsche Kammerphil. Bremen" }
     ],
   },
   {
@@ -536,7 +543,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Caprice_No._24_(Paganini)', label: 'Wikipedia — Paganini Caprice No. 24' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Caprice_No._24_(Paganini)', label: 'Wikipedia — Paganini Caprice No. 24' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=UcL0IsklM3M", "label": "Virtual Sheet Music — Hilary Hahn - Paganini - Caprice 24 - Sheet Music Play Along" }
     ],
   },
   {
@@ -556,7 +564,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/24_Caprices_for_Solo_Violin_(Paganini)', label: 'Wikipedia — Paganini 24 Caprices' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/24_Caprices_for_Solo_Violin_(Paganini)', label: 'Wikipedia — Paganini 24 Caprices' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=ZqzHlcYjRRM", "label": "Warner Classics — Paganini: Caprice No.1 for Violin (Augustin Hadelich)" }
     ],
   },
   {
@@ -575,7 +584,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-paganini-c5-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with detailed bowing and fingering suggestions.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=0jXXWBt5URw", "label": "Sumina Studer — N. Paganini Caprice no. 5 | Sumina Studer" }
     ],
   },
   {
@@ -594,7 +604,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-paganini-c9-imi', publisher: 'International Music Company', editor: 'Ruggiero Ricci', year: 1990, description: 'Ricci\'s performance edition with practical solutions for the double-stop passages.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=Lbzlby9vsPQ", "label": "TheExarion — Niccolò Paganini - Caprice for Solo Violin, Op. 1 No. 9 (Sheet Music)" }
     ],
   },
   {
@@ -613,7 +624,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-paganini-c13-peters', publisher: 'Peters', editor: 'Carl Flesch', year: 1930, description: 'Flesch edition with fingerings and bowings for all 24 Caprices.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' }
+      { type: 'imslp', url: 'https://imslp.org/wiki/24_Caprices_for_Solo_Violin,_Op.1_(Paganini,_Niccol%C3%B2)', label: 'IMSLP — 24 Caprices' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=Ffvww1dqxkU", "label": "Ellingmint — Paganini Caprice no.13 [HQ]" }
     ],
   },
   {
@@ -632,8 +644,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-brahms-vc-imi', publisher: 'International Music Company', editor: 'Joseph Joachim', year: 1905, description: 'Joachim\'s own edition with his cadenza and bowings.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_major,_Op.77_(Brahms,_Johannes)', label: 'IMSLP — Brahms Violin Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Brahms)', label: 'Wikipedia — Brahms Violin Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Brahms)', label: 'Wikipedia — Brahms Violin Concerto' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=UFl9xuYP5T8", "label": "hr-Sinfonieorchester – Frankfurt Radio Symphony — Brahms: Violinkonzert ∙ hr-Sinfonieorchester ∙ Hilary Hahn ∙ Paavo Järvi" }
     ],
   },
   {
@@ -653,7 +665,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_major,_Op.61_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Violin Concerto' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)', label: 'Wikipedia — Beethoven Violin Concerto' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Beethoven)', label: 'Wikipedia — Beethoven Violin Concerto' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=cokCgWPRZPg", "label": "Warner Classics — Itzhak Perlman – Beethoven: Violin Concerto (with Daniel Barenboim, Berliner Philharmoniker)" }
     ],
   },
   {
@@ -673,7 +686,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Sonata_No.9,_Op.47_(Beethoven,_Ludwig_van)', label: 'IMSLP — Kreutzer Sonata' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Sonata_No._9_(Beethoven)', label: 'Wikipedia — Kreutzer Sonata' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Sonata_No._9_(Beethoven)', label: 'Wikipedia — Kreutzer Sonata' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=COGcCBJAC6I", "label": "kamngaty — Beethoven.Violin.Sonata.No.9.Op.47.kreutzer.[Anne-Sophie Mutter.-.Lambert.Orkis]" }
     ],
   },
   {
@@ -692,7 +706,6 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-sibelius-vc-boosey', publisher: 'Boosey & Hawkes', editor: 'Original publication', year: 1905, description: 'The standard Boosey & Hawkes edition.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_in_D_minor,_Op.47_(Sibelius,_Jean)', label: 'IMSLP — Sibelius Violin Concerto' },
       { type: 'youtube', url: 'https://www.youtube.com/watch?v=gpS_u5RvMpM', label: 'Sarah Chang plays Sibelius Violin Concerto in D minor' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_(Sibelius)', label: 'Wikipedia — Sibelius Violin Concerto' }
     ],
@@ -714,7 +727,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Zigeunerweisen,_Op.20_(Sarasate,_Pablo_de)', label: 'IMSLP — Zigeunerweisen' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Zigeunerweisen_(Sarasate)', label: 'Wikipedia — Zigeunerweisen' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Zigeunerweisen_(Sarasate)', label: 'Wikipedia — Zigeunerweisen' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=ufIlOXXMqs0", "label": "PHOENIX — Itzhak Perlman - Pablo de Sarasate, Zigeunerweisen Op.20" }
     ],
   },
   {
@@ -734,7 +748,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_No.1,_Op.26_(Bruch,_Max)', label: 'IMSLP — Bruch Violin Concerto No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Bruch)', label: 'Wikipedia — Bruch Violin Concerto No. 1' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._1_(Bruch)', label: 'Wikipedia — Bruch Violin Concerto No. 1' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=KDJ6Wbzgy3E", "label": "hr-Sinfonieorchester – Frankfurt Radio Symphony — Bruch: 1. Violinkonzert ∙ hr-Sinfonieorchester ∙ Hilary Hahn ∙ Andrés Orozco-Estrada" }
     ],
   },
   {
@@ -775,7 +790,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Violin_Concerto_No.3_in_G_major,_K.216_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Mozart Violin Concerto No. 3' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._3_(Mozart)', label: 'Wikipedia — Mozart Violin Concerto No. 3' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Violin_Concerto_No._3_(Mozart)', label: 'Wikipedia — Mozart Violin Concerto No. 3' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=IhQAtkXOK6o", "label": "Violin Express — Mozart: Violin Concerto No. 3 - Hilary Hahn /Gustavo Dudamel /Stuttgart Radio Symphony Orchestra" }
     ],
   },
   {
@@ -794,8 +810,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-ss-irc-imi', publisher: 'International Music Company', editor: 'Zino Francescatti', year: 1958, description: 'Francescatti\'s performance edition.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Introduction_et_Rondo_capriccioso,_Op.28_(Saint-Sa%C3%ABns,_Camille)', label: 'IMSLP — Introduction and Rondo Capriccioso' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Introduction_and_Rondo_Capriccioso', label: 'Wikipedia — Introduction and Rondo Capriccioso' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Introduction_and_Rondo_Capriccioso', label: 'Wikipedia — Introduction and Rondo Capriccioso' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=8UTq1eZrDkI", "label": "Malta Philharmonic Orchestra — Introduction and Rondo Capriccioso Op.28, Saint-Saëns - Ray Chen & Malta Philharmonic Orchestra" }
     ],
   },
   {
@@ -815,7 +831,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Praeludium_and_Allegro_(Kreisler,_Fritz)', label: 'IMSLP — Praeludium and Allegro' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fritz_Kreisler', label: 'Wikipedia — Fritz Kreisler' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Fritz_Kreisler', label: 'Wikipedia — Fritz Kreisler' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=nyCjUPoAFX4", "label": "Heifetz International Music Institute — Kreisler: Praeludium & Allegro | SoHyun Ko, violin; Miki Aoki, piano" }
     ],
   },
 
@@ -839,7 +856,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Piano_Sonata_No.32,_Op.111_(Beethoven,_Ludwig_van)', label: 'IMSLP — Beethoven Sonata Op. 111' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._32_(Beethoven)', label: 'Wikipedia — Beethoven Sonata No. 32' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Sonata_No._32_(Beethoven)', label: 'Wikipedia — Beethoven Sonata No. 32' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=8AQ9hZTpgwM", "label": "Klassische Musik — Beethoven - Piano Sonata No.32 in C minor, Op.111 | Evgeny Kissin" }
     ],
   },
 
@@ -860,8 +878,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-wieniawski-pb1-pwm', publisher: 'PWM Edition', editor: 'Irena Dubiska', year: 1965, description: 'Polish critical edition based on first publication.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/Polonaise_brillante_No.1,_Op.4_(Wieniawski,_Henryk)', label: 'IMSLP — Polonaise brillante No. 1' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henryk_Wieniawski', label: 'Wikipedia — Wieniawski' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henryk_Wieniawski', label: 'Wikipedia — Wieniawski' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=0UPrGttumdw", "label": "Bomsori 김봄소리 — Wieniawski Polonaise in D major, Op.4 - Bomsori Kim 김봄소리" }
     ],
   },
   {
@@ -902,7 +920,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphonie_espagnole,_Op.21_(Lalo,_%C3%89douard)', label: 'IMSLP — Symphonie espagnole' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphonie_espagnole', label: 'Wikipedia — Symphonie espagnole' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphonie_espagnole', label: 'Wikipedia — Symphonie espagnole' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=NJMxCmHjsn4", "label": "Itzhak Perlman - Topic — Lalo: Symphonie espagnole, Op. 21: I. Allegro non troppo" }
     ],
   },
   {
@@ -922,7 +941,8 @@ export const pianoViolinNew: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Tha%C3%AFs_(Massenet,_Jules)', label: 'IMSLP — Thaïs' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Tha%C3%AFs_(opera)', label: 'Wikipedia — Thaïs' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Tha%C3%AFs_(opera)', label: 'Wikipedia — Thaïs' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=7QtGOWemQhY", "label": "Rusanda Panfili — Jules Massenet - Meditation from Thais for Violin and Piano" }
     ],
   },
 
@@ -943,8 +963,8 @@ export const pianoViolinNew: SeedPiece[] = [
       { id: 'e-telemann-ff1-henle', publisher: 'Henle Verlag', editor: 'Marion Beyer', year: 2016, description: 'Urtext with detailed source commentary.' }
     ],
     external_links: [
-      { type: 'imslp', url: 'https://imslp.org/wiki/12_Fantasias_for_Solo_Flute,_TWV_40:2-13_(Telemann,_Georg_Philipp)', label: 'IMSLP — 12 Fantasias for Solo Flute' },
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/12_Fantasias_for_Solo_Flute_(Telemann)', label: 'Wikipedia — Telemann Flute Fantasias' }
+      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/12_Fantasias_for_Solo_Flute_(Telemann)', label: 'Wikipedia — Telemann Flute Fantasias' },
+      { "type": "youtube", "url": "https://www.youtube.com/watch?v=Yni2mEgVFqM", "label": "Flutist Yubeen Kim Official — Georg Philipp Telemann, Fantasia No.1 in A major TWV 40:2 플루트 김유빈" }
     ],
   }
     ];

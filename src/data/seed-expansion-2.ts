@@ -435,16 +435,6 @@ export const expansionPieces2: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/3_Chorals_(Franck,_C%C3%A9sar)",
-        "label": "IMSLP — Three Chorales"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Three_Chorals_(Franck)",
-        "label": "Wikipedia — Franck Three Chorales"
-      }
     ]
   },
   {
@@ -479,11 +469,6 @@ export const expansionPieces2: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Octet,_Op.20_(Mendelssohn,_Felix)",
-        "label": "IMSLP — editions available"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Octet_(Mendelssohn)",
@@ -789,11 +774,6 @@ export const expansionPieces2: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Adagio_for_Strings_(Barber,_Samuel)",
-        "label": "IMSLP — score available"
-      },
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=izQsgE0L450",

@@ -38,16 +38,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/3_Chorals_(Franck,_C%C3%A9sar)",
-        "label": "IMSLP — Franck 3 Chorals"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Trois_chorals",
-        "label": "Wikipedia — Trois Chorals"
-      }
     ]
   },
   {
@@ -88,11 +78,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Organ_Concerto_in_B-flat_major,_Op.4_No.6,_HWV_294_(Handel,_George_Frideric)",
-        "label": "IMSLP — Handel Op. 4 No. 6"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Organ_concertos,_Op._4_(Handel)",
@@ -180,11 +165,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Double_Bass_Concerto_No.2_(Bottesini,_Giovanni)",
-        "label": "IMSLP — Bottesini Concerto No. 2"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Giovanni_Bottesini",
@@ -333,11 +313,6 @@ export const expansionPieces4: SeedPiece[] = [
         "url": "https://imslp.org/wiki/Piano_Quintet_in_A_major,_D.667_(Schubert,_Franz)",
         "label": "IMSLP — Schubert Trout Quintet"
       },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Piano_Quintet_in_A_major_(Schubert)",
-        "label": "Wikipedia — Trout Quintet"
-      }
     ]
   },
   {
@@ -422,11 +397,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/String_Sextet_No.1_in_B-flat_major,_Op.18_(Brahms,_Johannes)",
-        "label": "IMSLP — Brahms String Sextet No. 1"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Sextet_No._1_(Brahms)",
         "label": "Wikipedia — Brahms String Sextet No. 1"
@@ -476,16 +446,6 @@ export const expansionPieces4: SeedPiece[] = [
         "url": "https://imslp.org/wiki/Guitar_Concerto_No.1,_Op.30_(Giuliani,_Mauro)",
         "label": "IMSLP — Giuliani Guitar Concerto No. 1"
       },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=OzRjb0FLLGQ",
-        "label": "Giuliani: Guitar Concerto No. 1 — Pepe Romero"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Guitar_Concerto_No._1_(Giuliani)",
-        "label": "Wikipedia — Giuliani Guitar Concerto No. 1"
-      }
     ]
   },
   {
@@ -525,21 +485,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/12_%C3%89tudes_(Villa-Lobos,_Heitor)",
-        "label": "IMSLP — Villa-Lobos 12 Études"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=6mFpGwFUNFM",
-        "label": "Villa-Lobos: 12 Etudes — Göran Söllscher"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/12_%C3%89tudes_(Villa-Lobos)",
-        "label": "Wikipedia — Villa-Lobos 12 Études"
-      }
     ]
   },
   {
@@ -585,16 +530,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Introduction_and_Allegro_(Ravel,_Maurice)",
-        "label": "IMSLP — Ravel Introduction and Allegro"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=3tcrhHy5hPM",
-        "label": "Ravel: Introduction and Allegro — Marielle Nordmann"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Introduction_and_Allegro_(Ravel)",
         "label": "Wikipedia — Introduction and Allegro"
@@ -631,16 +566,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Rebonds_(Xenakis,_Iannis)",
-        "label": "IMSLP — Xenakis Rebonds"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=JEDzBnFt5cA",
-        "label": "Xenakis: Rebonds b — Sébastien Giot"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Rebonds_(Xenakis)",
@@ -687,16 +612,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/String_Quartet_No.8,_Op.110_(Shostakovich,_Dmitri)",
-        "label": "IMSLP — Shostakovich String Quartet No. 8"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=SjUBHikYbsE",
-        "label": "Shostakovich: String Quartet No. 8 — Emerson String Quartet"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Quartet_No._8_(Shostakovich)",
@@ -745,11 +660,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Also_sprach_Zarathustra,_Op.30_(Strauss,_Richard)",
         "label": "IMSLP — Also sprach Zarathustra"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=dOp9Y9OQLKE",
-        "label": "Strauss: Also sprach Zarathustra — Karajan / Berlin Phil"
       },
       {
         "type": "wikipedia",
@@ -802,11 +712,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Mahler Symphony No. 5"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=_aFdl-A8s7w",
-        "label": "Mahler Symphony No. 5 Adagietto — Bernstein / Vienna Phil"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._5_(Mahler)",
         "label": "Wikipedia — Mahler Symphony No. 5"
@@ -850,16 +755,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Praeludium_in_D_minor,_BuxWV_140_(Buxtehude,_Dieterich)",
-        "label": "IMSLP — Buxtehude BuxWV 140"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=6eFpJkK-lKE",
-        "label": "Buxtehude: Prelude and Fugue in D minor BuxWV 140"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Dieterich_Buxtehude",
@@ -905,16 +800,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Double_Bass_Concerto,_Op.3_(Koussevitzky,_Sergei)",
-        "label": "IMSLP — Koussevitzky Double Bass Concerto"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=WClFhIBfUeE",
-        "label": "Koussevitzky: Double Bass Concerto — Gary Karr"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Double_Bass_Concerto_(Koussevitzky)",
@@ -962,16 +847,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/String_Quartet_No.14_in_D_minor,_D.810_(Schubert,_Franz)",
-        "label": "IMSLP — Schubert Death and the Maiden Quartet"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=LOfSEMXWAXk",
-        "label": "Schubert: Death and the Maiden — Alban Berg Quartet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Quartet_No._14_(Schubert)",
         "label": "Wikipedia — Death and the Maiden Quartet"
@@ -1013,16 +888,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Symphony_No.6_in_F_major,_Op.68_(Beethoven,_Ludwig_van)",
-        "label": "IMSLP — Beethoven Symphony No. 6"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=iLG-ANQtaKg",
-        "label": "Beethoven: Symphony No. 6 — Karajan / Berlin Philharmonic (1984)"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._6_(Beethoven)",
@@ -1066,16 +931,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Symphony_No.1_in_C_minor,_Op.68_(Brahms,_Johannes)",
-        "label": "IMSLP — Brahms Symphony No. 1"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=_kHNeCTHo3A",
-        "label": "Brahms: Symphony No. 1 — Karajan / Berlin Philharmonic (1987)"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._1_(Brahms)",
         "label": "Wikipedia — Symphony No. 1 (Brahms)"
@@ -1110,21 +965,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Pi%C3%A8ce_h%C3%A9ro%C3%AFque_(Franck,_C%C3%A9sar)",
-        "label": "IMSLP — Franck Pièce héroïque"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=4JBiSINiMjE",
-        "label": "Franck: Pièce héroïque — Marie-Claire Alain"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Pi%C3%A8ce_h%C3%A9ro%C3%AFque",
-        "label": "Wikipedia — Pièce héroïque"
-      }
     ]
   },
   {
@@ -1155,21 +995,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Harp_Concerto_in_C_major_(Boieldieu,_Fran%C3%A7ois-Adrien)",
-        "label": "IMSLP — Boieldieu Harp Concerto"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=qd5pSGBVc1M",
-        "label": "Boieldieu: Harp Concerto — Marielle Nordmann"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Harp_Concerto_(Boieldieu)",
-        "label": "Wikipedia — Boieldieu Harp Concerto"
-      }
     ]
   },
   {
@@ -1205,11 +1030,6 @@ export const expansionPieces4: SeedPiece[] = [
         "url": "https://en.wikipedia.org/wiki/Third_Construction",
         "label": "Wikipedia — Third Construction"
       },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=pNxVZN_OQGA",
-        "label": "Cage: Third Construction — Nexus Percussion"
-      }
     ]
   },
   {
@@ -1248,16 +1068,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Lute_Suite_in_C_minor,_BWV_997_(Bach,_Johann_Sebastian)",
-        "label": "IMSLP — Bach Lute Suite BWV 997"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=qVvpjfEMHH0",
-        "label": "Bach: Lute Suite BWV 997 — Julian Bream (guitar)"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Lute_Suite_in_C_minor,_BWV_997",
         "label": "Wikipedia — Lute Suite BWV 997"
@@ -1292,21 +1102,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Double_Bass_Concerto_No.2_in_E_major_(Dittersdorf,_Karl_Ditters_von)",
-        "label": "IMSLP — Dittersdorf Double Bass Concerto No. 2"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=8L8M1k9biKc",
-        "label": "Dittersdorf: Double Bass Concerto No. 2 — Gary Karr"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Double_Bass_Concertos_(Dittersdorf)",
-        "label": "Wikipedia — Dittersdorf Double Bass Concertos"
-      }
     ]
   },
   {
@@ -1345,16 +1140,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Trio_No.7_in_B-flat_major,_Op.97_(Beethoven,_Ludwig_van)",
-        "label": "IMSLP — Beethoven Archduke Trio"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=GdFGPF-BQBE",
-        "label": "Beethoven: Archduke Trio — Beaux Arts Trio"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._7_(Beethoven)",
         "label": "Wikipedia — Beethoven Archduke Trio"
@@ -1389,16 +1174,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Symphony_No.2_in_D_major,_Op.43_(Sibelius,_Jean)",
-        "label": "IMSLP — Sibelius Symphony No. 2"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=qPR9RbMjpU0",
-        "label": "Sibelius: Symphony No. 2 — Osmo Vänskä / Minnesota Orchestra"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._2_(Sibelius)",
@@ -1442,16 +1217,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Piano_Quintet_in_E-flat_major,_Op.44_(Schumann,_Robert)",
-        "label": "IMSLP — Schumann Piano Quintet"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=KCFSJXcBBpM",
-        "label": "Schumann: Piano Quintet — Martha Argerich and Friends"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quintet_(Schumann)",
         "label": "Wikipedia — Piano Quintet (Schumann)"
@@ -1494,11 +1259,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Symphonie_fantastique,_Op.14_(Berlioz,_Hector)",
-        "label": "IMSLP — Berlioz: Symphonie fantastique Op. 14"
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=5HgqPpjIH5c",
         "label": "YouTube — Colin Davis, London Symphony Orchestra"
@@ -1508,11 +1268,6 @@ export const expansionPieces4: SeedPiece[] = [
         "url": "https://en.wikipedia.org/wiki/Symphonie_fantastique",
         "label": "Wikipedia — Symphonie fantastique"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/189444440",
-        "label": "Vimeo — Gustavo Dudamel, Orchestre de Paris"
-      }
     ]
   },
   {
@@ -1556,11 +1311,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Saint-Saëns: Symphony No. 3 Op. 78"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=y4DZDeVVxg0",
-        "label": "YouTube — Charles Dutoit, Orchestre de Paris"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Symphony_No._3_(Saint-Sa%C3%ABns)",
         "label": "Wikipedia — Saint-Saëns Symphony No. 3"
@@ -1602,21 +1352,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Prelude_and_Fugue_on_the_name_BACH,_S.260_(Liszt,_Franz)",
-        "label": "IMSLP — Liszt: Prelude and Fugue on BACH S. 260"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Z3WQOQM-14s",
-        "label": "YouTube — Thierry Escaich, Cathédrale Saint-Étienne"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Prelude_and_Fugue_on_the_name_BACH_(Liszt)",
-        "label": "Wikipedia — Liszt Prelude and Fugue on BACH"
-      }
     ]
   },
   {
@@ -1648,25 +1383,10 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Harp_Sonata,_Op.52_(Ginastera,_Alberto)",
-        "label": "IMSLP — Ginastera: Harp Sonata Op. 52"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=zVLSjU3XRMU",
-        "label": "YouTube — Xavier de Maistre, harp"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Alberto_Ginastera",
         "label": "Wikipedia — Alberto Ginastera"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/228473011",
-        "label": "Vimeo — Gwyneth Wentink, live recital"
-      }
     ]
   },
   {
@@ -1710,11 +1430,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Sor: Fantaisie Op. 7"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=3yRA6oSmC8M",
-        "label": "YouTube — Pepe Romero, guitar"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Fernando_Sor",
         "label": "Wikipedia — Fernando Sor"
@@ -1753,11 +1468,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Gran_Duo_Concertante_(Bottesini,_Giovanni)",
         "label": "IMSLP — Bottesini: Gran Duo Concertante"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=YHcDMSTlPuA",
-        "label": "YouTube — Francois Rabbath & Itzhak Perlman"
       },
       {
         "type": "wikipedia",
@@ -1807,11 +1517,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Fauré: Piano Quartet No. 1 Op. 15"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=K_oGcHJbTsE",
-        "label": "YouTube — Domus Piano Quartet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quartet_No._1_(Faur%C3%A9)",
         "label": "Wikipedia — Fauré Piano Quartet No. 1"
@@ -1859,20 +1564,10 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Schumann: Piano Quartet Op. 47"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=gBnl0GtIPeo",
-        "label": "YouTube — Martha Argerich & Gidon Kremer"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quartet_(Schumann)",
         "label": "Wikipedia — Piano Quartet (Schumann)"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/107490028",
-        "label": "Vimeo — Quatuor Ébène with Nelson Goerner"
-      }
     ]
   },
   {
@@ -1914,11 +1609,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Water_Music_(Handel,_George_Frideric)",
         "label": "IMSLP — Handel: Water Music HWV 348–350"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Izz6OmFiKWk",
-        "label": "YouTube — Nikolaus Harnoncourt, Concentus Musicus Wien"
       },
       {
         "type": "wikipedia",
@@ -1967,16 +1657,6 @@ export const expansionPieces4: SeedPiece[] = [
         "url": "https://imslp.org/wiki/Flute_Concerto_in_G_minor,_RV_439_(Vivaldi,_Antonio)",
         "label": "IMSLP — Vivaldi: Flute Concerto 'La notte' RV 439"
       },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=PQJWK7JVX1g",
-        "label": "YouTube — Jean-Pierre Rampal, I Solisti Veneti"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Flute_Concerto_in_G_minor,_RV_439_(Vivaldi)",
-        "label": "Wikipedia — Vivaldi Flute Concerto RV 439"
-      }
     ]
   },
   {
@@ -2007,16 +1687,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Enigma_Variations,_Op.36_(Elgar,_Edward)",
-        "label": "IMSLP — Elgar: Enigma Variations Op. 36"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Zi7wJQXqHnA",
-        "label": "YouTube — BBC Symphony Orchestra, Andrew Davis"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Enigma_Variations",
@@ -2052,21 +1722,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Fantasia_and_Fugue_on_B-A-C-H,_Op.46_(Reger,_Max)",
-        "label": "IMSLP — Reger: Fantasia and Fugue on B-A-C-H Op. 46"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=NVHbPNz9Kk4",
-        "label": "YouTube — Hans Fagius, organ"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Fantasia_and_Fugue_on_B-A-C-H_(Reger)",
-        "label": "Wikipedia — Reger Fantasia and Fugue on B-A-C-H"
-      }
     ]
   },
   {
@@ -2101,11 +1756,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Organ_Symphony_No.3,_Op.28_(Vierne,_Louis)",
         "label": "IMSLP — Vierne: Organ Symphony No. 3 Op. 28"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=OJzCFKdTdYQ",
-        "label": "YouTube — Ben van Oosten, Cavaillé-Coll organ"
       },
       {
         "type": "wikipedia",
@@ -2143,16 +1793,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Chor%C3%B4s_No.1_(Villa-Lobos,_Heitor)",
-        "label": "IMSLP — Villa-Lobos: Choros No. 1"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=fR6G7f8XPZE",
-        "label": "YouTube — Julian Bream, guitar"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Heitor_Villa-Lobos",
         "label": "Wikipedia — Heitor Villa-Lobos"
@@ -2188,11 +1828,6 @@ export const expansionPieces4: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Qq_9nLLOyFk",
-        "label": "YouTube — Ana Vidovic, complete 20 études"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Leo_Brouwer",
         "label": "Wikipedia — Leo Brouwer"
@@ -2227,11 +1862,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=TqHmO1NSKDE",
-        "label": "YouTube — Mitchell Peters, Los Angeles Philharmonic"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/William_Kraft",
@@ -2280,11 +1910,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Schubert: Octet D. 803"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=gv0SNQS3DKQ",
-        "label": "YouTube — Vienna Octet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Octet_(Schubert)",
         "label": "Wikipedia — Schubert Octet"
@@ -2323,11 +1948,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/String_Quartet_No.1,_Op.51_No.1_(Brahms,_Johannes)",
         "label": "IMSLP — Brahms: String Quartet No. 1 Op. 51"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=A7i7T2nRF7Y",
-        "label": "YouTube — Emerson String Quartet"
       },
       {
         "type": "wikipedia",
@@ -2370,11 +1990,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Saint-Saëns: Cello Concerto No. 2 Op. 119"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=UqCInWPFoTs",
-        "label": "YouTube — Truls Mørk, cello"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Cello_Concerto_No._2_(Saint-Sa%C3%ABns)",
         "label": "Wikipedia — Saint-Saëns Cello Concerto No. 2"
@@ -2413,11 +2028,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Elegy_(Bottesini,_Giovanni)",
         "label": "IMSLP — Bottesini: Elegy in D major"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=7jTIbhHqP9M",
-        "label": "YouTube — Gary Karr, double bass"
       },
       {
         "type": "wikipedia",
@@ -2461,21 +2071,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Trio_Sonata_No.1_in_E-flat_major,_BWV_525_(Bach,_Johann_Sebastian)",
-        "label": "IMSLP — Bach: Trio Sonata No. 1 BWV 525"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=5rSP2GcBoMo",
-        "label": "YouTube — Marie-Claire Alain, organ"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Trio_Sonatas,_BWV_525%E2%80%93530",
-        "label": "Wikipedia — Trio Sonatas BWV 525–530"
-      }
     ]
   },
   {
@@ -2513,21 +2108,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Organ_Symphony_No.5,_Op.42/1_(Widor,_Charles-Marie)",
-        "label": "IMSLP — Widor: Organ Symphony No. 5 Op. 42/1"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=Pn4b5HaVFo8",
-        "label": "YouTube — Pierre Cochereau, organ (Notre-Dame de Paris)"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Organ_Symphony_No._5_(Widor)",
-        "label": "Wikipedia — Organ Symphony No. 5 (Widor)"
-      }
     ]
   },
   {
@@ -2558,11 +2138,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=9KRNSHGdOZM",
-        "label": "YouTube — Pepe Romero, guitar; Neville Marriner, ASMF"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Concierto_de_Aranjuez",
@@ -2611,11 +2186,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Berlioz: Harold en Italie Op. 16"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=lS8GBTdVYSE",
-        "label": "YouTube — Yuri Bashmet, viola; Seiji Ozawa, Boston Symphony"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Harold_en_Italie",
         "label": "Wikipedia — Harold en Italie"
@@ -2650,21 +2220,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Danses_(Debussy,_Claude)",
-        "label": "IMSLP — Debussy: Danses (Danse sacrée et danse profane)"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=WFfbXvJXiGQ",
-        "label": "YouTube — Marielle Nordmann, harp; Jean-Pierre Rampal"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/Danses_(Debussy)",
-        "label": "Wikipedia — Danses (Debussy)"
-      }
     ]
   },
   {
@@ -2706,11 +2261,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Piano_Concerto_No.1,_Op.23_(Tchaikovsky,_Pyotr)",
         "label": "IMSLP — Tchaikovsky: Piano Concerto No. 1 Op. 23"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=TEB4MiHtxA4",
-        "label": "YouTube — Van Cliburn, piano; Kiril Kondrashin (RCA Victor)"
       },
       {
         "type": "wikipedia",
@@ -2760,11 +2310,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Brahms: Piano Trio No. 1 Op. 8"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=LiYNMjl9QoA",
-        "label": "YouTube — Heifetz, Rubinstein, Piatigorsky (RCA Victor)"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Trio_No._1_(Brahms)",
         "label": "Wikipedia — Piano Trio No. 1 (Brahms)"
@@ -2810,11 +2355,6 @@ export const expansionPieces4: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Piano_Quartet_No.2,_Op.45_(Fauré,_Gabriel)",
         "label": "IMSLP — Fauré: Piano Quartet No. 2 Op. 45"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=E6cZ2cBmDls",
-        "label": "YouTube — Quatuor Ébène with Pierre-Laurent Aimard"
       },
       {
         "type": "wikipedia",
@@ -2864,11 +2404,6 @@ export const expansionPieces4: SeedPiece[] = [
         "label": "IMSLP — Hasselmans: La Source Op. 44"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=fCRMjoNFGSQ",
-        "label": "YouTube — Marielle Nordmann, harp"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Alphonse_Hasselmans",
         "label": "Wikipedia — Alphonse Hasselmans"
@@ -2903,11 +2438,6 @@ export const expansionPieces4: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=T3DNMtSaP0s",
-        "label": "YouTube — Paula Robison, flute"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Density_21.5",

@@ -39,16 +39,6 @@ export const expansionPieces6: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Variations_on_a_No%C3%ABl,_Op.20_(Dupr%C3%A9,_Marcel)",
-        "label": "IMSLP — Dupré: Variations on a Noël Op. 20"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=4_dBMtBIKFo",
-        "label": "YouTube — Pierre Cochereau, Notre-Dame de Paris"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Marcel_Dupr%C3%A9",
         "label": "Wikipedia — Marcel Dupré"
@@ -93,19 +83,14 @@ export const expansionPieces6: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Images,_Op.29_(Tournier,_Marcel)",
-        "label": "IMSLP — Tournier: Images Op. 29"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=tENQEyHbmEE",
-        "label": "YouTube — Isabelle Moretti, harp"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Marcel_Tournier",
         "label": "Wikipedia — Marcel Tournier"
+      },
+      {
+        "type": "youtube",
+        "url": "https://www.youtube.com/watch?v=w_0kLfvY1L0",
+        "label": "Emmanuel Ceysson — Marcel Tournier - Images Suite no.1 Op.29 with string quartet - I. Clair de lune sur l'étang du parc"
       }
     ]
   },
@@ -142,25 +127,10 @@ export const expansionPieces6: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Drumming_(Reich,_Steve)",
-        "label": "IMSLP — Reich: Drumming"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=FGXbPBZbFE4",
-        "label": "YouTube — Steve Reich and Musicians"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Drumming_(Reich)",
         "label": "Wikipedia — Drumming (Reich)"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/57688089",
-        "label": "Vimeo — Percussion ensemble, live performance"
-      }
     ]
   },
   {
@@ -200,26 +170,6 @@ export const expansionPieces6: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/La_Catedral_(Barrios_Mangor%C3%A9,_Agust%C3%ADn)",
-        "label": "IMSLP — Barrios: La Catedral"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=4_GZ5Z5g5_c",
-        "label": "YouTube — John Williams, guitar"
-      },
-      {
-        "type": "wikipedia",
-        "url": "https://en.wikipedia.org/wiki/La_Catedral_(Barrios)",
-        "label": "Wikipedia — La Catedral (Barrios)"
-      },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/106297952",
-        "label": "Vimeo — Ana Vidovic, live performance"
-      }
     ]
   },
   {
@@ -260,16 +210,6 @@ export const expansionPieces6: SeedPiece[] = [
       }
     ],
     "external_links": [
-      {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/Double_Bass_Concerto_No.1_in_E_major_(Dittersdorf,_Carl_Ditters_von)",
-        "label": "IMSLP — Dittersdorf: Double Bass Concerto No. 1"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=lhivBBGSvXI",
-        "label": "YouTube — Gary Karr, double bass"
-      },
       {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Carl_Ditters_von_Dittersdorf",
@@ -321,20 +261,10 @@ export const expansionPieces6: SeedPiece[] = [
         "label": "IMSLP — Dvořák: Piano Quintet Op. 81"
       },
       {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=BFkAhcHVGEo",
-        "label": "YouTube — Emanuel Ax & Cleveland Quartet"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/Piano_Quintet_No._2_(Dvo%C5%99%C3%A1k)",
         "label": "Wikipedia — Dvořák Piano Quintet No. 2"
       },
-      {
-        "type": "vimeo",
-        "url": "https://vimeo.com/329184002",
-        "label": "Vimeo — Imogen Cooper & Belcea Quartet"
-      }
     ]
   },
   {
@@ -378,11 +308,6 @@ export const expansionPieces6: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Symphony_No.4,_Op.60_(Beethoven,_Ludwig_van)",
         "label": "IMSLP — Beethoven: Symphony No. 4 Op. 60"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=ZZUOM8PJM5Q",
-        "label": "YouTube — Carlos Kleiber, Bavarian State Orchestra"
       },
       {
         "type": "wikipedia",
@@ -488,16 +413,6 @@ export const expansionPieces6: SeedPiece[] = [
     ],
     "external_links": [
       {
-        "type": "imslp",
-        "url": "https://imslp.org/wiki/String_Quintet_in_C_major,_D.956_(Schubert,_Franz)",
-        "label": "IMSLP — Schubert: String Quintet D. 956"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=z8LQ7y_HyMM",
-        "label": "YouTube — Alban Berg Quartet & Heinrich Schiff"
-      },
-      {
         "type": "wikipedia",
         "url": "https://en.wikipedia.org/wiki/String_Quintet_(Schubert)",
         "label": "Wikipedia — Schubert String Quintet"
@@ -550,11 +465,6 @@ export const expansionPieces6: SeedPiece[] = [
         "type": "imslp",
         "url": "https://imslp.org/wiki/Prelude_and_Fugue_in_E_minor,_BWV_548_(Bach,_Johann_Sebastian)",
         "label": "IMSLP — Bach: Prelude and Fugue BWV 548"
-      },
-      {
-        "type": "youtube",
-        "url": "https://www.youtube.com/watch?v=O6gBjxDkFqI",
-        "label": "YouTube — Marie-Claire Alain, organ"
       },
       {
         "type": "wikipedia",
