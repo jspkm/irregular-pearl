@@ -45,6 +45,14 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
         </div>
       </div>
 
+      {/* Show from — controls when the event becomes visible */}
+      <div>
+        <label for="show_from" class="block text-xs font-medium text-ink mb-1">Show from</label>
+        <input type="date" id="show_from" name="show_from"
+          class="w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-accent font-body" />
+        <p class="text-[11px] text-[#A8A29E] mt-1">When the event should appear on /events. Defaults to 30 days before the event date. Earliest allowed: 30 days before; latest: the event date itself.</p>
+      </div>
+
       {/* Time — 30 min intervals */}
       <div class="w-1/2">
         <label for="start_time" class="block text-xs font-medium text-ink mb-1">Start Time</label>
@@ -150,14 +158,32 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
     }
   });
 
-  // Prevent past dates
+  // Prevent past dates and update show_from bounds when event_date changes
   const dateInput = document.getElementById('event_date') as HTMLInputElement;
+  const showFromInput = document.getElementById('show_from') as HTMLInputElement;
+  function applyShowFromBounds() {
+    if (!dateInput.value) {
+      showFromInput.removeAttribute('min');
+      showFromInput.removeAttribute('max');
+      return;
+    }
+    const ed = new Date(dateInput.value + 'T00:00:00');
+    const min = new Date(ed.getTime() - 30 * 86400_000).toISOString().split('T')[0];
+    const max = dateInput.value;
+    showFromInput.min = min;
+    showFromInput.max = max;
+    if (!showFromInput.value || showFromInput.value < min || showFromInput.value > max) {
+      showFromInput.value = min; // default to earliest (30 days before)
+    }
+  }
   dateInput.addEventListener('change', () => {
     const today = new Date().toISOString().split('T')[0];
     if (dateInput.value < today) {
       dateInput.value = '';
       showError('Event date cannot be in the past.');
+      return;
     }
+    applyShowFromBounds();
   });
 
   function showError(msg: string) {
@@ -224,6 +250,16 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
         return;
       }
 
+      // Validate show_from window: [event_date - 30, event_date]
+      const ed = new Date(event_date + 'T00:00:00');
+      const minShowFrom = new Date(ed.getTime() - 30 * 86400_000).toISOString().split('T')[0];
+      const submittedShowFrom = (formData.get('show_from') as string) || '';
+      const show_from = submittedShowFrom || minShowFrom;
+      if (show_from < minShowFrom || show_from > event_date) {
+        showError('Show-from date must be between 30 days before the event and the event date.');
+        return;
+      }
+
       // Insert event
       const start_time = formData.get('start_time') as string || null;
       const { data: newEvent, error: insertError } = await supabase
@@ -232,6 +268,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || '';
           title,
           event_type,
           event_date,
+          show_from,
           start_time: start_time || null,
           venue,
           city: (formData.get('city') as string)?.trim() || null,

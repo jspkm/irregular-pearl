@@ -1,0 +1,109 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getEventsBasic } from '../../lib/events';
+import { supabase, hasSupabase } from '../../lib/supabase';
+import { slugToVenueQuery, pickCanonicalVenueName } from '../../lib/venue-slug';
+import { resolveVenueUrl } from '../../data/venue-urls';
+
+const { slug = '' } = Astro.params;
+const query = slugToVenueQuery(slug);
+
+// Pull all venues currently in the events table that contain the query.
+// Used to (a) pick the canonical display name and (b) decide whether the
+// page should 404.
+let canonicalName: string | null = null;
+let knownVenueUrl: string | null = null;
+if (hasSupabase && query) {
+  const { data } = await supabase
+    .from('events')
+    .select('venue')
+    .ilike('venue', `%${query}%`)
+    .not('venue', 'is', null);
+  const venues = [...new Set((data ?? []).map((r: { venue: string }) => r.venue))];
+  canonicalName = pickCanonicalVenueName(slug, venues);
+  knownVenueUrl = canonicalName ? resolveVenueUrl(canonicalName) : null;
+}
+
+if (!canonicalName) return Astro.redirect('/events');
+
+const page = Math.max(1, parseInt(Astro.url.searchParams.get('page') || '1', 10));
+const perPage = 20;
+const mode = Astro.url.searchParams.get('mode') === 'archive' ? 'archive' : 'upcoming';
+
+const { events, count } = await getEventsBasic({
+  mode: mode as 'upcoming' | 'archive',
+  venue: query,
+  limit: perPage,
+  offset: (page - 1) * perPage,
+});
+const totalPages = Math.ceil(count / perPage);
+
+const seoDescription = `Upcoming classical music events at ${canonicalName}.`;
+---
+<Layout title={`${canonicalName} — Events`} description={seoDescription}>
+  <Navbar />
+
+  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
+    <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">&rsaquo;</span>
+    <a href="/events" class="text-muted no-underline hover:underline">Events</a>
+    <span class="mx-1">&rsaquo;</span>
+    <span class="text-muted">{canonicalName}</span>
+  </div>
+
+  <main class="max-w-[900px] mx-auto px-4 md:px-6 py-6 md:py-8">
+    <div class="flex items-center justify-between mb-2">
+      <h1 class="font-display italic text-2xl md:text-[28px]">{canonicalName}</h1>
+      <div class="flex border border-border rounded-lg overflow-hidden text-xs">
+        <a href={`/venues/${slug}`}
+           class:list={["px-3 py-1.5 no-underline transition-colors", mode === 'upcoming' ? 'bg-accent text-surface' : 'text-muted hover:text-ink']}>
+          Upcoming
+        </a>
+        <a href={`/venues/${slug}?mode=archive`}
+           class:list={["px-3 py-1.5 no-underline transition-colors", mode === 'archive' ? 'bg-accent text-surface' : 'text-muted hover:text-ink']}>
+          Past
+        </a>
+      </div>
+    </div>
+
+    {knownVenueUrl && (
+      <p class="text-xs text-muted mb-6">
+        Official site: <a href={knownVenueUrl} target="_blank" rel="noopener" class="text-accent no-underline hover:underline">{new URL(knownVenueUrl).hostname.replace(/^www\./,'')}</a>
+      </p>
+    )}
+
+    {events.length === 0 ? (
+      <div class="text-center py-16 text-muted">
+        <p class="text-sm">No {mode === 'archive' ? 'past' : 'upcoming'} events at this venue.</p>
+      </div>
+    ) : (
+      <div class="space-y-3">
+        {events.map((event) => (
+          <EventCard event={event} muted={mode === 'archive'} performers={[]} />
+        ))}
+      </div>
+    )}
+
+    {totalPages > 1 && (
+      <div class="flex justify-center gap-2 mt-8">
+        {page > 1 && (
+          <a href={`/venues/${slug}?mode=${mode}&page=${page - 1}`}
+             class="px-3 py-1.5 text-xs border border-border rounded-lg text-muted hover:text-ink no-underline">Previous</a>
+        )}
+        <span class="px-3 py-1.5 text-xs text-muted">Page {page} of {totalPages}</span>
+        {page < totalPages && (
+          <a href={`/venues/${slug}?mode=${mode}&page=${page + 1}`}
+             class="px-3 py-1.5 text-xs border border-border rounded-lg text-muted hover:text-ink no-underline">Next</a>
+        )}
+      </div>
+    )}
+
+    {count > 0 && (
+      <p class="text-center text-[11px] text-[#A8A29E] mt-4">
+        {count} {count === 1 ? 'event' : 'events'}
+      </p>
+    )}
+  </main>
+</Layout>

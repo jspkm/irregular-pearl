@@ -18,6 +18,7 @@ export interface EventBasic {
   city: string | null;
   country: string | null;
   event_date: string;
+  show_from: string | null;
   start_time: string | null;
   event_type: string;
   description: string | null;
@@ -28,6 +29,8 @@ export interface EventBasic {
   status: EventStatus;
   source: string;
   created_by: string | null;
+  performers_raw: string[] | null;
+  program_raw: string[] | null;
 }
 
 export interface EventPerformer {
@@ -46,13 +49,14 @@ export interface EventFull extends EventBasic {
 export interface EventListOptions {
   mode?: 'upcoming' | 'archive';
   city?: string;
+  venue?: string;
   eventType?: string;
   date?: string; // specific date filter (from calendar click)
   limit?: number;
   offset?: number;
 }
 
-const EVENT_BASIC_FIELDS = 'id, title, venue, city, country, event_date, start_time, event_type, description, url, poster_url, ticket_price, ticket_url, status, source, created_by';
+const EVENT_BASIC_FIELDS = 'id, title, venue, city, country, event_date, show_from, start_time, event_type, description, url, poster_url, ticket_price, ticket_url, status, source, created_by, performers_raw, program_raw';
 
 /**
  * Fetch events for list views. No JOINs. Fast.
@@ -61,7 +65,7 @@ const EVENT_BASIC_FIELDS = 'id, title, venue, city, country, event_date, start_t
 export async function getEventsBasic(options: EventListOptions = {}): Promise<{ events: EventBasic[]; count: number }> {
   if (!hasSupabase) return { events: [], count: 0 };
 
-  const { mode = 'upcoming', city, eventType, date, limit = 20, offset = 0 } = options;
+  const { mode = 'upcoming', city, venue, eventType, date, limit = 20, offset = 0 } = options;
   const today = new Date().toISOString().split('T')[0];
 
   let query = supabase
@@ -73,12 +77,16 @@ export async function getEventsBasic(options: EventListOptions = {}): Promise<{ 
   if (date) {
     query = query.eq('event_date', date);
   } else if (mode === 'upcoming') {
-    query = query.gte('event_date', today);
+    // Rolling window: event hasn't passed AND its show_from has arrived.
+    // show_from defaults to event_date - 30 days, so unsubmitted events
+    // surface roughly 30 days before they happen.
+    query = query.gte('event_date', today).lte('show_from', today);
   } else {
     query = query.lt('event_date', today);
   }
 
   if (city) query = query.eq('city', city);
+  if (venue) query = query.ilike('venue', `%${venue}%`);
   if (eventType) query = query.eq('event_type', eventType);
 
   query = query.order('event_date', { ascending: mode === 'upcoming' });

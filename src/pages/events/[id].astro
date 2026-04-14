@@ -101,10 +101,18 @@ const jsonLd = {
 
     {/* Poster image */}
     {event.poster_url && (
-      <div class="mb-6 rounded-lg overflow-hidden border border-border">
+      <div class="mb-3 rounded-lg overflow-hidden border border-border">
         <img src={event.poster_url} alt={`Poster for ${event.title}`} class="w-full max-h-[500px] object-contain bg-bg" />
       </div>
     )}
+
+    {/* Date + time restated below the poster/header so readers who scroll
+        past the top still see when the event is. */}
+    <p class="text-sm text-muted mb-6">
+      <span class="font-mono text-accent">{dateStr}</span>
+      {timeStr && <span class="font-mono ml-2">{timeStr}</span>}
+    </p>
+
 
     {/* Ticket info */}
     {(event.ticket_price || event.ticket_url) && (
@@ -122,11 +130,35 @@ const jsonLd = {
 
     {/* Description */}
     {event.description && (
-      <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-6">{event.description}</p>
+      <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-6 whitespace-pre-line">{event.description}</p>
+    )}
+
+    {/* Program (scraped) */}
+    {event.program_raw && event.program_raw.length > 0 && (
+      <section class="mb-6">
+        <h2 class="font-display text-lg mb-2">Program</h2>
+        <ul class="text-sm text-ink space-y-1 list-none pl-0">
+          {event.program_raw.map((p) => (
+            <li class="border-b border-[#F3F2F0] py-1.5 last:border-b-0">{p}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {/* Performers (scraped) */}
+    {event.performers_raw && event.performers_raw.length > 0 && (
+      <section class="mb-6">
+        <h2 class="font-display text-lg mb-2">Performers</h2>
+        <ul class="text-sm text-ink space-y-1 list-none pl-0">
+          {event.performers_raw.map((p) => (
+            <li class="border-b border-[#F3F2F0] py-1.5 last:border-b-0">{p}</li>
+          ))}
+        </ul>
+      </section>
     )}
 
     {event.url && (
-      <a href={event.url} class="text-sm text-accent no-underline hover:underline mb-6 inline-block" target="_blank" rel="noopener">Event website &rarr;</a>
+      <a href={event.url} class="text-sm text-accent no-underline hover:underline mb-6 inline-block" target="_blank" rel="noopener">Event details &rarr;</a>
     )}
 
     {/* Program / Performers */}
