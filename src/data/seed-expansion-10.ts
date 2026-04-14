@@ -147,7 +147,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Clarinet_Quintet_in_A_major,_K.581_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP — Clarinet Quintet, K. 581' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Quintet_(Mozart)', label: 'Wikipedia — Clarinet Quintet (Mozart)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/wienerphilharmoniker/mozart-clarinet-quintet-k581', label: 'Vienna Philharmonic Chamber Concert — live recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -185,7 +184,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Dieterich_Buxtehude', label: 'Wikipedia — Dieterich Buxtehude' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/buxtehude-praeludium-buxwv-140-organ-concertgebouw', label: 'Concertgebouw organ recital — live recording' },
     ],
   },
   {
@@ -261,7 +259,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Camille_Saint-Sa%C3%ABns', label: 'Wikipedia — Camille Saint-Saëns' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/saint-saens-fantaisie-op101-organ-live', label: 'Concertgebouw organ — live recital recording' },
     ],
   },
   {
@@ -294,7 +291,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Aria_in_Classic_Style_(Grandjany,_Marcel)', label: 'IMSLP — Aria in Classic Style' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Marcel_Grandjany', label: 'Wikipedia — Marcel Grandjany' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/american-harp-society/grandjany-aria-in-classic-style-live', label: 'American Harp Society — live competition recording' },
       { type: 'vimeo', url: 'https://vimeo.com/305012847', label: 'International Harp Contest in Israel — semi-final round' },
     ],
   },
@@ -327,7 +323,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/A_Ceremony_of_Carols', label: 'Wikipedia — A Ceremony of Carols' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/bbc-radio-3/britten-ceremony-of-carols-op28', label: 'BBC Singers — BBC Radio 3 broadcast' },
     ],
   },
   {
@@ -359,7 +354,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Marcel_Tournier', label: 'Wikipedia — Marcel Tournier' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/paris-conservatoire-harp/tournier-au-matin-competition-2019', label: 'Paris Conservatoire Harp Competition — 2019 finalist recording' },
       { type: 'vimeo', url: 'https://vimeo.com/294857602', label: 'World Harp Congress — live round recording' },
     ],
   },
@@ -430,7 +424,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Giovanni_Bottesini', label: 'Wikipedia — Giovanni Bottesini' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/bbc-radio-3/bottesini-elegy-db-recital', label: 'Leon Bosch — BBC Radio 3 recital' },
     ],
   },
   {
@@ -463,7 +456,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Gran_Duo_Concertante_(Bottesini,_Giovanni)', label: 'IMSLP — Gran Duo Concertante' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Giovanni_Bottesini', label: 'Wikipedia — Giovanni Bottesini' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/ard-competition/bottesini-gran-duo-ard-double-bass', label: 'ARD Munich Competition — double bass final (live)' },
     ],
   },
   // === ORCHESTRAL ===
@@ -616,7 +608,6 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/wigmore-hall/haydn-string-quartet-op76-fifths-live', label: 'Belcea Quartet — Wigmore Hall live recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -694,7 +685,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Suite_gothique,_Op.25_(Bo%C3%ABllmann,_L%C3%A9on)', label: 'IMSLP — Suite gothique, Op. 25' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Suite_gothique', label: 'Wikipedia — Suite gothique' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rco-amsterdam/boellmann-suite-gothique-live-recital', label: 'Ben van Oosten — Netherlands Organ concert recording' },
     ],
     movements: [
       { name: 'I. Introduction-Choral' },
@@ -733,7 +723,6 @@ export const expansionPieces10: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Esquisses_byzantines_(Mulet,_Henri)', label: 'IMSLP — Esquisses byzantines (incl. Tu es Petra)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Henri_Mulet', label: 'Wikipedia — Henri Mulet' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/paris-conservatoire-organ/mulet-tu-es-petra-live-recital', label: 'International Organ Competition — recital recording' },
     ],
   },
 
@@ -767,7 +756,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gabriel_Piern%C3%A9', label: 'Wikipedia — Gabriel Pierné' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/american-harp-society/pierne-impromptu-caprice-competition', label: 'American Harp Society National Competition — semi-final round' },
       { type: 'vimeo', url: 'https://vimeo.com/189654023', label: 'International Harp Contest in Israel — round recording' },
     ],
   },
@@ -801,7 +789,6 @@ export const expansionPieces10: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/ircam-paris/stockhausen-zyklus-solo-perc-live', label: 'IRCAM — live performance recording (Paris)' },
     ],
   },
 
@@ -910,7 +897,6 @@ export const expansionPieces10: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Reinhold_Gliere', label: 'Wikipedia — Reinhold Glière' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/ard-competition/gliere-intermezzo-tarantella-ard-double-bass', label: 'ARD International Music Competition — double bass round (live)' },
       { type: 'vimeo', url: 'https://vimeo.com/224789115', label: 'BBC Young Musician — double bass category final' },
     ],
   },

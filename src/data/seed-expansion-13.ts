@@ -73,7 +73,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._1_(Prokofiev)', label: 'Wikipedia -- Symphony No. 1 (Prokofiev)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/mariinsky/prokofiev-symphony-1-classical', label: 'Mariinsky Orchestra -- live broadcast recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -153,7 +152,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._1_(Schumann)', label: 'Wikipedia -- Symphony No. 1 (Schumann)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/hr-sinfonieorchester/schumann-symphony-1-spring', label: 'HR-Sinfonieorchester Frankfurt -- broadcast recording' },
     ],
     movements: [
       { name: 'I. Andante un poco maestoso -- Allegro molto vivace' },
@@ -234,7 +232,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quartet_No._2_(Jan%C3%A1%C4%8Dek)', label: 'Wikipedia -- String Quartet No. 2 (Janacek)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/belcea-quartet/janacek-string-quartet-2', label: 'Belcea Quartet -- live recital recording' },
     ],
     movements: [
       { name: 'I. Andante -- Con moto' },
@@ -353,7 +350,6 @@ export const expansionPieces13: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/String_Quintet_No.4_in_G_minor,_K.516_(Mozart,_Wolfgang_Amadeus)', label: 'IMSLP -- String Quintet K. 516' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quintet_No._4_(Mozart)', label: 'Wikipedia -- String Quintet No. 4 (Mozart)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/conservatoireparis/mozart-quintet-g-minor-k516', label: 'Paris Conservatoire -- live recital recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -431,7 +427,6 @@ export const expansionPieces13: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/parker-quartet/dvorak-american-quartet-op96', label: 'Parker Quartet -- Boston Conservatory live recital' },
     ],
     movements: [
       { name: 'I. Allegro ma non troppo' },
@@ -474,7 +469,6 @@ export const expansionPieces13: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/11_Chorale_Preludes,_Op.122_(Brahms,_Johannes)', label: 'IMSLP -- Eleven Chorale Preludes, Op. 122' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Eleven_Chorale_Preludes_(Brahms)', label: 'Wikipedia -- Eleven Chorale Preludes (Brahms)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rcco-organ/brahms-chorale-preludes-op122', label: 'Royal Canadian College of Organists -- recital recording' },
     ],
   },
 
@@ -507,7 +501,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Dietrich_Buxtehude', label: 'Wikipedia -- Dietrich Buxtehude' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/organ-heritage/buxtehude-praeludium-buxwv140', label: 'Lubeck Marienkirche -- historic organ reconstruction recording' },
     ],
   },
 
@@ -541,7 +534,6 @@ export const expansionPieces13: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphonie-Passion,_Op.23_(Dupr%C3%A9,_Marcel)', label: 'IMSLP -- Symphonie-Passion, Op. 23' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Marcel_Dupr%C3%A9', label: 'Wikipedia -- Marcel Dupre' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/orgue-saint-ouen/dupre-symphonie-passion-op23', label: 'Live performance -- Cavaille-Coll organ, Saint-Ouen, Rouen' },
     ],
     movements: [
       { name: 'I. Le Monde dans l\'attente du Sauveur' },
@@ -616,7 +608,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Harp_Concerto_(Ginastera)', label: 'Wikipedia -- Harp Concerto (Ginastera)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/juilliard/ginastera-harp-concerto-juilliard', label: 'Juilliard School -- student concerto competition performance' },
     ],
     movements: [
       { name: 'I. Allegro giusto' },
@@ -653,7 +644,6 @@ export const expansionPieces13: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/rncm-harp/britten-suite-for-harp-op83', label: 'RNCM Harp -- student competition recording' },
     ],
     movements: [
       { name: 'I. Overture: Maestoso -- Allegretto -- Maestoso' },
@@ -694,7 +684,6 @@ export const expansionPieces13: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Concertino_for_Harp_and_Orchestra_(Tailleferre,_Germaine)', label: 'IMSLP -- Harp Concertino (Tailleferre)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Germaine_Tailleferre', label: 'Wikipedia -- Germaine Tailleferre' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/cnsm-paris/tailleferre-concertino-harp', label: 'CNSM Paris -- student concerto recital' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -735,7 +724,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Iannis_Xenakis', label: 'Wikipedia -- Iannis Xenakis' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/ard-competition/xenakis-rebonds-ard-percussion', label: 'ARD Competition finalist -- Munich 2017' },
     ],
   },
 
@@ -768,7 +756,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/John_Psathas', label: 'Wikipedia -- John Psathas' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/john-psathas-composer/view-from-olympus-demo', label: 'John Psathas official -- composer recording' },
     ],
   },
 
@@ -801,7 +788,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Kaija_Saariaho', label: 'Wikipedia -- Kaija Saariaho' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/ircam-paris/saariaho-six-japanese-gardens', label: 'IRCAM Paris -- original electronics archive' },
       { type: 'vimeo', url: 'https://vimeo.com/314206792', label: 'International Percussion Competition -- Salzburg 2018 finalist' },
     ],
     movements: [
@@ -846,7 +832,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Manuel_Ponce', label: 'Wikipedia -- Manuel Ponce' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rcm-guitar/ponce-sonata-romantica', label: 'Royal College of Music -- guitar recital' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -885,7 +870,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Roland_Dyens', label: 'Wikipedia -- Roland Dyens' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rcm-guitar/dyens-tango-en-skai-student', label: 'Royal College of Music -- guitar student recital' },
     ],
   },
 
@@ -918,7 +902,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Luis_de_Mil%C3%A1n', label: 'Wikipedia -- Luis de Milan' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/rncm-guitar/milan-pavane-renaissance', label: 'RNCM Guitar -- Renaissance music recital' },
     ],
   },
 
@@ -954,7 +937,6 @@ export const expansionPieces13: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Johann_Matthias_Sperger', label: 'Wikipedia -- Johann Matthias Sperger' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/isb-doublebass/sperger-concerto-d-major-student', label: 'International Society of Bassists -- student concerto recording' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },

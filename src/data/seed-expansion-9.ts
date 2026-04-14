@@ -47,11 +47,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: "Wikipedia — Prélude à l'après-midi d'un faune",
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/debussy-orchestral/prelude-apres-midi-faune',
-        label: 'Paris Conservatoire Orchestra — archival conservatory broadcast',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=Y9iDOt2WbjY",
         "label": "hr-Sinfonieorchester – Frankfurt Radio Symphony — Debussy: Prélude à l’après-midi d’un faune ∙ hr-Sinfonieorchester ∙ Andrés Orozco-Estrada"
@@ -102,11 +97,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/The_Firebird',
         label: 'Wikipedia — The Firebird (Stravinsky)',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/stravinsky-ballets/firebird-suite-1919',
-        label: 'National Youth Orchestra — proms debut broadcast',
       },
       {
         "type": "youtube",
@@ -265,11 +255,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — Don Quixote (Strauss)',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/strauss-tone-poems/don-quixote-op35',
-        label: 'Munich Philharmonic — conservatory broadcast excerpt',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=5PvCGu2Ue0U",
         "label": "Roc Vela — Don Quixote, Op. 35 - Richard Strauss (Score)"
@@ -322,11 +307,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — La Valse (Ravel)',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/ravel-orchestral/la-valse-live-broadcast',
-        label: 'Conservatoire de Paris Orchestra — student broadcast performance',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=CeomfSaTHzc",
         "label": "Berlin Philharmonic Orchestra - Topic — Ravel: La valse, M. 72 - Choreographic poem, for Orchestra: La valse, M. 72"
@@ -368,11 +348,6 @@ export const expansionPieces9: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/haydn-chamber/emperor-quartet-op76-no3',
-        label: 'Conservatory quartet competition performance',
-      },
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=qoWdtGUe5fc",
@@ -483,11 +458,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — Piano Trio No. 1 (Mendelssohn)',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/chamber-music-archive/mendelssohn-trio-op49',
-        label: 'Leeds International Chamber Music Competition — 2019 finalist',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=-PAFzEnJ6NU",
         "label": "Thomas Hoppe — ATOS Trio: Mendelssohn - Trio no.1 in d-minor, op.49 - live at Wigmore Hall"
@@ -533,11 +503,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/String_Quartet_No._1_(Jan%C3%A1%C4%8Dek)',
         label: 'Wikipedia — String Quartet No. 1 (Janáček)',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/janacek-chamber/string-quartet-1-kreutzer',
-        label: 'International Janáček Festival — competition performance 2022',
       },
       {
         "type": "youtube",
@@ -701,11 +666,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — Violin Sonata No. 2 (Ravel)',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/ravel-chamber/violin-sonata-no2-blues',
-        label: 'Conservatoire National Supérieur — student recital competition',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=FkIxuxqBBJE",
         "label": "Augustin Hadelich — Augustin Hadelich - Ravel Sonata with Orion Weiss (Live November 2021)"
@@ -751,11 +711,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'imslp',
         url: 'https://imslp.org/wiki/Prelude_and_Fugue_in_C_major,_BWV_547_(Bach,_Johann_Sebastian)',
         label: 'IMSLP — Bach: Prelude and Fugue in C major BWV 547',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/bach-organ-works/bwv547-prelude-fugue-cmajor',
-        label: 'Royal College of Organists — student competition performance',
       },
       {
         "type": "youtube",
@@ -805,11 +760,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'IMSLP — Handel: Organ Concerto Op. 4 No. 1 HWV 289',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/handel-organ/concerto-op4-no1-gminor',
-        label: 'Royal Academy of Music — period instrument ensemble recital',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=RgoflxWzUNU",
         "label": "TheOmniWasher — Handel - Organ Concerto No.1 Opus 4 in G minor"
@@ -852,11 +802,6 @@ export const expansionPieces9: SeedPiece[] = [
     ],
     external_links: [
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/franck-organ/grande-piece-symphonique-op17',
-        label: 'Conservatoire National Supérieur de Musique — organ diploma recital',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=dkxY3lk3qLQ",
         "label": "Le Sheet Music Boi — César Franck - Grande Pièce Symphonique, Op.17"
@@ -898,11 +843,6 @@ export const expansionPieces9: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/guitar-competition/albeniz-asturias-leyenda',
-        label: 'GFA International Guitar Competition — 2022 semifinal performance',
-      },
     ],
   },
   {
@@ -940,11 +880,6 @@ export const expansionPieces9: SeedPiece[] = [
       },
     ],
     external_links: [
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/bach-guitar/lute-suite-bwv995-g-minor',
-        label: 'RNCM guitar student — Concerto for Guitar Competition entry',
-      },
       {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=7A4vR1NFS_I",
@@ -991,11 +926,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Silvius_Leopold_Weiss',
         label: 'Wikipedia — Silvius Leopold Weiss',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/weiss-baroque-lute/suite-d-minor-guitar',
-        label: 'Schola Cantorum Basiliensis — student lute recital',
       },
       {
         "type": "youtube",
@@ -1050,11 +980,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — Antonio Capuzzi',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/doublebass-competition/capuzzi-concerto-f-major',
-        label: 'ISB Young Bassist Competition — 2021 junior category finalist',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=WZ9GO_fY8vQ",
         "label": "String Virtuoso — Capuzzi — Double Bass Concerto (F major), Played by Lorraine Campet, Double Bass. Part 1 of 3."
@@ -1100,11 +1025,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/%C3%89douard_Nanny',
         label: 'Wikipedia — Édouard Nanny',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/nanny-double-bass/concertino-a-major',
-        label: 'Conservatoire de Paris — prize-winning student recital',
       },
       {
         "type": "youtube",
@@ -1154,11 +1074,6 @@ export const expansionPieces9: SeedPiece[] = [
         label: 'Wikipedia — Hindemith Sonatas (Paul Hindemith)',
       },
       {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/hindemith-chamber/double-bass-sonata-1949',
-        label: 'Hochschule für Musik Frankfurt — graduate recital competition entry',
-      },
-      {
         "type": "youtube",
         "url": "https://www.youtube.com/watch?v=tA04KtjWTIE",
         "label": "ContrebasseClassique — Paul Hindemith – Sonata for Double Bass and Piano"
@@ -1204,11 +1119,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Elias_Parish_Alvars',
         label: 'Wikipedia — Elias Parish Alvars',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/harp-competition/parish-alvars-concerto-gminor',
-        label: 'World Harp Congress Competition — finalist performance',
       },
       {
         "type": "youtube",
@@ -1261,11 +1171,6 @@ export const expansionPieces9: SeedPiece[] = [
         type: 'wikipedia',
         url: 'https://en.wikipedia.org/wiki/Henriette_Reni%C3%A9',
         label: 'Wikipedia — Henriette Renié',
-      },
-      {
-        type: 'soundcloud',
-        url: 'https://soundcloud.com/harp-conservatory/renie-contemplation-1901',
-        label: 'American Harp Society — student competition finalist (2021)',
       },
       {
         "type": "youtube",

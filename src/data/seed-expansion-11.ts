@@ -175,7 +175,6 @@ export const expansionPieces11: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.4,_Op.90_(Mendelssohn,_Felix)', label: 'IMSLP — Symphony No. 4, Op. 90' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._4_(Mendelssohn)', label: 'Wikipedia — Mendelssohn Symphony No. 4' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/orchestral-classics/mendelssohn-symphony-4-italian', label: 'Orchestral Classics — Italian Symphony highlights' },
     ],
     movements: [
       { name: 'I. Allegro vivace' },

@@ -70,6 +70,13 @@ async function check(link: Link): Promise<Result> {
       return { ok: true };
     }
 
+    // SoundCloud: oembed returns 404 for missing tracks. Generic HTML fetch always 200s (SPA).
+    if (link.type === 'soundcloud') {
+      const r = await fetch(`https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(link.url)}`, { signal: ctrl });
+      if (!r.ok) return { ok: false, reason: `soundcloud oembed ${r.status}` };
+      return { ok: true };
+    }
+
     // Default: GET with redirect follow. HEAD is unreliable on archive.org/IMSLP.
     const r = await fetch(link.url, { signal: ctrl, redirect: 'follow', headers: { 'user-agent': 'irregular-pearl-link-validator/1.0' } });
     if (!r.ok) return { ok: false, reason: `http ${r.status}` };

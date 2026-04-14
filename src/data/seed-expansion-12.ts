@@ -458,7 +458,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Clarinet_Sonatas_(Brahms)', label: 'Wikipedia — Clarinet Sonatas (Brahms)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/classical-music/brahms-clarinet-sonata-op120-1', label: 'Brahms Clarinet Sonata No. 1 — excerpt' },
     ],
     movements: [
       { name: 'I. Allegro appassionato' },
@@ -508,7 +507,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Organ_Sonata_No._1_(Elgar)', label: 'Wikipedia — Organ Sonata No. 1 (Elgar)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/elgar-society/elgar-organ-sonata-op28-trotter', label: 'Thomas Trotter — Live recital recording' },
     ],
     movements: [
       { name: 'I. Allegro maestoso' },
@@ -547,7 +545,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Flor_Peeters', label: 'Wikipedia — Flor Peeters' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/organ-music/peeters-toccata-fugue-hymn-ave-maris-stella', label: 'Student recital — Royal Flemish Conservatory' },
     ],
     movements: [
       { name: 'I. Toccata' },
@@ -633,7 +630,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gabriel_Piern%C3%A9#Works', label: 'Wikipedia — Gabriel Pierné works' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/classical-harp/pierne-concertstuck-nordmann', label: 'Marielle Nordmann — Concertstück excerpt' },
     ],
   },
 
@@ -708,7 +704,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Jean-Michel_Damase', label: 'Wikipedia — Jean-Michel Damase' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/conservatoire-paris/damase-sonatine-en-trio-conservatoire', label: 'Conservatoire National Supérieur de Paris — student recital' },
     ],
     movements: [
       { name: 'I. Allegretto' },
@@ -787,7 +782,6 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/marimba-competition/zivkovic-funny-marimba-competition', label: 'International Marimba Competition finalist — competition recording' },
     ],
     movements: [
       { name: 'I. Crazy' },
@@ -835,7 +829,6 @@ export const expansionPieces12: SeedPiece[] = [
       },
     ],
     external_links: [
-      { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/villa-lobos-prelude-1-yang', label: 'Xuefei Yang — Prelude No. 1 excerpt' },
     ],
   },
 
@@ -869,7 +862,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Manuel_Ponce#Guitar_music', label: 'Wikipedia — Manuel Ponce guitar works' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/ponce-sonata-guitarra-miolin', label: 'Anders Miolin — Ponce Sonata excerpt' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -908,7 +900,6 @@ export const expansionPieces12: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Mario_Castelnuovo-Tedesco#Guitar_sonata', label: 'Wikipedia — Mario Castelnuovo-Tedesco guitar works' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/classical-guitar/castelnuovo-tedesco-sonata-barrueco', label: 'Manuel Barrueco — Sonata Op. 77 excerpt' },
     ],
     movements: [
       { name: 'I. Allegro con spirito' },

@@ -52,7 +52,6 @@ export const expansionPieces15: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/String_Quintet_No.2,_Op.111_(Brahms,_Johannes)', label: 'IMSLP — String Quintet No. 2 Op. 111 (Brahms)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/String_Quintet_No._2_(Brahms)', label: 'Wikipedia — String Quintet No. 2 (Brahms)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/talich-quartet/brahms-string-quintet-op111', label: 'Talich Quartet — studio recording' },
     ],
   },
 
@@ -74,7 +73,6 @@ export const expansionPieces15: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Piano_Quartet_No._1_(Mozart)', label: 'Wikipedia — Piano Quartet No. 1 (Mozart)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/mozarteum-salzburg/mozart-piano-quartet-k478', label: 'Mozarteum Salzburg ensemble — concert recording' },
     ],
     movements: [
       { name: 'I. Allegro' },
@@ -101,7 +99,6 @@ export const expansionPieces15: SeedPiece[] = [
     ],
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/String_Quintet_in_C_major,_Op.29_(Beethoven,_Ludwig_van)', label: 'IMSLP — String Quintet Op. 29 (Beethoven)' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/quartetto-italiano/beethoven-string-quintet-op29', label: 'Quintetto Borciani — competition recording' },
     ],
     movements: [
       { name: 'I. Allegro moderato' },
@@ -243,7 +240,6 @@ export const expansionPieces15: SeedPiece[] = [
     ],
     external_links: [
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Gabriel_Fauré', label: 'Wikipedia — Gabriel Fauré' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/ecm-records/faure-impromptu-harp', label: 'Tara Minassian — conservatoire prize recording' },
     ],
   },
 
@@ -563,7 +559,6 @@ export const expansionPieces15: SeedPiece[] = [
     external_links: [
       { type: 'imslp', url: 'https://imslp.org/wiki/Symphony_No.4_in_E-flat_major_(Bruckner,_Anton)', label: 'IMSLP — Symphony No. 4 "Romantic" (Bruckner)' },
       { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Symphony_No._4_(Bruckner)', label: 'Wikipedia — Bruckner Symphony No. 4 "Romantic"' },
-      { type: 'soundcloud', url: 'https://soundcloud.com/berliner-philharmoniker/bruckner-symphony-4', label: 'Simon Rattle / Berlin Philharmonic — Digital Concert Hall' },
     ],
     movements: [
       { name: 'I. Bewegt, nicht zu schnell (Sonata Allegro)' },
