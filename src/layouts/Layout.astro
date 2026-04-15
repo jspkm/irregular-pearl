@@ -90,6 +90,15 @@ const canonicalUrl = canonical || Astro.url.href;
   <meta name="theme-color" content="#faf8f5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-R3S9WT1EVV"></script>
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-R3S9WT1EVV');
+  </script>
 </head>
 <style>
   @import '../styles/global.css';
