@@ -2,6 +2,12 @@
 
 A non-profit, community-driven classical music knowledge hub.
 
+## Product Requirements
+Always read PRD.md before making product, scope, or data-model decisions.
+Principles, invariants, entities, and surface tiers are defined there.
+Do not introduce features, entities, or surfaces that contradict PRD.md without explicit user approval.
+In QA and review modes, flag any code that contradicts PRD.md invariants.
+
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
 All font choices, colors, spacing, and aesthetic direction are defined there.
@@ -25,3 +31,4 @@ Key routing rules:
 - Design system, brand → invoke design-consultation
 - Visual audit, design polish → invoke design-review
 - Architecture review → invoke plan-eng-review
+- For design work on specific components or surfaces, invoke the designer subagent via @agent-designer
