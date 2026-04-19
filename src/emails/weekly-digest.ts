@@ -259,7 +259,7 @@ function generateDigestSummary(data: DigestData): string {
 function injectData(template: string, data: DigestData): string {
   const piecesHtml = data.pieces.length > 0
     ? data.pieces.map(renderPieceCard).join('\n')
-    : `<p style="font-family: 'DM Sans', Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C; font-style: italic; margin: 16px 0;">No new pieces were added this week.</p>`;
+    : `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C; font-style: italic; margin: 16px 0;">No new pieces were added this week.</p>`;
 
   return template
     .replace('{{recipient_name}}', escapeHtml(data.recipientName))
