@@ -20,7 +20,7 @@
 4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
 5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
 6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
-7. **Mobile and desktop are different products.** The piece page on mobile leads with landmarks and flags above editions and recordings. Desktop can present more discovery-friendly hierarchy. Both are first-class. Neither is a port of the other.
+7. **One responsive page, not two products.** The piece page is a single responsive surface — the same markup and information architecture reflowed across viewports via CSS. Narrow viewports may collapse multi-column sections into stacks and compress chrome, but the content, ordering, and hierarchy are shared. No viewport-specific React branches, no duplicate mobile routes, no "mobile app" inside the web app.
 
 ## Logo / Wordmark
 - **Font:** Instrument Serif italic
@@ -162,3 +162,4 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-04-18 | Two weights only (400, 500) | Adopted from design-system.md. Heavier weights read as loud on parchment surface. |
 | 2026-04-18 | Sentence case everywhere | Codified. Never Title Case, never ALL CAPS except kicker eyebrows and wordmark. |
 | 2026-04-19 | Removed applause, discussion, activity log, events, community directory | Scope narrowed to piece-page-centric knowledge base per PRD revision 2. Artist profile reduced to minimal bio + instruments. |
+| 2026-04-19 | Piece page is one responsive surface, not two products | Reversed principle 7. Maintaining two piece-page products doubles the work and drifts the information architecture. A single page reflowed with CSS keeps content, ordering, and hierarchy shared across viewports. Supersedes PRD.md "Piece page, mobile" language about a separate product. |

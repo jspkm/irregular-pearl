@@ -421,17 +421,15 @@ The entities below are the atomic units of the product. Relationships between th
 
 The surfaces below are the user-facing views of the product. Each surface has a job-to-be-done, a primary audience, and a priority tier. Tier 1 surfaces ship in the first public release. Tier 2 surfaces ship in the first nine months. Tier 3 surfaces are planned but not committed.
 
-**Revision 2 narrows Tier 1 to seven surfaces that together support the first real user's daily-use loop and produce the first signed content on the site. Surfaces previously in Tier 1 that do not serve this loop are moved to Tier 2.**
+**Revision 2 narrows Tier 1 to six surfaces that together support the first real user's daily-use loop and produce the first signed content on the site. Surfaces previously in Tier 1 that do not serve this loop are moved to Tier 2. (The piece page is one responsive surface across desktop and mobile; earlier drafts counted it as two.)**
 
 ## **Tier 1 — first release**
 
-### **Piece page, desktop**
+### **Piece page**
 
-Job: the definitive reference for the piece. Audience: the first real user, then performers deciding and preparing, teachers planning, students studying. Primary surface: a single scrollable page, anchored by sections. Header with title, composer, catalog, era pills. Four-axis difficulty panel. One or more signed performer's notes with distinct visual treatment per contributor (single voice in v1, plural as contributors land). Structural landmarks with per-movement flags and signed practice notes. Interpretive schools as a multi-column grid of signed positions. Editions section with a prominent passage-comparison surface. Recordings section organized around landmark tempi. Pedagogical arc section linking prepare-with and natural-next pieces.
+Job: the definitive reference for the piece, from the desk and from the music stand. Audience: the first real user, then performers deciding and preparing, teachers planning, students studying, and the same musician returning on a phone between takes. Primary surface: a single responsive page, anchored by sections. Header with title, composer, catalog, era pills. Four-axis difficulty panel. One or more signed performer's notes with distinct visual treatment per contributor (single voice in v1, plural as contributors land). Structural landmarks with per-movement flags and signed practice notes. Interpretive schools as a multi-column grid of signed positions on wide viewports, collapsing to stacked cards on narrow ones. Editions section with a prominent passage-comparison surface. Recordings section organized around landmark tempi. Pedagogical arc section linking prepare-with and natural-next pieces.
 
-### **Piece page, mobile**
-
-Job: serve the Tuesday-morning-between-takes moment. Audience: musicians practicing, phone on the stand. Primary surface: inverted information hierarchy. Landmarks and flags above the fold; performer's notes and editions below. Compact tab bar (Landmarks, Schools, Editions, Notes — where Notes is the user's own reflections). Cold-start to structural landmarks under one second, on a three-year-old phone on cellular. This is a separate product from the desktop page, not a port.
+The page is one product across viewports, not two. Content, ordering, and hierarchy are shared; narrow viewports reflow multi-column sections into stacks and compress chrome, but do not re-rank sections or hide information. Cold-start to structural landmarks under one second on a three-year-old phone on cellular is a Tier 1 performance target for the shared page, not a separate mobile build.
 
 ### **Structural landmarks**
 
