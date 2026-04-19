@@ -8,9 +8,19 @@
 
 ## Aesthetic Direction
 - **Direction:** Refined Library, Modernized
-- **Decoration level:** Intentional (subtle warm textures, content IS the decoration)
+- **Decoration level:** Flat, no textures. Content is the decoration.
 - **Mood:** Walking into a new conservatory library with warm wood, natural light, and clean typography. Scholarly authority with contemporary craft. Not dusty (IMSLP), not corporate (nkoda), not streaming-dark (tonebase).
 - **Reference sites:** IMSLP (competitor, zero design), tonebase (dark streaming feel), Classeek (corporate), old AI Studio prototype (warm research aesthetic)
+
+## Principles
+
+1. **Flat, not skeuomorphic.** No gradients, drop shadows, glow, blur, noise, or faux 3D. Surfaces are solid colors separated by 1px borders and whitespace.
+2. **Typography does the hierarchy.** Size, weight, and spacing carry structure. Color is sparingly used and only where it encodes meaning.
+3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use DM Sans. The switch is deliberate.
+4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
+5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
+6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, applause states, interpretive accents) and small editorial chrome.
+7. **Mobile and desktop are different products.** The piece page on mobile leads with landmarks and flags above editions and recordings. Desktop can present more discovery-friendly hierarchy. Both are first-class. Neither is a port of the other.
 
 ## Logo / Wordmark
 - **Font:** Instrument Serif italic
@@ -83,6 +93,59 @@
 - **Duration:** micro(50-100ms for hover) short(150ms for tabs/toggles) medium(250ms for panels)
 - **Rules:** No bouncy animations. No entrance animations on page load. Smooth tab transitions. Subtle hover color shifts on cards and buttons.
 
+## Components
+
+### Kicker eyebrows
+Small caps label above a section heading. Amber accent, 11-12px DM Sans, letter-spacing 0.4px, weight 500, `text-transform: uppercase`. Used once per section. Editorial chrome, not navigation.
+
+### Metadata pills
+Rounded chips for piece-level metadata (instrument, era, form, duration). Neutral only, never colored unless semantic.
+`font-size: 12px; padding: 3px 10px; border-radius: 9999px; background: #F5F4F1; color: #78716C`
+
+### Difficulty flags
+Inline pill within a structural landmark. Uses the warning palette.
+`font-size: 11px; padding: 2px 9px; border-radius: 9999px; background: #FEFCE8; color: #CA8A04; border: 1px solid #FDE68A; weight: 500`
+
+### Cards
+White background, 1px border (#E7E5E4), 8px radius (12px for large cards), 16px internal padding. Cards stack with 12px gaps. Cards never nest more than one level.
+
+### Signed notes
+Performer's notes and interpretive-school descriptions use a distinctive pattern: 2px amber left border, 18px left padding, Instrument Serif prose inside. Byline underneath in DM Sans sentence case. Contributor display name in weight 500, one-line bio in muted color.
+
+### Buttons
+Primary buttons are rare. Only when a single action deserves a solid background. When used: ink (#1C1917) bg, white text, 14px DM Sans weight 500, 8px radius, 8px / 16px padding. Secondary: transparent bg, 1px border, same type. Ghost: no border, underline on hover only.
+
+### Inputs
+36px tall desktop, 44px mobile. 1px border, 8px radius, 12px horizontal padding, 15px body text. Focus: 2px amber ring, no background change. No placeholder text where a label would serve.
+
+### Tables
+Used for edition comparisons, recording tempo references, structured metadata. Left-align everything except numeric columns (right-aligned). No zebra striping; row separators are 1px border. Column headers: 12px DM Sans, all caps, tracked out, muted color. Body rows: 14px DM Sans.
+
+### Borders and corners
+Default border is 1px. Featured cards (e.g., the recommended edition in a comparison) may use 2px amber. This is the only exception. Corner radius: 8px default, 12px large cards, 9999px pills.
+
+## Voice and Copy
+- Sentence case everywhere user-visible.
+- Never use exclamation marks in interface copy.
+- Prefer direct over clever. "Compare editions" beats "Dive into the differences."
+- Use em-dashes (—) and en-dashes (–) correctly in editorial prose. Em-dashes join thoughts; en-dashes join ranges; hyphens do neither.
+- Use smart quotes in prose, straight quotes in code.
+- Numbers under ten are spelled out in prose unless they are measurements, counts of editions, or catalog numbers.
+- Write instrument names in lowercase (cello, not Cello), except at the start of a sentence or in tag labels.
+- Never use emojis in interface or editorial content.
+
+## Using this system with Claude
+
+When starting a Claude design session, reference this document at the top of the conversation. A concise opening:
+
+> Use the Irregular Pearl design system (attached). Follow every principle; do not introduce new tokens. Produce HTML/CSS (or React with Tailwind utilities mapped to these tokens), not static mockups. If you need a decision the system doesn't cover, ask before inventing it.
+
+For iterative sessions, narrow scope each round: "Work on just the Editions block on the piece page," not "redesign the piece page." Three to four rounds on a narrow surface produce better work than one session on a wide one.
+
+End every session by asking Claude to list what it changed from the system and why. If the list is non-empty, either update the system deliberately or revert.
+
+Claude is an executor of this system, not its author. When the system needs to change, a human makes that change. Claude can propose; humans decide.
+
 ## Community Section
 
 ### Community Page (`/community`)
@@ -132,3 +195,7 @@
 | 2026-04-02 | Zero applause = hidden | Don't show "0 applause". New users shouldn't see an empty vanity metric. |
 | 2026-04-02 | Two-column profile with collapsible sidebar | Bio, training, performances on the left (the permanent identity). Working On, Discussions, Reviews on the right as collapsible sections (the active/changing content). |
 | 2026-04-02 | Community page added | Browsable directory at /community with featured artists, instrument filters, recently active grid, new members. |
+| 2026-04-18 | Merged docs/design-system.md into DESIGN.md | Two contradictory design systems existed. DESIGN.md matched the live site; docs/design-system.md was aspirational with conflicting tokens (white vs parchment, purple vs amber, Source Serif Pro vs Instrument Serif). Merged the structural additions (principles, components, voice, Claude governance) into DESIGN.md and deleted docs/design-system.md. |
+| 2026-04-18 | Flat confirmed, textures removed | "Subtle warm textures" bullet removed from Aesthetic Direction. Live site is flat; the textures line was aspirational and never shipped. |
+| 2026-04-18 | Two weights only (400, 500) | Adopted from design-system.md. Heavier weights read as loud on parchment surface. |
+| 2026-04-18 | Sentence case everywhere | Codified. Never Title Case, never ALL CAPS except kicker eyebrows and wordmark. |
