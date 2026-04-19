@@ -81,7 +81,7 @@ export default function AdminPage({ initialTab }: Props) {
     <div className="min-h-screen bg-[#FAF8F5]">
       <div className="bg-[#1C1917] text-white px-4 md:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <a href="/" className="font-['Instrument_Serif'] italic text-lg text-white no-underline opacity-70 hover:opacity-100">Irregular Pearl</a>
+          <a href="/" className="text-lg font-medium tracking-tight text-white no-underline opacity-70 hover:opacity-100">IrregularPearl</a>
           <span className="text-xs text-white/40">|</span>
           <span className="text-sm font-medium">{headerLabel}</span>
         </div>

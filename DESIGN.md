@@ -16,27 +16,29 @@
 
 1. **Flat, not skeuomorphic.** No gradients, drop shadows, glow, blur, noise, or faux 3D. Surfaces are solid colors separated by 1px borders and whitespace.
 2. **Typography does the hierarchy.** Size, weight, and spacing carry structure. Color is sparingly used and only where it encodes meaning.
-3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use DM Sans. The switch is deliberate.
+3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use Inter. The switch is deliberate.
 4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
 5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
 6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
 7. **One responsive page, not two products.** The piece page is a single responsive surface — the same markup and information architecture reflowed across viewports via CSS. Narrow viewports may collapse multi-column sections into stacks and compress chrome, but the content, ordering, and hierarchy are shared. No viewport-specific React branches, no duplicate mobile routes, no "mobile app" inside the web app.
 
 ## Logo / Wordmark
-- **Font:** Instrument Serif italic
-- **Style:** Flowing, elegant, not bold. The wordmark IS the logo. No icon needed.
-- **Usage:** Top-left navbar, homepage hero
-- **"beta" tag:** DM Sans, regular weight, smaller size, muted color
+- **Text:** `IrregularPearl` — one word, no space. Concatenated form is the brand.
+- **Font:** Inter, medium weight (500). Non-italic.
+- **Style:** Plain, precise, confident. The wordmark IS the logo. No icon needed. Typography carries the identity — no flourish, no italic, no tracking tricks.
+- **Usage:** Top-left navbar, homepage hero, email headers. Web = Inter; email = Arial fallback (Inter is not email-safe).
+- **Prose vs wordmark:** The wordmark is `IrregularPearl`. In body copy, legal text, meta/SEO titles, and editorial prose, the name is written `Irregular Pearl` (two words) for readability.
+- **"beta" tag:** Inter, regular weight, smaller size, muted color
 
 ## Typography
 - **Display/Hero:** Instrument Serif (regular + italic) — elegant serif with musical DNA in the name. Used for piece titles, section headings, homepage hero.
-- **Body:** DM Sans — clean, readable, modern. Better character width than Inter for body text. Used for descriptions, UI text.
-- **UI/Labels:** DM Sans Medium — tabs, buttons, nav items
+- **Body:** Inter — the interface reading voice. Used for descriptions, UI text.
+- **UI/Labels:** Inter Medium — tabs, buttons, nav items, wordmark.
 - **Data/Tables:** JetBrains Mono — catalog numbers (BWV 1007, Op. 104, K. 331), metadata. Supports tabular-nums.
 - **Code:** JetBrains Mono
 - **Loading:** Google Fonts CDN
   ```html
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   ```
 - **Scale (modular 1.25):**
   - xs: 11px (mono labels)
@@ -163,3 +165,5 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-04-18 | Sentence case everywhere | Codified. Never Title Case, never ALL CAPS except kicker eyebrows and wordmark. |
 | 2026-04-19 | Removed applause, discussion, activity log, events, community directory | Scope narrowed to piece-page-centric knowledge base per PRD revision 2. Artist profile reduced to minimal bio + instruments. |
 | 2026-04-19 | Piece page is one responsive surface, not two products | Reversed principle 7. Maintaining two piece-page products doubles the work and drifts the information architecture. A single page reflowed with CSS keeps content, ordering, and hierarchy shared across viewports. Supersedes PRD.md "Piece page, mobile" language about a separate product. |
+| 2026-04-19 | Sans family: Inter (replaces DM Sans); wordmark: Inter non-italic (replaces Instrument Serif italic) | User preference. Inter is the interface voice across body, UI, and the wordmark. The wordmark is now plain and precise rather than flowing. Instrument Serif stays as the editorial serif for piece titles, section headings, and hero display. |
+| 2026-04-19 | Wordmark rendered as `IrregularPearl` (one word) | The logo glyph is the concatenated form. Prose, meta titles, legal text, and editorial copy keep the two-word form `Irregular Pearl` for readability. The wordmark is a brand mark; the prose is writing. |
