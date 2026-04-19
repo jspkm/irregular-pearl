@@ -6,13 +6,11 @@ import MostWanted from '../components/MostWanted';
 import { seedPieces } from '../data/seed';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { groupBy, mapFuzzyResults } from '../lib/helpers';
-import type { PieceBasic } from '../lib/pieces';
 
 const query = Astro.url.searchParams.get('q')?.trim() || '';
 const filter = Astro.url.searchParams.get('filter') || '';
-const filterType = Astro.url.searchParams.get('type') || ''; // 'instrument', 'composer', 'era'
+const filterType = Astro.url.searchParams.get('type') || '';
 
-// Unified piece shape for display (works for both seed and Supabase pieces)
 interface DisplayPiece {
   id: string;
   title: string;
@@ -30,35 +28,18 @@ function seedToDisplay(p: typeof seedPieces[0]): DisplayPiece {
   return { ...p, edition_count: p.editions.length };
 }
 
-// Apply filters
 let displayPieces: DisplayPiece[] = seedPieces.map(seedToDisplay);
-let searchArtists: { id: string; display_name: string; instrument: string | null; username: string | null }[] = [];
-let searchInstruments: { id: string; type: string; maker: string | null; maker_year: number | null }[] = [];
-let searchEvents: { id: string; title: string; venue: string | null; city: string | null; event_date: string; event_type: string }[] = [];
 
 if (query) {
   if (hasSupabase) {
-    // Unified search: pieces + artists + instruments + events (parallel, fault-tolerant)
-    const [piecesResult, artistsResult, instrumentsResult, eventsResult] = await Promise.allSettled([
-      supabase.from('pieces').select('id, title, composer_name, catalog_number, instruments, era, difficulty, duration_minutes, description')
-        .textSearch('fts', query, { type: 'websearch' }).limit(20),
-      supabase.from('users').select('id, display_name, instrument, username')
-        .textSearch('fts', query, { type: 'websearch' })
-        .limit(10),
-      supabase.from('instruments').select('id, type, maker, maker_year')
-        .textSearch('fts', query, { type: 'websearch' })
-        .eq('privacy_level', 'public').limit(5),
-      supabase.from('events').select('id, title, venue, city, event_date, event_type')
-        .textSearch('fts', query, { type: 'websearch' })
-        .order('event_date', { ascending: false }).limit(5),
-    ]);
+    const piecesResult = await supabase.from('pieces')
+      .select('id, title, composer_name, catalog_number, instruments, era, difficulty, duration_minutes, description')
+      .textSearch('fts', query, { type: 'websearch' })
+      .limit(20);
 
-    const pieceData = piecesResult.status === 'fulfilled' ? piecesResult.value.data : null;
+    const pieceData = piecesResult.data;
     if (pieceData && pieceData.length > 0) {
-      // Render Supabase pieces directly (not mapped back to seed)
-      const seedIds = new Set(seedPieces.map(p => p.id));
       displayPieces = pieceData.map((r: any) => {
-        // Prefer seed data if available (has richer inline data)
         const seed = seedPieces.find(p => p.id === r.id);
         if (seed) return seedToDisplay(seed);
         return {
@@ -78,23 +59,11 @@ if (query) {
       displayPieces = [];
     }
 
-    if (artistsResult.status === 'fulfilled' && artistsResult.value.data) {
-      searchArtists = artistsResult.value.data as typeof searchArtists;
-    }
-    if (instrumentsResult.status === 'fulfilled' && instrumentsResult.value.data) {
-      searchInstruments = instrumentsResult.value.data as typeof searchInstruments;
-    }
-    if (eventsResult.status === 'fulfilled' && eventsResult.value.data) {
-      searchEvents = eventsResult.value.data as typeof searchEvents;
-    }
-
-    // Fuzzy fallback: if full-text search found nothing, try trigram similarity
-    if (displayPieces.length === 0 && searchArtists.length === 0 && searchInstruments.length === 0 && searchEvents.length === 0) {
+    if (displayPieces.length === 0) {
       const { data: fuzzyData } = await supabase.rpc('fuzzy_search', { search_query: query });
       if (fuzzyData && fuzzyData.length > 0) {
         const fuzzy = mapFuzzyResults(fuzzyData);
         if (fuzzy.pieceIds.length > 0) {
-          // Fetch full piece data for fuzzy results
           const { data: fuzzyPieces } = await supabase.from('pieces')
             .select('id, title, composer_name, catalog_number, instruments, era, difficulty, duration_minutes, description')
             .in('id', fuzzy.pieceIds);
@@ -106,17 +75,13 @@ if (query) {
             });
           }
         }
-        searchArtists = fuzzy.artists;
-        searchEvents = fuzzy.events;
       }
     }
 
-    // Log search query for "Most Wanted" analytics (fire-and-forget, skip bot/placeholder queries)
     if (!query.includes('{') && !query.includes('}')) {
       supabase.from('search_queries').insert({ query, result_count: displayPieces.length }).then(() => {});
     }
   } else {
-    // Fallback: client-side substring search (pieces only)
     const q = query.toLowerCase();
     displayPieces = seedPieces.filter(p =>
       p.title.toLowerCase().includes(q) ||
@@ -137,22 +102,19 @@ if (query) {
 }
 
 const isFiltered = !!(query || filter);
-const hasSearchResults = displayPieces.length > 0 || searchArtists.length > 0 || searchInstruments.length > 0;
+const hasSearchResults = displayPieces.length > 0;
 
-// Total piece count (for hero/JSON-LD)
 let totalPieceCount = seedPieces.length;
 if (hasSupabase) {
   const { count } = await supabase.from('pieces').select('id', { count: 'exact', head: true });
   if (count) totalPieceCount = count;
 }
 
-// Group instruments with counts
 const instrumentGroups: Record<string, number> = {};
 for (const piece of seedPieces) {
   const inst = piece.instruments[0]?.startsWith('Voice') ? 'Voice' : piece.instruments[0] || 'Other';
   instrumentGroups[inst] = (instrumentGroups[inst] || 0) + 1;
 }
-// Merge small groups into "Winds & Other"
 const displayInstruments: { name: string; count: number; filter: string }[] = [];
 let windsCount = 0;
 for (const [name, count] of Object.entries(instrumentGroups)) {
@@ -165,8 +127,6 @@ for (const [name, count] of Object.entries(instrumentGroups)) {
 displayInstruments.push({ name: 'Winds & Other', count: windsCount, filter: 'flute,clarinet,guitar,string' });
 displayInstruments.sort((a, b) => b.count - a.count);
 
-
-// Top composers
 const composerCounts: Record<string, number> = {};
 for (const piece of seedPieces) {
   composerCounts[piece.composer_name] = (composerCounts[piece.composer_name] || 0) + 1;
@@ -176,43 +136,6 @@ const topComposers = Object.entries(composerCounts)
   .slice(0, 8)
   .map(([name, count]) => ({ name, count, initial: name.split(' ').pop()?.[0] || '?' }));
 
-
-// Most active pieces this week (by unique musicians in past 7 days)
-// Ties (including zero activity) are broken randomly
-let mostActive: typeof seedPieces = [];
-
-if (hasSupabase) {
-  const oneWeekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-  const { data } = await supabase
-    .from('activity_log')
-    .select('piece_id, user_id')
-    .gte('created_at', oneWeekAgo);
-
-  const pieceUsers: Record<string, Set<string>> = {};
-  if (data) {
-    for (const r of data) {
-      if (!pieceUsers[r.piece_id]) pieceUsers[r.piece_id] = new Set();
-      pieceUsers[r.piece_id].add(r.user_id);
-    }
-  }
-
-  // Score every piece (0 for those with no activity), shuffle ties
-  const scored = seedPieces.map(p => ({
-    piece: p,
-    count: pieceUsers[p.id]?.size ?? 0,
-    rand: Math.random(),
-  }));
-  scored.sort((a, b) => b.count - a.count || a.rand - b.rand);
-  mostActive = scored.slice(0, 3).map(s => s.piece);
-}
-
-if (mostActive.length < 3) {
-  // Fallback when Supabase is not configured
-  const shuffled = [...seedPieces].sort(() => Math.random() - 0.5);
-  mostActive = shuffled.slice(0, 3);
-}
-
-// For filtered view, group pieces
 const filteredGroups = isFiltered
   ? groupBy(displayPieces, p => p.instruments[0]?.startsWith('Voice') ? 'Voice' : p.instruments[0] || 'Other')
   : {};
@@ -221,7 +144,7 @@ const homeLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Irregular Pearl',
-  description: `A collaborative platform for classical music knowledge. ${totalPieceCount.toLocaleString()} pieces with editions, recordings, and community discussion.`,
+  description: `A collaborative platform for classical music knowledge. ${totalPieceCount.toLocaleString()} pieces with editions and recordings.`,
   url: Astro.url.origin,
   potentialAction: {
     '@type': 'SearchAction',
@@ -246,7 +169,7 @@ const itemListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Classical Music Pieces',
-  description: `${totalPieceCount.toLocaleString()} classical music works with editions, recordings, and community discussion`,
+  description: `${totalPieceCount.toLocaleString()} classical music works with editions and recordings`,
   numberOfItems: totalPieceCount,
   itemListElement: seedPieces.slice(0, 30).map((piece, i) => ({
     '@type': 'ListItem',
@@ -260,7 +183,6 @@ const itemListLd = {
   <Navbar />
 
   {isFiltered ? (
-    <!-- Filtered view: show results -->
     <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
       {query && !hasSearchResults && (
         <div class="text-center py-16 text-muted">
@@ -278,73 +200,8 @@ const itemListLd = {
         </div>
       )}
 
-      {/* Artist results */}
-      {searchArtists.length > 0 && (
-        <section class="mb-8">
-          <h2 class="font-display text-lg mb-3">Artists</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {searchArtists.map((artist) => (
-              <a href={artist.username ? `/@${artist.username}` : `/profile/${artist.id}`} class="flex items-center gap-3 bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-sm text-muted flex-shrink-0">
-                  {artist.display_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </div>
-                <div>
-                  <div class="font-display text-base text-ink">{artist.display_name}</div>
-                  {artist.instrument && (
-                    <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full">{artist.instrument}</span>
-                  )}
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Instrument results */}
-      {searchInstruments.length > 0 && (
-        <section class="mb-8">
-          <h2 class="font-display text-lg mb-3">Instruments</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {searchInstruments.map((inst) => (
-              <a href={`/instruments/${inst.id}`} class="block bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
-                <div class="font-mono text-[11px] text-muted uppercase tracking-wider mb-1">{inst.maker || 'Unknown maker'}</div>
-                <div class="font-display text-base text-ink">{inst.type}{inst.maker_year ? `, c. ${inst.maker_year}` : ''}</div>
-                <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full mt-1 inline-block">{inst.type}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Event results */}
-      {searchEvents.length > 0 && (
-        <section class="mb-8">
-          <h2 class="font-display text-lg mb-3">Events</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {searchEvents.map((evt) => (
-              <a href={`/events/${evt.id}`} class="block bg-surface border border-border rounded-xl p-4 hover:border-muted transition-all no-underline">
-                <div class="flex items-center gap-2 mb-1">
-                  <span class="text-[10px] px-2 py-0.5 bg-[#FEF3C7] text-accent rounded-full capitalize">{evt.event_type}</span>
-                  <span class="font-mono text-[11px] text-muted">
-                    {new Date(evt.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
-                </div>
-                <div class="font-display text-base text-ink">{evt.title}</div>
-                {(evt.venue || evt.city) && (
-                  <div class="text-xs text-muted mt-0.5">{[evt.venue, evt.city].filter(Boolean).join(' · ')}</div>
-                )}
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Piece results */}
       {displayPieces.length > 0 && (
         <section class="mb-8">
-          {(searchArtists.length > 0 || searchInstruments.length > 0) && (
-            <h2 class="font-display text-lg mb-3">Pieces</h2>
-          )}
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {displayPieces.map((piece) => (
               <PieceCard
@@ -365,37 +222,13 @@ const itemListLd = {
       )}
     </main>
   ) : (
-    <!-- Lobby view -->
     <main>
-      <!-- Hero -->
       <div class="text-center py-16 md:py-20">
         <h1 class="text-4xl md:text-5xl font-display italic mb-3">Irregular Pearl</h1>
-        <p class="text-muted text-base md:text-lg">Where musicians practice and explore classical music. Together.</p>
+        <p class="text-muted text-base md:text-lg">Classical music knowledge platform</p>
       </div>
 
       <div class="max-w-[960px] mx-auto px-4 md:px-6">
-        <!-- Most Active This Week -->
-        <section class="mb-12">
-          <h2 class="font-display text-2xl mb-4">Most Active This Week</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {mostActive.map((piece) => piece && (
-              <PieceCard
-                id={piece.id}
-                title={piece.title}
-                composer_name={piece.composer_name}
-                catalog_number={piece.catalog_number}
-                instruments={piece.instruments}
-                era={piece.era}
-                difficulty={piece.difficulty}
-                duration_minutes={piece.duration_minutes}
-                description={piece.description}
-                edition_count={piece.edition_count}
-              />
-            ))}
-          </div>
-        </section>
-
-        <!-- Explore -->
         <section class="mb-12">
           <h2 class="font-display text-2xl mb-5">Explore</h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -415,7 +248,6 @@ const itemListLd = {
             ))}
           </div>
 
-          <!-- Top Composers -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {topComposers.map((c) => (
               <a href={`/composer/${encodeURIComponent(c.name)}`} class="flex items-center gap-3 bg-surface border border-border rounded-lg px-4 py-3 hover:border-muted transition-all no-underline">
@@ -429,9 +261,7 @@ const itemListLd = {
           </div>
         </section>
 
-        <!-- Most Searched -->
         <MostWanted client:idle />
-
       </div>
     </main>
   )}

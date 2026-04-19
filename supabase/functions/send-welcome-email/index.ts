@@ -9,9 +9,9 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 // Inline welcome email template (self-contained, no file system access in Edge Functions)
-function renderWelcomeEmail(recipientName: string, userId: string): string {
+function renderWelcomeEmail(recipientName: string, _userId: string): string {
   const name = escapeHtml(recipientName);
-  const profileUrl = `https://irregularpearl.org/profile/${encodeURIComponent(userId)}`;
+  const catalogUrl = `https://irregularpearl.org`;
 
   return `<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -39,7 +39,7 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
 <body id="body" style="margin:0;padding:0;background-color:#FAF8F5;-webkit-font-smoothing:antialiased;">
 
   <div style="display:none;font-size:1px;color:#FAF8F5;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
-    Welcome to the classical music community.&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;
+    A classical music knowledge platform. For all musical pieces — landmarks, editions at the measure level, signed performer's notes.&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;
   </div>
 
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#FAF8F5;">
@@ -79,12 +79,17 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
           <!-- WELCOME TEXT -->
           <tr>
             <td class="wrapper-inner" style="padding:0 24px 8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:400;color:#57534E;line-height:1.65;">
-              Welcome to Irregular Pearl. You've joined a community of musicians, students, and music lovers building a living knowledge base for classical music.
+              Welcome to Irregular Pearl. A classical music knowledge platform for classical musicians — performers, teachers, and students preparing real repertoire, piece by piece.
+            </td>
+          </tr>
+          <tr>
+            <td class="wrapper-inner" style="padding:0 24px 8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:400;color:#57534E;line-height:1.65;">
+              Every piece gets a living page: structural landmarks grouped by movement, editions compared at the measure level, and performer's notes from people who have played the work. Paired with a personal library that tracks what you're preparing, what you've performed, and the reflections you jot between takes.
             </td>
           </tr>
           <tr>
             <td class="wrapper-inner" style="padding:0 24px 28px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:400;color:#57534E;line-height:1.65;">
-              This is a non-profit, community-driven project. Every piece page is a shared resource that gets richer as people contribute editions, recordings, discussions, and performance notes. We're glad you're here.
+              It's non-profit, community-driven, and free forever. Glad you're here.
             </td>
           </tr>
 
@@ -103,8 +108,8 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                   <td style="padding-bottom:16px;border-bottom:1px solid #E7E5E4;">
-                    <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:500;color:#B45309;letter-spacing:0.12em;text-transform:uppercase;">Getting Started</div>
-                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:20px;font-weight:400;color:#1C1917;margin-top:2px;line-height:1.2;">Here's what you can do</div>
+                    <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:500;color:#B45309;letter-spacing:0.12em;text-transform:uppercase;">What makes it different</div>
+                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:20px;font-weight:400;color:#1C1917;margin-top:2px;line-height:1.2;">Depth, not just links</div>
                   </td>
                 </tr>
               </table>
@@ -116,8 +121,8 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
                     <div style="width:36px;height:36px;background-color:#FEF3C7;text-align:center;line-height:36px;font-family:'Courier New',Courier,monospace;font-size:14px;font-weight:500;color:#B45309;">1</div>
                   </td>
                   <td valign="top" style="padding:16px 0;font-family:Arial,Helvetica,sans-serif;">
-                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Browse and discover</div>
-                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Explore pieces across instruments, composers, and eras. Every piece has editions, recordings, and community notes.</div>
+                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Piece pages built around practice</div>
+                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Structural landmarks grouped by movement, with flags for the technical challenges in each passage. Signed performer's notes and interpretive schools alongside. Every editorial claim carries a human name.</div>
                   </td>
                 </tr>
               </table>
@@ -129,34 +134,21 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
                     <div style="width:36px;height:36px;background-color:#FEF3C7;text-align:center;line-height:36px;font-family:'Courier New',Courier,monospace;font-size:14px;font-weight:500;color:#B45309;">2</div>
                   </td>
                   <td valign="top" style="padding:16px 0;font-family:Arial,Helvetica,sans-serif;">
-                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Log your musical life</div>
-                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Track practice sessions, lessons, performances, and listening. Your activity feed becomes your musical diary.</div>
+                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Edition comparison at the measure level</div>
+                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">The same passage side by side across editions. Bowings, fingerings, articulation, sources, with signed editorial observations. Makes the edition decision concrete instead of guesswork.</div>
                   </td>
                 </tr>
               </table>
 
               <!-- Feature 3 -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-bottom:1px solid #E7E5E4;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                   <td width="50" valign="top" style="padding:16px 14px 16px 0;">
                     <div style="width:36px;height:36px;background-color:#FEF3C7;text-align:center;line-height:36px;font-family:'Courier New',Courier,monospace;font-size:14px;font-weight:500;color:#B45309;">3</div>
                   </td>
                   <td valign="top" style="padding:16px 0;font-family:Arial,Helvetica,sans-serif;">
-                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Join the discussion</div>
-                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Every piece page has a threaded discussion. Share edition recommendations, bowing choices, interpretation notes.</div>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Feature 4 -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                <tr>
-                  <td width="50" valign="top" style="padding:16px 14px 16px 0;">
-                    <div style="width:36px;height:36px;background-color:#FEF3C7;text-align:center;line-height:36px;font-family:'Courier New',Courier,monospace;font-size:14px;font-weight:500;color:#B45309;">4</div>
-                  </td>
-                  <td valign="top" style="padding:16px 0;font-family:Arial,Helvetica,sans-serif;">
-                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">Applaud fellow musicians</div>
-                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Show appreciation for artists in the community. Visit the Community page to discover who's here.</div>
+                    <div style="font-family:Georgia,'Times New Roman',Times,serif;font-size:16px;font-weight:400;color:#1C1917;line-height:1.3;">A personal library for your repertoire</div>
+                    <div style="font-size:13px;color:#78716C;margin-top:4px;line-height:1.5;">Pieces currently preparing, upcoming performances, pieces performed, and private reflections attached to specific passages. The layer your paper notebook, your iPad margins, and your scattered browser tabs have been trying to be.</div>
                   </td>
                 </tr>
               </table>
@@ -170,12 +162,12 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
                 <tr>
                   <td align="center" style="border-radius:8px;background-color:#B45309;">
                     <!--[if mso]>
-                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${profileUrl}" style="height:44px;v-text-anchor:middle;width:220px;" arcsize="18%" fillcolor="#B45309" stroke="f">
-                      <w:anchorlock/><center style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:500;color:#FFFFFF;">Complete Your Profile</center>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${catalogUrl}" style="height:44px;v-text-anchor:middle;width:220px;" arcsize="18%" fillcolor="#B45309" stroke="f">
+                      <w:anchorlock/><center style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:500;color:#FFFFFF;">Explore the catalog</center>
                     </v:roundrect>
                     <![endif]-->
                     <!--[if !mso]><!-->
-                    <a href="${profileUrl}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:500;color:#FFFFFF;text-decoration:none;padding:13px 32px;border-radius:8px;background-color:#B45309;mso-hide:all;" target="_blank">Complete Your Profile</a>
+                    <a href="${catalogUrl}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:500;color:#FFFFFF;text-decoration:none;padding:13px 32px;border-radius:8px;background-color:#B45309;mso-hide:all;" target="_blank">Explore the catalog</a>
                     <!--<![endif]-->
                   </td>
                 </tr>
@@ -200,9 +192,6 @@ function renderWelcomeEmail(recipientName: string, userId: string): string {
                 <tr>
                   <td style="padding:0 8px;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
                     <a href="https://irregularpearl.org" style="color:#78716C;text-decoration:none;" target="_blank">irregularpearl.org</a>
-                  </td>
-                  <td style="padding:0 8px;border-left:1px solid #E7E5E4;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
-                    <a href="https://irregularpearl.org/community" style="color:#78716C;text-decoration:none;" target="_blank">Community</a>
                   </td>
                   <td style="padding:0 8px;border-left:1px solid #E7E5E4;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
                     <a href="https://irregularpearl.org/about" style="color:#78716C;text-decoration:none;" target="_blank">About</a>

@@ -32,7 +32,7 @@ export const GET: APIRoute = ({ url }) => {
       '/piece/{id}': {
         get: {
           operationId: 'getPiece',
-          summary: 'Get detailed information about a classical music piece including editions, recordings, and discussion',
+          summary: 'Get detailed information about a classical music piece including editions and recordings',
           parameters: [
             {
               name: 'id',
@@ -43,7 +43,7 @@ export const GET: APIRoute = ({ url }) => {
             },
           ],
           responses: {
-            '200': { description: 'HTML page with piece details, editions, recordings, and discussion' },
+            '200': { description: 'HTML page with piece details, editions, and recordings' },
           },
         },
       },

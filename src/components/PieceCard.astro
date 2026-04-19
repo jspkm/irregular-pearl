@@ -1,6 +1,4 @@
 ---
-import PieceActivityStats from './PieceActivityStats';
-
 interface Props {
   id: string;
   title: string;
@@ -33,5 +31,4 @@ const { id, title, composer_name, catalog_number, instruments, era, difficulty, 
       <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{edition_count} editions</span>
     )}
   </div>
-  <PieceActivityStats pieceId={id} client:idle />
 </a>

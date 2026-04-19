@@ -24,10 +24,8 @@ const byComposer = groupBy(pieces, p => p.composer_name);
 const composerGroups = Object.entries(byComposer).sort(([, a], [, b]) => b.length - a.length);
 
 const eras = [...new Set(pieces.map(p => p.era))];
-const composerCount = composerGroups.length;
-const editionCount = pieces.reduce((sum, p) => sum + p.editions.length, 0);
 
-const seoDescription = `${instrumentName} repertoire on Irregular Pearl — ${pieces.length} pieces by ${composerCount} composers. Compare editions, listen to recordings, and discuss with musicians.`;
+const seoDescription = `${instrumentName} repertoire on Irregular Pearl — ${pieces.length} pieces. Compare editions and listen to recordings.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -69,7 +67,7 @@ const breadcrumbLd = {
     <div class="mb-8">
       <h1 class="font-display text-3xl md:text-4xl italic mb-2">{instrumentName} Repertoire</h1>
       <p class="text-muted text-sm md:text-base">
-        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {composerCount} composers · {editionCount} editions
+        {pieces.length} piece{pieces.length !== 1 ? 's' : ''}
       </p>
       <div class="flex flex-wrap gap-1.5 mt-3">
         {eras.map(era => (

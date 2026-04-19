@@ -4,7 +4,6 @@ import { supabase, hasSupabase } from '../../lib/supabase';
 const SECTIONS = [
   'baroque', 'classical', 'romantic', 'late-romantic', 'impressionist', '20th-century', 'post-romantic',
   'piano', 'violin', 'cello', 'voice', 'winds', 'organ', 'harp', 'percussion', 'guitar',
-  'events', 'discussions',
 ];
 
 interface User {
