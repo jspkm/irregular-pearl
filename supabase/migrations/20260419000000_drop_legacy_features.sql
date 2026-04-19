@@ -2,12 +2,22 @@
 -- Scope: events + event_performances, discussions + reports, activity_log,
 -- applause. See PRD.md for the scoped-down product direction.
 
--- Realtime publication removals (safe if already removed)
-alter publication supabase_realtime drop table if exists public.discussions;
-alter publication supabase_realtime drop table if exists public.activity_log;
-alter publication supabase_realtime drop table if exists public.applause;
-alter publication supabase_realtime drop table if exists public.events;
-alter publication supabase_realtime drop table if exists public.event_performances;
+-- Realtime publication removals (guarded because ALTER PUBLICATION ... DROP
+-- TABLE does not accept IF EXISTS)
+do $$
+declare
+  t text;
+begin
+  for t in select unnest(array['discussions', 'activity_log', 'applause', 'events', 'event_performances'])
+  loop
+    if exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t
+    ) then
+      execute format('alter publication supabase_realtime drop table public.%I', t);
+    end if;
+  end loop;
+end $$;
 
 -- Triggers and functions tied to activity emails
 drop trigger if exists on_activity_log_send_email on public.activity_log;
