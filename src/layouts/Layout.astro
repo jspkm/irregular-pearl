@@ -1,7 +1,4 @@
 ---
-import { seedPieces } from '../data/seed';
-import { supabase, hasSupabase } from '../lib/supabase';
-
 interface Props {
   title: string;
   description?: string;
@@ -14,7 +11,7 @@ interface Props {
 
 const {
   title,
-  description = 'A collaborative platform for classical music knowledge — editions, recordings, and community discussion for every piece.',
+  description = 'A collaborative platform for classical music knowledge — editions and recordings for every piece.',
   canonical,
   jsonLd,
   ogType = 'website',
@@ -23,22 +20,6 @@ const {
 } = Astro.props;
 
 const currentYear = new Date().getFullYear();
-
-// Counts: use Supabase totals when available, fall back to seed data
-let pieceCount = seedPieces.length;
-let composerCount = new Set(seedPieces.map(p => p.composer_name)).size;
-let editionCount = seedPieces.reduce((sum, p) => sum + p.editions.length, 0);
-
-if (hasSupabase) {
-  const [piecesRes, composersRes, editionsRes] = await Promise.allSettled([
-    supabase.from('pieces').select('id', { count: 'exact', head: true }),
-    supabase.from('pieces').select('composer_name').then(r => new Set((r.data || []).map((p: any) => p.composer_name)).size),
-    supabase.from('editions').select('id', { count: 'exact', head: true }),
-  ]);
-  if (piecesRes.status === 'fulfilled' && piecesRes.value.count) pieceCount = piecesRes.value.count;
-  if (composersRes.status === 'fulfilled') composerCount = composersRes.value as number;
-  if (editionsRes.status === 'fulfilled' && editionsRes.value.count) editionCount = editionsRes.value.count;
-}
 
 const siteName = 'Irregular Pearl';
 const fullTitle = title === 'Home' ? siteName : `${title} | ${siteName}`;
@@ -109,7 +90,6 @@ const canonicalUrl = canonical || Astro.url.href;
   </div>
   {!hideFooter && (
     <footer class="border-t border-border py-5 px-4 md:px-6 text-xs text-muted mt-auto">
-      <!-- Desktop: three columns -->
       <div class="hidden md:flex justify-between items-center">
         <div class="flex gap-4">
           <a href="/about" class="text-muted no-underline">About</a>
@@ -117,17 +97,12 @@ const canonicalUrl = canonical || Astro.url.href;
           <a href="/privacy" class="text-muted no-underline">Privacy</a>
         </div>
         <span>© {currentYear} Irregular Pearl — a non-profit for classical music knowledge</span>
-        <div>
-          {pieceCount.toLocaleString()} pieces · {composerCount} composers · {editionCount}+ editions
-        </div>
       </div>
-      <!-- Mobile: stacked, centered -->
       <div class="flex flex-col items-center gap-2 md:hidden text-center">
         <a href="/"><img src="/logo.svg" alt="Irregular Pearl" class="h-5 w-auto" /></a>
         <a href="/about" class="text-muted no-underline">About</a>
         <a href="/terms" class="text-muted no-underline">Terms</a>
         <a href="/privacy" class="text-muted no-underline">Privacy</a>
-        <div>{pieceCount.toLocaleString()} pieces · {composerCount} composers · {editionCount}+ editions</div>
         <span>© {currentYear} Irregular Pearl — a non-profit for classical music knowledge</span>
       </div>
     </footer>

@@ -7,41 +7,23 @@ interface Props {
 }
 
 export default function AdminDashboard({ isAdmin }: Props) {
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    newUsers7d: 0,
-    totalInteractions: 0,
-    totalDiscussions: 0,
-    pendingReports: 0,
-    pendingEvents: 0,
-  });
+  const [stats, setStats] = useState({ totalUsers: 0, newUsers7d: 0 });
   const [recentUsers, setRecentUsers] = useState<{ id: string; display_name: string; instrument: string | null; level: string | null; created_at: string }[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const composerCount = new Set(seedPieces.map(p => p.composer_name)).size;
-  const editionCount = seedPieces.reduce((sum, p) => sum + p.editions.length, 0);
 
   useEffect(() => {
     if (!hasSupabase) { setLoading(false); return; }
 
     const fetchStats = async () => {
-      const [usersRes, newUsersRes, activityRes, discussionsRes, reportsRes, eventsRes, recentRes] = await Promise.allSettled([
+      const [usersRes, newUsersRes, recentRes] = await Promise.allSettled([
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('users').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 7 * 86400000).toISOString()),
-        supabase.from('activity_log').select('id', { count: 'exact', head: true }),
-        supabase.from('discussions').select('id', { count: 'exact', head: true }).eq('is_deleted', false),
-        supabase.from('reports').select('id', { count: 'exact', head: true }),
-        supabase.from('events').select('id', { count: 'exact', head: true }).eq('status', 'queued'),
         isAdmin ? supabase.from('users').select('id, display_name, instrument, level, created_at').order('created_at', { ascending: false }).limit(10) : Promise.resolve({ data: [] }),
       ]);
 
       setStats({
         totalUsers: usersRes.status === 'fulfilled' ? (usersRes.value.count ?? 0) : 0,
         newUsers7d: newUsersRes.status === 'fulfilled' ? (newUsersRes.value.count ?? 0) : 0,
-        totalInteractions: activityRes.status === 'fulfilled' ? (activityRes.value.count ?? 0) : 0,
-        totalDiscussions: discussionsRes.status === 'fulfilled' ? (discussionsRes.value.count ?? 0) : 0,
-        pendingReports: reportsRes.status === 'fulfilled' ? (reportsRes.value.count ?? 0) : 0,
-        pendingEvents: eventsRes.status === 'fulfilled' ? (eventsRes.value.count ?? 0) : 0,
       });
 
       if (isAdmin && recentRes.status === 'fulfilled' && (recentRes.value as any).data) {
@@ -61,15 +43,7 @@ export default function AdminDashboard({ isAdmin }: Props) {
       { label: 'Total Users', value: stats.totalUsers },
       { label: 'New Users (7d)', value: stats.newUsers7d },
     ] : []),
-    { label: 'Interactions', value: stats.totalInteractions },
-    { label: 'Discussions', value: stats.totalDiscussions },
-    { label: 'Pending Reports', value: stats.pendingReports, accent: stats.pendingReports > 0 },
-    { label: 'Pending Events', value: stats.pendingEvents, accent: stats.pendingEvents > 0 },
     { label: 'Pieces', value: seedPieces.length },
-    ...(isAdmin ? [
-      { label: 'Composers', value: composerCount },
-      { label: 'Editions', value: editionCount },
-    ] : []),
   ];
 
   return (
@@ -78,7 +52,7 @@ export default function AdminDashboard({ isAdmin }: Props) {
         {cards.map(card => (
           <div key={card.label} className="bg-surface border border-border rounded-xl p-5">
             <div className="text-xs text-muted mb-1">{card.label}</div>
-            <div className={`font-display text-2xl ${(card as any).accent ? 'text-[#B45309]' : 'text-ink'}`}>
+            <div className="font-display text-2xl text-ink">
               {card.value.toLocaleString()}
             </div>
           </div>

@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../../lib/supabase';
 import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
-import AdminReportList from './AdminReportList';
 import AdminPlaylist from './AdminPlaylist';
-import AdminEventQueue from './AdminEventQueue';
 
-type Tab = 'dashboard' | 'users' | 'reports' | 'events' | 'playlist';
+type Tab = 'dashboard' | 'users' | 'playlist';
 
 interface StaffProfile {
   id: string;
@@ -66,12 +64,9 @@ export default function AdminPage({ initialTab }: Props) {
   const tabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
-    { id: 'reports' as Tab, label: 'Reports', show: isAdmin || profile.role === 'firstchair' },
-    { id: 'events' as Tab, label: 'Events', show: isAdmin || (profile.role === 'firstchair' && (profile.managed_sections || []).includes('events')) },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
   ].filter(t => t.show);
 
-  // Redirect to first available tab if current tab isn't accessible
   if (!tabs.find(t => t.id === activeTab) && tabs.length > 0) {
     setActiveTab(tabs[0].id);
   }
@@ -79,14 +74,11 @@ export default function AdminPage({ initialTab }: Props) {
   const titles: Record<Tab, string> = {
     dashboard: 'Dashboard',
     users: 'User Management',
-    reports: 'Reports',
-    events: 'Moderate Events',
     playlist: 'Maestro Playlist',
   };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
-      {/* Header */}
       <div className="bg-[#1C1917] text-white px-4 md:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <a href="/" className="font-['Instrument_Serif'] italic text-lg text-white no-underline opacity-70 hover:opacity-100">Irregular Pearl</a>
@@ -99,7 +91,6 @@ export default function AdminPage({ initialTab }: Props) {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="border-b border-[#E7E5E4] bg-white px-4 md:px-6">
         <div className="max-w-6xl mx-auto flex gap-0">
           {tabs.map(tab => (
@@ -118,14 +109,11 @@ export default function AdminPage({ initialTab }: Props) {
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
         <h1 className="font-['Instrument_Serif'] italic text-2xl mb-6">{titles[activeTab]}</h1>
 
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}
-        {activeTab === 'reports' && <AdminReportList isAdmin={isAdmin} managedSections={profile.managed_sections} />}
-        {activeTab === 'events' && <AdminEventQueue userId={profile.id} />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
       </div>
     </div>

@@ -1,13 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
-import { seedPieces } from '../data/seed';
 
-const composerCount = new Set(seedPieces.map(p => p.composer_name)).size;
-const editionCount = seedPieces.reduce((sum, p) => sum + p.editions.length, 0);
-const instruments = [...new Set(seedPieces.flatMap(p => p.instruments))];
-
-const seoDescription = `Irregular Pearl is a non-profit, collaborative platform for classical music knowledge. ${seedPieces.length} pieces, ${composerCount} composers, ${editionCount}+ editions — all free and open.`;
+const seoDescription = `A non-profit classical music knowledge platform for classical musicians. Piece pages with structural landmarks, signed performer's notes, and edition comparison at the measure level.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -22,7 +17,7 @@ const jsonLd = {
     description: seoDescription,
     nonprofitStatus: 'NonprofitType',
     foundingDate: '2026',
-    knowsAbout: ['Classical Music', 'Sheet Music Editions', 'Music Repertoire', 'Music Education'],
+    knowsAbout: ['Classical Music', 'Sheet Music Editions', 'Music Repertoire', 'Music Education', 'Performance Practice'],
   },
 };
 ---
@@ -34,7 +29,11 @@ const jsonLd = {
 
     <div class="space-y-6 text-sm md:text-base text-[#57534E] leading-relaxed">
       <p>
-        Irregular Pearl is a non-profit platform that organizes classical music knowledge around the <strong class="text-ink">piece</strong> as the atomic unit. Every musical work gets a living page with structured metadata, edition comparisons, recordings, and community discussion from working musicians.
+        Irregular Pearl is a non-profit classical music knowledge platform for classical musicians — performers, teachers, and students preparing real repertoire, piece by piece.
+      </p>
+
+      <p>
+        Every piece gets a living page: structural landmarks grouped by movement, editions compared at the measure level, and performer's notes from people who have played the work. Paired with a personal library that tracks what you are preparing, what you have performed, and the reflections you jot between takes.
       </p>
 
       <p>
@@ -45,40 +44,30 @@ const jsonLd = {
 
       <ul class="space-y-3 list-none pl-0">
         <li class="flex gap-3">
-          <span class="text-[#B45309] font-semibold flex-shrink-0">Catalog.</span>
-          <span>{seedPieces.length} pieces across {instruments.length} instrument families, from Baroque to 20th Century. Each piece has a title, composer, catalog number, era, form, difficulty, and a written description.</span>
+          <span class="text-[#B45309] font-semibold flex-shrink-0">Piece pages.</span>
+          <span>Structural landmarks grouped by movement, with flags for the technical challenges in each passage. Signed performer's notes and interpretive schools alongside. Every editorial claim carries a human name.</span>
         </li>
         <li class="flex gap-3">
-          <span class="text-[#B45309] font-semibold flex-shrink-0">Compare.</span>
-          <span>{editionCount}+ editions with publisher, editor, year, and editorial notes. Side-by-side comparison so you can pick the right score for your level and taste.</span>
+          <span class="text-[#B45309] font-semibold flex-shrink-0">Edition comparison.</span>
+          <span>The same passage side by side across editions — bowings, fingerings, articulation, sources — with signed editorial observations. Makes the edition decision concrete instead of guesswork.</span>
         </li>
         <li class="flex gap-3">
-          <span class="text-[#B45309] font-semibold flex-shrink-0">Discuss.</span>
-          <span>Every piece has a threaded discussion where musicians share fingerings, tempos, interpretive choices, and practice strategies.</span>
-        </li>
-        <li class="flex gap-3">
-          <span class="text-[#B45309] font-semibold flex-shrink-0">Track.</span>
-          <span>Log your practice, lessons, performances, and listening. See what the community is working on.</span>
+          <span class="text-[#B45309] font-semibold flex-shrink-0">Personal library.</span>
+          <span>Pieces currently preparing, upcoming performances, pieces performed, and private reflections attached to specific passages.</span>
         </li>
       </ul>
 
-      <h2 class="font-display text-xl md:text-2xl italic text-ink pt-4">For musicians, teachers, and students</h2>
+      <h2 class="font-display text-xl md:text-2xl italic text-ink pt-4">Plurality of voices</h2>
 
       <p>
-        Whether you're a conservatory student picking your next recital piece, a teacher building a syllabus, or a returning adult player looking for the right edition of a Chopin nocturne — Irregular Pearl gives you the information that used to require asking a dozen people.
+        When two respected musicians hold incompatible views on how a piece should be played, Irregular Pearl shows both, signed, with neither presented as canonical. The site is editorial before it is technical. Interpretive judgment carries a human name — we do not publish anonymous opinions or AI-generated content under false bylines.
       </p>
 
       <h2 class="font-display text-xl md:text-2xl italic text-ink pt-4">Open and free</h2>
 
       <p>
-        Irregular Pearl is a non-profit. All piece data, edition information, and community discussion are free to access. We link to IMSLP for public domain scores, YouTube for recordings, and Wikipedia for background.
+        Irregular Pearl is a non-profit. All piece data, edition information, and editorial writing are free to access. We describe editions, we do not reproduce them. We reference recordings, we do not host them.
       </p>
-
-      <div class="border-t border-border pt-6 mt-8">
-        <p class="text-xs text-muted">
-          {seedPieces.length} pieces · {composerCount} composers · {editionCount}+ editions
-        </p>
-      </div>
     </div>
   </main>
 </Layout>

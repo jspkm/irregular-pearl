@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { extractYouTubeId, getInitials, formatTime, formatDate, ACTIVITIES, ACTIVITY_STAT_LABELS, groupBy, validateSlug, mapFuzzyResults } from './helpers';
+import { extractYouTubeId, getInitials, formatTime, formatDate, groupBy, validateSlug, mapFuzzyResults } from './helpers';
 import type { FuzzyRow } from './helpers';
 
 describe('extractYouTubeId', () => {
@@ -77,26 +77,6 @@ describe('formatDate', () => {
   });
 });
 
-describe('ACTIVITIES', () => {
-  test('has 6 activity types', () => {
-    expect(ACTIVITIES).toHaveLength(6);
-  });
-
-  test('each has type, emoji, and label', () => {
-    for (const a of ACTIVITIES) {
-      expect(a.type).toBeTruthy();
-      expect(a.emoji).toBeTruthy();
-      expect(a.label).toBeTruthy();
-    }
-  });
-});
-
-describe('ACTIVITY_STAT_LABELS', () => {
-  test('has labels for all 6 types', () => {
-    expect(Object.keys(ACTIVITY_STAT_LABELS)).toHaveLength(6);
-  });
-});
-
 describe('groupBy', () => {
   test('groups items by key function', () => {
     const items = [{ n: 'a', g: 'x' }, { n: 'b', g: 'x' }, { n: 'c', g: 'y' }];
@@ -160,9 +140,6 @@ describe('mapFuzzyResults', () => {
   const sampleRows: FuzzyRow[] = [
     { match_type: 'piece', match_id: 'bach-cello-suite-1', match_title: 'Cello Suite No. 1', match_subtitle: 'J.S. Bach', similarity: 0.8 },
     { match_type: 'piece', match_id: 'beethoven-moonlight', match_title: 'Moonlight Sonata', match_subtitle: 'Beethoven', similarity: 0.6 },
-    { match_type: 'artist', match_id: 'uuid-1', match_title: 'Yo-Yo Ma', match_subtitle: 'Cello', similarity: 0.7 },
-    { match_type: 'artist', match_id: 'uuid-2', match_title: 'Lang Lang', match_subtitle: '', similarity: 0.5 },
-    { match_type: 'event', match_id: 'evt-1', match_title: 'Spring Recital', match_subtitle: 'Carnegie Hall', similarity: 0.65 },
   ];
 
   test('extracts piece IDs in order', () => {
@@ -170,60 +147,17 @@ describe('mapFuzzyResults', () => {
     expect(result.pieceIds).toEqual(['bach-cello-suite-1', 'beethoven-moonlight']);
   });
 
-  test('maps artists with correct fields', () => {
-    const result = mapFuzzyResults(sampleRows);
-    expect(result.artists).toHaveLength(2);
-    expect(result.artists[0]).toEqual({
-      id: 'uuid-1',
-      display_name: 'Yo-Yo Ma',
-      instrument: 'Cello',
-      username: null,
-    });
-  });
-
-  test('maps empty subtitle to null instrument', () => {
-    const result = mapFuzzyResults(sampleRows);
-    expect(result.artists[1].instrument).toBeNull();
-  });
-
-  test('maps events with correct fields', () => {
-    const result = mapFuzzyResults(sampleRows);
-    expect(result.events).toHaveLength(1);
-    expect(result.events[0]).toEqual({
-      id: 'evt-1',
-      title: 'Spring Recital',
-      venue: 'Carnegie Hall',
-      city: null,
-      event_date: '',
-      event_type: '',
-    });
-  });
-
-  test('returns empty arrays for no matches', () => {
+  test('returns empty array for no matches', () => {
     const result = mapFuzzyResults([]);
     expect(result.pieceIds).toEqual([]);
-    expect(result.artists).toEqual([]);
-    expect(result.events).toEqual([]);
   });
 
-  test('handles single match type only', () => {
-    const onlyPieces: FuzzyRow[] = [
+  test('ignores non-piece match types', () => {
+    const mixed: FuzzyRow[] = [
+      { match_type: 'artist', match_id: 'x', match_title: 'X', match_subtitle: '', similarity: 0.5 },
       { match_type: 'piece', match_id: 'p1', match_title: 'Test', match_subtitle: '', similarity: 0.9 },
     ];
-    const result = mapFuzzyResults(onlyPieces);
+    const result = mapFuzzyResults(mixed);
     expect(result.pieceIds).toEqual(['p1']);
-    expect(result.artists).toEqual([]);
-    expect(result.events).toEqual([]);
-  });
-
-  test('ignores unknown match types', () => {
-    const withUnknown: FuzzyRow[] = [
-      { match_type: 'unknown', match_id: 'x', match_title: 'X', match_subtitle: '', similarity: 0.5 },
-      { match_type: 'piece', match_id: 'p1', match_title: 'Test', match_subtitle: '', similarity: 0.9 },
-    ];
-    const result = mapFuzzyResults(withUnknown);
-    expect(result.pieceIds).toEqual(['p1']);
-    expect(result.artists).toEqual([]);
-    expect(result.events).toEqual([]);
   });
 });

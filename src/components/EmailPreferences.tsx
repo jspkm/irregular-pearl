@@ -4,7 +4,6 @@ import { useAuth } from '../lib/useAuth';
 
 interface Preferences {
   email_weekly_digest: boolean;
-  email_activity: boolean;
   email_welcome: boolean;
 }
 
@@ -21,7 +20,7 @@ export default function EmailPreferences() {
     const fetch = async () => {
       const { data } = await supabase
         .from('users')
-        .select('email_weekly_digest, email_activity, email_welcome')
+        .select('email_weekly_digest, email_welcome')
         .eq('id', user.id)
         .single();
 
@@ -47,7 +46,7 @@ export default function EmailPreferences() {
   const unsubscribeAll = async () => {
     if (!user) return;
     setSaving(true);
-    const updated = { email_weekly_digest: false, email_activity: false, email_welcome: false };
+    const updated = { email_weekly_digest: false, email_welcome: false };
     setPrefs(updated);
     await supabase.from('users').update(updated).eq('id', user.id);
     setSaving(false);
@@ -70,7 +69,6 @@ export default function EmailPreferences() {
           <div className="h-6 bg-gray-200 rounded w-48" />
           <div className="h-16 bg-gray-100 rounded-lg" />
           <div className="h-16 bg-gray-100 rounded-lg" />
-          <div className="h-16 bg-gray-100 rounded-lg" />
         </div>
       </div>
     );
@@ -80,12 +78,7 @@ export default function EmailPreferences() {
     {
       key: 'email_weekly_digest',
       title: 'Weekly Digest',
-      description: 'A summary of new pieces, new members, and community highlights every Monday.',
-    },
-    {
-      key: 'email_activity',
-      title: 'Activity Updates',
-      description: 'Personalized emails when you log practice, performances, lessons, and other activity.',
+      description: 'A summary of new pieces added to the catalog every Monday.',
     },
   ];
 
@@ -129,7 +122,7 @@ export default function EmailPreferences() {
       <div className="mt-8 pt-6 border-t border-border">
         <button
           onClick={unsubscribeAll}
-          disabled={saving || (!prefs.email_weekly_digest && !prefs.email_activity)}
+          disabled={saving || !prefs.email_weekly_digest}
           className="text-sm text-muted hover:text-error bg-transparent border-none cursor-pointer p-0 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Unsubscribe from all emails

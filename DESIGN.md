@@ -19,7 +19,7 @@
 3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use DM Sans. The switch is deliberate.
 4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
 5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
-6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, applause states, interpretive accents) and small editorial chrome.
+6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
 7. **Mobile and desktop are different products.** The piece page on mobile leads with landmarks and flags above editions and recordings. Desktop can present more discovery-friendly hierarchy. Both are first-class. Neither is a port of the other.
 
 ## Logo / Wordmark
@@ -30,7 +30,7 @@
 
 ## Typography
 - **Display/Hero:** Instrument Serif (regular + italic) — elegant serif with musical DNA in the name. Used for piece titles, section headings, homepage hero.
-- **Body:** DM Sans — clean, readable, modern. Better character width than Inter for body text. Used for descriptions, discussions, UI text.
+- **Body:** DM Sans — clean, readable, modern. Better character width than Inter for body text. Used for descriptions, UI text.
 - **UI/Labels:** DM Sans Medium — tabs, buttons, nav items
 - **Data/Tables:** JetBrains Mono — catalog numbers (BWV 1007, Op. 104, K. 331), metadata. Supports tabular-nums.
 - **Code:** JetBrains Mono
@@ -40,7 +40,7 @@
   ```
 - **Scale (modular 1.25):**
   - xs: 11px (mono labels)
-  - sm: 13px (UI, discussion text, edition details)
+  - sm: 13px (UI, edition details)
   - base: 14px-15px (body text)
   - lg: 18px (section headings)
   - xl: 24px (piece titles on mobile)
@@ -74,13 +74,13 @@
 
 ## Layout
 - **Approach:** Grid-disciplined
-- **Piece page:** Two-column (content + 280-340px discussion sidebar). Sidebar always visible on tablet+.
+- **Piece page:** Single-column content with editions and recordings sections.
 - **Homepage:** Three-column card grid, pieces grouped by instrument
 - **Max content width:** 1100px
 - **Breakpoints:**
-  - Mobile: < 768px (single column, sidebar below content)
-  - Tablet/iPad: 768px-1024px (two-column, 280px sidebar)
-  - Desktop: > 1024px (two-column, 340px sidebar)
+  - Mobile: < 768px
+  - Tablet/iPad: 768px-1024px
+  - Desktop: > 1024px
 - **Border radius:**
   - sm: 4px (tags, small elements)
   - md: 8px (cards, inputs, buttons)
@@ -146,41 +146,8 @@ End every session by asking Claude to list what it changed from the system and w
 
 Claude is an executor of this system, not its author. When the system needs to change, a human makes that change. Claude can propose; humans decide.
 
-## Community Section
-
-### Community Page (`/community`)
-- **Purpose:** Browsable directory of registered musicians
-- **Layout:** Three-column card grid (desktop), two-column (tablet), single (mobile)
-- **Sections (top to bottom):**
-  1. **Featured Artists** — horizontal scroll strip, top 5-10 most applauded. Each card: avatar, name, instrument, applause count.
-  2. **Filter tabs** — All, Piano, Violin, Cello, Voice, Winds. Pill-style, amber fill on active.
-  3. **Recently Active** — card grid sorted by recent activity_log entries. Badge shows total count.
-  4. **New Members** — chip-style row with mini avatars, recently joined users.
-- **Artist card contents:** Generative avatar, display name (Instrument Serif), instrument, level badge, "Working on [piece]" snippet, applause count, Applaud button.
-
-### Applause Feature
-- **Terminology:** "Applaud" (action), "Applauding" (active state), "applause" (count noun). NOT "follow/followers."
-- **Pluralization:** "1 applause" (singular), "47 applause" (plural). Zero applause shows nothing — no count, no text.
-- **No icon.** Applause count is text-only. No emoji, no SVG icon.
-- **Button states:**
-  - Default: amber outline, text "Applaud"
-  - Hover: solid amber fill, white text
-  - Active: solid amber fill, white text "Applauding ✓"
-  - Logged out: 50% opacity, disabled, links to sign-in on click
-- **Button style:** pill shape (border-radius: 9999px), DM Sans medium, 12px on cards / 13px on profiles
-- **Profile display:** Applause count + Applaud button in a row below the user details. Below that, a row of mini avatars (28px) showing who applauded, with "+N more" overflow text.
-- **Realtime:** Count updates via Supabase realtime subscriptions.
-- **DB table:** `applause` — columns: `user_id`, `artist_id`, `created_at`. Unique constraint on `(user_id, artist_id)`.
-
-### Profile Page Layout (updated)
-- **Two-column layout** on tablet+ (single column on mobile, sidebar below content)
-- **Left column (main content):** Bio (pre-formatted text), social links, training timeline, performances, instruments
-- **Right column (sidebar, 300px):** Collapsible sections for Working On, Discussions, Reviews
-  - Each section: card with header (title + count badge + chevron), click to toggle open/closed
-  - Working On: open by default
-  - Discussions, Reviews: collapsed by default
-  - Header hover: subtle background fill (var(--bg))
-  - Chevron rotates 180deg on open (200ms ease transition)
+## Artist Profile
+- **Single-column layout.** Display name, instruments, bio, social links.
 - **Level badges:** Student/Amateur = default gray, Professional = amber light bg, Teacher = green light bg
 
 ## Decisions Log
@@ -190,12 +157,8 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-03-28 | Amber accent over blue/red | Every classical music site uses blue or red. Amber signals warmth, tradition, and concert hall glow. |
 | 2026-03-28 | No dark mode (Phase 1) | Primary users on iPads in lit practice rooms. Dark mode deferred to Phase 2. |
 | 2026-03-28 | Instrument Serif italic for logo | Inspired by the old AI Studio prototype's Playfair Display italic wordmark. Instrument Serif is more contemporary. |
-| 2026-04-02 | "Applause" over "Follow/Followers" | Classical music social connection should use performance-world language. "Applaud" is warm, respectful, unmistakably musical. |
-| 2026-04-02 | No icon on applause count | Text-only count is cleaner and more typographic. No emoji, no SVG. |
-| 2026-04-02 | Zero applause = hidden | Don't show "0 applause". New users shouldn't see an empty vanity metric. |
-| 2026-04-02 | Two-column profile with collapsible sidebar | Bio, training, performances on the left (the permanent identity). Working On, Discussions, Reviews on the right as collapsible sections (the active/changing content). |
-| 2026-04-02 | Community page added | Browsable directory at /community with featured artists, instrument filters, recently active grid, new members. |
 | 2026-04-18 | Merged docs/design-system.md into DESIGN.md | Two contradictory design systems existed. DESIGN.md matched the live site; docs/design-system.md was aspirational with conflicting tokens (white vs parchment, purple vs amber, Source Serif Pro vs Instrument Serif). Merged the structural additions (principles, components, voice, Claude governance) into DESIGN.md and deleted docs/design-system.md. |
 | 2026-04-18 | Flat confirmed, textures removed | "Subtle warm textures" bullet removed from Aesthetic Direction. Live site is flat; the textures line was aspirational and never shipped. |
 | 2026-04-18 | Two weights only (400, 500) | Adopted from design-system.md. Heavier weights read as loud on parchment surface. |
 | 2026-04-18 | Sentence case everywhere | Codified. Never Title Case, never ALL CAPS except kicker eyebrows and wordmark. |
+| 2026-04-19 | Removed applause, discussion, activity log, events, community directory | Scope narrowed to piece-page-centric knowledge base per PRD revision 2. Artist profile reduced to minimal bio + instruments. |

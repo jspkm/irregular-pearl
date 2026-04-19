@@ -1,11 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
-import { formatDate, ACTIVITIES, randomNoteStarter, normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
-import { VENUES } from '../data/venues';
-import GenerativeAvatar from './GenerativeAvatar';
+import { normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import UsernameEditor from './UsernameEditor';
-import ApplaudButton from './ApplaudButton';
 
 interface ProfileData {
   id: string;
@@ -17,165 +14,48 @@ interface ProfileData {
   bio: string;
   website: string | null;
   social_links: Record<string, string>;
-  genres: string[];
   location: string | null;
-  ensembles: string[];
-  created_at: string;
 }
 
-interface ActivityPiece {
-  piece_id: string;
-  activity: string;
-  created_at: string;
-  pieces: { title: string; composer_name: string; catalog_number: string | null };
-}
-
-interface DiscussionPost {
-  id: string;
-  text: string;
-  created_at: string;
-  piece_id: string;
-  pieces: { title: string };
-}
-
-interface EditionReview {
-  id: string;
-  rating: number;
-  text: string | null;
-  created_at: string;
-  editions: { publisher: string; piece_id: string; pieces: { title: string } };
-}
-
-interface Performance {
-  id: string;
-  event_name: string;
-  venue: string | null;
-  date: string | null;
-  piece_id: string | null;
-  is_upcoming: boolean;
-  role: string | null;
-  notes: string | null;
-  notes_public: boolean;
-}
-
-interface DiscographyItem {
-  id: string;
-  title: string;
-  year: number | null;
-  role: string | null;
-  url: string | null;
-}
+const SOCIAL_PLATFORMS = ['instagram', 'youtube', 'tiktok', 'twitter', 'spotify'];
 
 export default function ArtistProfile({ userId }: { userId: string }) {
   const { user } = useAuth();
   const isOwnProfile = user?.id === userId;
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [workingOn, setWorkingOn] = useState<ActivityPiece[]>([]);
-  const [posts, setPosts] = useState<DiscussionPost[]>([]);
-  const [reviews, setReviews] = useState<EditionReview[]>([]);
-  const [performances, setPerformances] = useState<Performance[]>([]);
-  const [discography, setDiscography] = useState<DiscographyItem[]>([]);
-  const [instruments, setInstruments] = useState<{ id: string; type: string; maker: string | null; maker_year: number | null; country_of_origin: string | null; provenance_story: string }[]>([]);
-  const [trainingHistory, setTrainingHistory] = useState<{ year: string; title: string; detail: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ bio: '', instrument: '', level: '', website: '', location: '', social_links: {} as Record<string, string> });
+  const [editForm, setEditForm] = useState({
+    bio: '',
+    instrument: '',
+    level: '',
+    website: '',
+    location: '',
+    social_links: {} as Record<string, string>,
+  });
 
   useEffect(() => {
     if (!hasSupabase) { setLoading(false); return; }
-
-    const fetchProfile = async () => {
-      const { data: profileData, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (!profileError && profileData) {
-        setProfile(profileData as ProfileData);
+    (async () => {
+      const { data } = await supabase.from('users').select('*').eq('id', userId).single();
+      if (data) {
+        setProfile(data as ProfileData);
         setEditForm({
-          bio: profileData.bio || '',
-          instrument: profileData.instrument || '',
-          level: profileData.level || '',
-          website: profileData.website || '',
-          location: profileData.location || '',
-          social_links: profileData.social_links || {},
+          bio: data.bio || '',
+          instrument: data.instrument || '',
+          level: data.level || '',
+          website: data.website || '',
+          location: data.location || '',
+          social_links: data.social_links || {},
         });
-        setTrainingHistory((profileData as any).training_history || []);
       }
-
-      const { data: workingData } = await supabase
-        .from('activity_log')
-        .select('piece_id, activity, created_at, pieces(title, composer_name, catalog_number)')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (workingData) setWorkingOn(workingData.map((d: any) => ({
-        piece_id: d.piece_id,
-        activity: d.activity,
-        created_at: d.created_at,
-        pieces: d.pieces || { title: '', composer_name: '', catalog_number: null },
-      })));
-
-      const { data: postData, error: postError } = await supabase
-        .from('discussions')
-        .select('id, text, created_at, piece_id, pieces(title)')
-        .eq('user_id', userId)
-        .eq('is_deleted', false)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (!postError && postData) setPosts(postData.map((d: any) => ({
-        id: d.id, text: d.text, created_at: d.created_at,
-        piece_id: d.piece_id, pieces: d.pieces || { title: '' },
-      })));
-
-      const { data: reviewData, error: reviewError } = await supabase
-        .from('edition_reviews')
-        .select('id, rating, text, created_at, editions(publisher, piece_id, pieces(title))')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (!reviewError && reviewData) setReviews(reviewData.map((d: any) => ({
-        id: d.id, rating: d.rating, text: d.text, created_at: d.created_at,
-        editions: d.editions || { publisher: '', piece_id: '', pieces: { title: '' } },
-      })));
-
-      const { data: perfData, error: perfError } = await supabase
-        .from('performances')
-        .select('id, event_name, venue, date, piece_id, is_upcoming, role, notes, notes_public')
-        .eq('user_id', userId)
-        .order('date', { ascending: false })
-        .limit(20);
-
-      if (!perfError && perfData) setPerformances(perfData as Performance[]);
-
-      const { data: discData, error: discError } = await supabase
-        .from('discography')
-        .select('id, title, year, role, url')
-        .eq('user_id', userId)
-        .order('year', { ascending: false })
-        .limit(20);
-
-      if (!discError && discData) setDiscography(discData as DiscographyItem[]);
-
-      const { data: instrData, error: instrError } = await supabase
-        .from('instruments')
-        .select('id, type, maker, maker_year, country_of_origin, provenance_story')
-        .eq('current_owner_id', userId);
-
-      if (!instrError && instrData) setInstruments(instrData);
-
       setLoading(false);
-    };
-
-    fetchProfile();
+    })();
   }, [userId]);
 
   const handleSave = async () => {
-    if (!isOwnProfile || !user) return;
+    if (!isOwnProfile || !profile) return;
     const cleanLinks = Object.fromEntries(Object.entries(editForm.social_links).filter(([, v]) => v));
     await supabase.from('users').update({
       bio: editForm.bio,
@@ -184,769 +64,108 @@ export default function ArtistProfile({ userId }: { userId: string }) {
       website: editForm.website || null,
       location: editForm.location || null,
       social_links: cleanLinks,
-    }).eq('id', user.id);
-
+    }).eq('id', profile.id);
     setProfile(prev => prev ? { ...prev, ...editForm } : null);
     setEditing(false);
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/';
-  };
-
-  if (loading) {
-    return (
-      <div className="max-w-[720px] mx-auto px-6 md:px-10 py-10">
-        <div className="flex items-start gap-5 mb-8 animate-pulse">
-          <div className="w-20 h-20 rounded-full bg-gray-200 flex-shrink-0" />
-          <div className="flex-1">
-            <div className="h-7 bg-gray-200 rounded w-48 mb-2" />
-            <div className="h-4 bg-gray-100 rounded w-32 mb-1" />
-            <div className="h-3 bg-gray-100 rounded w-24" />
-          </div>
-        </div>
-        {[1, 2, 3].map(i => (
-          <div key={i} className="mb-8">
-            <div className="h-5 bg-gray-200 rounded w-36 mb-3" />
-            <div className="h-16 bg-gray-100 rounded-lg" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return <div className="text-center py-16 text-muted text-sm">Profile not found.</div>;
-  }
+  if (loading) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Loading…</div>;
+  if (!profile) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Profile not found.</div>;
 
   return (
-    <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-10">
-      {/* Header */}
+    <main className="max-w-[760px] mx-auto px-4 md:px-8 py-8 md:py-12">
       <div className="flex items-start gap-5 mb-6">
-        <div className="relative flex-shrink-0">
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover" />
-          ) : (
-            <GenerativeAvatar userId={profile.id} size={80} />
-          )}
-          {isOwnProfile && !editing && (
-            <AvatarMenu
-              hasPhoto={!!profile.avatar_url}
-              googleAvatarUrl={user?.user_metadata?.avatar_url}
-              onRemove={async () => {
-                await supabase.from('users').update({ avatar_url: null }).eq('id', user!.id);
-                setProfile(prev => prev ? { ...prev, avatar_url: null } : null);
-              }}
-              onRestoreGoogle={async () => {
-                const url = user?.user_metadata?.avatar_url;
-                if (url) {
-                  await supabase.from('users').update({ avatar_url: url }).eq('id', user!.id);
-                  setProfile(prev => prev ? { ...prev, avatar_url: url } : null);
-                }
-              }}
-              onUpload={async (url: string) => {
-                await supabase.from('users').update({ avatar_url: url }).eq('id', user!.id);
-                setProfile(prev => prev ? { ...prev, avatar_url: url } : null);
-              }}
-              userId={user!.id}
-            />
-          )}
+        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-['Instrument_Serif'] italic text-3xl md:text-4xl text-[#78716C] flex-shrink-0">
+          {profile.display_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-['Instrument_Serif'] text-2xl md:text-3xl mb-1">{profile.display_name}</h1>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted">
+          <h1 className="font-['Instrument_Serif'] italic text-2xl md:text-[28px] leading-tight mb-1">{profile.display_name}</h1>
+          {isOwnProfile && <UsernameEditor currentUsername={profile.username} userId={profile.id} />}
+          <div className="mt-2 flex flex-wrap gap-2 items-center">
             {profile.instrument && profile.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (
-              <span key={inst} className="text-[11px] bg-[#FEF3C7] text-[#B45309] px-2 py-0.5 rounded-full font-medium">{inst}</span>
+              <span key={inst} className="text-[11px] px-2.5 py-1 bg-[#FEF3C7] text-[#B45309] rounded-full font-medium">{inst}</span>
             ))}
             {profile.level && (
-              <span className="text-[11px] bg-success-bg text-success px-1.5 py-0.5 rounded capitalize">{profile.level}</span>
+              <span className="text-[11px] px-2.5 py-1 bg-green-50 text-green-700 rounded-full capitalize font-medium">{profile.level}</span>
             )}
-            {profile.location && <span className="text-xs">· {profile.location}</span>}
+            {profile.location && <span className="text-xs text-[#78716C]">{profile.location}</span>}
           </div>
-          <div className="text-xs text-muted mt-1">Joined {formatDate(profile.created_at)}</div>
-          <div className="mt-2">
-            <ApplaudButton artistId={userId} />
-          </div>
-          {isOwnProfile && (
-            <div className="mt-2">
-              <UsernameEditor
-                userId={userId}
-                currentUsername={profile.username || null}
-                onUsernameChange={(username) => setProfile({ ...profile, username } as ProfileData)}
-              />
-            </div>
-          )}
         </div>
         {isOwnProfile && !editing && (
-          <button
-            onClick={() => setEditing(true)}
-            className="text-sm text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0"
-          >
-            Edit
-          </button>
+          <button onClick={() => setEditing(true)} className="text-xs text-[#B45309] underline">Edit</button>
         )}
       </div>
 
-      {/* Bio & links */}
-      {!editing && (
-        <div className="mb-8">
-          {profile.bio && <p className="text-sm text-muted leading-relaxed mb-3 whitespace-pre-line">{profile.bio}</p>}
-          {(profile.website || (profile.social_links && Object.values(profile.social_links).some(Boolean))) && (
-            <div className="flex flex-wrap items-center gap-3 mb-3">
-              {profile.social_links && Object.entries(profile.social_links).filter(([, v]) => v).map(([platform, value]) => (
-                <a key={platform} href={normalizeSocialUrl(platform, value)} target="_blank" rel="noopener noreferrer" title={platform}
-                  className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-border flex items-center justify-center text-muted hover:text-[#B45309] hover:border-[#B45309] transition-colors no-underline">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" dangerouslySetInnerHTML={{ __html: getSocialIcon(platform) }} />
-                </a>
-              ))}
-              {profile.website && (
-                <a href={normalizeWebsiteUrl(profile.website)} className="text-xs text-[#B45309] no-underline hover:underline" target="_blank" rel="noopener">
-                  {profile.website.replace(/^https?:\/\//, '')}
-                </a>
-              )}
-            </div>
+      {!editing && profile.bio && (
+        <p className="text-sm md:text-base text-[#57534E] leading-relaxed mb-4 whitespace-pre-line">{profile.bio}</p>
+      )}
+
+      {!editing && (profile.website || (profile.social_links && Object.values(profile.social_links).some(Boolean))) && (
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+          {profile.social_links && Object.entries(profile.social_links).filter(([, v]) => v).map(([platform, value]) => (
+            <a key={platform} href={normalizeSocialUrl(platform, value)} target="_blank" rel="noopener noreferrer" title={platform}
+              className="w-8 h-8 rounded-full bg-white border border-[#E7E5E4] flex items-center justify-center text-[#78716C] hover:text-[#B45309] hover:border-[#B45309] no-underline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" dangerouslySetInnerHTML={{ __html: getSocialIcon(platform) }} />
+            </a>
+          ))}
+          {profile.website && (
+            <a href={normalizeWebsiteUrl(profile.website)} className="text-xs text-[#B45309] hover:underline" target="_blank" rel="noopener">
+              {profile.website.replace(/^https?:\/\//, '')}
+            </a>
           )}
         </div>
       )}
 
-      {/* Edit form */}
       {editing && (
-        <div className="bg-surface border border-border rounded-lg p-5 mb-8 space-y-4">
-          <div>
-            <label className="block text-xs text-muted mb-1">Bio</label>
-            <textarea value={editForm.bio} onChange={e => setEditForm(f => ({ ...f, bio: e.target.value }))}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:border-accent"
-              placeholder="Tell other musicians about yourself..." />
-          </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Instruments</label>
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {editForm.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (
-                <span key={inst} className="inline-flex items-center gap-1 text-xs bg-[#FEF3C7] text-[#B45309] px-2.5 py-1 rounded-full font-medium">
-                  {inst}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = editForm.instrument.split(',').map(i => i.trim()).filter(i => i && i !== inst).join(', ');
-                      setEditForm(f => ({ ...f, instrument: updated }));
-                    }}
-                    className="text-[#B45309]/60 hover:text-[#B45309] bg-transparent border-none cursor-pointer p-0 ml-0.5 text-sm leading-none"
-                  >
-                    x
-                  </button>
-                </span>
-              ))}
-            </div>
-            <input
-              placeholder="Type an instrument and press comma or Enter"
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
-              onKeyDown={e => {
-                if (e.key === ',' || e.key === 'Enter') {
-                  e.preventDefault();
-                  const val = (e.target as HTMLInputElement).value.trim();
-                  if (val) {
-                    const existing = editForm.instrument.split(',').map(i => i.trim()).filter(Boolean);
-                    if (!existing.includes(val)) {
-                      setEditForm(f => ({ ...f, instrument: [...existing, val].join(', ') }));
-                    }
-                    (e.target as HTMLInputElement).value = '';
-                  }
-                }
-              }}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs text-muted mb-1">I am</label>
-              <select value={editForm.level} onChange={e => setEditForm(f => ({ ...f, level: e.target.value }))}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent bg-white">
-                <option value="">Select...</option>
-                <option value="student">Student</option>
-                <option value="enthusiast">Enthusiast</option>
-                <option value="amateur">Amateur</option>
-                <option value="professional">Professional</option>
-                <option value="teacher">Teacher</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-muted mb-1">Location</label>
-              <input value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="e.g., New York, NY" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs text-muted mb-1">Website</label>
-            <input value={editForm.website} onChange={e => setEditForm(f => ({ ...f, website: e.target.value }))}
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder="https://..." />
-          </div>
-          <div>
-            <label className="block text-xs text-muted mb-2">Social Links</label>
-            <div className="grid grid-cols-2 gap-3">
-              {['Instagram', 'YouTube', 'X / Twitter', 'Facebook'].map(platform => (
-                <input key={platform} value={editForm.social_links[platform] || ''}
-                  onChange={e => setEditForm(f => ({ ...f, social_links: { ...f.social_links, [platform]: e.target.value } }))}
-                  className="border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" placeholder={platform} />
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-3 justify-end">
-            <button onClick={() => setEditing(false)} className="text-sm text-muted bg-transparent border-none cursor-pointer p-0">Cancel</button>
-            <button onClick={handleSave} className="text-sm text-white bg-accent hover:bg-accent-hover px-4 py-1.5 rounded-lg border-none cursor-pointer">Save</button>
+        <div className="space-y-4 mb-8">
+          <label className="block">
+            <span className="text-xs text-[#78716C] uppercase tracking-wider">Bio</span>
+            <textarea value={editForm.bio} onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
+              rows={4}
+              className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]" />
+          </label>
+          <label className="block">
+            <span className="text-xs text-[#78716C] uppercase tracking-wider">Instrument(s)</span>
+            <input value={editForm.instrument} onChange={e => setEditForm({ ...editForm, instrument: e.target.value })}
+              className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]" />
+          </label>
+          <label className="block">
+            <span className="text-xs text-[#78716C] uppercase tracking-wider">Level</span>
+            <select value={editForm.level} onChange={e => setEditForm({ ...editForm, level: e.target.value })}
+              className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]">
+              <option value="">—</option>
+              <option value="student">student</option>
+              <option value="amateur">amateur</option>
+              <option value="professional">professional</option>
+              <option value="teacher">teacher</option>
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs text-[#78716C] uppercase tracking-wider">Location</span>
+            <input value={editForm.location} onChange={e => setEditForm({ ...editForm, location: e.target.value })}
+              className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]" />
+          </label>
+          <label className="block">
+            <span className="text-xs text-[#78716C] uppercase tracking-wider">Website</span>
+            <input value={editForm.website} onChange={e => setEditForm({ ...editForm, website: e.target.value })}
+              className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]" />
+          </label>
+          {SOCIAL_PLATFORMS.map(platform => (
+            <label key={platform} className="block">
+              <span className="text-xs text-[#78716C] uppercase tracking-wider capitalize">{platform}</span>
+              <input
+                value={editForm.social_links[platform] || ''}
+                onChange={e => setEditForm({ ...editForm, social_links: { ...editForm.social_links, [platform]: e.target.value } })}
+                placeholder={platform === 'twitter' ? '@handle' : 'username or URL'}
+                className="mt-1 w-full border border-[#E7E5E4] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]" />
+            </label>
+          ))}
+          <div className="flex gap-3 pt-2">
+            <button onClick={handleSave} className="bg-[#1C1917] text-white text-sm font-medium px-4 py-2 rounded">Save</button>
+            <button onClick={() => setEditing(false)} className="text-sm text-[#78716C] underline">Cancel</button>
           </div>
         </div>
       )}
-
-      {/* Divider before sections */}
-      <div className="border-t border-border mb-10" />
-
-      {/* Two-column layout */}
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-8 items-start">
-
-        {/* LEFT: Main content */}
-        <div className="min-w-0">
-
-      {/* Performances */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Performances</h2>
-          {isOwnProfile && (
-            <button onClick={() => addPerformance()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
-          )}
-        </div>
-        {performances.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Share your performances with the community." : "No performances listed yet."}
-            action={isOwnProfile ? "Add your first performance" : undefined}
-            onAction={isOwnProfile ? () => addPerformance() : undefined}
-          />
-        ) : (
-          <div className="space-y-2">
-            {performances.map(p => (
-              <EditableCard key={p.id} isOwner={isOwnProfile}
-                onDelete={async () => { await supabase.from('performances').delete().eq('id', p.id); setPerformances(prev => prev.filter(x => x.id !== p.id)); }}
-                onSave={async (vals) => {
-                  const updates = { ...vals, notes_public: vals.notes_public === 'false' ? false : true };
-                  await supabase.from('performances').update(updates).eq('id', p.id);
-                  setPerformances(prev => prev.map(x => x.id === p.id ? { ...x, ...updates } as Performance : x));
-                }}
-                fields={[
-                  { key: 'event_name', label: 'Event', value: p.event_name },
-                  { key: 'venue', label: 'Venue', value: p.venue || '', suggestions: VENUES, placeholder: '' },
-                  { key: 'date', label: 'Date', value: p.date || '', type: 'date' },
-                  { key: 'role', label: '', value: p.role || 'performed', type: 'toggle', toggleLabels: ['Performed', 'Attended'], toggleValues: ['performed', 'attended'] },
-                  { key: 'notes', label: 'How was it?', value: p.notes || '', type: 'textarea', placeholder: randomNoteStarter() },
-                  { key: 'notes_public', label: '', value: p.notes_public === false ? 'false' : 'true', type: 'toggle', toggleLabels: ['Public', 'Private'], toggleValues: ['true', 'false'] },
-                ]}
-              >
-                <div className="text-sm font-medium text-ink">
-                  {p.event_name}
-                  {p.role && (
-                    <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded ${p.role === 'performed' ? 'bg-[#FEF3C7] text-[#B45309]' : 'bg-blue-50 text-blue-700'}`}>
-                      {p.role === 'performed' ? 'Performed' : 'Attended'}
-                    </span>
-                  )}
-                  {p.is_upcoming && <span className="ml-2 text-[10px] bg-accent-light text-accent px-1.5 py-0.5 rounded">Upcoming</span>}
-                </div>
-                <div className="text-xs text-muted">{p.venue && `${p.venue} · `}{p.date || ''}</div>
-                {p.notes && (isOwnProfile || p.notes_public) && (
-                  <div className="mt-2 text-xs text-[#57534E] leading-relaxed border-t border-[#F3F2F0] pt-2 whitespace-pre-line">
-                    <span className="text-muted font-medium">How was it: </span>
-                    {p.notes}
-                    {isOwnProfile && !p.notes_public && (
-                      <span className="ml-1 text-[10px] text-[#A8A29E]">(private)</span>
-                    )}
-                  </div>
-                )}
-              </EditableCard>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Training */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Training</h2>
-          {isOwnProfile && (
-            <button onClick={() => addTraining()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
-          )}
-        </div>
-        {trainingHistory.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Add your training history — conservatories, teachers, lessons, masterclasses." : "No training listed yet."}
-            action={isOwnProfile ? "Add training" : undefined}
-            onAction={isOwnProfile ? () => addTraining() : undefined}
-          />
-        ) : (
-          <div className="space-y-2">
-            {trainingHistory.map((item, i) => (
-              <EditableCard key={`training-${i}`} isOwner={isOwnProfile}
-                onDelete={() => deleteTraining(i)}
-                onSave={(vals) => {
-                  const updated = [...trainingHistory];
-                  updated[i] = { year: vals.year, title: vals.title, detail: vals.detail };
-                  saveTrainingHistory(updated);
-                }}
-                fields={[
-                  { key: 'year', label: 'Year or period (e.g., 2015-2019)', value: item.year },
-                  { key: 'title', label: 'Institution, teacher, or program', value: item.title },
-                  { key: 'detail', label: 'Details (e.g., degree, instrument, focus)', value: item.detail },
-                ]}
-              >
-                <div className="text-sm font-medium text-ink">{item.title}</div>
-                <div className="text-xs text-muted">{item.year}{item.detail ? ` · ${item.detail}` : ''}</div>
-              </EditableCard>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Instruments */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Instruments</h2>
-          {isOwnProfile && (
-            <button onClick={() => addInstrument()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
-          )}
-        </div>
-        {instruments.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Add your instrument to build its story and provenance." : "No instruments listed yet."}
-            action={isOwnProfile ? "Add your instrument" : undefined}
-            onAction={isOwnProfile ? () => addInstrument() : undefined}
-          />
-        ) : (
-          <div className="space-y-2">
-            {instruments.map(inst => (
-              <EditableCard key={inst.id} isOwner={isOwnProfile}
-                onDelete={async () => {
-                  await supabase.from('instruments').delete().eq('id', inst.id);
-                  setInstruments(prev => prev.filter(x => x.id !== inst.id));
-                }}
-                onSave={async (vals) => {
-                  const year = vals.maker_year ? parseInt(vals.maker_year) || null : null;
-                  await supabase.from('instruments').update({
-                    type: vals.type, maker: vals.maker || null,
-                    maker_year: year, country_of_origin: vals.country_of_origin || null,
-                    provenance_story: vals.provenance_story,
-                  }).eq('id', inst.id);
-                  setInstruments(prev => prev.map(x => x.id === inst.id ? { ...x, ...vals, maker_year: year } : x));
-                }}
-                fields={[
-                  { key: 'type', label: 'Instrument type (e.g., Cello, Violin)', value: inst.type },
-                  { key: 'maker', label: 'Maker', value: inst.maker || '' },
-                  { key: 'maker_year', label: 'Year made', value: inst.maker_year?.toString() || '' },
-                  { key: 'country_of_origin', label: 'Country of origin', value: inst.country_of_origin || '' },
-                  { key: 'provenance_story', label: 'Story / provenance', value: inst.provenance_story },
-                ]}
-              >
-                <div className="text-sm font-medium text-ink">
-                  {inst.type || 'New instrument'}{inst.maker ? ` — ${inst.maker}` : ''}
-                  {inst.maker_year ? `, c. ${inst.maker_year}` : ''}
-                </div>
-                <div className="text-xs text-muted">
-                  {inst.country_of_origin || ''}
-                  {inst.provenance_story ? ` · ${inst.provenance_story.slice(0, 80)}...` : ''}
-                </div>
-                {inst.type && (
-                  <a href={`/instruments/${inst.id}`} className="text-[11px] text-accent hover:underline no-underline mt-1 inline-block">View instrument page →</a>
-                )}
-              </EditableCard>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Discography */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-['Instrument_Serif'] text-xl">Discography</h2>
-          {isOwnProfile && (
-            <button onClick={() => addDiscography()} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">+ Add</button>
-          )}
-        </div>
-        {discography.length === 0 ? (
-          <EmptyState
-            message={isOwnProfile ? "Add your recordings and albums." : "No recordings listed yet."}
-            action={isOwnProfile ? "Add your first recording" : undefined}
-            onAction={isOwnProfile ? () => addDiscography() : undefined}
-          />
-        ) : (
-          <div className="space-y-2">
-            {discography.map(d => (
-              <EditableCard key={d.id} isOwner={isOwnProfile}
-                onDelete={async () => { await supabase.from('discography').delete().eq('id', d.id); setDiscography(prev => prev.filter(x => x.id !== d.id)); }}
-                onSave={async (vals) => { await supabase.from('discography').update(vals).eq('id', d.id); setDiscography(prev => prev.map(x => x.id === d.id ? { ...x, ...vals } : x)); }}
-                fields={[
-                  { key: 'title', label: 'Title', value: d.title },
-                  { key: 'role', label: 'Role', value: d.role || '' },
-                  { key: 'year', label: 'Year', value: String(d.year || '') },
-                  { key: 'url', label: 'URL', value: d.url || '' },
-                ]}
-              >
-                <div className="text-sm font-medium text-ink">
-                  {d.url ? <a href={d.url} target="_blank" rel="noopener noreferrer" className="text-ink no-underline hover:underline">{d.title}</a> : d.title}
-                </div>
-                <div className="text-xs text-muted">{d.role && `${d.role} · `}{d.year || ''}</div>
-              </EditableCard>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Sign Out */}
-      {isOwnProfile && (
-        <div className="border-t border-border pt-6">
-          <button onClick={handleSignOut} className="text-sm text-muted hover:text-ink bg-transparent border-none cursor-pointer p-0">Sign out</button>
-        </div>
-      )}
-
-        </div>{/* /LEFT */}
-
-        {/* RIGHT: Collapsible sidebar */}
-        <div className="flex flex-col gap-3">
-
-          {/* Working On */}
-          <CollapsibleSection title="Working On" count={workingOn.length} defaultOpen>
-            {workingOn.length === 0 ? (
-              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Log activity on pieces from any piece page.' : 'No activity yet.'}</p>
-            ) : (
-              <div className="space-y-0">
-                {workingOn.slice(0, 10).map(w => {
-                  const act = ACTIVITIES.find(a => a.type === w.activity);
-                  return (
-                    <a key={`${w.piece_id}-${w.created_at}`} href={`/piece/${w.piece_id}`} className="block py-2 border-b border-border last:border-b-0 no-underline hover:bg-bg -mx-4 px-4 transition-colors">
-                      <div className="text-xs font-medium text-ink">{w.pieces.title}</div>
-                      <div className="text-[11px] text-muted mt-0.5">
-                        {act ? `${act.emoji} ${act.label}` : w.activity}
-                        {' · '}
-                        {new Date(w.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </div>
-                    </a>
-                  );
-                })}
-              </div>
-            )}
-          </CollapsibleSection>
-
-          {/* Discussions */}
-          <CollapsibleSection title="Discussions" count={posts.length}>
-            {posts.length === 0 ? (
-              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Join a discussion on any piece page.' : 'No posts yet.'}</p>
-            ) : (
-              <div className="space-y-0">
-                {posts.slice(0, 5).map(p => (
-                  <a key={p.id} href={`/piece/${p.piece_id}`} className="block py-2 border-b border-border last:border-b-0 no-underline hover:bg-bg -mx-4 px-4 transition-colors">
-                    <div className="text-xs text-ink leading-relaxed line-clamp-2">{p.text}</div>
-                    <div className="text-[11px] text-muted mt-0.5">on {p.pieces.title} · {formatDate(p.created_at)}</div>
-                  </a>
-                ))}
-              </div>
-            )}
-          </CollapsibleSection>
-
-          {/* Reviews */}
-          <CollapsibleSection title="Reviews" count={reviews.length}>
-            {reviews.length === 0 ? (
-              <p className="text-xs text-muted py-2">{isOwnProfile ? 'Rate editions from any piece page.' : 'No reviews yet.'}</p>
-            ) : (
-              <div className="space-y-0">
-                {reviews.slice(0, 5).map(r => (
-                  <div key={r.id} className="py-2 border-b border-border last:border-b-0">
-                    <div className="text-[11px] text-star tracking-wide">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
-                    {r.text && <div className="text-xs text-ink leading-relaxed mt-0.5 line-clamp-2">{r.text}</div>}
-                    <div className="text-[11px] text-muted mt-0.5">{r.editions.publisher} · {r.editions.pieces.title}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CollapsibleSection>
-
-        </div>{/* /RIGHT */}
-
-      </div>{/* /two-column grid */}
-    </div>
-  );
-
-  // Helper functions for adding items
-  async function saveTrainingHistory(updated: { year: string; title: string; detail: string }[]) {
-    const sorted = [...updated].sort((a, b) => (b.year || '').localeCompare(a.year || ''));
-    await supabase.from('users').update({ training_history: sorted }).eq('id', user!.id);
-    setTrainingHistory(sorted);
-  }
-
-  function addTraining() {
-    // Add blank entry — inline form will auto-open
-    setTrainingHistory(prev => [{ year: '', title: '', detail: '' }, ...prev]);
-  }
-
-  function editTraining(_index: number) {
-    // EditableCard handles this inline
-  }
-
-  function deleteTraining(index: number) {
-    const updated = trainingHistory.filter((_, i) => i !== index);
-    saveTrainingHistory(updated);
-  }
-
-  function addInstrument() {
-    supabase.from('instruments').insert({
-      type: '', maker: '', maker_year: null, country_of_origin: '',
-      current_owner_id: user!.id, provenance_story: '',
-    }).select().single().then(({ data, error }) => {
-      if (!error && data) {
-        setInstruments(prev => [data, ...prev]);
-        supabase.from('instrument_history').insert({
-          instrument_id: data.id, artist_id: user!.id,
-          date_from: new Date().toISOString().split('T')[0],
-          relationship: 'owned',
-        });
-      }
-    });
-  }
-
-  function addPerformance() {
-    supabase.from('performances').insert({
-      user_id: user!.id, event_name: '', venue: '', date: new Date().toISOString().split('T')[0],
-      is_upcoming: true, role: 'performed', notes: '', notes_public: true,
-    }).select().single().then(({ data }) => {
-      if (data) setPerformances(prev => [data as Performance, ...prev]);
-    });
-  }
-
-  function addDiscography() {
-    supabase.from('discography').insert({
-      user_id: user!.id, title: '', year: new Date().getFullYear(), role: 'Performer',
-    }).select().single().then(({ data }) => {
-      if (data) setDiscography(prev => [data as DiscographyItem, ...prev]);
-    });
-  }
-}
-
-// --- Collapsible Section ---
-
-function CollapsibleSection({ title, count, defaultOpen = false, children }: {
-  title: string;
-  count: number;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  return (
-    <div className="bg-surface border border-border rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center px-4 py-3 cursor-pointer bg-transparent border-none hover:bg-bg transition-colors"
-      >
-        <span className="text-[13px] font-semibold text-ink flex items-center gap-1.5">
-          {title}
-          {count > 0 && (
-            <span className="text-[10px] font-medium text-muted bg-bg border border-border px-1.5 py-0 rounded-full">{count}</span>
-          )}
-        </span>
-        <svg
-          width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className={`text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </button>
-      {open && (
-        <div className="px-4 pb-3 border-t border-border">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// --- Empty State ---
-
-function EmptyState({ message, action, onAction }: { message: string; action?: string; onAction?: () => void }) {
-  return (
-    <div className="border border-dashed border-border rounded-lg py-6 px-4 text-center">
-      <p className="text-sm text-muted mb-2">{message}</p>
-      {action && onAction && (
-        <button onClick={onAction} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">{action}</button>
-      )}
-    </div>
-  );
-}
-
-// --- Editable Card ---
-
-function EditableCard({ children, isOwner, onDelete, onSave, fields }: {
-  children: React.ReactNode;
-  isOwner: boolean;
-  onDelete: () => void;
-  onSave: (vals: Record<string, string>) => void;
-  fields: { key: string; label: string; value: string; type?: string; options?: { value: string; label: string }[]; toggleLabels?: string[]; toggleValues?: string[]; placeholder?: string; suggestions?: string[] }[];
-}) {
-  const isNew = !fields[0]?.value;
-  const [editMode, setEditMode] = useState(false);
-  const [vals, setVals] = useState<Record<string, string>>(() => Object.fromEntries(fields.map(f => [f.key, f.value])));
-
-  // Open in edit mode if title/event_name is empty (just created)
-  useEffect(() => {
-    if (isNew) setEditMode(true);
-  }, []);
-
-  if (editMode && isOwner) {
-    return (
-      <div className="bg-surface border border-accent/30 rounded-lg px-5 md:px-6 py-4 space-y-2">
-        {fields.map(f => (
-          <div key={f.key}>
-            {f.label && <label className="block text-[11px] text-muted mb-0.5">{f.label}</label>}
-            {f.type === 'select' && f.options ? (
-              <select value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
-                className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent bg-white">
-                {f.options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            ) : f.type === 'toggle' ? (
-              <div className="inline-flex rounded-lg overflow-hidden border border-border">
-                {(f.toggleLabels || ['On', 'Off']).map((lbl, idx) => {
-                  const val = f.toggleValues?.[idx] || (idx === 0 ? 'true' : 'false');
-                  const isActive = vals[f.key] === val;
-                  return (
-                    <button key={val} type="button"
-                      onClick={() => setVals(v => ({ ...v, [f.key]: val }))}
-                      className={`text-xs px-3 py-1 border-none cursor-pointer transition-colors ${isActive ? 'bg-[#1C1917] text-white' : 'bg-white text-muted hover:bg-gray-50'}`}>
-                      {lbl}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : f.type === 'textarea' ? (
-              <textarea value={vals[f.key] || ''} onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
-                className="w-full border border-border rounded px-2 py-1 text-sm resize-none h-16 focus:outline-none focus:border-accent"
-                placeholder={f.placeholder || f.label} />
-            ) : f.suggestions ? (
-              <AutocompleteInput
-                value={vals[f.key] || ''}
-                onChange={v => setVals(prev => ({ ...prev, [f.key]: v }))}
-                suggestions={f.suggestions}
-                placeholder={f.placeholder || f.label}
-              />
-            ) : (
-              <input value={vals[f.key] || ''} type={f.type || 'text'}
-                onChange={e => setVals(v => ({ ...v, [f.key]: e.target.value }))}
-                className="w-full border border-border rounded px-2 py-1 text-sm focus:outline-none focus:border-accent" />
-            )}
-          </div>
-        ))}
-        <div className="flex gap-2 justify-end pt-1">
-          <button onClick={() => { if (isNew) { onDelete(); } else { setEditMode(false); } }} className="text-xs text-muted bg-transparent border-none cursor-pointer p-0">Cancel</button>
-          <button onClick={() => {
-            // Treat as empty if only default values (e.g., only date filled)
-            const meaningful = fields.filter(f => f.type !== 'date' && f.type !== 'select' && f.type !== 'toggle');
-            const hasContent = meaningful.some(f => vals[f.key]?.trim());
-            if (!hasContent) { onDelete(); return; }
-            onSave(vals); setEditMode(false);
-          }} className="text-xs text-accent hover:text-accent-hover bg-transparent border-none cursor-pointer p-0">Save</button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-surface border border-border rounded-lg px-5 md:px-6 py-3 flex justify-between items-start group">
-      <div className="flex-1 min-w-0 whitespace-pre-line">{children}</div>
-      {isOwner && (
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-          <button onClick={() => setEditMode(true)} className="text-muted hover:text-ink bg-transparent border-none cursor-pointer p-1" title="Edit">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-          </button>
-          <button onClick={onDelete} className="text-muted hover:text-error bg-transparent border-none cursor-pointer p-1" title="Delete">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// --- Autocomplete Input (uses shared Autocomplete component) ---
-import Autocomplete from './Autocomplete';
-
-function AutocompleteInput({ value, onChange, suggestions, placeholder }: {
-  value: string;
-  onChange: (v: string) => void;
-  suggestions: string[];
-  placeholder?: string;
-}) {
-  return (
-    <Autocomplete
-      id="" name=""
-      value={value}
-      onChange={onChange}
-      suggestions={suggestions}
-      placeholder={placeholder}
-      className="w-full border border-[#E7E5E4] rounded px-2 py-1 text-sm focus:outline-none focus:border-[#B45309]"
-    />
-  );
-}
-
-// --- Avatar Menu ---
-
-function AvatarMenu({ hasPhoto, googleAvatarUrl, onRemove, onRestoreGoogle, onUpload, userId }: {
-  hasPhoto: boolean;
-  googleAvatarUrl?: string;
-  onRemove: () => void;
-  onRestoreGoogle: () => void;
-  onUpload: (url: string) => void;
-  userId: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const ext = file.name.split('.').pop();
-    const path = `avatars/${userId}.${ext}`;
-    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
-    if (!error) {
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
-      onUpload(`${data.publicUrl}?t=${Date.now()}`);
-    }
-    setUploading(false);
-    setOpen(false);
-  };
-
-  return (
-    <>
-      <button onClick={() => setOpen(!open)}
-        className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-ink cursor-pointer transition-colors"
-        title="Change photo">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </button>
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 mt-2 bg-surface border border-border rounded-lg shadow-lg z-50 w-48 py-1">
-            {hasPhoto && (
-              <button onClick={() => { onRemove(); setOpen(false); }}
-                className="w-full text-left px-3 py-2 text-sm text-muted hover:bg-bg bg-transparent border-none cursor-pointer">Remove photo</button>
-            )}
-            {!hasPhoto && googleAvatarUrl && (
-              <button onClick={() => { onRestoreGoogle(); setOpen(false); }}
-                className="w-full text-left px-3 py-2 text-sm text-muted hover:bg-bg bg-transparent border-none cursor-pointer">Restore Google photo</button>
-            )}
-            <button onClick={() => fileInputRef.current?.click()}
-              className="w-full text-left px-3 py-2 text-sm text-muted hover:bg-bg bg-transparent border-none cursor-pointer" disabled={uploading}>
-              {uploading ? 'Uploading...' : 'Upload new photo'}
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          </div>
-        </>
-      )}
-    </>
+    </main>
   );
 }

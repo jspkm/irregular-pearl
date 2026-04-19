@@ -1,23 +1,5 @@
 // Pure helper functions extracted for testability
 
-import type { ActivityType } from './database.types';
-
-// ── Activity types (single source of truth) ──
-
-export const ACTIVITIES: { type: ActivityType; emoji: string; label: string }[] = [
-  { type: 'working_on', emoji: '✊', label: 'Working on this' },
-  { type: 'listened', emoji: '👂', label: 'Listened / studied' },
-  { type: 'practiced', emoji: '🎵', label: 'Practiced' },
-  { type: 'sight_read', emoji: '🏁', label: 'Sight-read' },
-  { type: 'took_lesson', emoji: '📖', label: 'Took a lesson' },
-  { type: 'performed', emoji: '🎤', label: 'Performed' },
-];
-
-export const ACTIVITY_STAT_LABELS: Record<string, string> = {
-  practiced: 'practice', took_lesson: 'lessons', performed: 'performances',
-  listened: 'listens', sight_read: 'sight-reads', working_on: 'working',
-};
-
 // ── Grouping utility ──
 
 export function groupBy<T>(items: T[], keyFn: (item: T) => string): Record<string, T[]> {
@@ -54,30 +36,6 @@ export function formatTime(dateStr: string): string {
 
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-}
-
-// ── Performance note starters ──
-
-export const NOTE_STARTERS = [
-  'The acoustics were incredible because...',
-  'I wasn\'t expecting the encore to be...',
-  'The highlight was the second movement when...',
-  'What surprised me most was...',
-  'I\'ll never forget the moment when...',
-  'The conductor\'s interpretation of the adagio...',
-  'My hands were shaking before the cadenza but...',
-  'The audience reaction after the final chord...',
-  'I finally understood why this piece matters when...',
-  'Three words: standing ovation because...',
-  'The soloist did something unexpected in the...',
-  'Best sight-reading experience of my life because...',
-  'I almost didn\'t go, but I\'m glad I did because...',
-  'The venue made the pianissimo sections feel like...',
-  'After years of practicing this piece, performing it felt...',
-];
-
-export function randomNoteStarter(): string {
-  return NOTE_STARTERS[Math.floor(Math.random() * NOTE_STARTERS.length)];
 }
 
 // ── Social URL normalization ──
@@ -130,27 +88,11 @@ export interface FuzzyRow {
 
 export interface FuzzyResults {
   pieceIds: string[];
-  artists: { id: string; display_name: string; instrument: string | null; username: null }[];
-  events: { id: string; title: string; venue: string | null; city: null; event_date: string; event_type: string }[];
 }
 
 export function mapFuzzyResults(rows: FuzzyRow[]): FuzzyResults {
   return {
     pieceIds: rows.filter(r => r.match_type === 'piece').map(r => r.match_id),
-    artists: rows.filter(r => r.match_type === 'artist').map(r => ({
-      id: r.match_id,
-      display_name: r.match_title,
-      instrument: r.match_subtitle || null,
-      username: null,
-    })),
-    events: rows.filter(r => r.match_type === 'event').map(r => ({
-      id: r.match_id,
-      title: r.match_title,
-      venue: r.match_subtitle || null,
-      city: null,
-      event_date: '',
-      event_type: '',
-    })),
   };
 }
 

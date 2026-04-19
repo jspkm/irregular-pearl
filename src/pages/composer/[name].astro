@@ -33,9 +33,8 @@ const byForm = groupBy(pieces, p => p.form || 'Other');
 const eras = [...new Set(pieces.map(p => p.era))];
 const forms = [...new Set(pieces.map(p => p.form))];
 const instruments = [...new Set(pieces.flatMap(p => p.instruments))];
-const editionCount = 0; // Not available from basic shape
 
-const seoDescription = `${composerName} on Irregular Pearl — browse ${pieces.length} pieces across ${instruments.join(', ')}. Compare editions, listen to recordings, and discuss with musicians.`;
+const seoDescription = `${composerName} on Irregular Pearl — browse ${pieces.length} pieces across ${instruments.join(', ')}. Compare editions and listen to recordings.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',

@@ -185,26 +185,10 @@ describe('E2E: meta tags', () => {
   });
 });
 
-describe('E2E: new pages', () => {
-  test('events page returns 200', async () => {
-    const res = await fetchOk('/events');
-    expect(res.status).toBe(200);
-    const html = await res.text();
-    expect(html).toContain('Upcoming Events');
-  });
-
-  test('llms.txt includes artist and instrument routes', async () => {
+describe('E2E: additional routes', () => {
+  test('llms.txt includes artist profile route', async () => {
     const res = await fetchOk('/llms.txt');
     const text = await res.text();
     expect(text).toContain('/@{username}');
-    expect(text).toContain('/instruments/{id}');
-    expect(text).toContain('/events');
-    expect(text).toContain('Instrument Registry');
-  });
-
-  test('sitemap includes events page', async () => {
-    const res = await fetchOk('/sitemap.xml');
-    const xml = await res.text();
-    expect(xml).toContain('/events');
   });
 });
