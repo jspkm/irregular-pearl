@@ -9,8 +9,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "bun test src/lib src/data src/components src/tests",
+    "test:integration": "bun --env-file=.env.test test src/integration",
     "test:e2e": "bun test src/e2e",
-    "test:all": "bun run test && bun run test:e2e",
+    "test:all": "bun run test && bun run test:integration && bun run test:e2e",
     "validate:urls": "bun run scripts/validate-seed-urls.ts"
   },
   "dependencies": {

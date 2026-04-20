@@ -204,29 +204,32 @@ A published note is never mutated in place. Any edit is a new version row + `cur
 
 ## 5. API / route surface
 
-All under `src/pages/api/`. Astro endpoints, session auth via `supabase.auth.getUser()` from request cookies. State-changing endpoints call Postgres RPCs (`security definer`) that encapsulate the transition, audit writes, and notification side effects atomically.
+**Decision — no Astro API route layer. UI calls RPCs directly via `supabase.rpc(...)` from the browser.** The security-definer functions enforce every guard that an Astro route would (auth, ownership, state machine). PostgREST automatically exposes each grantable RPC at `POST /rest/v1/rpc/<function_name>`, which is curl-compatible with a user JWT. Adding a pass-through Astro layer would be boilerplate with no additional security or functional value for Slice A. If Slice B+ needs server-side orchestration (cron triggers, multi-RPC transactions, rate limiting), we add routes then.
 
-| Path | Method | Auth | Body | Purpose |
-|---|---|---|---|---|
-| `api/performers-notes` | POST | contributor | `{piece_id, body}` | `publish_contributor_note` — self-author, publishes immediately. |
-| `api/performers-notes/[id]/edit` | POST | contributor (owner) | `{body}` | `publish_contributor_edit` — new version, stays published. |
-| `api/admin/performers-notes` | POST | staff | `{piece_id, contributor_id, body}` | `create_performers_note_draft`. |
-| `api/admin/performers-notes/[id]/submit` | POST | staff | — | `draft → awaiting_contributor_approval`. |
-| `api/admin/performers-notes/[id]/retract` | POST | staff | — | Retract to draft, sets `retracted_by`. |
-| `api/performers-notes/[id]/approve` | POST | contributor (owner) | — | `approve_performers_note`. |
-| `api/performers-notes/[id]/approve-and-edit` | POST | contributor (owner) | `{body}` | `approve_and_edit_performers_note`. |
-| `api/performers-notes/[id]/reject` | POST | contributor (owner) | `{reason?}` | `reject_performers_note`. |
-| `api/performers-notes/[id]/remove` | POST | contributor (owner) | — | `remove_performers_note`, sets `removed_by`. |
-| `api/notifications` | GET | any authed | — | List un-cleared for bell/queue. |
-| `api/notifications/[id]/clear` | POST | recipient | — | Set `cleared_at`. |
+Listing the RPC surface for reference:
 
-No DELETE verbs — removal is a state transition, not a row delete.
+| RPC | Caller | Args | Effect |
+|---|---|---|---|
+| `publish_contributor_note` | contributor | `p_piece_id, p_body` | create + publish v1 atomically |
+| `publish_contributor_edit` | contributor (owner) | `p_note_id, p_body` | new version, stays published |
+| `remove_performers_note` | contributor (owner) | `p_note_id` | `published → removed` |
+| `create_performers_note_draft` | staff | `p_piece_id, p_contributor_id, p_body` | new note in `draft` state |
+| `update_performers_note_draft` | staff | `p_note_id, p_body` | new version, stays `draft` |
+| `submit_performers_note` | staff | `p_note_id` | `draft → awaiting`, inserts notification |
+| `retract_performers_note` | staff | `p_note_id` | `awaiting → draft`, clears notification |
+| `approve_performers_note` | contributor (owner) | `p_note_id` | `awaiting → published` |
+| `approve_and_edit_performers_note` | contributor (owner) | `p_note_id, p_body` | new version + publish in one call |
+| `reject_performers_note` | contributor (owner) | `p_note_id, p_reason?` | `awaiting → draft`, reason on version |
+| `clear_notification` | recipient | `p_notification_id` | set `cleared_at` |
+| `clear_all_notifications` | recipient | — | clear all, return count |
+
+All grant `execute` to `authenticated`; internal helpers (`_require_*`, `_insert_performers_note_version`, `_clear_notifications_for_note`) are revoked from `public`. No DELETE verbs — removal is a state transition, not a row delete.
 
 ## 6. Component inventory
 
 All components consume existing DESIGN.md tokens. Astro where static, React where there's local state.
 
-- **`src/components/NavbarBell.tsx`** — React island inside `Navbar.astro`, placed immediately left of `AuthButton`. Props: none (self-fetches). Poll-only for Slice A: fetches `/api/notifications` on mount, on `visibilitychange` when the tab becomes visible, and after any local action that could create/clear notifications. Badge rules: hidden at 0, exact count `1`–`9`, `9+` at 10 or more. Popover on click, click-outside closes. Each popover item is a link to the piece page (or `/notifications`) plus an inline `Clear` button. Footer `Clear all` button sets `cleared_at` on every un-cleared notification for the recipient.
+- **`src/components/NavbarBell.tsx`** — React island inside `Navbar.astro`, placed immediately left of `AuthButton`. Props: none (self-fetches). Poll-only for Slice A: queries `notifications` (via supabase client, RLS scopes to recipient) on mount, on `visibilitychange` when the tab becomes visible, and after any local action that could create/clear notifications. Badge rules: hidden at 0, exact count `1`–`9`, `9+` at 10 or more. Popover on click, click-outside closes. Each popover item is a link to the piece page (or `/notifications`) plus an inline `Clear` button. Footer `Clear all` button sets `cleared_at` on every un-cleared notification for the recipient.
 - **`src/pages/notifications.astro`** — hosts `<NotificationsQueue client:load />`. For v1 this page *is* the contributor approval queue (un-cleared notifications are all pending drafts). Title "Your queue".
 - **`src/components/NotificationsQueue.tsx`** — React. For each pending draft: piece title, byline-to-be, current proposed body (serif, signed-notes pattern). Diff block against prior versions is deferred to v1.1 — Slice A shows the current body only. Action row: `Approve`, `Approve and edit` (toggles an inline textarea), `Reject` (inline confirmation with freeform reason, not a native dialog).
 - **`src/pages/admin/performers-notes.astro`** + **`src/components/admin/PerformersNotesAdmin.tsx`** — staff authoring. Select piece (existing `Autocomplete`), select contributor (default to the single `is_contributor=true AND contributor_active=true` user if there's exactly one; require explicit pick otherwise; disable Send button with an inline note if zero contributors). Textarea, `Save draft` and `Send to contributor` buttons. List of existing drafts with status, rejection notes inline on rejected-version rows, and a `Retract` button on `awaiting_contributor_approval` rows. Deliberately unpolished — PRD says Tier 1 is data-model + admin view, not styled product.
