@@ -27,7 +27,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 interface NotificationRow {
   id: string;
   recipient_id: string;
-  performers_note_id: string;
+  subject_table: string;
+  subject_id: string;
   body: string;
   link_path: string;
   created_at: string;
@@ -40,10 +41,14 @@ interface PieceRef {
   composer_name: string;
 }
 
-interface NoteWithPiece {
-  note_id: string;
-  piece: PieceRef;
-}
+// Subject tables that route through the contributor approval pipeline.
+// Keep in sync with src/lib/contributorSubjects.ts — the edge function runs
+// in Deno and can't import TypeScript from src/, so this is a local mirror.
+const SUBJECT_TABLES = [
+  'performers_notes',
+  'interpretive_schools',
+  'piece_descriptions',
+] as const;
 
 async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; errors: string[] }> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -55,7 +60,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
   // the bell + /notifications provide the ongoing nag.
   const { data: rows } = await supabase
     .from("notifications")
-    .select("id, recipient_id, performers_note_id, body, link_path, created_at")
+    .select("id, recipient_id, subject_table, subject_id, body, link_path, created_at")
     .is("cleared_at", null)
     .is("last_digest_sent_at", null)
     .order("created_at", { ascending: true });
@@ -72,23 +77,35 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
     byRecipient.set(n.recipient_id, arr);
   }
 
-  // Batch-fetch the performers_notes + pieces referenced across all recipients.
-  const noteIds = [...new Set((rows as NotificationRow[]).map((n) => n.performers_note_id))];
-  const { data: notesData } = await supabase
-    .from("performers_notes")
-    .select("id, piece_id")
-    .in("id", noteIds);
-  const pieceIds = [...new Set((notesData ?? []).map((n: any) => n.piece_id))];
-  const { data: piecesData } = pieceIds.length
-    ? await supabase.from("pieces").select("id, title, catalog_number, composer_name").in("id", pieceIds)
+  // Batch-fetch subjects per subject_table (O(tables) round trips). Each
+  // supported subject table has a `piece_id` column, so the projection is
+  // uniform.
+  const idsByTable = new Map<string, Set<string>>();
+  for (const n of rows as NotificationRow[]) {
+    if (!(SUBJECT_TABLES as readonly string[]).includes(n.subject_table)) continue;
+    const set = idsByTable.get(n.subject_table) ?? new Set<string>();
+    set.add(n.subject_id);
+    idsByTable.set(n.subject_table, set);
+  }
+
+  const subjectToPiece = new Map<string, string>(); // "<table>:<id>" → piece_id
+  const pieceIdSet = new Set<string>();
+  for (const [table, ids] of idsByTable) {
+    const { data: subjects } = await supabase
+      .from(table)
+      .select("id, piece_id")
+      .in("id", [...ids]);
+    for (const row of (subjects ?? []) as Array<{ id: string; piece_id: string }>) {
+      subjectToPiece.set(`${table}:${row.id}`, row.piece_id);
+      pieceIdSet.add(row.piece_id);
+    }
+  }
+
+  const { data: piecesData } = pieceIdSet.size
+    ? await supabase.from("pieces").select("id, title, catalog_number, composer_name").in("id", [...pieceIdSet])
     : { data: [] };
   const pieceById = new Map<string, PieceRef>();
   for (const p of (piecesData ?? []) as PieceRef[]) pieceById.set(p.id, p);
-  const noteToPiece = new Map<string, NoteWithPiece>();
-  for (const n of (notesData ?? []) as Array<{ id: string; piece_id: string }>) {
-    const piece = pieceById.get(n.piece_id);
-    if (piece) noteToPiece.set(n.id, { note_id: n.id, piece });
-  }
 
   for (const [recipientId, notifications] of byRecipient) {
     try {
@@ -108,11 +125,14 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
       const html = renderNotificationDigest({
         recipientName: firstName,
         count: notifications.length,
-        items: notifications.map((n) => ({
-          body: n.body,
-          linkPath: n.link_path,
-          piece: noteToPiece.get(n.performers_note_id)?.piece ?? null,
-        })),
+        items: notifications.map((n) => {
+          const pieceId = subjectToPiece.get(`${n.subject_table}:${n.subject_id}`);
+          return {
+            body: n.body,
+            linkPath: n.link_path,
+            piece: pieceId ? pieceById.get(pieceId) ?? null : null,
+          };
+        }),
       });
 
       const subject = notifications.length === 1
