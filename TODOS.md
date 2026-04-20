@@ -126,18 +126,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 **Priority:** P3
 **Depends on:** Slice A bell ships first
 
-### Confirm Supabase local dev workflow
-
-**What:** Verify `supabase start` works locally against `supabase/config.toml`. If not, run `supabase init`, wire up local ports in `.env.local.example`, and document the dev loop in README under "Running locally."
-
-**Why:** Slice A tests (and any future integration test surface) assume real Supabase via `supabase start`. README only documents `supabase db push` for prod migrations. Without a local dev container, every integration test run is a round-trip to prod or a blocked session.
-
-**Context:** Blocks Slice A step 2 (RPCs + API endpoints) if local doesn't work. Likely a 15-minute confirmation; could be a couple hours if the config is missing. Do before test implementation starts.
-
-**Effort:** S
-**Priority:** P2
-**Depends on:** None (but blocks Slice A testing)
-
 ---
 
 ## Contributor pipeline (post-Slice-A)
