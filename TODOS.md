@@ -114,6 +114,46 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 **Priority:** P3
 **Depends on:** None
 
+### Spec popover chrome in DESIGN.md
+
+**What:** Add a popover spec to DESIGN.md — border weight, radius, shadow (or lack thereof), arrow (or lack thereof), entrance motion. Locks the default for the navbar bell, future contextual menus, diff-reveal blocks, and any other hover-or-click surfaces that escape the Cards pattern.
+
+**Why:** DESIGN.md covers Cards but not Popovers. Every new popover surface re-debates the same choices (Slice A alone defaults to 0.5px / 8px radius / no shadow / no arrow to keep moving). One-time spec closes the drift.
+
+**Context:** Source of truth is whatever Slice A's bell popover ships. Codify retroactively, then reference the spec from future component specs. Complementary to the existing signed-notes + Cards entries.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** Slice A bell ships first
+
+### Confirm Supabase local dev workflow
+
+**What:** Verify `supabase start` works locally against `supabase/config.toml`. If not, run `supabase init`, wire up local ports in `.env.local.example`, and document the dev loop in README under "Running locally."
+
+**Why:** Slice A tests (and any future integration test surface) assume real Supabase via `supabase start`. README only documents `supabase db push` for prod migrations. Without a local dev container, every integration test run is a round-trip to prod or a blocked session.
+
+**Context:** Blocks Slice A step 2 (RPCs + API endpoints) if local doesn't work. Likely a 15-minute confirmation; could be a couple hours if the config is missing. Do before test implementation starts.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None (but blocks Slice A testing)
+
+---
+
+## Contributor pipeline (post-Slice-A)
+
+### Diff block in NotificationsQueue
+
+**What:** Render a line-level diff in the approval queue against the most recently approved version of the same note. Uses the `diff` npm package (tree-shakes cleanly). Visible when a pending draft is a revision after a prior rejection or an earlier published state.
+
+**Why:** Deferred from Slice A per Codex review — for v1 with H. only, diff block adds dep + test surface for limited decision value. Once rejections become common enough that H. wants a direct comparison against the prior reading, the diff block shortens the review cycle.
+
+**Context:** Add to `src/components/NotificationsQueue.tsx`. Fetch prior version body via an `/api/performers-notes/[id]/versions` endpoint (new, read-only, gated by owner contributor + staff). Render inline above the current body. Small enough for a follow-up PR, large enough it didn't belong in Slice A.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** Slice A (shipped first)
+
 ---
 
 ## Completed
