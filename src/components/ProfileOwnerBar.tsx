@@ -14,7 +14,7 @@ export default function ProfileOwnerBar({ profileUserId }: ProfileOwnerBarProps)
       <span className="text-sm text-[#4C385C]">This is your public profile</span>
       <a
         href={`/profile/${profileUserId}`}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
+        className="inline-flex items-center bg-transparent border-[0.5px] border-border-strong text-muted font-body text-[11px] px-2.5 py-1 rounded-md transition-colors hover:text-ink hover:border-ink no-underline"
       >
         Edit profile
       </a>

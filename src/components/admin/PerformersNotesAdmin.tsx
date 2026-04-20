@@ -179,6 +179,11 @@ export default function PerformersNotesAdmin() {
     setBody('');
     setCreating(false);
     await reload();
+    notifyChanged();
+  }
+
+  function notifyChanged() {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
   async function handleSubmit(noteId: string) {
@@ -187,6 +192,7 @@ export default function PerformersNotesAdmin() {
     setRowBusy((b) => ({ ...b, [noteId]: false }));
     if (err) { setError(err.message); return; }
     await reload();
+    notifyChanged();
   }
 
   async function handleRetract(noteId: string) {
@@ -195,6 +201,7 @@ export default function PerformersNotesAdmin() {
     setRowBusy((b) => ({ ...b, [noteId]: false }));
     if (err) { setError(err.message); return; }
     await reload();
+    notifyChanged();
   }
 
   async function handleRevise(noteId: string) {
@@ -311,19 +318,26 @@ export default function PerformersNotesAdmin() {
 
       {/* Existing notes */}
       <section>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 gap-4">
           <h2 className="font-display text-[20px] text-[#1A1A1A]">Notes</h2>
-          <div className="flex gap-1 text-xs">
-            {(['awaiting_contributor_approval', 'draft', 'published', 'removed', 'all'] as const).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => setFilter(f)}
-                className={`px-2 py-1 rounded ${filter === f ? 'bg-[#F2EEF5] text-[#6B4E7C]' : 'bg-transparent text-[#6F6F6F] hover:text-[#1A1A1A]'}`}
-              >
-                {f === 'awaiting_contributor_approval' ? 'awaiting' : f}
-              </button>
-            ))}
+          <div className="flex gap-2 flex-wrap">
+            {(['awaiting_contributor_approval', 'draft', 'published', 'removed', 'all'] as const).map((f) => {
+              const active = filter === f;
+              return (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={`inline-flex items-center font-body text-[11px] px-2.5 py-1 rounded-md cursor-pointer border-[0.5px] transition-colors ${
+                    active
+                      ? 'bg-accent-light text-accent border-accent-border'
+                      : 'bg-transparent text-muted border-border-strong hover:text-ink hover:border-ink'
+                  }`}
+                >
+                  {f === 'awaiting_contributor_approval' ? 'awaiting' : f}
+                </button>
+              );
+            })}
           </div>
         </div>
 

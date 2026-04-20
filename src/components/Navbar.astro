@@ -1,5 +1,6 @@
 ---
 import AuthButton from './AuthButton';
+import NavbarBell from './NavbarBell';
 ---
 <nav class="relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4 border-b border-border bg-surface sticky top-0 z-50">
   <a href="/" class="no-underline shrink-0 text-ink font-medium tracking-tight text-base md:text-lg">
@@ -32,6 +33,7 @@ import AuthButton from './AuthButton';
       </svg>
     </button>
     <a href="/about" class="no-underline text-ink hover:text-accent transition-colors">About</a>
+    <NavbarBell client:load />
     <AuthButton client:load />
   </div>
 
