@@ -118,6 +118,16 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Completed
 
+### Catalog reset to curated editorial spine (PRD rev 2)
+
+**What:** Wiped the OpenOpus-imported breadth catalog (~7,829 scraped stubs) and replaced with 19 hand-authored cello-forward pieces. Deleted the seed-expansion files and scraper scripts that produced the breadth catalog. Supabase `pieces` truncate-cascades on deploy; FK-linked rows drop with it.
+
+**Why:** PRD rev 2 "narrow scope, deep craft" — H.'s daily-use loop is cellist repertoire, not a 7,829-piece scrape. Building the piece-page redesign against 19 real target pieces forces depth-first design (landmarks, performer's notes, schools populated for real), not breadth-first empty-state patterns.
+
+**Effort:** L
+**Priority:** P1
+**Completed:** v0.1.0 (2026-04-19)
+
 ### Sans family switch to Inter + wordmark rendered as `IrregularPearl`
 
 **What:** Body/UI sans family moved from DM Sans to Inter. Wordmark switched from Instrument Serif italic `Irregular Pearl` to Inter medium non-italic `IrregularPearl` across navbar, layout footer, admin header, emails, and `public/logo.svg`. Landing and About pages cleaned of residual italic + `font-display`.
