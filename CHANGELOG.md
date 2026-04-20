@@ -4,6 +4,31 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Added (contributor approval pipeline — Slice B)
+
+Two more signed content types now flow through the pipeline Slice A proved. A contributor can publish named *interpretive schools* (plural-voices-per-piece, no canonical framing) and long-form *signed piece descriptions* carrying interpretive or pedagogical judgment. Schools render on the piece page as a grid that collapses to stacked cards on narrow viewports; signed descriptions render in the same 2px-purple-left-border signed-notes pattern. The navbar bell, approval queue, admin view, and daily digest all light up for every subject type through one codepath.
+
+- **Two new content types** — `interpretive_schools` (name, signed paragraph, optional tempo cues jsonb) and `piece_descriptions` (long-form signed prose). Both have their own `*_versions` tables with append-only versioning and the same six-audit-column trail as performer's notes. Existing unsigned `pieces.description` is untouched — the signed surface is additive. Full design in [PLAN-contributor-pipeline-slice-b.md](PLAN-contributor-pipeline-slice-b.md).
+- **23 new security-definer RPCs** across both subject types (11 per subject plus one school-metadata updater), reusing the Slice A state machine (`draft → awaiting_contributor_approval → published → removed`) with zero rewrites. Every mutation path has the same integrated auth guards, state-machine validation, version inserts, and notification lifecycle that Slice A proved.
+- **Polymorphic notifications pivot** — `notifications.performers_note_id` gains siblings `subject_table text + subject_id uuid`, with a partial unique index keeping the invariant "at most one open notification per subject". Slice A RPCs dual-write both the narrow FK and the polymorphic pair during the vestigial window; a post-Slice-B cleanup migration (tracked in TODOS) drops the column after one week of live traffic. Consumers (queue + bell + digest) flipped to `(subject_table, subject_id)` in Step 3, while existing data resolves through either path.
+- **Schools section on the piece page** — new `InterpretiveSchools` React island. Multi-column grid on wide viewports, stacked cards below the `sm` breakpoint. Contributors see their own Edit + Remove affordances; the "propose a school" entry point is always visible when a contributor is signed in (per the CM5 decision — schools are plural by design, unlike performer's notes which hide the entry after first publish).
+- **Signed-description section on the piece page** — new `SignedPieceDescription` React island in the same signed-notes visual pattern, coexisting with the unsigned `pieces.description` metadata strip above it (eng-review 7A: both can render; the unsigned copy stays house-style reference prose).
+- **Generic `ContributorContentAdmin` component** — the old `PerformersNotesAdmin` was extracted into one subject-type-parameterized admin. Mounted from three admin pages (`/admin/performers-notes`, `/admin/interpretive-schools`, `/admin/piece-descriptions`), each with its own field config. No duplicate admin UIs to keep in sync.
+- **Subject-agnostic queue + bell + digest** — `NotificationsQueue` renders mixed subject types in one stream; bell popover lists all pending drafts regardless of subject; daily digest groups by subject and reads `notifications.body` verbatim so new content types don't need digest template changes.
+- **Dev fixtures** — `scripts/seed-local-queue.ts` now seeds at least one school and one signed piece description for a seeded piece so the piece page has meaningful signed content the moment you run migrations locally.
+
+### For contributors
+- Integration test tier grew from 30 to 78 tests. New files: `interpretiveSchools.test.ts` (22), `pieceDescriptions.test.ts` (15), `queueMixedSubjects.test.ts` (3), `sliceBStep1.test.ts` (11) cover the new state machines, RLS on the new tables, the polymorphic pivot invariants, the partial unique index, and mixed-subject queue rendering.
+- Three new migrations: `20260421000000_contributor_pipeline_slice_b.sql` (tables + pivot + dual-write), `20260421000001_…_rpcs.sql`, `20260422000000_…_rpcs.sql`.
+- New `src/lib/` helpers: `contributorSubjects.ts` (shared subject-type constants), `interpretiveSchools.ts`, `pieceDescriptions.ts` — page-load reads.
+
+### Changed
+- `NotificationsQueue.tsx` and `send-notification-digest/index.ts` now read `(subject_table, subject_id)` instead of `performers_note_id`. Behavior unchanged for existing Slice A data (dual-write means both codepaths resolve). Vestigial `performers_note_id` column drops in the post-Slice-B cleanup migration.
+- `NavbarBell.tsx` popover entries deep-link to the piece-page section anchor for the subject (`#interpretive-schools`, `#signed-description`, or the existing performer's notes anchor) rather than a subject-specific queue route. The queue itself stays the precision surface.
+- `PiecePageLayout.astro` wires the two new sections into the piece page body in the PRD Tier 1 order.
+
+## [0.1.0] — 2026-04-20
+
 ### Added (contributor approval pipeline — Slice A)
 
 The first piece of signed editorial content is now possible on the site. A working musician (v1: Haji Kim, cellist) can draft performer's notes herself, review staff-authored drafts in an in-app queue, and see the approved prose render under her byline on any piece page. An email reminder fires the first time a draft lands in her queue.
