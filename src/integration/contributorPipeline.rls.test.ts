@@ -155,14 +155,16 @@ describe('RLS — notifications', () => {
     const { data: contribView } = await contributor.client
       .from('notifications')
       .select('id, recipient_id')
-      .eq('performers_note_id', draftId!);
+      .eq('subject_table', 'performers_notes')
+      .eq('subject_id', draftId!);
     expect(contribView!.length).toBe(1);
     expect(contribView![0].recipient_id).toBe(contributor.id);
 
     const { data: otherView } = await otherContributor.client
       .from('notifications')
       .select('id')
-      .eq('performers_note_id', draftId!);
+      .eq('subject_table', 'performers_notes')
+      .eq('subject_id', draftId!);
     expect(otherView).toEqual([]);
   });
 });

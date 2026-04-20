@@ -110,12 +110,16 @@ export async function deleteTestPiece(id: string): Promise<void> {
   await admin.from('pieces').delete().eq('id', id);
 }
 
-// Convenience: count notifications scoped to a note.
+// Convenience: count notifications scoped to a performer's note (polymorphic).
 export async function countNotifications(
   noteId: string,
   opts: { onlyUncleared?: boolean } = {},
 ): Promise<number> {
-  let q = admin.from('notifications').select('id', { count: 'exact', head: true }).eq('performers_note_id', noteId);
+  let q = admin
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('subject_table', 'performers_notes')
+    .eq('subject_id', noteId);
   if (opts.onlyUncleared) q = q.is('cleared_at', null);
   const { count, error } = await q;
   if (error) throw new Error(`count notifications: ${error.message}`);

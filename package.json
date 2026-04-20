@@ -9,6 +9,7 @@
     "build": "astro build && printf '_worker.js\n_routes.json\n' > dist/.assetsignore",
     "preview": "astro preview",
     "check": "astro check",
+    "check:vestigial": "bash scripts/check-no-vestigial-refs.sh",
     "test": "bun test src/lib src/data src/components src/tests",
     "test:integration": "bun --env-file=.env.test test src/integration",
     "test:e2e": "bun test src/e2e",
