@@ -363,7 +363,7 @@ export default function NotificationsQueue() {
         <button
           type="button"
           onClick={refresh}
-          className="text-xs text-tertiary hover:text-ink underline underline-offset-4"
+          className="inline-flex items-center bg-transparent border-[0.5px] border-border-strong text-muted font-body text-[11px] px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:text-ink hover:border-ink"
         >
           Refresh
         </button>
