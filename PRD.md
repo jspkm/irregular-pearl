@@ -211,11 +211,9 @@ The entities below are the atomic units of the product. Relationships between th
 
 • areas of expertise (repertoire, era, instrument, interpretive tradition)
 
-• agreement on file (reference to signed contributor agreement — includes assent to the draft-and-approve pattern)
+• agreement on file (reference to signed contributor agreement — which governs the draft-and-approve pattern, AI usage of transcripts and signed work, house-style grounding, and agent-memory treatment of their identity; see Contributor Agreement)
 
 • payment configuration (per-piece fee, retainer, honorary, etc.; deferred operationally in v1)
-
-• AI consent settings (whether the Editorial Agent may draft from their transcripts, whether their signed work may inform house-style grounding, whether their identity may appear in agent memory — see Contributor Agreement)
 
 • active status (active, paused, retired)
 
@@ -413,7 +411,7 @@ The entities below are the atomic units of the product. Relationships between th
 -   **No content publishes under a Contributor's byline without that Contributor's explicit in-app approval of the current text. Approval is stored with a timestamp. Edits and deletions after publication are performed by the bylined Contributor from within the app. Staff do not edit or remove a Contributor's published content without a written request from that Contributor recorded in the system.**
 -   An Edition is never a Piece. A Recording is never a Piece. A Score is never represented in the data model at all.
 -   A Flag type cannot be introduced without an editorial decision. The controlled vocabulary is owned by the Editorial Director.
--   A Contributor's AI consent settings are the authoritative source for what agents may do with their work and identity. Agent systems check this at action time, not at configuration time.
+-   AI usage of a Contributor's transcripts, signed work, and identity is governed by the Contributor Agreement accepted at onboarding, not by per-contributor runtime toggles. There is no in-product AI consent surface; what agents may and may not do is set uniformly by the Agreement. Revocation happens by amending the Agreement (or withdrawing from the site), not by flipping a setting.
 -   User library reflections are private by default. Publication requires an explicit user action, per reflection, with a visible signed byline, routed through the contributor approval pipeline.
 -   Revisions to PerformersNotes, InterpretiveSchools, and PracticeNotes are versioned. A contributor may request the current version be replaced or withdrawn; prior versions are retained for audit but removed from public view on request.
 
