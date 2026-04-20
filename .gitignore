@@ -13,6 +13,7 @@ coverage/
 .dev.vars
 supabase/.temp/
 supabase/.branches/
+dist-preview/
 .context/
 .claude/
 outreach-emails.csv
