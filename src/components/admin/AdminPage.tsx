@@ -3,8 +3,9 @@ import { supabase, hasSupabase } from '../../lib/supabase';
 import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminPlaylist from './AdminPlaylist';
+import PerformersNotesAdmin from './PerformersNotesAdmin';
 
-type Tab = 'dashboard' | 'users' | 'playlist';
+type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes';
 
 interface StaffProfile {
   id: string;
@@ -64,6 +65,7 @@ export default function AdminPage({ initialTab }: Props) {
   const tabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
+    { id: 'performers-notes' as Tab, label: "Performer's notes", show: isAdmin },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
   ].filter(t => t.show);
 
@@ -74,6 +76,7 @@ export default function AdminPage({ initialTab }: Props) {
   const titles: Record<Tab, string> = {
     dashboard: 'Dashboard',
     users: 'User Management',
+    'performers-notes': "Performer's notes",
     playlist: 'Maestro Playlist',
   };
 
@@ -114,6 +117,7 @@ export default function AdminPage({ initialTab }: Props) {
 
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}
+        {activeTab === 'performers-notes' && isAdmin && <PerformersNotesAdmin />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
       </div>
     </div>
