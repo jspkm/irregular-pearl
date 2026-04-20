@@ -70,7 +70,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
             >
               View
             </a>
-            <span className="text-[11px] text-[#E7E5E4]">·</span>
+            <span className="text-[11px] text-[#E5E3DE]">·</span>
             <button
               onClick={() => { setEditing(true); setUsername(currentUsername); }}
               className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0"
@@ -82,7 +82,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1C1917] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer"
           >
             Claim your URL
           </button>
@@ -117,7 +117,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         <button
           onClick={handleSave}
           disabled={saving || !username.trim()}
-          className="px-3 py-1.5 bg-[#1C1917] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer disabled:opacity-50"
+          className="px-3 py-1.5 bg-[#1A1A1A] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>

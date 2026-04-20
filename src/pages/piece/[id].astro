@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import PiecePageLayout from '../../components/PiecePageLayout';
+import PiecePageLayout from '../../components/PiecePageLayout.astro';
 import StubPageLayout from '../../components/StubPageLayout.astro';
 import { getPieceFull, isStub } from '../../lib/pieces';
 
@@ -96,7 +96,7 @@ const breadcrumbLd = {
     <!-- Stub page: illustration + inline contribution forms -->
     <StubPageLayout piece={piece} />
   ) : (
-    <!-- Full page: React island with editions and recordings -->
-    <PiecePageLayout piece={piece} client:load />
+    <!-- Full page: ported from the Claude design kit -->
+    <PiecePageLayout piece={piece} />
   )}
 </Layout>

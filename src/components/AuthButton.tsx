@@ -58,17 +58,17 @@ export default function AuthButton() {
     return (
       <div className="flex items-center gap-3">
         {isMaestro && (
-          <a href="/maestro" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+          <a href="/maestro" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
             Maestro
           </a>
         )}
         {userRole === 'admin' && (
-          <a href="/admin" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+          <a href="/admin" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
             Admin
           </a>
         )}
         {userRole === 'firstchair' && (
-          <a href="/firstchair/reports" className="text-xs font-medium text-[#B45309] hover:text-[#92400E] no-underline transition-colors">
+          <a href="/firstchair/reports" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
             First Chair
           </a>
         )}
@@ -86,7 +86,7 @@ export default function AuthButton() {
   return (
     <button
       onClick={handleSignIn}
-      className="text-sm font-medium text-[#B45309] hover:text-[#92400E] transition-colors bg-transparent border-none cursor-pointer p-0"
+      className="text-sm font-medium text-[#6B4E7C] hover:text-[#4C385C] transition-colors bg-transparent border-none cursor-pointer p-0"
     >
       Sign in
     </button>

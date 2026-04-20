@@ -78,7 +78,7 @@ const COMPOSERS = [
     // Red hair, priest collar
     svg: (bg: string) => `<rect width="24" height="24" rx="12" fill="${bg}"/>
       <circle cx="12" cy="13" r="5" fill="#FCEBD5"/>
-      <ellipse cx="12" cy="16.5" rx="3.5" ry="2.5" fill="#1C1917"/>
+      <ellipse cx="12" cy="16.5" rx="3.5" ry="2.5" fill="#1A1A1A"/>
       <ellipse cx="12" cy="17.5" rx="1.5" ry="0.8" fill="#E8E0D0"/>
       <path d="M7 8 Q8 4 12 4 Q16 4 17 8 Q15 5 12 5 Q9 5 7 8Z" fill="#B44B2A"/>
       <circle cx="7" cy="9" r="2" fill="#B44B2A"/>
@@ -136,7 +136,7 @@ const COMPOSERS = [
     svg: (bg: string) => `<rect width="24" height="24" rx="12" fill="${bg}"/>
       <ellipse cx="12" cy="13" rx="4.5" ry="5" fill="#FCEBD5"/>
       <ellipse cx="12" cy="17" rx="3" ry="2" fill="#2C2C2C"/>
-      <path d="M7 8 Q8 4 12 4 Q16 4 17 8 L18 16 Q17 13 16 10 Q14 6 12 6 Q10 6 8 10 Q7 13 6 16Z" fill="#1C1917"/>
+      <path d="M7 8 Q8 4 12 4 Q16 4 17 8 L18 16 Q17 13 16 10 Q14 6 12 6 Q10 6 8 10 Q7 13 6 16Z" fill="#1A1A1A"/>
       <circle cx="10.5" cy="12.5" r="0.6" fill="#4A3728"/>
       <circle cx="13.5" cy="12.5" r="0.6" fill="#4A3728"/>
       <path d="M11 15 Q12 15.5 13 15" stroke="#4A3728" stroke-width="0.4" fill="none"/>
