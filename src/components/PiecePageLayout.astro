@@ -61,6 +61,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <span class="pill">{piece.difficulty}</span>
   </div>
 
+  {piece.description && (
+    <p class="piece-intro">{piece.description}</p>
+  )}
+
   {/* ---------- Performer's notes (empty state until schema lands) ---------- */}
   <section class="block">
     <div class="kicker">Performer's notes</div>
@@ -91,14 +95,6 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <div class="kicker">Interpretive schools</div>
     <p class="empty-state">No interpretive schools recorded yet.</p>
   </section>
-
-  {/* ---------- Description (seed content until a richer editorial surface replaces it) ---------- */}
-  {piece.description && (
-    <section class="block">
-      <div class="kicker">About this piece</div>
-      <p class="prose">{piece.description}</p>
-    </section>
-  )}
 
   {/* ---------- Editions ---------- */}
   <section class="block">
@@ -181,14 +177,16 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     margin: 0;
   }
 
-  /* Description prose block (transitional — replaced by richer editorial surfaces) */
-  .prose {
+  /* Piece intro — prose description sitting directly under the metadata pills
+     as part of the piece definition. Transitional content until richer editorial
+     surfaces (performer's notes, schools) replace it. */
+  .piece-intro {
     font-family: var(--font-serif);
     font-size: 16px;
     line-height: var(--lh-serif-prose);
     color: var(--ink);
-    max-width: var(--content-max-editorial);
-    margin: 0;
+    max-width: 640px;
+    margin: 0 0 48px;
   }
 
   /* Movement title */
