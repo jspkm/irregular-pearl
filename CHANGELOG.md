@@ -4,6 +4,17 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Changed (landing page + navbar)
+- **Landing page rewritten as front-matter-of-a-journal** in `src/pages/index.astro`. Hero is the wordmark `IrregularPearl` in Inter medium 34px with subtitle "Classical music knowledge platform". In Focus block is conditional — renders only when a recently approved signed work exists (currently always null; wires live when the contributor approval pipeline lands). Below: unnumbered list of pieces ordered by `created_at DESC` (proxy for `updated_at`), each row rendering title · composer · catalog number. Old posture removed: browse-by-era tile grid, top-composer avatars, MostWanted requests section, numbered list rows — all contradicted the PRD rev 2 "narrow scope, one contributor" reality.
+- **Navbar rewritten** (`src/components/Navbar.astro`): desktop search input absolute-centered at `w-1/2 max-w-xl` with a `shadow-md` affordance. Mobile (< sm) collapses the search into a magnifier icon that opens a full-row overlay with an X close and Esc-to-dismiss. `About` moved to flush-right, immediately left of the AuthButton. `Browse` link and the inline `beta` label removed. Navbar padding bumped from `py-3` to `py-4`.
+- Deleted `src/components/MostWanted.tsx` — orphaned after the LP rewrite, no callers remain.
+
+### Changed (piece page)
+- Four-axis difficulty panel now responsive: 4 columns > 1024px, 2×2 768–1024px, 1×4 < 768px. Keeps the "one responsive surface" principle intact when the panel narrows.
+
+### Changed (catalog)
+- **Removed Crumb *Vox Balaenae* from the catalog** (`src/data/seed.ts` + `src/data/difficulty-axes.ts` + new migration `20260419210000_remove_vox_balaenae.sql` applied to production). Chamber-trio scope (electric flute + cello + piano, masks, blue lighting, graphic notation) sits outside the cellist-forward daily-use loop the catalog is being built around. FK cascade cleans up related editions and external_links. Catalog now stands at 18 pieces.
+
 ### Changed (aesthetic direction)
 - **Aesthetic tokens flipped to the Claude design kit direction.** Purple accent `#6B4E7C` replaces amber `#B45309`; white primary `#FFFFFF` + `#F8F7F4` tint replaces parchment `#FAF8F5`; Source Serif 4 replaces Instrument Serif for editorial display; 0.5px default borders replace 1px; eight-size type scale locked (11/12/13/14/15/16/18/22/26/34). `global.css` rewritten with the kit token namespace alongside Tailwind's `@theme`. Inline hex refs swept across `src/` and email templates. Logo SVG ink color updated. `manifest.json` theme color updated.
 - **Piece page ported from the Claude design kit** into `src/components/PiecePageLayout.astro` with `src/styles/piece-page.css`. Single responsive page, 9 PRD Tier 1 sections (breadcrumbs, piece header, performer's notes, structural landmarks, interpretive schools, description, editions, recordings, pedagogical arc, external references). Sections without schema show empty-state copy worded as state ("No performer's notes yet"). No kit chrome — nav/footer provided by `Layout.astro`. No meta-caption paragraphs under section headings.

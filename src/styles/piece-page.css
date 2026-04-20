@@ -18,6 +18,12 @@ h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--mut
 
 /* ---------- Four-axis difficulty panel (PRD) ---------- */
 .diff-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 24px; margin-bottom: 48px; background: #fff; }
+@media (max-width: 1024px) {
+  .diff-panel { grid-template-columns: repeat(2, 1fr); gap: 20px 24px; }
+}
+@media (max-width: 768px) {
+  .diff-panel { grid-template-columns: 1fr; gap: 16px; padding: 16px 18px; }
+}
 .diff-axis { }
 .diff-axis .lab { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
 .diff-axis .bars { display: flex; gap: 3px; margin-bottom: 8px; }

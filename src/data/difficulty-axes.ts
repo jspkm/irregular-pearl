@@ -133,10 +133,4 @@ export const difficultyAxes: Record<string, PieceDifficultyAxes> = {
     interpretive: { level: 4, label: 'Advanced', note: 'Formal architecture clear; expressive demands are idiomatic 20th-century.' },
     ensemble: { level: 0, label: 'n/a', note: 'Solo work.' },
   },
-  'crumb-vox-balaenae': {
-    technical: { level: 5, label: 'Professional', note: 'Extended techniques, harmonics over scordatura tuning, amplified cello bow control.' },
-    stamina: { level: 3, label: 'Moderate', note: 'Twenty-two minutes; physical demands spread across three large sections.' },
-    interpretive: { level: 5, label: 'Advanced', note: 'Graphic notation, staging in masks and blue light; the piece is a theatrical ritual.' },
-    ensemble: { level: 4, label: 'Demanding', note: 'Amplified trio (flute, cello, piano) with graphic-score coordination.' },
-  },
 };
