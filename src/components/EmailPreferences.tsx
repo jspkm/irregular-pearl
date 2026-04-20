@@ -85,7 +85,7 @@ export default function EmailPreferences() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-['Instrument_Serif'] text-xl">Email Preferences</h2>
+        <h2 className="font-display text-xl">Email Preferences</h2>
         {saved && <span className="text-xs text-success">Saved</span>}
       </div>
 

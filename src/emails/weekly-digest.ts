@@ -63,29 +63,29 @@ function renderPieceCard(piece: DigestPiece): string {
 
   return `
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
-  style="margin-bottom: 12px; background-color: #FFFFFF; border: 1px solid #E7E5E4; border-left: 3px solid #B45309;">
+  style="margin-bottom: 12px; background-color: #FFFFFF; border: 1px solid #E5E3DE; border-left: 3px solid #6B4E7C;">
   <!--[if mso]><tr><td style="padding: 18px 20px;"><![endif]-->
   <!--[if !mso]><!--><tr><td style="padding: 18px 20px; border-radius: 8px;"><!--<![endif]-->
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
         <tr>
-          <td style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #B45309; letter-spacing: 0.06em; text-transform: uppercase;">
+          <td style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #6B4E7C; letter-spacing: 0.06em; text-transform: uppercase;">
             ${escapeHtml(metaLabel)}
           </td>
-          ${piece.catalog_number ? `<td align="right" style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #78716C;">${escapeHtml(piece.catalog_number)}</td>` : ''}
+          ${piece.catalog_number ? `<td align="right" style="font-family: 'Courier New', Courier, monospace; font-size: 10px; color: #6F6F6F;">${escapeHtml(piece.catalog_number)}</td>` : ''}
         </tr>
         <tr>
-          <td colspan="2" style="padding-top: 6px; padding-bottom: 4px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 18px; font-weight: 400; color: #1C1917; line-height: 1.25;">
-            <a href="${pieceUrl}" style="text-decoration: none; color: #1C1917;" target="_blank">${escapeHtml(piece.title)}</a>
+          <td colspan="2" style="padding-top: 6px; padding-bottom: 4px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 18px; font-weight: 400; color: #1A1A1A; line-height: 1.25;">
+            <a href="${pieceUrl}" style="text-decoration: none; color: #1A1A1A;" target="_blank">${escapeHtml(piece.title)}</a>
           </td>
         </tr>
         <tr>
-          <td colspan="2" style="padding-bottom: ${desc ? '10px' : '0'}; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C;">
+          <td colspan="2" style="padding-bottom: ${desc ? '10px' : '0'}; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #6F6F6F;">
             ${escapeHtml(piece.composer_name)}
           </td>
         </tr>
         ${desc ? `
         <tr>
-          <td colspan="2" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1C1917; line-height: 1.55;">
+          <td colspan="2" style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1A1A1A; line-height: 1.55;">
             ${escapeHtml(desc)}
           </td>
         </tr>` : ''}
@@ -101,7 +101,7 @@ function renderTrendChart(data: WeeklySnapshot[]): string {
   if (data.length === 0) return '';
 
   const max = Math.max(...data.map(d => d.registeredUsers), 1);
-  const color = '#B45309';
+  const color = '#6B4E7C';
   const barWidth = Math.max(Math.floor(480 / data.length) - 1, 4);
   const maxHeight = 40;
 
@@ -125,7 +125,7 @@ function renderTrendChart(data: WeeklySnapshot[]): string {
   return `
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-top: 16px; margin-bottom: 8px;">
   <tr>
-    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #78716C; padding-bottom: 6px;">
+    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 500; color: #6F6F6F; padding-bottom: 6px;">
       <span style="display: inline-block; width: 8px; height: 8px; background-color: ${color}; border-radius: 2px; margin-right: 6px; vertical-align: middle;"></span>
       Registered Users
       <span style="font-family: 'Courier New', Courier, monospace; font-size: 12px; font-weight: 400; color: ${color}; margin-left: 8px;">${latest}</span>
@@ -133,7 +133,7 @@ function renderTrendChart(data: WeeklySnapshot[]): string {
   </tr>
   <tr>
     <td>
-      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-bottom: 1px solid #E7E5E4;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-bottom: 1px solid #E5E3DE;">
         <tr>${bars}</tr>
       </table>
     </td>
@@ -259,7 +259,7 @@ function generateDigestSummary(data: DigestData): string {
 function injectData(template: string, data: DigestData): string {
   const piecesHtml = data.pieces.length > 0
     ? data.pieces.map(renderPieceCard).join('\n')
-    : `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #78716C; font-style: italic; margin: 16px 0;">No new pieces were added this week.</p>`;
+    : `<p style="font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #6F6F6F; font-style: italic; margin: 16px 0;">No new pieces were added this week.</p>`;
 
   return template
     .replace('{{recipient_name}}', escapeHtml(data.recipientName))

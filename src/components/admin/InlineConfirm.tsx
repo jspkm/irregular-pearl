@@ -36,7 +36,7 @@ interface Props {
 const STYLES = {
   danger: 'bg-[#DC2626] hover:bg-[#B91C1C] text-white',
   success: 'bg-[#15803D] hover:bg-[#166534] text-white',
-  default: 'bg-[#1C1917] hover:bg-[#292524] text-white',
+  default: 'bg-[#1A1A1A] hover:bg-[#292524] text-white',
 };
 
 export default function InlineConfirm({
@@ -51,15 +51,15 @@ export default function InlineConfirm({
   const [inputValue, setInputValue] = useState('');
 
   return (
-    <div className="bg-[#FAF8F5] border border-[#E7E5E4] rounded-lg p-3 mt-2">
-      <p className="text-xs text-[#1C1917] mb-2">{message}</p>
+    <div className="bg-[#FFFFFF] border border-[#E5E3DE] rounded-lg p-3 mt-2">
+      <p className="text-xs text-[#1A1A1A] mb-2">{message}</p>
       {inputPlaceholder && (
         <input
           type="text"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           placeholder={inputPlaceholder}
-          className="w-full px-2.5 py-1.5 border border-[#E7E5E4] rounded text-xs mb-2 focus:outline-none focus:border-[#B45309] font-sans bg-white"
+          className="w-full px-2.5 py-1.5 border border-[#E5E3DE] rounded text-xs mb-2 focus:outline-none focus:border-[#6B4E7C] font-sans bg-white"
           autoFocus
         />
       )}
@@ -72,7 +72,7 @@ export default function InlineConfirm({
         </button>
         <button
           onClick={onCancel}
-          className="px-3 py-1 text-xs text-[#78716C] hover:text-[#1C1917] bg-transparent border-none cursor-pointer transition-colors"
+          className="px-3 py-1 text-xs text-[#6F6F6F] hover:text-[#1A1A1A] bg-transparent border-none cursor-pointer transition-colors"
         >
           {cancelLabel}
         </button>

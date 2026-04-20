@@ -46,13 +46,13 @@ export default function AdminPage({ initialTab }: Props) {
     });
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center text-sm text-[#78716C]">Loading...</div>;
+  if (loading) return <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center text-sm text-[#6F6F6F]">Loading...</div>;
 
   if (denied || !profile) {
     return (
-      <div className="min-h-screen bg-[#FAF8F5] flex flex-col items-center justify-center">
-        <p className="text-sm text-[#78716C] mb-2">Access denied</p>
-        <a href="/" className="text-xs text-[#B45309] no-underline hover:underline">← Back to site</a>
+      <div className="min-h-screen bg-[#FFFFFF] flex flex-col items-center justify-center">
+        <p className="text-sm text-[#6F6F6F] mb-2">Access denied</p>
+        <a href="/" className="text-xs text-[#6B4E7C] no-underline hover:underline">← Back to site</a>
       </div>
     );
   }
@@ -78,8 +78,8 @@ export default function AdminPage({ initialTab }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
-      <div className="bg-[#1C1917] text-white px-4 md:px-6 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-[#FFFFFF]">
+      <div className="bg-[#1A1A1A] text-white px-4 md:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <a href="/" className="text-lg font-medium tracking-tight text-white no-underline opacity-70 hover:opacity-100">IrregularPearl</a>
           <span className="text-xs text-white/40">|</span>
@@ -91,7 +91,7 @@ export default function AdminPage({ initialTab }: Props) {
         </div>
       </div>
 
-      <div className="border-b border-[#E7E5E4] bg-white px-4 md:px-6">
+      <div className="border-b border-[#E5E3DE] bg-white px-4 md:px-6">
         <div className="max-w-6xl mx-auto flex gap-0">
           {tabs.map(tab => (
             <button
@@ -99,8 +99,8 @@ export default function AdminPage({ initialTab }: Props) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 text-sm font-medium border-b-2 bg-transparent cursor-pointer transition-colors ${
                 activeTab === tab.id
-                  ? 'border-[#B45309] text-[#B45309]'
-                  : 'border-transparent text-[#78716C] hover:text-[#1C1917]'
+                  ? 'border-[#6B4E7C] text-[#6B4E7C]'
+                  : 'border-transparent text-[#6F6F6F] hover:text-[#1A1A1A]'
               }`}
             >
               {tab.label}
@@ -110,7 +110,7 @@ export default function AdminPage({ initialTab }: Props) {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <h1 className="font-['Instrument_Serif'] italic text-2xl mb-6">{titles[activeTab]}</h1>
+        <h1 className="font-display italic text-2xl mb-6">{titles[activeTab]}</h1>
 
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}

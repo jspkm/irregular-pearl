@@ -1,0 +1,233 @@
+---
+// Piece page layout — ported from the Claude design kit, adapted for the
+// curated 19-piece catalog and the current schema. Uses the kit-namespace
+// CSS variables (see src/styles/global.css :root) via src/styles/piece-page.css.
+//
+// Sections present now (wired to seed data):
+//   - Breadcrumbs, piece header, metadata pills
+//   - Editions (seed.editions)
+//   - Recordings (derived from seed.external_links)
+//
+// Sections with empty states (schema not yet built per TODOS.md):
+//   - Performer's notes (plural signed — needs performers_notes schema)
+//   - Structural landmarks + flags (needs landmarks + flags schema)
+//   - Interpretive schools (needs interpretive_schools schema)
+//   - Pedagogical arc (needs prepare-with / natural-next schema)
+//   - Four-axis difficulty panel (needs per-axis scoring — shown as single pill in header for now)
+//
+// Empty-state copy follows the feedback-memory rule: state, not philosophy.
+
+import '../styles/piece-page.css';
+import type { PieceFull } from '../lib/pieces';
+
+interface Props {
+  piece: PieceFull;
+}
+
+const { piece } = Astro.props;
+
+const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
+
+// Recordings derived from external_links of video/audio types
+const recordings = piece.external_links.filter(l =>
+  l.type === 'youtube' || l.type === 'internet_archive' || l.type === 'vimeo' || l.type === 'spotify'
+);
+
+// Reference links (non-recording): IMSLP + wikipedia
+const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === 'wikipedia');
+---
+
+<main class="page">
+
+  <div class="crumbs">
+    <a href="/">Pieces</a><span class="sep">/</span>
+    <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a><span class="sep">/</span>
+    <span>{piece.title}</span>
+  </div>
+
+  <h1 class="piece">
+    {piece.title}
+    {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
+  </h1>
+  <p class="byline">
+    by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
+  </p>
+
+  <div class="pills">
+    {piece.instruments.map(i => <span class="pill">{i.toLowerCase()}</span>)}
+    {piece.era && <span class="pill">{piece.era.toLowerCase()}</span>}
+    {piece.form && <span class="pill">{piece.form.toLowerCase()}</span>}
+    {piece.duration_minutes && <span class="pill">~{piece.duration_minutes} min</span>}
+    <span class="pill">{piece.difficulty}</span>
+  </div>
+
+  {/* ---------- Performer's notes (empty state until schema lands) ---------- */}
+  <section class="block">
+    <div class="kicker">Performer's notes</div>
+    <p class="empty-state">No performer's notes yet.</p>
+  </section>
+
+  {/* ---------- Structural landmarks ---------- */}
+  <section class="block">
+    <div class="kicker">Structural landmarks</div>
+    {piece.movements && piece.movements.length > 0 ? (
+      <div class="movements">
+        {piece.movements.map((m) => (
+          <div class="mvmt">
+            <div class="mvmt-head">
+              <h3 class="mvmt-title">{m.name}</h3>
+            </div>
+            <p class="empty-state">Landmarks not yet curated for this movement.</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state">Landmarks not yet curated.</p>
+    )}
+  </section>
+
+  {/* ---------- Interpretive schools (empty state) ---------- */}
+  <section class="block">
+    <div class="kicker">Interpretive schools</div>
+    <p class="empty-state">No interpretive schools recorded yet.</p>
+  </section>
+
+  {/* ---------- Description (seed content until a richer editorial surface replaces it) ---------- */}
+  {piece.description && (
+    <section class="block">
+      <div class="kicker">About this piece</div>
+      <p class="prose">{piece.description}</p>
+    </section>
+  )}
+
+  {/* ---------- Editions ---------- */}
+  <section class="block">
+    <div class="kicker">Editions</div>
+    {piece.editions.length > 0 ? (
+      <div class="editions">
+        {piece.editions.map((e) => (
+          <div class="ed">
+            <div class="ed-body">
+              <h3>{e.publisher}</h3>
+              <div class="meta">{e.editor}{e.year ? ` · ${e.year}` : ''}</div>
+              {e.description && <p class="desc">{e.description}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="empty-state">No editions listed yet.</p>
+    )}
+  </section>
+
+  {/* ---------- Recordings ---------- */}
+  <section class="block">
+    <div class="kicker">Recordings</div>
+    {recordings.length > 0 ? (
+      <table class="rec-table">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {recordings.map((r) => (
+            <tr>
+              <td>
+                <a class="ext" href={r.url} target="_blank" rel="noopener">{r.label}</a>
+              </td>
+              <td class="label">
+                <span class="type-chip">{r.type.replace('_', ' ')}</span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p class="empty-state">No reference recordings catalogued yet.</p>
+    )}
+  </section>
+
+  {/* ---------- Pedagogical arc (empty state until schema lands) ---------- */}
+  <section class="block">
+    <div class="kicker">Pedagogical arc</div>
+    <p class="empty-state">Prepare-with and natural-next connections not yet curated.</p>
+  </section>
+
+  {/* ---------- External references (IMSLP, Wikipedia) ---------- */}
+  {refs.length > 0 && (
+    <section class="block">
+      <div class="kicker">External references</div>
+      <ul class="ext-refs">
+        {refs.map((r) => (
+          <li>
+            <a class="ext" href={r.url} target="_blank" rel="noopener">{r.label}</a>
+            <span class="type-chip">{r.type.replace('_', ' ')}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+</main>
+
+<style>
+  /* Empty state copy — state, not philosophy */
+  .empty-state {
+    font-size: 14px;
+    color: var(--tertiary);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* Description prose block (transitional — replaced by richer editorial surfaces) */
+  .prose {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: var(--lh-serif-prose);
+    color: var(--ink);
+    max-width: var(--content-max-editorial);
+    margin: 0;
+  }
+
+  /* Movement title */
+  .mvmt-title {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+
+  /* External reference list (IMSLP, Wikipedia) */
+  .ext-refs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ext-refs li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Edition card body wrapper (single-column cards for now; kit's right-rail will return when we wire edition-type chips to data) */
+  .editions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ed-body {
+    flex: 1;
+  }
+
+  /* Responsive */
+  @media (max-width: 760px) {
+    .page {
+      padding: 32px 20px 64px;
+    }
+  }
+</style>

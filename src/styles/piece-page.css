@@ -1,0 +1,108 @@
+/* Piece page layout — ported from the Claude design kit.
+   Uses kit-namespace CSS variables (--accent, --font-serif, etc.)
+   defined in global.css :root.
+   Nav/footer/CTA sections stripped: Layout.astro provides those. */
+
+/* ---------- Layout ---------- */
+.page { max-width: 1180px; margin: 0 auto; padding: 48px 40px 96px; }
+.crumbs { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.crumbs .sep { margin: 0 8px; color: var(--tertiary); }
+
+/* ---------- Piece header ---------- */
+h1.piece { font-family: var(--font-serif); font-weight: 500; font-size: 34px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.005em; }
+h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 6px; }
+.byline { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
+.byline a { color: var(--ink); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); border: 0.5px solid var(--border); }
+
+/* ---------- Four-axis difficulty panel (PRD) ---------- */
+.diff-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 24px; margin-bottom: 48px; background: #fff; }
+.diff-axis { }
+.diff-axis .lab { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 10px; }
+.diff-axis .bars { display: flex; gap: 3px; margin-bottom: 8px; }
+.diff-axis .bars span { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
+.diff-axis .bars span.on { background: var(--accent); }
+.diff-axis .val { font-size: 13px; color: var(--ink); font-weight: 500; }
+.diff-axis .note { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+/* ---------- Section scaffolding ---------- */
+section.block { margin-bottom: 64px; }
+.kicker { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; margin: 0 0 10px; }
+.section-desc { font-size: 14px; color: var(--muted); line-height: 1.55; margin-bottom: 28px; max-width: 640px; }
+
+/* ---------- Signed performer's notes (plural) ---------- */
+.notes-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.signed { border-left: 2px solid var(--accent); padding: 4px 0 4px 20px; }
+.signed.alt { border-left-color: var(--border-strong); }
+.signed .prose { font-family: var(--font-serif); font-size: 16px; line-height: 1.65; color: var(--ink); }
+.signed .prose p { margin: 0 0 10px; }
+.signed .by { font-size: 13px; color: var(--muted); margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+.signed .by .name { color: var(--ink); font-weight: 500; }
+.signed .by .dot { width: 3px; height: 3px; border-radius: 999px; background: var(--tertiary); }
+
+/* ---------- Landmarks + flags (by movement) ---------- */
+.movements { display: flex; flex-direction: column; gap: 28px; }
+.mvmt { }
+.mvmt-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); }
+.mvmt-head h3 { font-family: var(--font-serif); font-size: 18px; font-weight: 500; margin: 0; }
+.mvmt-head .meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.mvmt-head .dur { font-size: 12px; color: var(--tertiary); margin-left: auto; font-variant-numeric: tabular-nums; }
+.landmarks { display: flex; flex-direction: column; }
+.lm { display: grid; grid-template-columns: 82px 1fr; gap: 20px; padding: 10px 0; border-bottom: 0.5px solid var(--border); align-items: start; }
+.lm:last-child { border-bottom: 0; }
+.lm .bars { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 2px; font-variant-numeric: tabular-nums; }
+.lm .body { display: flex; flex-direction: column; gap: 4px; }
+.lm .label { font-size: 14px; font-weight: 500; color: var(--ink); }
+.lm .desc { font-size: 13px; color: var(--muted); line-height: 1.5; font-family: var(--font-serif); }
+.lm .flags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.flag { font-size: 11px; font-weight: 500; padding: 2px 9px; border-radius: var(--r-pill); background: var(--warning-soft); color: var(--warning); }
+.flag.notable { background: var(--bg-tint); color: var(--muted); }
+.flag.significant { background: var(--danger-soft); color: var(--danger); }
+
+/* ---------- Interpretive schools (plural, signed) ---------- */
+.schools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.school { background: #fff; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 22px; }
+.school .name { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin-bottom: 8px; }
+.school .prose { font-family: var(--font-serif); font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 14px; }
+.school .tempi { font-family: var(--font-mono); font-size: 11px; color: var(--muted); line-height: 1.7; padding-top: 10px; border-top: 0.5px solid var(--border); margin-bottom: 12px; }
+.school .rep { font-size: 12px; color: var(--muted); }
+.school .rep b { color: var(--ink); font-weight: 500; }
+.school .by { font-size: 12px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); }
+.school .by b { color: var(--ink); font-weight: 500; }
+
+/* ---------- Editions — comparison-first ---------- */
+.editions-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+.ed-list { display: flex; flex-direction: column; gap: 12px; }
+.ed { background: #fff; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 18px 22px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; transition: border-color 100ms ease-out; }
+.ed:hover { border-color: var(--accent); }
+.ed h3 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 4px; }
+.ed .meta { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; }
+.ed .desc { font-family: var(--font-serif); font-size: 14px; line-height: 1.55; color: var(--ink); max-width: 620px; }
+.ed .stance { font-size: 12px; color: var(--muted); margin-top: 6px; font-style: italic; }
+.ed .right { text-align: right; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; min-width: 120px; }
+.ed .type-chip { font-size: 11px; padding: 2px 9px; border-radius: var(--r-pill); background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.ed .ismn { font-family: var(--font-mono); font-size: 11px; color: var(--tertiary); }
+
+/* ---------- Recordings — organized around landmark tempi ---------- */
+.rec-table { width: 100%; border-collapse: collapse; }
+.rec-table th { text-align: left; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 10px 12px 10px 0; border-bottom: 0.5px solid var(--border); }
+.rec-table th.num { text-align: right; padding-right: 0; padding-left: 12px; }
+.rec-table td { padding: 12px 12px 12px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; vertical-align: top; }
+.rec-table td.num { text-align: right; font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink); padding-right: 0; padding-left: 12px; }
+.rec-table .artist { font-weight: 500; }
+.rec-table .label { color: var(--muted); }
+.rec-table .type-chip { font-size: 10px; padding: 1px 7px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-left: 6px; }
+.rec-table a.ext { color: var(--accent); text-decoration: none; font-size: 12px; }
+.rec-table a.ext:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Pedagogical arc ---------- */
+.arc { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.arc-col { }
+.arc-col .head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+.arc-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.arc-item:last-child { border-bottom: 0; }
+.arc-item .t { font-family: var(--font-serif); font-size: 15px; font-weight: 500; }
+.arc-item .t .cat { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.arc-item .m { font-size: 12px; color: var(--muted); margin-top: 2px; }

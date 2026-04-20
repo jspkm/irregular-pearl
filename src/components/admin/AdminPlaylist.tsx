@@ -71,7 +71,7 @@ export default function AdminPlaylist() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search pieces to add..."
-          className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#B45309]"
+          className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#6B4E7C]"
         />
         {searchResults.length > 0 && (
           <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
@@ -79,7 +79,7 @@ export default function AdminPlaylist() {
               <button
                 key={p.id}
                 onClick={() => { addPiece(p.id); setSearch(''); }}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-[#FEF3C7] bg-transparent border-none cursor-pointer"
+                className="w-full text-left px-3 py-2 text-sm hover:bg-[#F2EEF5] bg-transparent border-none cursor-pointer"
               >
                 <span className="font-medium">{p.title}</span>
                 <span className="text-muted ml-1">— {p.composer_name}</span>

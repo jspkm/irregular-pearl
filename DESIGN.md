@@ -7,10 +7,11 @@
 - **Project type:** Web app (SSR), iPad-first responsive design
 
 ## Aesthetic Direction
-- **Direction:** Refined Library, Modernized
+- **Direction:** Editorial restraint, museum-catalog register. Adopted from the Claude design kit on 2026-04-19.
 - **Decoration level:** Flat, no textures. Content is the decoration.
-- **Mood:** Walking into a new conservatory library with warm wood, natural light, and clean typography. Scholarly authority with contemporary craft. Not dusty (IMSLP), not corporate (nkoda), not streaming-dark (tonebase).
-- **Reference sites:** IMSLP (competitor, zero design), tonebase (dark streaming feel), Classeek (corporate), old AI Studio prototype (warm research aesthetic)
+- **Mood:** A well-made scholarly reference or an editorial magazine, not a contemporary SaaS product, not a streaming service, not an AI-tool marketing page. When in doubt, remove rather than add.
+- **Reference sites:** New York Times graphics desk, Stripe documentation, Grove Music Online, Henle Verlag edition pages, Met/Rijksmuseum online collection entries, Linear marketing (for restraint), The Pudding (for data-driven editorial), Tonebase blog posts (for the voice performer's notes should read like). See DESIGN-REFERENCES companion document when it lands.
+- **Anti-references:** Notion/Airtable/productivity-SaaS chrome, Medium/Substack blog-platform hero pattern, Spotify/Apple Music streaming carousels, Masterclass/Coursera premium-learning photography, generic classical sites (2012 layouts updated piecemeal).
 
 ## Principles
 
@@ -19,7 +20,7 @@
 3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use Inter. The switch is deliberate.
 4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
 5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
-6. **Ink on parchment or white.** Primary reading is ink on parchment (#FAF8F5). Cards, sidebars, and modals use white (#FFFFFF) for gentle separation. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
+6. **Ink on white.** Primary reading is ink (#1A1A1A) on white (#FFFFFF). Secondary surfaces use a near-white warm tint (#F8F7F4) for gentle separation without introducing color. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
 7. **One responsive page, not two products.** The piece page is a single responsive surface — the same markup and information architecture reflowed across viewports via CSS. Narrow viewports may collapse multi-column sections into stacks and compress chrome, but the content, ordering, and hierarchy are shared. No viewport-specific React branches, no duplicate mobile routes, no "mobile app" inside the web app.
 
 ## Logo / Wordmark
@@ -31,42 +32,55 @@
 - **"beta" tag:** Inter, regular weight, smaller size, muted color
 
 ## Typography
-- **Display/Hero:** Instrument Serif (regular + italic) — elegant serif with musical DNA in the name. Used for piece titles, section headings, homepage hero.
-- **Body:** Inter — the interface reading voice. Used for descriptions, UI text.
-- **UI/Labels:** Inter Medium — tabs, buttons, nav items, wordmark.
-- **Data/Tables:** JetBrains Mono — catalog numbers (BWV 1007, Op. 104, K. 331), metadata. Supports tabular-nums.
-- **Code:** JetBrains Mono
+- **Display/Editorial:** Source Serif 4 (regular + italic, two weights). Used for piece titles, performer's notes prose, interpretive-school paragraphs, signed editorial text, movement titles. This is the reading voice of the site.
+- **Body / UI:** Inter (regular + medium). Used for navigation, buttons, labels, metadata, tables, descriptions, short reference copy, and the IrregularPearl wordmark.
+- **Data / Tables / Catalog numbers:** JetBrains Mono — catalog numbers (BWV 1007, Op. 85, K. 331, Hob. VIIb/1), measure ranges, tempi. Supports tabular-nums.
+- **Code:** JetBrains Mono.
 - **Loading:** Google Fonts CDN
   ```html
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400;1,8..60,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   ```
-- **Scale (modular 1.25):**
-  - xs: 11px (mono labels)
-  - sm: 13px (UI, edition details)
-  - base: 14px-15px (body text)
-  - lg: 18px (section headings)
-  - xl: 24px (piece titles on mobile)
-  - 2xl: 28px (piece titles on desktop)
-  - 3xl: 36px (homepage hero)
-  - 4xl: 48px (display, preview page)
+- **Scale — eight sizes, use only these.** If you want a size between, the answer is to change weight or spacing, not add a size.
+  - 11px — fine print, legal
+  - 12px — small labels, metadata, timestamps
+  - 13px — secondary UI text
+  - 14px — button labels, table headers
+  - 15px — body text on mobile
+  - 16px — body text default
+  - 18px — subheadings (H3)
+  - 22px — section headings (H2)
+  - 26px — page titles (H1)
+  - 34px — hero titles (landing page only)
+- **Weights:** 400 regular, 500 medium. Nothing else.
+- **Line-heights:** serif prose 1.68, sans prose 1.55, headings 1.25, captions 1.4.
 
 ## Color
-- **Approach:** Restrained (warm neutrals + one accent color)
-- **Background:** #FAF8F5 — warm parchment, the signature Irregular Pearl surface
-- **Surface:** #FFFFFF — cards, sidebar, modals
-- **Ink:** #1C1917 — warm near-black for primary text
-- **Muted:** #78716C — secondary text, timestamps, placeholders
-- **Border:** #E7E5E4 — subtle warm gray borders
-- **Accent:** #B45309 — amber/warm gold. Like the patina on a well-loved instrument, or the glow of a concert hall. Distinct from the blue (IMSLP) and red (nkoda/tonebase) that dominate this space.
-- **Accent hover:** #92400E — darker amber on interaction
-- **Accent light:** #FEF3C7 — light amber for backgrounds (working-on badge, selected states)
-- **Star rating:** #D97706 — golden amber for edition stars
-- **Semantic:**
-  - Success: #15803D on #F0FDF4 (border: #BBF7D0)
-  - Error: #DC2626 on #FEF2F2 (border: #FECACA)
-  - Warning: #CA8A04 on #FEFCE8 (border: #FDE68A)
-  - Info: #0369A1 on #F0F9FF (border: #BAE6FD)
-- **Dark mode:** Deferred to Phase 2. Primary users are on iPads in well-lit practice rooms.
+The palette is small and mostly neutral. Add a color only if it encodes meaning.
+
+**Neutrals**
+- Primary background: `#FFFFFF` — white
+- Secondary surface / band backgrounds: `#F8F7F4` — warm near-white tint
+- Primary text (ink): `#1A1A1A`
+- Secondary text (muted): `#6F6F6F`
+- Tertiary text (hints): `#9A9A9A`
+- Default border (0.5px): `#E5E3DE`
+- Emphasis border: `#CCC9C2`
+
+**Accent — one, used sparingly**
+- `#6B4E7C` — quiet purple, derived from the site's logomark palette. Used for kicker eyebrows, selected states, featured-card emphasis borders, focus rings, interactive chrome.
+- Accent soft: `#F2EEF5` — band backgrounds, hover fills.
+
+**Semantic — used only for meaning, never decoration**
+| Meaning | Foreground | Soft background |
+|---------|-----------|------------------|
+| Warning (difficulty flags, caution) | `#8B6914` | `#FAF2DB` |
+| Info (information, links) | `#2B5797` | `#E8EEF7` |
+| Success | `#2D6A3F` | `#E6F1E9` |
+| Danger (error, destructive) | `#A32D2D` | `#F7E4E4` |
+
+Never introduce a new color outside this palette without updating this document first. If a surface needs a color that isn't here, ask whether the surface really needs it — often the answer is typography or spacing would do the same work better.
+
+**Dark mode:** Deferred to Phase 2. Primary users are on iPads in well-lit practice rooms.
 
 ## Spacing
 - **Base unit:** 4px
@@ -98,7 +112,7 @@
 ## Components
 
 ### Kicker eyebrows
-Small caps label above a section heading. Amber accent, 11-12px DM Sans, letter-spacing 0.4px, weight 500, `text-transform: uppercase`. Used once per section. Editorial chrome, not navigation.
+Small caps label above a section heading. Accent purple, 11-12px Inter, letter-spacing 0.08em, weight 500, `text-transform: uppercase`. Used once per section. Editorial chrome, not navigation.
 
 ### Metadata pills
 Rounded chips for piece-level metadata (instrument, era, form, duration). Neutral only, never colored unless semantic.
@@ -106,25 +120,27 @@ Rounded chips for piece-level metadata (instrument, era, form, duration). Neutra
 
 ### Difficulty flags
 Inline pill within a structural landmark. Uses the warning palette.
-`font-size: 11px; padding: 2px 9px; border-radius: 9999px; background: #FEFCE8; color: #CA8A04; border: 1px solid #FDE68A; weight: 500`
+`font-size: 11px; padding: 2px 9px; border-radius: 999px; background: #FAF2DB; color: #8B6914; border: 0.5px solid #8B6914; weight: 500`
 
 ### Cards
-White background, 1px border (#E7E5E4), 8px radius (12px for large cards), 16px internal padding. Cards stack with 12px gaps. Cards never nest more than one level.
+White background, 0.5px border (`#E5E3DE`), 12px radius, 16px internal padding. Cards stack with 12px gaps. Cards never nest more than one level. Featured cards (e.g., the recommended edition in a comparison) use a 2px accent-purple border — the only exception to the 0.5px border rule, used sparingly.
 
 ### Signed notes
-Performer's notes and interpretive-school descriptions use a distinctive pattern: 2px amber left border, 18px left padding, Instrument Serif prose inside. Byline underneath in DM Sans sentence case. Contributor display name in weight 500, one-line bio in muted color.
+Performer's notes and interpretive-school descriptions use a distinctive pattern: 2px accent (purple) left border, 18px left padding, Source Serif 4 prose inside. Byline underneath in Inter sentence case. Contributor display name in weight 500, one-line bio in muted color. A contrasting voice within the same section uses a lighter `border-strong` (`#CCC9C2`) left border instead of accent, signalling "contrasting voice," not ranking.
 
 ### Buttons
-Primary buttons are rare. Only when a single action deserves a solid background. When used: ink (#1C1917) bg, white text, 14px DM Sans weight 500, 8px radius, 8px / 16px padding. Secondary: transparent bg, 1px border, same type. Ghost: no border, underline on hover only.
+Primary buttons are rare. The site has few places where a single action is so primary it deserves a solid background. When used: dark ink (`#1A1A1A`) background, white text, 14px Inter weight 500, 12px radius, 8px vertical / 16px horizontal padding. Secondary: transparent background, 0.5px border, same typography. Ghost: no border, underline-on-hover only.
 
 ### Inputs
 36px tall desktop, 44px mobile. 1px border, 8px radius, 12px horizontal padding, 15px body text. Focus: 2px amber ring, no background change. No placeholder text where a label would serve.
 
 ### Tables
-Used for edition comparisons, recording tempo references, structured metadata. Left-align everything except numeric columns (right-aligned). No zebra striping; row separators are 1px border. Column headers: 12px DM Sans, all caps, tracked out, muted color. Body rows: 14px DM Sans.
+Used for edition comparisons, recording tempo references, structured metadata. Left-align everything except numeric columns (right-aligned). No zebra striping; row separators are 0.5px border. Column headers: 12px Inter weight 500, all caps, tracked 0.08em, muted color. Body rows: 14px Inter.
 
 ### Borders and corners
-Default border is 1px. Featured cards (e.g., the recommended edition in a comparison) may use 2px amber. This is the only exception. Corner radius: 8px default, 12px large cards, 9999px pills.
+Default border is 0.5px solid `#E5E3DE`. Never thicker than 1px anywhere. Featured cards (e.g., the recommended edition in a comparison) use 2px solid accent-purple — the only exception to the 0.5px rule, used sparingly.
+
+Corner radius: 8px default (inputs, buttons), 12px large cards, 999px pills. Never use rounded corners with single-sided borders.
 
 ## Voice and Copy
 - Sentence case everywhere user-visible.
@@ -167,3 +183,5 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-04-19 | Piece page is one responsive surface, not two products | Reversed principle 7. Maintaining two piece-page products doubles the work and drifts the information architecture. A single page reflowed with CSS keeps content, ordering, and hierarchy shared across viewports. Supersedes PRD.md "Piece page, mobile" language about a separate product. |
 | 2026-04-19 | Sans family: Inter (replaces DM Sans); wordmark: Inter non-italic (replaces Instrument Serif italic) | User preference. Inter is the interface voice across body, UI, and the wordmark. The wordmark is now plain and precise rather than flowing. Instrument Serif stays as the editorial serif for piece titles, section headings, and hero display. |
 | 2026-04-19 | Wordmark rendered as `IrregularPearl` (one word) | The logo glyph is the concatenated form. Prose, meta titles, legal text, and editorial copy keep the two-word form `Irregular Pearl` for readability. The wordmark is a brand mark; the prose is writing. |
+| 2026-04-19 | **Aesthetic flipped to Claude design kit direction (supersedes amber/parchment/Instrument Serif).** | Purple accent `#6B4E7C`, white `#FFFFFF` primary with `#F8F7F4` tint, Source Serif 4 for editorial (Instrument Serif removed), 0.5px borders, eight-size type scale, two weights (400/500). Reverses the 2026-04-18 purple-vs-amber decision. Rationale: building the piece-page redesign against the kit's IA and tokens is cleaner than reskinning; the kit's museum-catalog/scholarly register is a better fit for the PRD's "reference surface, not product chrome" posture than the earlier refined-library direction. Legacy-amber.css kept in `~/Downloads/Irregular Pearl Design System/` as a historical snapshot. |
+| 2026-04-19 | Piece page ported from Claude design kit into `src/components/PiecePageLayout.astro` | Single responsive page, 9 PRD Tier 1 sections (breadcrumbs → header → performer's notes → landmarks → schools → description → editions → recordings → pedagogical arc → external references). Sections without schema (performer's notes, landmarks per-movement, schools, pedagogical arc) show empty-state copy worded as state. No kit chrome (nav/footer provided by `Layout.astro`); no meta-caption paragraphs under section headings. `piece-page.css` uses kit-namespace CSS variables from `global.css :root`. |

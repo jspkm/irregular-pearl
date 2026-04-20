@@ -6,7 +6,7 @@
       font-weight: 500;
       font-size: 22px;
       letter-spacing: -0.02em;
-      fill: #1C1917;
+      fill: #1A1A1A;
     }
   </style>
   <text x="0" y="21">IrregularPearl</text>

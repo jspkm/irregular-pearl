@@ -1,42 +1,154 @@
 @import "tailwindcss";
 
+/* =========================================================================
+   Irregular Pearl — design tokens
+   Canonical direction (white-first, purple accent, Source Serif 4 + Inter).
+   Adopted from the Claude design kit on 2026-04-19; supersedes the earlier
+   amber/parchment/Instrument Serif tokens recorded in DESIGN.md.
+   ========================================================================= */
+
 @theme {
   /* Fonts */
-  --font-display: 'Instrument Serif', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Core colors */
-  --color-bg: #FAF8F5;
+  /* Neutrals */
+  --color-bg: #FFFFFF;
+  --color-bg-tint: #F8F7F4;
   --color-surface: #FFFFFF;
-  --color-ink: #1C1917;
-  --color-muted: #78716C;
-  --color-border: #E7E5E4;
+  --color-ink: #1A1A1A;
+  --color-muted: #6F6F6F;
+  --color-tertiary: #9A9A9A;
+  --color-border: #E5E3DE;
+  --color-border-strong: #CCC9C2;
 
-  /* Accent — amber/gold */
-  --color-accent: #B45309;
-  --color-accent-hover: #92400E;
-  --color-accent-light: #FEF3C7;
-  --color-accent-border: #FDE68A;
-  --color-star: #D97706;
+  /* Accent — purple, used sparingly */
+  --color-accent: #6B4E7C;
+  --color-accent-soft: #F2EEF5;
+  /* Legacy tailwind class names kept as aliases so existing components
+     that reference bg-accent-light / bg-accent-hover continue to resolve. */
+  --color-accent-hover: #4C385C;
+  --color-accent-light: #F2EEF5;
+  --color-accent-border: #D9CCE1;
+  --color-star: #6B4E7C;
 
-  /* Semantic */
-  --color-success: #15803D;
-  --color-success-bg: #F0FDF4;
-  --color-error: #DC2626;
-  --color-error-bg: #FEF2F2;
-  --color-warning: #CA8A04;
-  --color-warning-bg: #FEFCE8;
-  --color-info: #0369A1;
-  --color-info-bg: #F0F9FF;
+  /* Semantic (meaning only, never decoration) */
+  --color-success: #2D6A3F;
+  --color-success-bg: #E6F1E9;
+  --color-error: #A32D2D;
+  --color-error-bg: #F7E4E4;
+  --color-warning: #8B6914;
+  --color-warning-bg: #FAF2DB;
+  --color-info: #2B5797;
+  --color-info-bg: #E8EEF7;
 
   /* Legacy aliases (used in existing components) */
-  --color-pearl-50: #FAF8F5;
+  --color-pearl-50: #FFFFFF;
+}
+
+/* =========================================================================
+   Kit-compatible token namespace
+   The piece-page CSS and any ported kit markup reference CSS variables
+   without the --color- prefix (--ink, --bg, --accent, etc). These aliases
+   make the kit's CSS portable into this codebase without rewriting every
+   var() call.
+   ========================================================================= */
+
+:root {
+  /* Neutrals */
+  --ink: #1A1A1A;
+  --muted: #6F6F6F;
+  --tertiary: #9A9A9A;
+  --bg: #FFFFFF;
+  --bg-tint: #F8F7F4;
+  --border: #E5E3DE;
+  --border-strong: #CCC9C2;
+
+  /* Accent */
+  --accent: #6B4E7C;
+  --accent-soft: #F2EEF5;
+
+  /* Semantic */
+  --warning: #8B6914;
+  --warning-soft: #FAF2DB;
+  --info: #2B5797;
+  --info-soft: #E8EEF7;
+  --success: #2D6A3F;
+  --success-soft: #E6F1E9;
+  --danger: #A32D2D;
+  --danger-soft: #F7E4E4;
+
+  /* Typography */
+  --font-serif: 'Source Serif 4', 'Source Serif Pro', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Scale */
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-15: 15px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-22: 22px;
+  --fs-26: 26px;
+  --fs-34: 34px;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --lh-serif-prose: 1.68;
+  --lh-sans-prose: 1.55;
+  --lh-heading: 1.25;
+  --lh-caption: 1.4;
+
+  /* Spacing — 4px base */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Radius */
+  --r-default: 8px;
+  --r-card: 12px;
+  --r-pill: 999px;
+
+  /* Borders */
+  --border-width: 0.5px;
+  --border-emphasis: 2px;
+
+  /* Focus */
+  --focus-ring: 0 0 0 2px var(--accent);
+
+  /* Motion */
+  --t-micro: 100ms;
+  --t-short: 150ms;
+  --t-medium: 250ms;
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --content-max-editorial: 960px;
+  --content-max-catalog: 1100px;
 }
 
 html {
   font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-bg);
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 /* Touch targets on tablet/mobile */

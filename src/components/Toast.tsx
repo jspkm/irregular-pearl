@@ -21,7 +21,7 @@ export default function Toast({ message, onUndo, duration = 5000, onDismiss }: T
   if (!visible) return null;
 
   return (
-    <div className="inline-flex items-center gap-2 bg-[#1C1917] text-white px-4 py-2.5 rounded-lg text-sm shadow-lg">
+    <div className="inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-lg text-sm shadow-lg">
       <span className="text-emerald-400 font-semibold">✓</span>
       <span>{message}</span>
       <button

@@ -118,6 +118,16 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Completed
 
+### Port Claude kit piece page + adopt kit aesthetic tokens
+
+**What:** Adopted the Claude design kit's aesthetic direction as canonical: purple accent, white primary, Source Serif 4 editorial, 0.5px borders, eight-size type scale. Swept inline hex and font references across `src/` and email templates. Ported the kit's piece page HTML into `PiecePageLayout.astro` with `piece-page.css`, wiring the curated 19-piece catalog into the 9 PRD Tier 1 sections. Sections without schema (performer's notes, per-movement landmarks, schools, pedagogical arc) show empty-state copy.
+
+**Why:** Building the piece-page redesign against the kit's IA + tokens is cleaner than reskinning. Kit's museum-catalog register fits the PRD "reference surface, not product chrome" posture. Unblocks the Tier 1 piece page without waiting for the contributor + landmark + school schemas — those sections render empty states until the data layer catches up.
+
+**Effort:** L
+**Priority:** P1
+**Completed:** v0.1.0 (2026-04-19)
+
 ### Catalog reset to curated editorial spine (PRD rev 2)
 
 **What:** Wiped the OpenOpus-imported breadth catalog (~7,829 scraped stubs) and replaced with 19 hand-authored cello-forward pieces. Deleted the seed-expansion files and scraper scripts that produced the breadth catalog. Supabase `pieces` truncate-cascades on deploy; FK-linked rows drop with it.
