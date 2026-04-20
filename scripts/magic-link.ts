@@ -3,8 +3,9 @@
 // (or prints the URL) so you can sign in without the Google-OAuth flow.
 //
 // Usage:
-//   bun --env-file=.env.development.local run scripts/magic-link.ts <email>
+//   bun --env-file=.env.development.local run scripts/magic-link.ts <email> [path]
 //   bun --env-file=.env.development.local run scripts/magic-link.ts haji@local.test --open
+//   bun --env-file=.env.development.local run scripts/magic-link.ts staff@local.test /admin/performers-notes --open
 
 import { createClient } from '@supabase/supabase-js';
 import { spawn } from 'node:child_process';
@@ -15,9 +16,11 @@ if (!url || !serviceKey) {
   console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.');
   process.exit(1);
 }
-const [email] = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const positional = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const email = positional[0];
+const path = positional[1] ?? '/notifications';
 if (!email) {
-  console.error('Usage: bun --env-file=.env.development.local run scripts/magic-link.ts <email> [--open]');
+  console.error('Usage: bun --env-file=.env.development.local run scripts/magic-link.ts <email> [path] [--open]');
   process.exit(1);
 }
 
@@ -25,7 +28,7 @@ const admin = createClient(url, serviceKey, { auth: { autoRefreshToken: false, p
 const { data, error } = await admin.auth.admin.generateLink({
   type: 'magiclink',
   email,
-  options: { redirectTo: 'http://localhost:4321/notifications' },
+  options: { redirectTo: `http://localhost:4321${path}` },
 });
 if (error) {
   console.error(`generateLink: ${error.message}`);
