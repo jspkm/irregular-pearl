@@ -19,12 +19,20 @@
 
 import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
+import { difficultyAxes, type DifficultyAxis } from '../data/difficulty-axes';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
+const axes = difficultyAxes[piece.id];
+const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
+  { key: 'technical', label: 'Technical' },
+  { key: 'stamina', label: 'Stamina' },
+  { key: 'interpretive', label: 'Interpretive' },
+  { key: 'ensemble', label: 'Ensemble' },
+];
 
 const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
 
@@ -65,6 +73,26 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <p class="piece-intro">{piece.description}</p>
   )}
 
+  {axes && (
+    <div class="diff-panel">
+      {axisOrder.map(({ key, label }) => {
+        const a: DifficultyAxis = axes[key];
+        return (
+          <div class="diff-axis">
+            <div class="lab">{label}</div>
+            <div class="bars">
+              {[1, 2, 3, 4, 5].map(n => (
+                <span class={n <= a.level ? 'on' : ''}></span>
+              ))}
+            </div>
+            <div class="val">{a.label}</div>
+            <div class="note">{a.note}</div>
+          </div>
+        );
+      })}
+    </div>
+  )}
+
   {/* ---------- Performer's notes (empty state until schema lands) ---------- */}
   <section class="block">
     <div class="kicker">Performer's notes</div>
@@ -76,14 +104,18 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <div class="kicker">Structural landmarks</div>
     {piece.movements && piece.movements.length > 0 ? (
       <div class="movements">
-        {piece.movements.map((m) => (
-          <div class="mvmt">
-            <div class="mvmt-head">
-              <h3 class="mvmt-title">{m.name}</h3>
+        {piece.movements.map((m) => {
+          const meta = [m.key, m.meter].filter(Boolean).join(' · ');
+          return (
+            <div class="mvmt">
+              <div class="mvmt-head">
+                <h3>{m.name}</h3>
+                {meta && <span class="meta">{meta}</span>}
+              </div>
+              <p class="empty-state">Landmarks not yet curated for this movement.</p>
             </div>
-            <p class="empty-state">Landmarks not yet curated for this movement.</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     ) : (
       <p class="empty-state">Landmarks not yet curated.</p>
@@ -101,15 +133,24 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <div class="kicker">Editions</div>
     {piece.editions.length > 0 ? (
       <div class="editions">
-        {piece.editions.map((e) => (
-          <div class="ed">
-            <div class="ed-body">
-              <h3>{e.publisher}</h3>
-              <div class="meta">{e.editor}{e.year ? ` · ${e.year}` : ''}</div>
-              {e.description && <p class="desc">{e.description}</p>}
-            </div>
-          </div>
-        ))}
+        {piece.editions.map((e) => {
+          const Wrapper: any = e.url ? 'a' : 'div';
+          const wrapProps = e.url ? { href: e.url, target: '_blank', rel: 'noopener', class: 'ed' } : { class: 'ed' };
+          return (
+            <Wrapper {...wrapProps}>
+              <div class="ed-body">
+                <h3>{e.publisher}</h3>
+                <div class="meta">{e.editor}{e.year ? ` · ${e.year}` : ''}</div>
+                {e.description && <p class="desc">{e.description}</p>}
+              </div>
+              {e.type && (
+                <div class="right">
+                  <span class="type-chip">{e.type}</span>
+                </div>
+              )}
+            </Wrapper>
+          );
+        })}
       </div>
     ) : (
       <p class="empty-state">No editions listed yet.</p>
@@ -189,14 +230,6 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     margin: 0 0 48px;
   }
 
-  /* Movement title */
-  .mvmt-title {
-    font-family: var(--font-serif);
-    font-size: 17px;
-    font-weight: 500;
-    margin: 0 0 4px;
-  }
-
   /* External reference list (IMSLP, Wikipedia) */
   .ext-refs {
     list-style: none;
@@ -212,7 +245,7 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     gap: 10px;
   }
 
-  /* Edition card body wrapper (single-column cards for now; kit's right-rail will return when we wire edition-type chips to data) */
+  /* Edition card list */
   .editions {
     display: flex;
     flex-direction: column;
@@ -220,6 +253,16 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
   }
   .ed-body {
     flex: 1;
+  }
+  /* When the edition card is rendered as a link, strip anchor chrome and inherit colour
+     so the kit's .ed card styling stays intact. */
+  a.ed {
+    color: inherit;
+    text-decoration: none;
+  }
+  a.ed:hover .type-chip {
+    background: var(--accent);
+    color: #fff;
   }
 
   /* Responsive */

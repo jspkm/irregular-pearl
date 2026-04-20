@@ -28,6 +28,8 @@ export interface Edition {
   editor: string;
   year: number | null;
   description: string;
+  type?: 'urtext' | 'scholarly' | 'performer' | 'facsimile' | 'critical' | 'practical';
+  url?: string;
 }
 
 export interface ExternalLink {
@@ -40,6 +42,8 @@ export interface ExternalLink {
 export interface Movement {
   name: string;
   pieceId?: string;
+  key?: string;
+  meter?: string;
 }
 
 export interface PieceFull extends PieceBasic {
@@ -77,6 +81,8 @@ function seedToFull(s: SeedPiece): PieceFull {
       editor: e.editor,
       year: e.year,
       description: e.description,
+      type: e.type,
+      url: e.url,
     })),
     external_links: s.external_links.map((l) => ({
       type: l.type,
@@ -87,6 +93,8 @@ function seedToFull(s: SeedPiece): PieceFull {
     movements: (s.movements ?? []).map((m) => ({
       name: m.name,
       pieceId: m.pieceId,
+      key: m.key,
+      meter: m.meter,
     })),
   };
 }
