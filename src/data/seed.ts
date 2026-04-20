@@ -534,27 +534,4 @@ export const seedPieces: SeedPiece[] = [
       { name: 'III. Toccata', meter: '4/4' },
     ],
   },
-  {
-    id: 'crumb-vox-balaenae',
-    title: 'Vox Balaenae (Voice of the Whale)',
-    composer_name: 'George Crumb',
-    catalog_number: null,
-    instruments: ['Flute', 'Cello', 'Piano'],
-    era: 'Contemporary',
-    form: 'Chamber',
-    duration_minutes: 22,
-    difficulty: 'professional',
-    description: 'A chamber work for electric flute, electric cello, and amplified piano, composed in 1971 after Crumb heard a recording of humpback whale song. The instrumentalists are instructed to perform in black half-masks under deep blue lighting: the masks depersonalise the players so that the music feels like a voice from another species. The work unfolds in three large sections — Vocalise, Variations on Sea-Time, and Sea-Nocturne — and uses extended techniques throughout: flute singing while playing, bowed piano strings, and the cellist\'s imitation of seagull cries via high harmonics over scordatura tuning. A touchstone of late-20th-century chamber music and a central work in the cellist\'s new-music repertoire.',
-    editions: [
-      { id: 'e-crumb-vox-peters', publisher: 'C. F. Peters', editor: 'Original publication', year: 1971, description: 'The original Peters score, printed with Crumb\'s signature graphic notation and staging directions. The only published edition.', type: 'performer', url: 'https://www.wisemusicclassical.com/publishers/edition-peters/' }
-    ],
-    external_links: [
-      { type: 'wikipedia', url: 'https://en.wikipedia.org/wiki/Vox_Balaenae', label: 'Wikipedia — Vox Balaenae' },
-    ],
-    movements: [
-      { name: 'Vocalise (… for the beginning of time)', meter: 'graphic notation' },
-      { name: 'Variations on Sea-Time', meter: 'graphic notation' },
-      { name: 'Sea-Nocturne (… for the end of time)', meter: 'graphic notation' },
-    ],
-  },
 ];
