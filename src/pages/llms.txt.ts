@@ -1,8 +1,18 @@
 import type { APIRoute } from 'astro';
-import { seedPieces } from '../data/seed';
+import { seedPieces, EXAMPLE_PIECE_IDS } from '../data/seed';
 
 export const GET: APIRoute = ({ url }) => {
   const origin = url.origin;
+
+  const examples = EXAMPLE_PIECE_IDS
+    .map((id) => {
+      const piece = seedPieces.find((p) => p.id === id);
+      if (!piece) return null;
+      const catalog = piece.catalog_number ? `, ${piece.catalog_number}` : '';
+      return `- ${origin}/piece/${id} — ${piece.composer_name} ${piece.title}${catalog}`;
+    })
+    .filter(Boolean)
+    .join('\n');
 
   const content = `# Irregular Pearl
 
@@ -41,9 +51,7 @@ Each piece page (${origin}/piece/{id}) contains:
 - External links to IMSLP, YouTube recordings, Wikipedia
 
 ## Example Pieces
-- ${origin}/piece/bach-cello-suite-1 — Bach Cello Suite No. 1 in G major, BWV 1007
-- ${origin}/piece/beethoven-sonata-14 — Beethoven "Moonlight" Sonata
-- ${origin}/piece/chopin-ballade-1 — Chopin Ballade No. 1 in G minor
+${examples}
 
 ## Contact
 Irregular Pearl is a non-profit for classical music knowledge.
