@@ -1,6 +1,8 @@
 # PLAN — Contributor approval pipeline, Slice A (PerformersNote)
 
-*Draft for review. One content entity end-to-end. Slice B and Slice C follow this shape without schema rewrites.*
+> **Shipped v0.1.0 · 2026-04-20.** Kept at repo root as reference for Slice B and C, which reuse this state machine and notification layer.
+
+*One content entity end-to-end. Slice B and Slice C follow this shape without schema rewrites.*
 
 ## 1. Scope and non-goals
 

@@ -17,7 +17,7 @@
 
 1. **Flat, not skeuomorphic.** No gradients, drop shadows, glow, blur, noise, or faux 3D. Surfaces are solid colors separated by 1px borders and whitespace.
 2. **Typography does the hierarchy.** Size, weight, and spacing carry structure. Color is sparingly used and only where it encodes meaning.
-3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Instrument Serif (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use Inter. The switch is deliberate.
+3. **Serif for editorial, sans for interface.** Long-form performer's notes, interpretive schools, and piece descriptions use Source Serif 4 (the reading voice of the site). Navigation, buttons, labels, metadata, and tables use Inter. The switch is deliberate.
 4. **Sentence case everywhere.** Headings, button labels, nav items, tags. Never Title Case, never ALL CAPS, except small kicker eyebrows and the wordmark if set in caps.
 5. **Two weights only.** 400 regular for body; 500 medium for emphasis, headings, button labels, and names. Never 600 or 700. They read as heavy on the quiet surfaces the site uses.
 6. **Ink on white.** Primary reading is ink (#1A1A1A) on white (#FFFFFF). Secondary surfaces use a near-white warm tint (#F8F7F4) for gentle separation without introducing color. Color is reserved for semantic meaning (warning flags, interpretive accents) and small editorial chrome.
@@ -129,10 +129,22 @@ White background, 0.5px border (`#E5E3DE`), 12px radius, 16px internal padding. 
 Performer's notes and interpretive-school descriptions use a distinctive pattern: 2px accent (purple) left border, 18px left padding, Source Serif 4 prose inside. Byline underneath in Inter sentence case. Contributor display name in weight 500, one-line bio in muted color. A contrasting voice within the same section uses a lighter `border-strong` (`#CCC9C2`) left border instead of accent, signalling "contrasting voice," not ranking.
 
 ### Buttons
-Primary buttons are rare. The site has few places where a single action is so primary it deserves a solid background. When used: dark ink (`#1A1A1A`) background, white text, 14px Inter weight 500, 12px radius, 8px vertical / 16px horizontal padding. Secondary: transparent background, 0.5px border, same typography. Ghost: no border, underline-on-hover only.
+
+Three tiers. Pick the lowest-weight tier that still reads as actionable.
+
+**Primary.** One per surface, used for the single action the user is most likely trying to take (e.g., *Approve* in the contributor queue). Dark ink `#1A1A1A` background, white text, Inter 14px weight 500, 12px radius, 8px vertical / 16px horizontal padding.
+
+**Secondary outline.** Transparent background, 0.5px `border-strong` border, muted text. Settled usage across Slice A: *Edit / Remove* on piece-page signed notes, *Refresh* on the contributor queue, *Edit profile* on the owner bar, filter chips in the admin view. Exact spec: Inter 11px, `text-muted`, `border-strong`, padding `4px 10px`, 6px radius, hover darkens both text and border to `ink`. Use for any non-primary button adjacent to or below content — it reads as "you can, but don't have to."
+
+**Active filter chip.** Same shape as the secondary outline, different colors: `bg-accent-light`, `text-accent`, `border-accent-border`. Use only for the "this is the current filter" state, never as a primary action.
+
+**Ghost.** No border, underline-on-hover only. Reserve for inline prose links and footer navigation.
+
+### Popovers
+Used for the navbar notifications bell and any future contextual flyouts. 320px wide desktop, full-width on narrow viewports with the same escape-to-close mechanism `Navbar.astro` uses for search. Container: white `bg-surface`, 0.5px `border` (not `border-strong` — popovers already live above the page so they need less weight), 12px radius, subtle shadow (`shadow-md` token). Content sections use `0.5px border` dividers between rows. Dismiss on outside click, Escape key, or route change. First paint has the popover hidden; do not SSR an open state.
 
 ### Inputs
-36px tall desktop, 44px mobile. 1px border, 8px radius, 12px horizontal padding, 15px body text. Focus: 2px amber ring, no background change. No placeholder text where a label would serve.
+36px tall desktop, 44px mobile. 0.5px border, 8px radius, 12px horizontal padding, 15px body text. Focus: 1px accent (purple) ring, no background change. No placeholder text where a label would serve.
 
 ### Tables
 Used for edition comparisons, recording tempo references, structured metadata. Left-align everything except numeric columns (right-aligned). No zebra striping; row separators are 0.5px border. Column headers: 12px Inter weight 500, all caps, tracked 0.08em, muted color. Body rows: 14px Inter.
@@ -166,7 +178,7 @@ Claude is an executor of this system, not its author. When the system needs to c
 
 ## Artist Profile
 - **Single-column layout.** Display name, instruments, bio, social links.
-- **Level badges:** Student/Amateur = default gray, Professional = amber light bg, Teacher = green light bg
+- **Level badges:** Student/Amateur = default gray, Professional = accent-soft bg with accent text, Teacher = success-bg with success text.
 
 ## Decisions Log
 | Date | Decision | Rationale |
@@ -189,3 +201,6 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-04-19 | Navbar search inputs carry `shadow-md` (exception to principle 1 "no drop shadows") | User preference to give the search input a clearer "tap me" affordance, especially on the first-visit landing page where search is the primary action. The exception is scoped to the search-input control only — no other surface on the site introduces shadows. Principle 1 remains load-bearing everywhere else. |
 | 2026-04-19 | Four-axis difficulty panel made responsive: 4 → 2×2 → 1×4 | `.diff-panel` in `piece-page.css` stays at four columns on wide viewports, collapses to 2×2 under 1024px and to a single column under 768px. Keeps the PRD "one responsive page" principle intact as the panel narrows. |
 | 2026-04-19 | Removed Crumb *Vox Balaenae* (catalog entry + `difficulty_axes` + Supabase `pieces` row) | Chamber-trio scope (electric flute + cello + piano, masks, blue lighting, graphic notation) sits outside the cellist-forward daily-use loop the catalog is being built around. FK cascade cleans up related editions and external_links. Catalog now stands at 18 pieces. Migration `20260419210000_remove_vox_balaenae.sql`. |
+| 2026-04-20 | Signed notes pattern now shipping live on the piece page | First signed content on the site. Slice A of the contributor approval pipeline shipped: performer's notes render in the existing `.signed` pattern (2px accent left border, 18px padding, Source Serif 4 prose, byline in Inter medium with one-line bio). Contributor self-authored vs staff-drafted-and-approved both produce the same public output; the difference is the state machine behind the scenes. Multi-voice treatment (second voice uses `border-strong` instead of accent) already wired in markup even though v1 ships one contributor. |
+| 2026-04-20 | Secondary outline button pattern codified | Four surfaces had four different secondary-button looks during the Slice A build. Aligned all to one spec: transparent bg, 0.5px `border-strong`, `text-muted`, Inter 11px, padding `4px 10px`, 6px radius, darkens to `ink` on hover. Applies to Edit/Remove on signed notes, Refresh on the queue, Edit profile on the owner bar, and all filter chips. Enshrined in Buttons spec. |
+| 2026-04-20 | Popover spec added | Slice A's navbar bell introduced the site's first popover surface. Spec: 320px desktop / full-width narrow, `bg-surface`, 0.5px `border`, 12px radius, `shadow-md` (popovers float above the page so they get the shadow exception already granted to search inputs), 0.5px row dividers, Esc/outside-click/route-change dismiss. |

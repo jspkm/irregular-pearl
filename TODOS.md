@@ -6,41 +6,29 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Data model (PRD Tier 1)
 
-### Contributor approval pipeline
+### Contributor pipeline — Slice B (InterpretiveSchool + substantive Piece descriptions)
 
-**What:** Introduce `contributors`, draft/approval status, version history, and in-app approve/edit/delete for bylined content. Every `performers_note`, `interpretive_school`, `practice_note`, and substantive `description` routes through this flow.
+**What:** Extend the contributor approval pipeline to two additional content types: `interpretive_schools` (name, description, representative recording, tempo cues) and substantive Piece descriptions when they carry interpretive judgment. Both route through the exact same state machine and notification layer the PerformersNote slice already proved.
 
-**Why:** PRD invariant: "No content publishes under a Contributor's byline without that Contributor's explicit in-app approval of the current text." This is the invariant that makes ghostwriting on behalf of contributors ethically honest. Without it, no signed content can ship.
+**Why:** Schools are the plural-voices surface PRD names as the site's editorial signature ("when two respected musicians disagree, both show signed, neither as canonical"). Without them, the piece page is one voice per piece — which works for the one-contributor-v1 reality but not for the promise.
 
-**Context:** Schema currently has `users` but no `contributors` table, no `drafted_by`/`approved_by_contributor_at` fields, no per-contributor approval queue. Start from PRD "Contributor" and "InterpretiveSchool" / "PerformersNote" / "PracticeNote" field specs. Approval queue UI is Tier 1; staff draft dashboard is data-model-only for v1 per PRD.
-
-**Effort:** XL
-**Priority:** P1
-**Depends on:** None (but gates every other signed-content surface)
-
-### Structural landmarks + flags schema
-
-**What:** Add `landmarks` (movement, measure range, label, ordinal), `flags` (controlled vocabulary, severity, instrument specificity), and `practice_notes` (signed prose attached to landmarks).
-
-**Why:** Landmarks is "the densest information surface on the piece page and the place where the site's expertise is most visibly load-bearing" (PRD). Without these entities there is no Tier 1 piece page.
-
-**Context:** Flag vocabulary is governed by the Editorial Director per PRD — start with the PRD list (stamina, bow control, stretch, voicing, double stops, sustained bowing, articulation, rhythmic lift, intonation, ensemble coordination) and keep it as a code-defined enum, not a user-editable table. Signed practice notes route through the same approval pipeline above.
-
-**Effort:** L
-**Priority:** P1
-**Depends on:** Contributor approval pipeline
-
-### InterpretiveSchool + PerformersNote entities
-
-**What:** Add `interpretive_schools` (name, description, representative recording, tempo cues) and `performers_notes` (body, signed by contributor). Both carry draft/approval state.
-
-**Why:** Core editorial surface on every piece page. Schools are plural by design; performer's notes are open-ended reflections.
-
-**Context:** Both entities use the signed-notes visual pattern already specified in DESIGN.md (2px amber left border, Instrument Serif prose, byline in Inter sentence case). Multi-column grid for schools on wide viewports, stacked on narrow, per the responsive piece page principle.
+**Context:** The Slice A pipeline (RPCs, notifications, bell, queue, admin, digest) is content-type agnostic — Slice B adds new subject tables, new RPC specializations, and a new Tier 1 piece-page section. Per the plan-eng-review decision, narrow-FK notification pattern means Slice B either adds a new nullable FK column with a CHECK that exactly one is non-null, or pivots to polymorphic at that point with the lift paid when there's real reason. See `PLAN-contributor-pipeline-slice-a.md` for the established shape.
 
 **Effort:** M
 **Priority:** P1
-**Depends on:** Contributor approval pipeline
+**Depends on:** Slice A (shipped)
+
+### Contributor pipeline — Slice C (landmarks + PracticeNote + flags)
+
+**What:** Add `landmarks` (movement, measure range, label, ordinal), `flags` (controlled vocabulary, severity, instrument specificity), and `practice_notes` (signed prose attached to landmarks). PracticeNotes route through the Slice A pipeline; landmarks + flags are editorially-owned structural data (not contributor-signed per-row).
+
+**Why:** Landmarks is "the densest information surface on the piece page and the place where the site's expertise is most visibly load-bearing" (PRD). Without these entities there is no Tier 1 piece page.
+
+**Context:** Flag vocabulary is governed by the Editorial Director per PRD — start with the PRD list (stamina, bow control, stretch, voicing, double stops, sustained bowing, articulation, rhythmic lift, intonation, ensemble coordination) and keep it as a code-defined enum, not a user-editable table. Signed practice notes reuse Slice A's pipeline — the approval queue and bell already show "a draft awaits your review" for any subject type added to the `notification_type` enum.
+
+**Effort:** L
+**Priority:** P1
+**Depends on:** Slice A (shipped), Slice B (recommended but not strictly required)
 
 ---
 
@@ -114,18 +102,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 **Priority:** P3
 **Depends on:** None
 
-### Spec popover chrome in DESIGN.md
-
-**What:** Add a popover spec to DESIGN.md — border weight, radius, shadow (or lack thereof), arrow (or lack thereof), entrance motion. Locks the default for the navbar bell, future contextual menus, diff-reveal blocks, and any other hover-or-click surfaces that escape the Cards pattern.
-
-**Why:** DESIGN.md covers Cards but not Popovers. Every new popover surface re-debates the same choices (Slice A alone defaults to 0.5px / 8px radius / no shadow / no arrow to keep moving). One-time spec closes the drift.
-
-**Context:** Source of truth is whatever Slice A's bell popover ships. Codify retroactively, then reference the spec from future component specs. Complementary to the existing signed-notes + Cards entries.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** Slice A bell ships first
-
 ---
 
 ## Contributor pipeline (post-Slice-A)
@@ -145,6 +121,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Contributor approval pipeline — Slice A (PerformersNote)
+
+**What:** End-to-end pipeline for the first signed content type. Three tables (`performers_notes`, `performers_note_versions`, `notifications`), one audit view, 12 security-definer RPCs with integrated auth + state-machine + versioning + notification lifecycle, an approval queue at `/notifications`, a staff admin view at `/admin/performers-notes`, piece-page render in the signed-notes pattern with contributor self-authoring + edit + remove affordances, a navbar bell with badge + popover, and a daily email digest via new Supabase Edge Function + GitHub Actions cron at 13:00 UTC. 30 integration tests + 20 email-template unit tests all green. Haji Kim seeded as the first active contributor.
+
+**Why:** The PRD invariant "no content publishes under a contributor's byline without explicit in-app approval" was the gating item for every other signed-content surface. Slice A proves the pattern on the simplest subject (performer's notes, piece-level, no landmarks dependency); Slice B (schools + substantive descriptions) and Slice C (landmarks + practice notes) reuse the same RPCs, notification layer, bell, and queue with new subject tables.
+
+**Context:** Full design in [PLAN-contributor-pipeline-slice-a.md](PLAN-contributor-pipeline-slice-a.md). The Plan + PRD passed interactive engineering review plus an independent Codex challenge before any code landed. Side-wins: local Supabase dev workflow now documented and works end-to-end (closed a separate TODO); four pre-existing migrations patched to be replayable from a fresh DB; shared email template in Claude-kit aesthetic now consumed by both weekly digest (re-skinned from amber) and new daily digest. PRs #27–#40 (#36 was a parallel pre-existing-test-failure cleanup).
+
+**Effort:** L (shipped as 8 rollout steps, each independently reviewable)
+**Priority:** P1
+**Completed:** v0.1.0 (2026-04-20)
 
 ### Port Claude kit piece page + adopt kit aesthetic tokens
 

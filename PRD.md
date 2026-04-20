@@ -10,7 +10,7 @@ The document is in three layers. Principles define the constraints that shape ev
 
 *When in doubt during any decision about Irregular Pearl, this document is the first place to look. If the answer isn't here, raise it — so the document can be updated before the decision compounds.*
 
-*This is revision 2. Revision 1 is preserved in git history. Key changes: (a) Tier 1 narrowed to the surfaces that support a single named user's daily-use loop and produce the site's first signed content, with the personal library promoted from Tier 2 and broad browse/landing surfaces demoted to Tier 2; (b) the attribution model is made explicit — content carries a contributor's byline only after that contributor has approved the current text in-app, and the contributor controls edit and delete from within the app thereafter; (c) the existing events/venues code is flagged for reconciliation against the "not an events directory" principle.*
+*This is revision 2. Revision 1 is preserved in git history. Key changes: (a) Tier 1 narrowed to the surfaces that support a single named user's daily-use loop and produce the site's first signed content, with the personal library promoted from Tier 2 and broad browse/landing surfaces demoted to Tier 2; (b) the attribution model is made explicit — content carries a contributor's byline only after that contributor has approved the current text in-app, and the contributor controls edit and delete from within the app thereafter; (c) legacy community surfaces (events/venues scrapers, public /events and /venues pages, applause, activity log, discussions) were removed to align with the "not an events directory" and "not a social network" principles.*
 
 # **Part one: principles**
 
@@ -29,7 +29,7 @@ The audience is working musicians: performers deciding what to program and which
 -   Not a streaming service. Spotify, Apple Music, Idagio, Qobuz handle recording delivery. We describe and reference, we do not stream.
 -   Not a social network. We have named signed contributors, not anonymous users commenting. We have a personal library, not a public feed.
 -   Not a content farm. No listicles, no SEO-chasing, no AI-generated insights under fake bylines, no outrage-bait programming.
--   Not an events directory. Bachtrack and Operabase handle concert listings. We focus on the pieces themselves. *The current repository contains per-venue event scrapers, an /events surface, and a /venues surface. These were built in an earlier direction and contradict this principle. They are flagged for reconciliation. Resolution options: (a) remove entirely, (b) keep as internal research data for event-to-piece discovery but remove the public surfaces, or (c) rewrite this principle. This document treats the principle as load-bearing until a formal decision lands.*
+-   Not an events directory. Bachtrack and Operabase handle concert listings. We focus on the pieces themselves. *Earlier builds shipped per-venue event scrapers, an /events surface, and a /venues surface. These contradicted this principle and were removed (migration `20260419000000_drop_legacy_features.sql`).*
 
 ## **Vocabulary discipline**
 
@@ -523,7 +523,7 @@ The Tier 1 comparison covers a handful of iconic passages per piece. Tier 2 exte
 -   A practice timer, metronome, section-looping tool, or any software running during practice.
 -   A score annotation layer, in browser or app.
 -   A composer biography section expanded beyond what is performance-relevant. Wikipedia wins.
--   A general concert events directory. Bachtrack wins. *(See Part one: existing events/venues code is flagged for reconciliation. Until that decision lands, no further work is done on those surfaces.)*
+-   A general concert events directory. Bachtrack wins.
 -   A music-theoretic analysis tool.
 
 # **Appendix: using this document**
