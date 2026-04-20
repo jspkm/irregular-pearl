@@ -1,11 +1,13 @@
 -- Enable pg_trgm for fuzzy/typo-tolerant search
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- Trigram indexes for fuzzy matching
+-- Trigram indexes for fuzzy matching on in-scope surfaces.
+-- Events index + union branch removed once the events table was dropped by
+-- #17 (drop_legacy_features). Keeping the migration file replayable from a
+-- fresh database requires that removal here too.
 CREATE INDEX IF NOT EXISTS idx_pieces_title_trgm ON public.pieces USING gin(title gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_pieces_composer_trgm ON public.pieces USING gin(composer_name gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_users_display_name_trgm ON public.users USING gin(display_name gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_events_title_trgm ON public.events USING gin(title gin_trgm_ops);
 
 -- Fuzzy search RPC: returns results ranked by similarity when full-text search misses
 CREATE OR REPLACE FUNCTION public.fuzzy_search(search_query text)
@@ -42,18 +44,6 @@ AS $$
     similarity(u.display_name, search_query) AS similarity
   FROM public.users u
   WHERE u.display_name % search_query
-
-  UNION ALL
-
-  -- Events (match on title)
-  SELECT
-    'event' AS match_type,
-    e.id::text AS match_id,
-    e.title AS match_title,
-    COALESCE(e.venue, '') AS match_subtitle,
-    similarity(e.title, search_query) AS similarity
-  FROM public.events e
-  WHERE e.title % search_query
 
   ORDER BY similarity DESC
   LIMIT 20;

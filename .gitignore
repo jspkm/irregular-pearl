@@ -11,6 +11,7 @@ coverage/
 .wrangler/
 .dev.vars
 supabase/.temp/
+supabase/.branches/
 .context/
 .claude/
 outreach-emails.csv
