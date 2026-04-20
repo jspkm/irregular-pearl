@@ -535,3 +535,11 @@ export const seedPieces: SeedPiece[] = [
     ],
   },
 ];
+
+// Pieces referenced as examples in llms.txt and other outward-facing docs.
+// Kept in one place so the docs and the drift-detection test stay in sync.
+export const EXAMPLE_PIECE_IDS = [
+  'bach-cello-suite-1',
+  'haydn-cello-concerto-1',
+  'elgar-cello-concerto',
+] as const;

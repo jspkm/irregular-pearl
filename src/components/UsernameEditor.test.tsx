@@ -1,10 +1,13 @@
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 if (!globalThis.document) GlobalRegistrator.register();
-import { describe, test, expect } from 'bun:test';
-import { render, fireEvent } from '@testing-library/react';
+import { afterEach, describe, test, expect } from 'bun:test';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 import UsernameEditor from './UsernameEditor';
 
 describe('UsernameEditor', () => {
+  afterEach(() => cleanup());
+
+
   test('shows "Claim your URL" button when no username', () => {
     const { getByText } = render(
       <UsernameEditor userId="test-id" currentUsername={null} onUsernameChange={() => {}} />
