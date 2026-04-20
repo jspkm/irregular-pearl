@@ -314,5 +314,22 @@ These came up in review and were explicitly left out. Recording so future reader
 
 - **Digest timezone.** 13:00 UTC is 6am Pacific / 9am Eastern / 3pm CET. Pick one, not per-user — which is H.'s morning?
 - **Notification type extensibility.** Enum `notification_type` has one value. Adding `draft_revision_requested` in Slice B is an `alter type add value`. Acceptable vs a lookup table?
-- **Popover chrome (border, shadow, arrow).** DESIGN.md doesn't specify. Defaulting to 0.5px border / 8px radius / no shadow; needs designer sign-off.
-- **`supabase start` local workflow.** README documents `supabase db push` (prod) but not the local `supabase start` loop. Confirm the local dev container works before test implementation depends on it; otherwise plan a `supabase init` step.
+- **Popover chrome (border, shadow, arrow).** DESIGN.md doesn't specify. Defaulting to 0.5px border / 8px radius / no shadow; needs designer sign-off. Captured as a TODO.
+- **`supabase start` local workflow.** README documents `supabase db push` (prod) but not the local `supabase start` loop. Confirm the local dev container works before test implementation depends on it; otherwise plan a `supabase init` step. Captured as a P2 TODO.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 23 issues resolved (7 arch, 3 code quality, 3 tests, 2 perf, 8 outside-voice) |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+| DX Review | `/plan-devex-review` | Developer experience gaps | 0 | — | — |
+| Outside Voice | `/plan-eng-review` → Codex | Independent plan challenge | 1 | issues_found (resolved) | 12 findings; 1 invalidated (stale PRD excerpt); 11 decisions taken |
+
+- **OUTSIDE VOICE:** Codex surfaced 8 real integrity/workflow gaps the single-model review missed — explicit actor columns, composite FK for `current_version_id`, unique `(note_id, version_number)` with concurrency handling, polymorphic notifications vs narrow FK, mutable `parent_status` write amplification, rollout order stranded-approval window, diff UI deferral, weekly-digest reskin scope. All addressed in commits `be12c6d` → `1a72508`.
+- **CROSS-MODEL:** Review and Codex independently flagged the audit-trail gap (prior learning `events-moderation-audit-trail` at 9/10 + Codex's "every state change has named actor is false"). Strong signal — applied.
+- **UNRESOLVED:** 0
+- **VERDICT:** ENG CLEARED — plan is ready for implementation. CEO + Design + DX reviews optional; skip unless the scope or visual surfaces change materially before the first PR.
+
