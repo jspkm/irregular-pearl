@@ -124,6 +124,8 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
     setBusy(false);
     if (err) { setError(err.message); return; }
     await refetchNotes();
+    // remove can auto-clear stragglers via the defensive trigger; ping the bell.
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
   // Can the viewer write a brand-new note? Only if they're an active

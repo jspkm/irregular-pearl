@@ -166,6 +166,10 @@ export default function NotificationsQueue() {
     if (session) await loadQueue(session);
   }
 
+  function notifyChanged() {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
+  }
+
   async function handleApprove(noteId: string) {
     setBusyById((b) => ({ ...b, [noteId]: true }));
     setError(null);
@@ -175,6 +179,7 @@ export default function NotificationsQueue() {
     // Remove the row locally; avoids a round-trip.
     setDrafts((rows) => rows.filter((r) => r.noteId !== noteId));
     setActionById((a) => ({ ...a, [noteId]: null }));
+    notifyChanged();
   }
 
   async function handleApproveAndEdit(noteId: string, body: string) {
@@ -188,6 +193,7 @@ export default function NotificationsQueue() {
     if (rpcErr) { setError(rpcErr.message); return; }
     setDrafts((rows) => rows.filter((r) => r.noteId !== noteId));
     setActionById((a) => ({ ...a, [noteId]: null }));
+    notifyChanged();
   }
 
   async function handleReject(noteId: string, reason: string) {
@@ -201,6 +207,7 @@ export default function NotificationsQueue() {
     if (rpcErr) { setError(rpcErr.message); return; }
     setDrafts((rows) => rows.filter((r) => r.noteId !== noteId));
     setActionById((a) => ({ ...a, [noteId]: null }));
+    notifyChanged();
   }
 
   if (status === 'loading') {

@@ -179,6 +179,11 @@ export default function PerformersNotesAdmin() {
     setBody('');
     setCreating(false);
     await reload();
+    notifyChanged();
+  }
+
+  function notifyChanged() {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
   async function handleSubmit(noteId: string) {
@@ -187,6 +192,7 @@ export default function PerformersNotesAdmin() {
     setRowBusy((b) => ({ ...b, [noteId]: false }));
     if (err) { setError(err.message); return; }
     await reload();
+    notifyChanged();
   }
 
   async function handleRetract(noteId: string) {
@@ -195,6 +201,7 @@ export default function PerformersNotesAdmin() {
     setRowBusy((b) => ({ ...b, [noteId]: false }));
     if (err) { setError(err.message); return; }
     await reload();
+    notifyChanged();
   }
 
   async function handleRevise(noteId: string) {
