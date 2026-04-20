@@ -21,14 +21,23 @@ import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
 import { difficultyAxes, type DifficultyAxis } from '../data/difficulty-axes';
 import { getPublishedPerformersNotes } from '../lib/performersNotes';
+import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
+import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
 import PerformersNotes from './PerformersNotes';
+import InterpretiveSchools from './InterpretiveSchools';
+import SignedPieceDescription from './SignedPieceDescription';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
-const performersNotes = await getPublishedPerformersNotes(piece.id);
+const [performersNotes, interpretiveSchools, signedDescriptions] = await Promise.all([
+  getPublishedPerformersNotes(piece.id),
+  getPublishedInterpretiveSchools(piece.id),
+  getPublishedPieceDescriptions(piece.id),
+]);
+const hasSignedDescription = signedDescriptions.length > 0;
 const axes = difficultyAxes[piece.id];
 const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
   { key: 'technical', label: 'Technical' },
@@ -72,9 +81,17 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <span class="pill">{piece.difficulty}</span>
   </div>
 
+  {/* 7A: unsigned pieces.description renders as italic metadata strip when
+      a signed description coexists; as a fuller intro paragraph when alone. */}
   {piece.description && (
-    <p class="piece-intro">{piece.description}</p>
+    <p class={hasSignedDescription ? 'piece-meta-strip' : 'piece-intro'}>{piece.description}</p>
   )}
+
+  {/* 7A: signed description renders as the editorial essay below the header. */}
+  <section class="block" id="signed-description">
+    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} />
+  </section>
+
 
   {axes && (
     <div class="diff-panel">
@@ -125,10 +142,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     )}
   </section>
 
-  {/* ---------- Interpretive schools (empty state) ---------- */}
-  <section class="block">
+  {/* ---------- Interpretive schools ---------- */}
+  <section class="block" id="interpretive-schools">
     <div class="kicker">Interpretive schools</div>
-    <p class="empty-state">No interpretive schools recorded yet.</p>
+    <InterpretiveSchools client:load pieceId={piece.id} initialSchools={interpretiveSchools} />
   </section>
 
   {/* ---------- Editions ---------- */}
@@ -221,9 +238,8 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     margin: 0;
   }
 
-  /* Piece intro — prose description sitting directly under the metadata pills
-     as part of the piece definition. Transitional content until richer editorial
-     surfaces (performer's notes, schools) replace it. */
+  /* Piece intro — unsigned pieces.description as the primary paragraph when
+     no signed editorial description exists on the piece yet. */
   .piece-intro {
     font-family: var(--font-serif);
     font-size: 16px;
@@ -231,6 +247,19 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     color: var(--ink);
     max-width: 640px;
     margin: 0 0 48px;
+  }
+
+  /* 7A: metadata-strip treatment. When a signed piece description exists,
+     the unsigned reference blurb demotes to this smaller italic strip so
+     the signed essay carries the editorial weight. */
+  .piece-meta-strip {
+    font-family: var(--font-sans);
+    font-style: italic;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--muted);
+    max-width: 640px;
+    margin: 0 0 32px;
   }
 
   /* External reference list (IMSLP, Wikipedia) */

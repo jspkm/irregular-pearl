@@ -32,11 +32,21 @@ export interface SubjectConfig {
   anchor: string;
   /** True if the subject has a `name` column (schools). */
   hasName: boolean;
+  /** True if the subject has a `tempo_cues` jsonb column (schools). */
+  hasTempoCues: boolean;
   /** RPC names the queue dispatches to for each contributor action. */
   rpcs: {
     approve: string;
     approveAndEdit: string;
     reject: string;
+    /** Staff: create a draft on behalf of a contributor. */
+    createDraft: string;
+    /** Staff: insert a new version body on an existing draft. */
+    updateDraft: string;
+    /** Staff: send a draft to the contributor's queue. */
+    submit: string;
+    /** Staff: pull a submitted draft back before the contributor acts. */
+    retract: string;
   };
 }
 
@@ -49,10 +59,15 @@ export const SUBJECT_CONFIG: Record<SubjectTable, SubjectConfig> = {
     pageContext: 'on the piece page',
     anchor: '#performers-notes',
     hasName: false,
+    hasTempoCues: false,
     rpcs: {
       approve: 'approve_performers_note',
       approveAndEdit: 'approve_and_edit_performers_note',
       reject: 'reject_performers_note',
+      createDraft: 'create_performers_note_draft',
+      updateDraft: 'update_performers_note_draft',
+      submit: 'submit_performers_note',
+      retract: 'retract_performers_note',
     },
   },
   interpretive_schools: {
@@ -63,10 +78,15 @@ export const SUBJECT_CONFIG: Record<SubjectTable, SubjectConfig> = {
     pageContext: 'on the piece page',
     anchor: '#interpretive-schools',
     hasName: true,
+    hasTempoCues: true,
     rpcs: {
       approve: 'approve_interpretive_school',
       approveAndEdit: 'approve_and_edit_interpretive_school',
       reject: 'reject_interpretive_school',
+      createDraft: 'create_interpretive_school_draft',
+      updateDraft: 'update_interpretive_school_draft',
+      submit: 'submit_interpretive_school',
+      retract: 'retract_interpretive_school',
     },
   },
   piece_descriptions: {
@@ -77,10 +97,15 @@ export const SUBJECT_CONFIG: Record<SubjectTable, SubjectConfig> = {
     pageContext: 'on the piece page',
     anchor: '#signed-description',
     hasName: false,
+    hasTempoCues: false,
     rpcs: {
       approve: 'approve_piece_description',
       approveAndEdit: 'approve_and_edit_piece_description',
       reject: 'reject_piece_description',
+      createDraft: 'create_piece_description_draft',
+      updateDraft: 'update_piece_description_draft',
+      submit: 'submit_piece_description',
+      retract: 'retract_piece_description',
     },
   },
 };
