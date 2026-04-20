@@ -4,6 +4,10 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Changed (data model / catalog)
+- **Catalog reset to curated editorial spine (PRD rev 2, "narrow scope, deep craft").** Wiped the OpenOpus-imported breadth catalog (~7,829 scraped stubs) and replaced it with 19 hand-authored cello-forward pieces aligned with the first real user's daily-use loop: six Bach Cello Suites, three Bach Gamba Sonatas (BWV 1027-1029), Bach Chaconne arranged for cello, Haydn C major, Vivaldi RV 544 "Il Proteo", Saint-Saëns No. 1, Elgar Op. 85, Strauss Op. 6, Mendelssohn Op. 109, Fauré Papillon, Crumb Sonata for Solo Cello (1955), Crumb Vox Balaenae (1971). The Supabase `pieces` table is truncated cascade on deploy; FK-linked rows (editions, recordings, discography, performances, external_links, working_on, maestro_playlist, search_queries, admin- and profile-linked pieces) cascade-delete accordingly.
+- Deleted seed-expansion files (`seed-expansion*.ts`, `seed-piano-violin-new.ts`) and scraper scripts (`import-openopus.ts`, `match-spotify.ts`, `repopulate-recordings.ts`) that were producing the scraped breadth catalog.
+
 ### Changed
 - Sans family switched from DM Sans to Inter across body, UI, and email fallback (Arial where Inter is not reliable).
 - Wordmark rendered as `IrregularPearl` (one word) in Inter medium non-italic, replacing the Instrument Serif italic `Irregular Pearl` treatment. Navbar, layout footer, admin header, and email templates all updated. Prose copy (body paragraphs, meta titles, legal, editorial) keeps the two-word form for readability.

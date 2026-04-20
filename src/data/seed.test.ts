@@ -2,8 +2,8 @@ import { describe, test, expect } from 'bun:test';
 import { seedPieces } from './seed';
 
 describe('seed data integrity', () => {
-  test('has pieces', () => {
-    expect(seedPieces.length).toBeGreaterThan(100);
+  test('has curated catalog (PRD rev 2)', () => {
+    expect(seedPieces.length).toBe(19);
   });
 
   test('all pieces have unique IDs', () => {
