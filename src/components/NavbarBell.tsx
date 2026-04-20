@@ -37,7 +37,6 @@ export default function NavbarBell() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
@@ -104,27 +103,6 @@ export default function NavbarBell() {
     };
   }, [open]);
 
-  async function handleClearOne(id: string) {
-    setBusy(true);
-    const { error } = await supabase.rpc('clear_notification', { p_notification_id: id });
-    setBusy(false);
-    if (!error) {
-      setItems((prev) => prev.filter((n) => n.id !== id));
-      window.dispatchEvent(new Event('notifications:changed'));
-    }
-  }
-
-  async function handleClearAll() {
-    setBusy(true);
-    const { error } = await supabase.rpc('clear_all_notifications');
-    setBusy(false);
-    if (!error) {
-      setItems([]);
-      setOpen(false);
-      window.dispatchEvent(new Event('notifications:changed'));
-    }
-  }
-
   // Invisible when not signed in (loading or anon).
   if (signedIn !== true) return null;
 
@@ -182,33 +160,21 @@ export default function NavbarBell() {
                     : null;
                   return (
                     <li key={n.id} className="border-b-[0.5px] border-border last:border-b-0">
-                      <div className="px-4 py-3">
-                        <a
-                          href={n.link_path}
-                          className="block text-sm text-ink no-underline hover:underline"
-                          onClick={() => setOpen(false)}
-                        >
-                          {pieceLabel && (
-                            <div className="font-display text-[15px] leading-tight mb-0.5">{pieceLabel}</div>
-                          )}
-                          <div className="text-xs text-muted leading-snug">{n.body}</div>
-                        </a>
-                        <div className="mt-2 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleClearOne(n.id)}
-                            disabled={busy}
-                            className="text-[11px] text-tertiary hover:text-ink underline underline-offset-2 disabled:opacity-50"
-                          >
-                            Clear
-                          </button>
-                        </div>
-                      </div>
+                      <a
+                        href={n.link_path}
+                        className="block px-4 py-3 text-sm text-ink no-underline hover:bg-bg-tint"
+                        onClick={() => setOpen(false)}
+                      >
+                        {pieceLabel && (
+                          <div className="font-display text-[15px] leading-tight mb-0.5">{pieceLabel}</div>
+                        )}
+                        <div className="text-xs text-muted leading-snug">{n.body}</div>
+                      </a>
                     </li>
                   );
                 })}
               </ul>
-              <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint flex items-center justify-between">
+              <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint">
                 <a
                   href="/notifications"
                   className="text-xs text-accent no-underline hover:underline"
@@ -216,14 +182,6 @@ export default function NavbarBell() {
                 >
                   Open queue &rarr;
                 </a>
-                <button
-                  type="button"
-                  onClick={handleClearAll}
-                  disabled={busy}
-                  className="text-[11px] text-tertiary hover:text-ink underline underline-offset-2 disabled:opacity-50"
-                >
-                  {busy ? 'Clearing…' : 'Clear all'}
-                </button>
               </div>
             </>
           )}
