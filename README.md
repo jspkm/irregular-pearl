@@ -129,6 +129,7 @@ public/
 - [TODOS.md](./TODOS.md) — tracked work, sorted by priority.
 - [CHANGELOG.md](./CHANGELOG.md) — what shipped, when.
 - [PLAN-contributor-pipeline-slice-a.md](./PLAN-contributor-pipeline-slice-a.md) — reference implementation plan for the contributor approval pipeline. Slice A shipped; Slice B and C reuse the same shape.
+- [PLAN-contributor-pipeline-slice-b.md](./PLAN-contributor-pipeline-slice-b.md) — Slice B plan: InterpretiveSchool + signed PieceDescription through the same pipeline, plus the notifications polymorphic pivot. Eng-review + Codex-challenge cleared; landing in 6 rollout steps.
 
 ## Name
 
