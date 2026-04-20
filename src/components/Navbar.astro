@@ -1,12 +1,13 @@
 ---
 import AuthButton from './AuthButton';
 ---
-<nav class="flex items-center justify-between px-4 md:px-6 py-3 border-b border-border bg-surface sticky top-0 z-50">
-  <a href="/" class="no-underline shrink-0 text-ink font-medium tracking-tight text-base md:text-lg">
-    IrregularPearl
+<nav class="flex items-center gap-4 md:gap-6 px-4 md:px-6 py-3 border-b border-border bg-surface sticky top-0 z-50">
+  <a href="/" class="no-underline shrink-0 text-ink font-medium tracking-tight text-base md:text-lg flex items-baseline gap-2">
+    <span>IrregularPearl</span>
+    <span class="text-[11px] font-normal text-muted tracking-normal">beta</span>
   </a>
 
-  <div class="flex-1 max-w-md mx-4 md:mx-8">
+  <div class="flex-1 max-w-md">
     <form action="/" method="get">
       <input
         type="search"
@@ -17,7 +18,9 @@ import AuthButton from './AuthButton';
     </form>
   </div>
 
-  <div class="flex items-center gap-4 text-sm text-muted">
+  <div class="flex items-center gap-4 md:gap-5 text-sm text-ink">
+    <a href="/browse/era" class="no-underline text-ink hover:text-accent transition-colors hidden sm:inline">Browse</a>
+    <a href="/about" class="no-underline text-ink hover:text-accent transition-colors hidden sm:inline">About</a>
     <AuthButton client:load />
   </div>
 </nav>
