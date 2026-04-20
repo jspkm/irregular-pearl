@@ -20,12 +20,15 @@
 import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
 import { difficultyAxes, type DifficultyAxis } from '../data/difficulty-axes';
+import { getPublishedPerformersNotes } from '../lib/performersNotes';
+import PerformersNotes from './PerformersNotes';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
+const performersNotes = await getPublishedPerformersNotes(piece.id);
 const axes = difficultyAxes[piece.id];
 const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
   { key: 'technical', label: 'Technical' },
@@ -93,10 +96,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     </div>
   )}
 
-  {/* ---------- Performer's notes (empty state until schema lands) ---------- */}
-  <section class="block">
+  {/* ---------- Performer's notes ---------- */}
+  <section class="block" id="performers-notes">
     <div class="kicker">Performer's notes</div>
-    <p class="empty-state">No performer's notes yet.</p>
+    <PerformersNotes client:load pieceId={piece.id} initialNotes={performersNotes} />
   </section>
 
   {/* ---------- Structural landmarks ---------- */}
