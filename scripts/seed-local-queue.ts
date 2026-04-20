@@ -52,16 +52,17 @@ const staffId = await ensureUser('staff@local.test', 'stafflocal', {
 const { data: pieces } = await admin.from('pieces').select('id, title').limit(1);
 let pieceId = pieces?.[0]?.id;
 if (!pieceId) {
-  const fixtureId = 'local-test-piece';
+  const fixtureId = 'bach-cello-suite-1';
   await admin.from('pieces').upsert({
     id: fixtureId,
-    title: 'Local Test Piece',
-    composer_name: 'Anonymous',
+    title: 'Cello Suite No. 1 in G major',
+    composer_name: 'Bach, J.S.',
+    catalog_number: 'BWV 1007',
     era: 'Baroque',
-    form: 'sonata',
+    form: 'suite',
     instruments: ['cello'],
-    difficulty: 'intermediate',
-    description: '',
+    difficulty: 'advanced',
+    description: 'The most-played of the Six, and the one every cellist must eventually confront on their own terms.',
   });
   pieceId = fixtureId;
 }

@@ -23,6 +23,7 @@ interface PendingDraft {
   pieceId: string;
   pieceTitle: string;
   composerName: string;
+  catalogNumber: string | null;
   drafterName: string | null;
   body: string;
   versionNumber: number;
@@ -30,10 +31,16 @@ interface PendingDraft {
   createdAt: string;
 }
 
+interface ContributorProfile {
+  displayName: string;
+  bioShort: string | null;
+}
+
 type ItemAction = null | 'approve' | 'approve-and-edit' | 'reject';
 
 export default function NotificationsQueue() {
   const [status, setStatus] = useState<Status>('loading');
+  const [profile, setProfile] = useState<ContributorProfile | null>(null);
   const [drafts, setDrafts] = useState<PendingDraft[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [actionById, setActionById] = useState<Record<string, ItemAction>>({});
@@ -43,19 +50,23 @@ export default function NotificationsQueue() {
     setError(null);
 
     // Profile check: must be an active contributor.
-    const { data: profile, error: profileErr } = await supabase
+    const { data: profileRow, error: profileErr } = await supabase
       .from('users')
-      .select('is_contributor, contributor_active')
+      .select('is_contributor, contributor_active, display_name, contributor_bio_short')
       .eq('id', session.user.id)
       .single();
     if (profileErr) {
       setError(profileErr.message);
       return;
     }
-    if (!profile?.is_contributor || !profile.contributor_active) {
+    if (!profileRow?.is_contributor || !profileRow.contributor_active) {
       setStatus('not-contributor');
       return;
     }
+    setProfile({
+      displayName: profileRow.display_name,
+      bioShort: profileRow.contributor_bio_short ?? null,
+    });
 
     // Pending drafts for this contributor.
     const { data: notes, error: notesErr } = await supabase
@@ -85,7 +96,7 @@ export default function NotificationsQueue() {
         .in('note_id', noteIds)
         .is('approved_at', null)
         .order('version_number', { ascending: false }),
-      supabase.from('pieces').select('id, title, composer_name').in('id', pieceIds),
+      supabase.from('pieces').select('id, title, composer_name, catalog_number').in('id', pieceIds),
       supabase.from('performers_notes').select('id, drafted_by').in('id', noteIds),
     ]);
     if (versionsRes.error) { setError(versionsRes.error.message); return; }
@@ -128,6 +139,7 @@ export default function NotificationsQueue() {
         pieceId: n.piece_id,
         pieceTitle: piece.title,
         composerName: piece.composer_name,
+        catalogNumber: piece.catalog_number ?? null,
         drafterName: drafterId ? drafterById.get(drafterId) ?? null : null,
         body: version.body,
         versionNumber: version.version_number,
@@ -218,7 +230,7 @@ export default function NotificationsQueue() {
     <div className="font-body">
       <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Your queue</h1>
       <p className="text-sm text-muted mb-8">
-        Drafts waiting for your review. Approve as-is, edit and publish, or send back with a note.
+        Drafts waiting for your review. Approve as-is, edit and then approve, or send back with a note.
       </p>
 
       {error && (
@@ -241,24 +253,52 @@ export default function NotificationsQueue() {
                 key={d.noteId}
                 className="rounded-xl border-[0.5px] border-border bg-surface p-5"
               >
-                <div className="flex items-baseline justify-between gap-4 mb-1">
-                  <a
-                    href={`/piece/${d.pieceId}`}
-                    className="text-[20px] font-display text-ink leading-tight no-underline hover:underline"
-                  >
-                    {d.pieceTitle}
-                  </a>
-                  <span className="text-xs text-tertiary shrink-0">
-                    {d.drafterName ? `drafted by ${d.drafterName}` : `v${d.versionNumber}`}
-                  </span>
-                </div>
-                <p className="text-sm text-muted mb-4">{d.composerName}</p>
-
+                {/* Context: where this will appear */}
                 <div
-                  className="pl-[18px] border-l-2 mb-5 font-display text-[16px] text-ink leading-[1.68] whitespace-pre-wrap"
+                  className="text-[11px] font-medium tracking-[0.08em] uppercase mb-4"
+                  style={{ color: 'var(--color-accent)' }}
+                >
+                  Performer's note &middot; on the piece page
+                </div>
+
+                {/* Piece header — mirror the piece-page H1 + byline format */}
+                <div className="pb-4 mb-5 border-b-[0.5px] border-border">
+                  <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+                    <a
+                      href={`/piece/${d.pieceId}`}
+                      className="font-display text-[22px] text-ink leading-tight tracking-tight no-underline hover:underline"
+                    >
+                      {d.pieceTitle}
+                    </a>
+                    {d.catalogNumber && (
+                      <span className="text-[11px] font-mono text-tertiary tracking-wide">
+                        {d.catalogNumber}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1 text-sm text-muted">
+                    by <span className="text-ink">{d.composerName}</span>
+                  </div>
+                </div>
+
+                {/* Preview of the signed unit exactly as it will render on the piece page */}
+                <div
+                  className="pl-[18px] border-l-2 mb-2 font-display text-[16px] text-ink leading-[1.68] whitespace-pre-wrap"
                   style={{ borderLeftColor: 'var(--color-accent)' }}
                 >
                   {d.body}
+                </div>
+                {profile && (
+                  <div className="pl-[18px] mb-1 font-body">
+                    <div className="text-sm text-ink font-medium">{profile.displayName}</div>
+                    {profile.bioShort && (
+                      <div className="text-xs text-muted">{profile.bioShort}</div>
+                    )}
+                  </div>
+                )}
+
+                <div className="text-[11px] text-tertiary mt-4 mb-4">
+                  {d.drafterName ? `drafted by ${d.drafterName}` : 'drafted on your behalf'} &middot; v{d.versionNumber}
                 </div>
 
                 {currentAction === null && (
@@ -277,7 +317,7 @@ export default function NotificationsQueue() {
                       disabled={busy}
                       className="inline-flex items-center px-4 py-2 bg-transparent text-ink text-sm font-medium border-[0.5px] border-border-strong rounded-lg hover:bg-[#F8F7F4] disabled:opacity-50 transition-colors"
                     >
-                      Approve and edit
+                      Edit and approve
                     </button>
                     <button
                       type="button"
@@ -347,7 +387,7 @@ function EditForm(props: {
           disabled={props.submitting || value.trim() === ''}
           className="inline-flex items-center px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-[#292524] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {props.submitting ? 'Publishing…' : 'Publish edited'}
+          {props.submitting ? 'Approving…' : 'Approve'}
         </button>
         <button
           type="button"
