@@ -1,0 +1,31 @@
+name: Daily Notification Digest
+
+on:
+  schedule:
+    # 13:00 UTC = 06:00 Pacific / 09:00 Eastern / 15:00 CET. Matches H.'s morning.
+    - cron: '0 13 * * *'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger notification digest edge function
+        run: |
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST "${{ secrets.SUPABASE_URL }}/functions/v1/send-notification-digest" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Response ($HTTP_CODE): $BODY"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Notification digest failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
