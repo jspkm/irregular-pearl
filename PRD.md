@@ -407,6 +407,36 @@ The entities below are the atomic units of the product. Relationships between th
 
 *The library is the site's personal-memory layer and the long-run contributor pipeline. A private reflection today is a signed public note tomorrow, if and when the user chooses to publish. This data is treated with the same sensitivity as contributor identity.*
 
+**Notification**
+
+*An in-product message alerting a user that something requires their attention.*
+
+**FIELDS**
+
+• id
+
+• recipient (reference to the user the notification is addressed to)
+
+• type (enumerated: draft-awaiting-approval is the first type; the list extends only by editorial decision)
+
+• subject (reference to the entity the notification is about — a draft PerformersNote, InterpretiveSchool, PracticeNote, edition observation, or substantive description)
+
+• body (short system-generated line; e.g. "A draft performer's note on the Dvořák Cello Concerto is ready for your review")
+
+• created at (timestamp)
+
+• cleared at (timestamp; null until the recipient explicitly clears it — navigating to the subject does not auto-clear)
+
+• last digest sent at (timestamp; null until included in an email digest, updated thereafter so the same unchanged notification is not re-mailed)
+
+**RELATIONSHIPS**
+
+• belongs to one User (the recipient)
+
+• references one subject entity, polymorphic by type
+
+*Notifications are the one in-product nag surface. The type list stays deliberately short — a notification firehose is as bad as none at all.*
+
 ## **Invariants the data model must preserve**
 
 -   Every PerformersNote, InterpretiveSchool, PracticeNote, and substantive description has a Contributor signature. No anonymous interpretive or pedagogical content is publishable.
@@ -416,12 +446,13 @@ The entities below are the atomic units of the product. Relationships between th
 -   A Contributor's AI consent settings are the authoritative source for what agents may do with their work and identity. Agent systems check this at action time, not at configuration time.
 -   User library reflections are private by default. Publication requires an explicit user action, per reflection, with a visible signed byline, routed through the contributor approval pipeline.
 -   Revisions to PerformersNotes, InterpretiveSchools, and PracticeNotes are versioned. A contributor may request the current version be replaced or withdrawn; prior versions are retained for audit but removed from public view on request.
+-   A Notification is only generated when the recipient has a direct action to take (approve a draft, respond to an edit request). Notifications are not used for activity feeds, social signals, marketing, or system announcements. The type list is controlled by the Editorial Director.
 
 # **Part three: surfaces**
 
 The surfaces below are the user-facing views of the product. Each surface has a job-to-be-done, a primary audience, and a priority tier. Tier 1 surfaces ship in the first public release. Tier 2 surfaces ship in the first nine months. Tier 3 surfaces are planned but not committed.
 
-**Revision 2 narrows Tier 1 to six surfaces that together support the first real user's daily-use loop and produce the first signed content on the site. Surfaces previously in Tier 1 that do not serve this loop are moved to Tier 2. (The piece page is one responsive surface across desktop and mobile; earlier drafts counted it as two.)**
+**Revision 2 narrows Tier 1 to seven surfaces that together support the first real user's daily-use loop and produce the first signed content on the site. Surfaces previously in Tier 1 that do not serve this loop are moved to Tier 2. (The piece page is one responsive surface across desktop and mobile; earlier drafts counted it as two. Notifications was added as a Tier 1 surface alongside the contributor approval pipeline, since the pipeline is meaningless if contributors aren't told they have drafts to review.)**
 
 ## **Tier 1 — first release**
 
@@ -446,6 +477,10 @@ Job: give the first real user, and the musicians like her who follow, a lightwei
 ### **Contributor submission and approval pipeline**
 
 Job: the surface by which drafts become published content under a contributor's byline, and the surface by which new contributors onboard. Audience: contributors (first, the one real contributor; later, every signed voice). Primary surface: an in-app approval queue showing drafts attributed to the logged-in contributor, each with current text, diff from any prior version, and action buttons (approve, edit-and-approve, reject). For staff producing drafts on a contributor's behalf, the draft status is visible in a staff dashboard (not in Tier 1 UI, but in the data model and an admin view). Every signed surface on the site routes through this flow: performer's notes, interpretive schools, practice notes, substantive piece descriptions, edition observations. Published content is editable and deletable by the bylined contributor at any time from within the app; deletion removes from public view in the next request.
+
+### **Notifications**
+
+Job: surface the things a logged-in user must act on, so drafts never stall waiting on a contributor who doesn't know they are waiting. Audience: logged-in users; in v1 effectively the one signed contributor. Primary surface: a bell icon in the navbar next to the profile control, badged with the count of un-cleared notifications; clicking opens a popover listing each notification with its subject line and a link to the relevant review surface. Clearing is an explicit user action from the popover or the review surface — navigating away does not auto-clear. A scheduled daily job emails the recipient a digest of their un-cleared notifications with a direct link back to the in-app popover; the same unchanged notification is not re-sent in subsequent digests. The bell is the only in-product nag surface — no toasts, modals, or interstitials.
 
 ### **Search**
 
