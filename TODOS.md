@@ -6,18 +6,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Data model (PRD Tier 1)
 
-### Contributor pipeline — Slice B (InterpretiveSchool + substantive Piece descriptions)
-
-**What:** Extend the contributor approval pipeline to two additional content types: `interpretive_schools` (name, description, representative recording, tempo cues) and substantive Piece descriptions when they carry interpretive judgment. Both route through the exact same state machine and notification layer the PerformersNote slice already proved.
-
-**Why:** Schools are the plural-voices surface PRD names as the site's editorial signature ("when two respected musicians disagree, both show signed, neither as canonical"). Without them, the piece page is one voice per piece — which works for the one-contributor-v1 reality but not for the promise.
-
-**Context:** The Slice A pipeline (RPCs, notifications, bell, queue, admin, digest) is content-type agnostic — Slice B adds new subject tables, new RPC specializations, and a new Tier 1 piece-page section. Per the plan-eng-review decision, narrow-FK notification pattern means Slice B either adds a new nullable FK column with a CHECK that exactly one is non-null, or pivots to polymorphic at that point with the lift paid when there's real reason. See `PLAN-contributor-pipeline-slice-a.md` for the established shape.
-
-**Effort:** M
-**Priority:** P1
-**Depends on:** Slice A (shipped)
-
 ### Contributor pipeline — Slice C (landmarks + PracticeNote + flags)
 
 **What:** Add `landmarks` (movement, measure range, label, ordinal), `flags` (controlled vocabulary, severity, instrument specificity), and `practice_notes` (signed prose attached to landmarks). PracticeNotes route through the Slice A pipeline; landmarks + flags are editorially-owned structural data (not contributor-signed per-row).
@@ -28,7 +16,7 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 **Effort:** L
 **Priority:** P1
-**Depends on:** Slice A (shipped), Slice B (recommended but not strictly required)
+**Depends on:** Slice A (shipped), Slice B (shipped)
 
 ---
 
@@ -38,13 +26,13 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 **What:** Restructure the piece page into the sections PRD describes: header + difficulty panel, signed performer's notes, structural landmarks with flags and practice notes, interpretive schools grid, editions with passage comparison, recordings around landmark tempi, pedagogical arc.
 
-**Why:** Current `src/pages/piece/[id].astro` is ~100 lines with a `PieceTabs` component. Missing landmarks, schools, performer's notes, passage comparison, and pedagogical arc. It is the atomic surface of the product per PRD.
+**Why:** The Claude-kit port (v0.1.0) stood up the 9-section shell and Slices A + B lit up signed performer's notes, interpretive schools, and signed piece descriptions with real data. Still missing: structural landmarks + flags + practice notes (Slice C), edition passage comparison, recordings-around-landmark-tempi wiring, and the pedagogical arc. It is the atomic surface of the product per PRD.
 
 **Context:** One responsive page, not two. Content, ordering, and hierarchy shared across viewports; narrow viewports reflow multi-column sections into stacks. Cold-start to structural landmarks under one second on a three-year-old phone on cellular is a Tier 1 perf target. Use `/design-shotgun` or `@agent-designer` to generate layout mockups honoring DESIGN.md tokens before coding.
 
 **Effort:** L
 **Priority:** P1
-**Depends on:** Structural landmarks + flags schema, InterpretiveSchool + PerformersNote entities
+**Depends on:** Structural landmarks + flags schema (Slice C)
 
 ### Edition comparison at measure level
 
@@ -106,6 +94,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Contributor pipeline (post-Slice-A)
 
+### Drop vestigial `notifications.performers_note_id` + remove dual-write
+
+**What:** A cleanup migration that drops `notifications.performers_note_id` (nullable narrow FK kept vestigial during the Slice B polymorphic pivot) and removes the dual-write branches from Slice A's submit RPCs. After the drop, every notification row lives on `(subject_table, subject_id)` only.
+
+**Why:** Eng-review decision 1A deferred the drop out of Slice B so the pivot could ship without a destructive change riding with it. Once Slice B has one week of live traffic and no regressions, the vestigial column is load-bearing only to old rows — and those already have `(subject_table='performers_notes', subject_id=...)` populated via the dual-write.
+
+**Context:** One migration file, one pass through the three performer's-notes submit RPCs to strip the `performers_note_id` insert. Tracked as a Slice C prerequisite so landmark notifications don't inherit the vestigial shape.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** Slice B shipped + one week of live traffic
+
 ### Diff block in NotificationsQueue
 
 **What:** Render a line-level diff in the approval queue against the most recently approved version of the same note. Uses the `diff` npm package (tree-shakes cleanly). Visible when a pending draft is a revision after a prior rejection or an earlier published state.
@@ -121,6 +121,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Contributor approval pipeline — Slice B (InterpretiveSchool + signed PieceDescription)
+
+**What:** Two more signed content types now flow through the Slice A pipeline. New tables `interpretive_schools` + `interpretive_school_versions` and `piece_descriptions` + `piece_description_versions`, each with the same six-audit-column trail and append-only versioning. 23 new security-definer RPCs (11 per subject + a school-metadata updater) reuse the Slice A state machine unchanged. Polymorphic notifications pivot — `notifications.performers_note_id` stays vestigial alongside new `subject_table text + subject_id uuid` columns with a partial unique index; Slice A RPCs dual-write during the vestigial window. Queue, bell, admin, and daily digest all went subject-agnostic in one pass (Step 3 refactor). The old `PerformersNotesAdmin` was extracted into a generic `ContributorContentAdmin` component mounted from three admin pages. New piece-page sections: `InterpretiveSchools` grid + `SignedPieceDescription`, both in the DESIGN.md signed-notes pattern. Integration test tier grew from 30 to 78 tests covering the new state machines, RLS, mixed-subject queue rendering, and the pivot invariants.
+
+**Why:** Schools are the plural-voices surface PRD names as the site's editorial signature — "when two respected musicians disagree, both show signed, neither as canonical." Without them, the piece page was one voice per piece. Signed piece descriptions give long-form interpretive judgment its own home without collapsing the short unsigned reference copy. The polymorphic pivot was paid now because three subject types by end-of-slice made narrow-FK notifications ugly to extend.
+
+**Context:** Full design in [PLAN-contributor-pipeline-slice-b.md](PLAN-contributor-pipeline-slice-b.md). Shipped as 6 rollout steps across PRs #42–#45, each independently reviewable: (1) schema + dual-write, (2) shared RPC helpers + both RPC families, (3) queue/bell/digest refactor to subject-agnostic reads, (4) schools admin + queue card + piece-page section, (5) piece-description admin + queue card + piece-page section + unsigned-metadata-strip treatment, (6) dev fixtures. Follow-up tracked: drop vestigial `notifications.performers_note_id` and remove dual-write after one week of live traffic.
+
+**Effort:** M (shipped as 6 rollout steps)
+**Priority:** P1
+**Completed:** v0.1.0 (2026-04-20)
 
 ### Contributor approval pipeline — Slice A (PerformersNote)
 
