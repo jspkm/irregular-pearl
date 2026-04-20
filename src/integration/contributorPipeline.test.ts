@@ -39,7 +39,6 @@ afterAll(async () => {
 afterEach(async () => {
   // Each test creates notes against the same piece; clean between tests.
   await admin.from('performers_notes').update({ current_version_id: null }).eq('piece_id', PIECE);
-  await admin.from('notifications').delete().eq('performers_note_id', 'any'); // no-op unless needed
   await admin.from('performers_note_versions').delete().eq('piece_id', PIECE);
   await admin.from('performers_notes').delete().eq('piece_id', PIECE);
 });

@@ -1,11 +1,17 @@
-// Slice B Step 1 integration tests.
+// Post-Slice-B cleanup integration tests.
 //
-// Verifies the additive polymorphic pivot, the Slice A dual-write, idempotency
-// on notification inserts, and the per-subject trigger behavior (soft-remove
-// AFTER UPDATE + hard-delete BEFORE DELETE).
+// Verifies Slice B notification polymorphism works after the vestigial narrow
+// FK column is dropped by migration 20260426000000. Covered:
+//   - submit_performers_note routes through _insert_notification helper.
+//   - _clear_notifications_for_note delegates to polymorphic clear.
+//   - Per-subject soft-remove trigger still fires (no cross-subject bleed).
+//   - Hard-delete trigger still removes orphan notifications.
+//   - Idempotency on double-submit is preserved.
+//   - Schema shape: subject_table CHECK + polymorphic columns intact.
 //
-// These are the iron-rule regression tests for Step 1: Slice A must keep
-// working unchanged after the pivot.
+// Previously this file tested the Slice B dual-write window; after the column
+// drop those tests are moot. File now tests that the Slice A→B→C migration
+// path still resolves Slice A flows correctly.
 
 import { describe, test, expect, beforeAll, afterAll, afterEach } from 'bun:test';
 import {
@@ -16,15 +22,15 @@ import {
   deleteTestPiece,
 } from './helpers';
 
-const PIECE = 'slice-b-step1-test';
+const PIECE = 'slice-b-cleanup-test';
 
 let contributor: Awaited<ReturnType<typeof createAuthUser>>;
 let staff: Awaited<ReturnType<typeof createAuthUser>>;
 
 beforeAll(async () => {
-  await createTestPiece(PIECE, 'Slice B Step 1 Test Piece');
-  contributor = await createAuthUser({ isContributor: true, displayName: 'Slice B Contributor' });
-  staff = await createAuthUser({ isStaff: true, displayName: 'Slice B Staff' });
+  await createTestPiece(PIECE, 'Slice B Cleanup Test Piece');
+  contributor = await createAuthUser({ isContributor: true, displayName: 'Cleanup Contributor' });
+  staff = await createAuthUser({ isStaff: true, displayName: 'Cleanup Staff' });
 });
 
 afterAll(async () => {
@@ -53,37 +59,25 @@ async function draftAndSubmit(body: string): Promise<string> {
   return noteId!;
 }
 
-describe('CM1 — Slice A dual-write during vestigial window', () => {
-  test('submit_performers_note populates BOTH performers_note_id AND (subject_table, subject_id)', async () => {
-    const noteId = await draftAndSubmit('Dual-write body.');
+describe('post-drop Slice A flow still works', () => {
+  test('submit_performers_note creates exactly one polymorphic notification', async () => {
+    const noteId = await draftAndSubmit('Post-drop submit body.');
 
     const { data: notif, error } = await admin
       .from('notifications')
-      .select('performers_note_id, subject_table, subject_id, body')
+      .select('subject_table, subject_id, body, type, cleared_at')
       .eq('subject_id', noteId)
       .single();
     expect(error).toBeNull();
-    expect(notif!.performers_note_id).toBe(noteId);
     expect(notif!.subject_table).toBe('performers_notes');
     expect(notif!.subject_id).toBe(noteId);
+    expect(notif!.type).toBe('draft_awaiting_approval');
+    expect(notif!.cleared_at).toBeNull();
     expect(notif!.body).toContain("A draft performer's note on");
   });
 
-  test('Slice A queue query (by performers_note_id) still finds the notification', async () => {
-    const noteId = await draftAndSubmit('Slice A consumer regression.');
-
-    // Simulates the pre-refactor Slice A consumer that reads performers_note_id.
-    const { count, error } = await admin
-      .from('notifications')
-      .select('id', { count: 'exact', head: true })
-      .eq('performers_note_id', noteId)
-      .is('cleared_at', null);
-    expect(error).toBeNull();
-    expect(count).toBe(1);
-  });
-
-  test('New-style queue query (by subject_table + subject_id) finds the same notification', async () => {
-    const noteId = await draftAndSubmit('New-style consumer.');
+  test('polymorphic query finds the submitted notification', async () => {
+    const noteId = await draftAndSubmit('Polymorphic consumer read.');
 
     const { count, error } = await admin
       .from('notifications')
@@ -94,18 +88,29 @@ describe('CM1 — Slice A dual-write during vestigial window', () => {
     expect(error).toBeNull();
     expect(count).toBe(1);
   });
+
+  test('retract clears the notification via delegating helper', async () => {
+    const noteId = await draftAndSubmit('Retract delegation test.');
+
+    await staff.client.rpc('retract_performers_note', { p_note_id: noteId });
+
+    const { count } = await admin
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('subject_id', noteId)
+      .is('cleared_at', null);
+    expect(count).toBe(0);
+  });
 });
 
-describe('CM3 — notification insert idempotency', () => {
+describe('CM3 — notification insert idempotency preserved', () => {
   test('calling submit_performers_note twice produces exactly one live notification', async () => {
     const noteId = await draftAndSubmit('Idempotency test body.');
 
-    // Manually flip status back to draft so we can call submit again (the
-    // state machine rejects double-submit on its own, so we're testing the
-    // ON CONFLICT DO NOTHING path directly by forcing the state).
+    // Flip status back to draft so we can exercise the ON CONFLICT DO NOTHING
+    // path directly (state machine rejects real double-submit).
     await admin.from('performers_notes').update({ status: 'draft' }).eq('id', noteId);
 
-    // Call submit a second time; should not create a duplicate notification.
     const { error } = await staff.client.rpc('submit_performers_note', { p_note_id: noteId });
     expect(error).toBeNull();
 
@@ -120,15 +125,12 @@ describe('CM3 — notification insert idempotency', () => {
   test('after clearing, a re-submit produces a new live notification', async () => {
     const noteId = await draftAndSubmit('Re-submit after clear.');
 
-    // Clear the notification.
     await admin.from('notifications').update({ cleared_at: new Date().toISOString() }).eq('subject_id', noteId);
-
-    // Flip status back to draft and re-submit.
     await admin.from('performers_notes').update({ status: 'draft' }).eq('id', noteId);
+
     const { error } = await staff.client.rpc('submit_performers_note', { p_note_id: noteId });
     expect(error).toBeNull();
 
-    // Now two notifications exist: the cleared one + the new live one.
     const { count: total } = await admin
       .from('notifications')
       .select('id', { count: 'exact', head: true })
@@ -154,15 +156,13 @@ describe('2A — parameterized soft-remove trigger', () => {
       recipient_id: contributor.id,
       type: 'draft_awaiting_approval',
       subject_table: 'interpretive_schools',
-      subject_id: noteId, // intentionally same id to prove the filter discriminates
+      subject_id: noteId,
       body: 'Fake school notification — should NOT be cleared when the note is removed.',
       link_path: '/notifications',
     });
 
-    // Remove the note (status='removed' triggers the soft-remove).
     await admin.from('performers_notes').update({ current_version_id: null, status: 'removed' }).eq('id', noteId);
 
-    // The performers_notes notification should be cleared.
     const { data: pnNotif } = await admin
       .from('notifications')
       .select('cleared_at')
@@ -171,7 +171,6 @@ describe('2A — parameterized soft-remove trigger', () => {
       .single();
     expect(pnNotif!.cleared_at).not.toBeNull();
 
-    // The interpretive_schools notification MUST still be live.
     const { data: schoolNotif } = await admin
       .from('notifications')
       .select('cleared_at')
@@ -180,7 +179,6 @@ describe('2A — parameterized soft-remove trigger', () => {
       .single();
     expect(schoolNotif!.cleared_at).toBeNull();
 
-    // Cleanup.
     await admin.from('notifications').delete().eq('subject_table', 'interpretive_schools').eq('subject_id', noteId);
   });
 });
@@ -189,21 +187,16 @@ describe('CM2 — hard-delete cleanup trigger', () => {
   test('BEFORE DELETE on performers_notes removes orphan notifications', async () => {
     const noteId = await draftAndSubmit('Hard-delete orphan cleanup.');
 
-    // Verify the live notification exists before delete.
     const { count: before } = await admin
       .from('notifications')
       .select('id', { count: 'exact', head: true })
       .eq('subject_id', noteId);
     expect(before).toBe(1);
 
-    // Hard-delete the note (simulates cascade from a piece hard-delete or
-    // test cleanup code). Null the current_version_id first so the composite
-    // FK allows delete, then drop the version rows.
     await admin.from('performers_notes').update({ current_version_id: null, status: 'removed' }).eq('id', noteId);
     await admin.from('performers_note_versions').delete().eq('note_id', noteId);
     await admin.from('performers_notes').delete().eq('id', noteId);
 
-    // The notification should have been removed by the BEFORE DELETE trigger.
     const { count: after } = await admin
       .from('notifications')
       .select('id', { count: 'exact', head: true })
@@ -212,22 +205,18 @@ describe('CM2 — hard-delete cleanup trigger', () => {
   });
 });
 
-describe('schema shape', () => {
-  test('notifications.performers_note_id is now nullable', async () => {
-    // Try to insert a notification with NULL performers_note_id and populated
-    // polymorphic columns (what the new subject-type RPCs will do in Step 2).
+describe('schema shape — post-drop', () => {
+  test('polymorphic notification insert without the dropped narrow FK succeeds', async () => {
     const { error } = await admin.from('notifications').insert({
       recipient_id: contributor.id,
       type: 'draft_awaiting_approval',
-      performers_note_id: null,
       subject_table: 'interpretive_schools',
       subject_id: '00000000-0000-0000-0000-000000000001',
-      body: 'Nullable-perf-note-id test.',
+      body: 'Post-drop polymorphic insert test.',
       link_path: '/notifications',
     });
     expect(error).toBeNull();
 
-    // Cleanup.
     await admin
       .from('notifications')
       .delete()
@@ -238,7 +227,6 @@ describe('schema shape', () => {
     const { error } = await admin.from('notifications').insert({
       recipient_id: contributor.id,
       type: 'draft_awaiting_approval',
-      performers_note_id: null,
       subject_table: 'bogus_table',
       subject_id: '00000000-0000-0000-0000-000000000002',
       body: 'Bogus subject_table test.',
@@ -249,7 +237,6 @@ describe('schema shape', () => {
   });
 
   test('interpretive_schools metadata_updated_by/at columns exist', async () => {
-    // Smoke test: schema introspection via direct insert with metadata fields.
     const { data: school, error } = await admin
       .from('interpretive_schools')
       .insert({
@@ -264,7 +251,6 @@ describe('schema shape', () => {
     expect(school!.metadata_updated_by).toBeNull();
     expect(school!.metadata_updated_at).toBeNull();
 
-    // Cleanup.
     await admin.from('interpretive_schools').delete().eq('id', school!.id);
   });
 
