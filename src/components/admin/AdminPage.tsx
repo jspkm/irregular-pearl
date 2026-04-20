@@ -3,9 +3,9 @@ import { supabase, hasSupabase } from '../../lib/supabase';
 import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminPlaylist from './AdminPlaylist';
-import PerformersNotesAdmin from './PerformersNotesAdmin';
+import ContributorContentAdmin from './ContributorContentAdmin';
 
-type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes';
+type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes' | 'interpretive-schools' | 'piece-descriptions';
 
 interface StaffProfile {
   id: string;
@@ -66,6 +66,8 @@ export default function AdminPage({ initialTab }: Props) {
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
     { id: 'performers-notes' as Tab, label: "Performer's notes", show: isAdmin },
+    { id: 'interpretive-schools' as Tab, label: 'Schools', show: isAdmin },
+    { id: 'piece-descriptions' as Tab, label: 'Descriptions', show: isAdmin },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
   ].filter(t => t.show);
 
@@ -77,6 +79,8 @@ export default function AdminPage({ initialTab }: Props) {
     dashboard: 'Dashboard',
     users: 'User Management',
     'performers-notes': "Performer's notes",
+    'interpretive-schools': 'Interpretive schools',
+    'piece-descriptions': 'Piece descriptions',
     playlist: 'Maestro Playlist',
   };
 
@@ -117,7 +121,9 @@ export default function AdminPage({ initialTab }: Props) {
 
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}
-        {activeTab === 'performers-notes' && isAdmin && <PerformersNotesAdmin />}
+        {activeTab === 'performers-notes' && isAdmin && <ContributorContentAdmin subjectTable="performers_notes" />}
+        {activeTab === 'interpretive-schools' && isAdmin && <ContributorContentAdmin subjectTable="interpretive_schools" />}
+        {activeTab === 'piece-descriptions' && isAdmin && <ContributorContentAdmin subjectTable="piece_descriptions" />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
       </div>
     </div>
