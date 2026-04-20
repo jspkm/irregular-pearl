@@ -7,12 +7,14 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { SUBJECT_CONFIG, isSubjectTable, type SubjectTable } from '../lib/contributorSubjects';
 
 interface NotificationRow {
   id: string;
   body: string;
   link_path: string;
-  performers_note_id: string;
+  subject_table: string;
+  subject_id: string;
   created_at: string;
 }
 
@@ -48,32 +50,48 @@ export default function NavbarBell() {
 
     const { data: notifRows } = await supabase
       .from('notifications')
-      .select('id, body, link_path, performers_note_id, created_at')
+      .select('id, body, link_path, subject_table, subject_id, created_at')
       .is('cleared_at', null)
       .order('created_at', { ascending: false });
     if (!notifRows || notifRows.length === 0) { setItems([]); return; }
 
-    // Join to piece via the note → piece_id link. Two round trips so we
-    // keep PostgREST happy across the composite FKs.
-    const noteIds = [...new Set(notifRows.map((n) => n.performers_note_id))];
-    const { data: notesData } = await supabase
-      .from('performers_notes')
-      .select('id, piece_id')
-      .in('id', noteIds);
-    const pieceIds = [...new Set((notesData ?? []).map((n) => n.piece_id))];
-    const { data: piecesData } = pieceIds.length
-      ? await supabase.from('pieces').select('id, title, catalog_number').in('id', pieceIds)
-      : { data: [] };
-
-    const pieceByNoteId = new Map<string, PieceRef>();
-    const pieceIdByNoteId = new Map((notesData ?? []).map((n) => [n.id, n.piece_id]));
-    const pieceById = new Map((piecesData ?? []).map((p) => [p.id, p as PieceRef]));
-    for (const [noteId, pieceId] of pieceIdByNoteId) {
-      const piece = pieceById.get(pieceId);
-      if (piece) pieceByNoteId.set(noteId, piece);
+    // Batch-fetch subjects per subject_table (O(tables) round trips). Every
+    // supported subject table has a `piece_id` column, so the projection is
+    // uniform.
+    const idsByTable = new Map<SubjectTable, string[]>();
+    for (const n of notifRows) {
+      if (!isSubjectTable(n.subject_table)) continue;
+      const arr = idsByTable.get(n.subject_table) ?? [];
+      arr.push(n.subject_id);
+      idsByTable.set(n.subject_table, arr);
     }
 
-    setItems(notifRows.map((n) => ({ ...n, piece: pieceByNoteId.get(n.performers_note_id) ?? null })));
+    const subjectResults = await Promise.all(
+      [...idsByTable.entries()].map(([table, ids]) =>
+        supabase.from(SUBJECT_CONFIG[table].table).select('id, piece_id').in('id', ids),
+      ),
+    );
+    const pieceIdBySubjectKey = new Map<string, string>();
+    const pieceIdSet = new Set<string>();
+    for (const [idx, [table]] of [...idsByTable.entries()].entries()) {
+      const res = subjectResults[idx];
+      for (const row of (res.data ?? []) as { id: string; piece_id: string }[]) {
+        pieceIdBySubjectKey.set(`${table}:${row.id}`, row.piece_id);
+        pieceIdSet.add(row.piece_id);
+      }
+    }
+
+    const { data: piecesData } = pieceIdSet.size
+      ? await supabase.from('pieces').select('id, title, catalog_number').in('id', [...pieceIdSet])
+      : { data: [] };
+    const pieceById = new Map((piecesData ?? []).map((p) => [p.id, p as PieceRef]));
+
+    setItems(
+      notifRows.map((n) => {
+        const pieceId = pieceIdBySubjectKey.get(`${n.subject_table}:${n.subject_id}`);
+        return { ...n, piece: pieceId ? pieceById.get(pieceId) ?? null : null };
+      }),
+    );
   }, []);
 
   useEffect(() => {
