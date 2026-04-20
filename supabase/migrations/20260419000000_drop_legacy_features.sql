@@ -19,8 +19,16 @@ begin
   end loop;
 end $$;
 
--- Triggers and functions tied to activity emails
-drop trigger if exists on_activity_log_send_email on public.activity_log;
+-- Triggers and functions tied to activity emails. The trigger drop is wrapped
+-- so a fresh replay (where activity_log was never created by any surviving
+-- migration) doesn't choke on the missing table.
+do $$
+begin
+  if to_regclass('public.activity_log') is not null then
+    drop trigger if exists on_activity_log_send_email on public.activity_log;
+  end if;
+end;
+$$;
 drop function if exists public.send_activity_email();
 
 -- Tables (CASCADE removes dependent FKs, indexes, policies)
