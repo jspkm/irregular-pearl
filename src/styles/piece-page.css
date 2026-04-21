@@ -859,11 +859,25 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .rec-item {
   border-bottom: 0.5px solid var(--border);
 }
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 4px;
+}
+.rec-row .ed-ctrls { opacity: 0; transition: opacity 120ms ease; }
+.rec-row:hover .ed-ctrls,
+.rec-row:focus-within .ed-ctrls { opacity: 1; }
+@media (pointer: coarse) { .rec-row .ed-ctrls { opacity: 0.6; } }
+.rec-item-editing {
+  padding: 12px 4px 16px;
+}
 .rec-header {
   appearance: none;
   background: transparent;
   border: 0;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 14px 4px;
   text-align: left;
   cursor: pointer;

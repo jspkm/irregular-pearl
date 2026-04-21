@@ -19,6 +19,40 @@ export interface ExternalLink {
   ordinal: number;
 }
 
+// Translate a recording's source URL into an embeddable iframe URL. Returns
+// null for types we cannot embed (caller falls back to "Open on source").
+// Lifted from PiecePageLayout.astro so the client-side RecordingsList can
+// recompute embeds after a wiki edit without a server round-trip.
+export function recordingEmbedUrl(type: string, rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl);
+    if (type === 'youtube') {
+      const v = url.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
+      if (url.hostname === 'youtu.be') return `https://www.youtube.com/embed${url.pathname}?autoplay=1`;
+      return null;
+    }
+    if (type === 'vimeo') {
+      const id = url.pathname.replace(/^\//, '').split('/')[0];
+      if (/^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}?autoplay=1`;
+      return null;
+    }
+    if (type === 'internet_archive') {
+      const m = url.pathname.match(/^\/details\/([^/?#]+)/);
+      if (m) return `https://archive.org/embed/${m[1]}`;
+      return null;
+    }
+    if (type === 'spotify') {
+      const m = url.pathname.match(/^\/(track|album|playlist|episode)\/([^/?#]+)/);
+      if (m) return `https://open.spotify.com/embed/${m[1]}/${m[2]}`;
+      return null;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
+}
+
 export async function fetchExternalLinksForPiece(pieceId: string): Promise<ExternalLink[]> {
   if (!hasSupabase) return [];
   const { data, error } = await supabase

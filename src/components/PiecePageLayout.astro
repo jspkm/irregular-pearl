@@ -34,7 +34,7 @@ import MovementsList from './MovementsList';
 import RecordingsList from './RecordingsList';
 import EditionsList from './EditionsList';
 import ExternalRefsList from './ExternalRefsList';
-import { fetchExternalLinksForPiece, REFERENCE_TYPES } from '../lib/externalLinks';
+import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '../lib/externalLinks';
 
 interface Props {
   piece: PieceFull;
@@ -85,51 +85,10 @@ const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
 
 const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
 
-// Recordings derived from external_links of video/audio types. Each one is
-// embedded inline when we can derive an embed URL; otherwise it drops to
-// the caption-only link fallback below the grid.
-const recordings = piece.external_links.filter(l =>
-  l.type === 'youtube' || l.type === 'internet_archive' || l.type === 'vimeo' || l.type === 'spotify'
-);
-
-function recordingEmbedUrl(type: string, rawUrl: string): string | null {
-  try {
-    const url = new URL(rawUrl);
-    if (type === 'youtube') {
-      const v = url.searchParams.get('v');
-      if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
-      if (url.hostname === 'youtu.be') return `https://www.youtube.com/embed${url.pathname}?autoplay=1`;
-      return null;
-    }
-    if (type === 'vimeo') {
-      const id = url.pathname.replace(/^\//, '').split('/')[0];
-      if (/^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}?autoplay=1`;
-      return null;
-    }
-    if (type === 'internet_archive') {
-      const m = url.pathname.match(/^\/details\/([^/?#]+)/);
-      if (m) return `https://archive.org/embed/${m[1]}`;
-      return null;
-    }
-    if (type === 'spotify') {
-      // https://open.spotify.com/{type}/{id} → https://open.spotify.com/embed/{type}/{id}
-      const m = url.pathname.match(/^\/(track|album|playlist|episode)\/([^/?#]+)/);
-      if (m) return `https://open.spotify.com/embed/${m[1]}/${m[2]}`;
-      return null;
-    }
-  } catch {
-    // fall through
-  }
-  return null;
-}
-
-const recordingCards = recordings.map((r) => ({
-  ...r,
-  embedUrl: recordingEmbedUrl(r.type, r.url),
-}));
-
-// Reference links (non-recording): IMSLP + wikipedia
-const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === 'wikipedia');
+// Recordings + references both come from the live external_links DB rows
+// (RecordingsList + ExternalRefsList own their own filtering). The recording
+// surface owns the audio/video subset; references owns IMSLP / Wikipedia.
+const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly string[]).includes(l.type));
 ---
 
 <main class="page">
@@ -217,7 +176,7 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
   {/* ---------- Recordings (collapsed list, open to play) ---------- */}
   <section class="block">
     <div class="kicker">Recordings</div>
-    <RecordingsList client:load recordings={recordingCards} />
+    <RecordingsList client:load pieceId={piece.id} initialLinks={dbRecordingLinks} />
   </section>
 
   {/* ---------- Pedagogical arc (empty state until schema lands) ---------- */}
