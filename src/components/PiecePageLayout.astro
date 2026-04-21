@@ -23,20 +23,29 @@ import { difficultyAxes, type DifficultyAxis } from '../data/difficulty-axes';
 import { getPublishedPerformersNotes } from '../lib/performersNotes';
 import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
+import { fetchMovementsForPiece } from '../lib/movements';
 import PerformersNotes from './PerformersNotes';
 import InterpretiveSchools from './InterpretiveSchools';
 import SignedPieceDescription from './SignedPieceDescription';
+import MovementsList from './MovementsList';
+import RecordingsList from './RecordingsList';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
-const [performersNotes, interpretiveSchools, signedDescriptions] = await Promise.all([
+const [performersNotes, interpretiveSchools, signedDescriptions, dbMovements] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
+  fetchMovementsForPiece(piece.id),
 ]);
+const seedMovements = (piece.movements ?? []).map((m) => ({
+  name: m.name,
+  key: m.key,
+  meter: m.meter,
+}));
 const hasSignedDescription = signedDescriptions.length > 0;
 const axes = difficultyAxes[piece.id];
 const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
@@ -48,10 +57,48 @@ const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
 
 const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
 
-// Recordings derived from external_links of video/audio types
+// Recordings derived from external_links of video/audio types. Each one is
+// embedded inline when we can derive an embed URL; otherwise it drops to
+// the caption-only link fallback below the grid.
 const recordings = piece.external_links.filter(l =>
   l.type === 'youtube' || l.type === 'internet_archive' || l.type === 'vimeo' || l.type === 'spotify'
 );
+
+function recordingEmbedUrl(type: string, rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl);
+    if (type === 'youtube') {
+      const v = url.searchParams.get('v');
+      if (v) return `https://www.youtube.com/embed/${v}?autoplay=1`;
+      if (url.hostname === 'youtu.be') return `https://www.youtube.com/embed${url.pathname}?autoplay=1`;
+      return null;
+    }
+    if (type === 'vimeo') {
+      const id = url.pathname.replace(/^\//, '').split('/')[0];
+      if (/^\d+$/.test(id)) return `https://player.vimeo.com/video/${id}?autoplay=1`;
+      return null;
+    }
+    if (type === 'internet_archive') {
+      const m = url.pathname.match(/^\/details\/([^/?#]+)/);
+      if (m) return `https://archive.org/embed/${m[1]}`;
+      return null;
+    }
+    if (type === 'spotify') {
+      // https://open.spotify.com/{type}/{id} → https://open.spotify.com/embed/{type}/{id}
+      const m = url.pathname.match(/^\/(track|album|playlist|episode)\/([^/?#]+)/);
+      if (m) return `https://open.spotify.com/embed/${m[1]}/${m[2]}`;
+      return null;
+    }
+  } catch {
+    // fall through
+  }
+  return null;
+}
+
+const recordingCards = recordings.map((r) => ({
+  ...r,
+  embedUrl: recordingEmbedUrl(r.type, r.url),
+}));
 
 // Reference links (non-recording): IMSLP + wikipedia
 const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === 'wikipedia');
@@ -122,24 +169,12 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
   {/* ---------- Structural landmarks ---------- */}
   <section class="block">
     <div class="kicker">Structural landmarks</div>
-    {piece.movements && piece.movements.length > 0 ? (
-      <div class="movements">
-        {piece.movements.map((m) => {
-          const meta = [m.key, m.meter].filter(Boolean).join(' · ');
-          return (
-            <div class="mvmt">
-              <div class="mvmt-head">
-                <h3>{m.name}</h3>
-                {meta && <span class="meta">{meta}</span>}
-              </div>
-              <p class="empty-state">Landmarks not yet curated for this movement.</p>
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <p class="empty-state">Landmarks not yet curated.</p>
-    )}
+    <MovementsList
+      client:load
+      pieceId={piece.id}
+      initialMovements={dbMovements}
+      seedMovements={seedMovements}
+    />
   </section>
 
   {/* ---------- Interpretive schools ---------- */}
@@ -177,33 +212,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     )}
   </section>
 
-  {/* ---------- Recordings ---------- */}
+  {/* ---------- Recordings (collapsed list, open to play) ---------- */}
   <section class="block">
     <div class="kicker">Recordings</div>
-    {recordings.length > 0 ? (
-      <table class="rec-table">
-        <thead>
-          <tr>
-            <th>Reference</th>
-            <th>Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recordings.map((r) => (
-            <tr>
-              <td>
-                <a class="ext" href={r.url} target="_blank" rel="noopener">{r.label}</a>
-              </td>
-              <td class="label">
-                <span class="type-chip">{r.type.replace('_', ' ')}</span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    ) : (
-      <p class="empty-state">No reference recordings catalogued yet.</p>
-    )}
+    <RecordingsList client:load recordings={recordingCards} />
   </section>
 
   {/* ---------- Pedagogical arc (empty state until schema lands) ---------- */}
@@ -219,13 +231,17 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
       <ul class="ext-refs">
         {refs.map((r) => (
           <li>
-            <a class="ext" href={r.url} target="_blank" rel="noopener">{r.label}</a>
-            <span class="type-chip">{r.type.replace('_', ' ')}</span>
+            <a class="ext-ref" href={r.url} target="_blank" rel="noopener">{r.label}</a>
           </li>
         ))}
       </ul>
     </section>
   )}
+
+  {/* ---------- Change log link (its own page) ---------- */}
+  <p class="change-log-link">
+    <a href={`/piece/${piece.id}/change-log`}>Change log</a>
+  </p>
 
 </main>
 
@@ -262,19 +278,67 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     margin: 0 0 32px;
   }
 
-  /* External reference list (IMSLP, Wikipedia) */
+  /* Destination links (Option D): serif accent with trailing glyph. A
+     fading 0.5px underline on hover is the only motion. Used for the
+     Change log section-ending link and the External references list. */
+  .change-log-link {
+    margin: 40px 0 0;
+    font-family: var(--font-serif);
+    font-size: 14px;
+  }
+  .change-log-link a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 0.5px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 160ms ease;
+  }
+  .change-log-link a::after {
+    content: ' →';
+    color: var(--accent);
+  }
+  .change-log-link a:hover,
+  .change-log-link a:focus-visible {
+    border-bottom-color: var(--accent);
+  }
+
+  /* External reference list (IMSLP, Wikipedia) — Option D: serif accent
+     with a trailing ↗ (muted) marking outbound. Border-underline fades in
+     on hover. Pills retired; the glyph carries the external signal. */
   .ext-refs {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
   .ext-refs li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: block;
+  }
+  .ext-refs a.ext-ref {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 0.5px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 160ms ease;
+  }
+  .ext-refs a.ext-ref::after {
+    content: ' ↗';
+    color: var(--muted);
+    font-family: var(--font-sans);
+    margin-left: 2px;
+  }
+  .ext-refs a.ext-ref:hover,
+  .ext-refs a.ext-ref:focus-visible {
+    border-bottom-color: var(--accent);
+  }
+  .ext-refs a.ext-ref:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   /* Edition card list */
