@@ -3,7 +3,7 @@
 // EditionsList and MovementsList.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { supabase, hasSupabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import {
   fetchExternalLinksForPiece,
@@ -11,6 +11,7 @@ import {
   type ExternalLink,
 } from '../lib/externalLinks';
 import { CHANGELOG_REFRESH_EVENT } from './ChangeLog';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -166,7 +167,18 @@ export default function ExternalRefsList({ pieceId, initialLinks }: Props) {
         </div>
       )}
 
-      {signInOpen && <SignInPrompt onClose={() => setSignInOpen(false)} kind="reference" />}
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to edit"
+          body={
+            <>
+              Reference entries are wiki-edit — any registered user can add, revise, reorder, or remove them.
+              Sign in or create an account to make your change.
+            </>
+          }
+        />
+      )}
       {addOpen && (
         <ExternalLinkAddModal
           pieceId={pieceId}
@@ -183,36 +195,6 @@ export default function ExternalRefsList({ pieceId, initialLinks }: Props) {
 function pretty(msg: string, fallback: string): string {
   if (msg.includes('rate limit')) return 'Too many edits — wait a moment.';
   return `${fallback}: ${msg}`;
-}
-
-function SignInPrompt({ onClose, kind }: { onClose: () => void; kind: string }) {
-  const handleSignIn = useCallback(async () => {
-    if (!hasSupabase) return;
-    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-  }, []);
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [onClose]);
-  return (
-    <>
-      <div className="movement-edit-backdrop" onClick={onClose} aria-hidden="true" />
-      <div className="movement-edit-modal movement-edit-signin" role="dialog" aria-modal="true" aria-labelledby="ext-signin-title">
-        <h2 id="ext-signin-title" className="movement-edit-title">Sign in to edit</h2>
-        <p className="movement-edit-signin-body">
-          {kind} entries are wiki-edit — any registered user can add, revise, reorder, or remove them.
-          Sign in or create an account to make your change.
-        </p>
-        <div className="movement-edit-actions">
-          <button type="button" className="movement-edit-button movement-edit-button-ghost" onClick={onClose}>Cancel</button>
-          <button type="button" className="movement-edit-button movement-edit-button-primary" onClick={handleSignIn} autoFocus>
-            Sign in / Register
-          </button>
-        </div>
-      </div>
-    </>
-  );
 }
 
 interface Fields { type: string; url: string; label: string }

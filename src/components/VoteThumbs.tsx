@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import SignInPanel from './SignInPanel';
 
 export type VoteSubjectTable =
   | 'performers_notes'
@@ -95,14 +96,6 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
     [user, vote, pending, subjectTable, subjectId],
   );
 
-  const handleSignIn = useCallback(async () => {
-    if (!hasSupabase) return;
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href },
-    });
-  }, []);
-
   const ariaUp = user
     ? vote === 1
       ? 'Remove upvote'
@@ -166,40 +159,16 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
       )}
 
       {signInOpen && (
-        <>
-          <div className="movement-edit-backdrop" onClick={() => setSignInOpen(false)} aria-hidden="true" />
-          <div
-            className="movement-edit-modal movement-edit-signin"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="vote-signin-title"
-          >
-            <h2 id="vote-signin-title" className="movement-edit-title">
-              Sign in to vote
-            </h2>
-            <p className="movement-edit-signin-body">
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to vote"
+          body={
+            <>
               Voting helps the community surface the most trusted signed contributions.
               Sign in or create an account to cast your vote.
-            </p>
-            <div className="movement-edit-actions">
-              <button
-                type="button"
-                className="movement-edit-button movement-edit-button-ghost"
-                onClick={() => setSignInOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="movement-edit-button movement-edit-button-primary"
-                onClick={handleSignIn}
-                autoFocus
-              >
-                Sign in / Register
-              </button>
-            </div>
-          </div>
-        </>
+            </>
+          }
+        />
       )}
     </>
   );

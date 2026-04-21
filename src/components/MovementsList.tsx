@@ -14,9 +14,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import MovementEdit from './MovementEdit';
 import { CHANGELOG_REFRESH_EVENT } from './ChangeLog';
-import { supabase, hasSupabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { fetchMovementsForPiece, type Movement } from '../lib/movements';
+import SignInPanel from './SignInPanel';
 
 export interface SeedMovement {
   name: string;
@@ -231,7 +232,18 @@ export default function MovementsList({ pieceId, initialMovements, seedMovements
         </div>
       )}
 
-      {signInOpen && <SignInPrompt onClose={() => setSignInOpen(false)} />}
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to edit"
+          body={
+            <>
+              Movements are wiki-edit — any registered user can add, revise, reorder, or remove them.
+              Sign in or create an account to make your change.
+            </>
+          }
+        />
+      )}
 
       {addOpen && (
         <AddMovementModal
@@ -243,61 +255,6 @@ export default function MovementsList({ pieceId, initialMovements, seedMovements
           }}
         />
       )}
-    </>
-  );
-}
-
-// ----------------------------------------------------------------------------
-// Shared sign-in prompt (used for anon interactions with any control).
-// ----------------------------------------------------------------------------
-
-function SignInPrompt({ onClose }: { onClose: () => void }) {
-  const handleSignIn = useCallback(async () => {
-    if (!hasSupabase) return;
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href },
-    });
-  }, []);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <>
-      <div className="movement-edit-backdrop" onClick={onClose} aria-hidden="true" />
-      <div
-        className="movement-edit-modal movement-edit-signin"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="movements-signin-title"
-      >
-        <h2 id="movements-signin-title" className="movement-edit-title">
-          Sign in to edit
-        </h2>
-        <p className="movement-edit-signin-body">
-          Movements are wiki-edit — any registered user can add, revise, reorder, or remove them.
-          Sign in or create an account to make your change.
-        </p>
-        <div className="movement-edit-actions">
-          <button type="button" className="movement-edit-button movement-edit-button-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="movement-edit-button movement-edit-button-primary"
-            onClick={handleSignIn}
-            autoFocus
-          >
-            Sign in / Register
-          </button>
-        </div>
-      </div>
     </>
   );
 }

@@ -7,10 +7,11 @@
 // mutation so state stays consistent with DB order.
 
 import { useCallback, useState, useEffect, useRef } from 'react';
-import { supabase, hasSupabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { fetchEditionsForPiece, type Edition } from '../lib/editions';
 import { CHANGELOG_REFRESH_EVENT } from './ChangeLog';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -203,7 +204,18 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
         </div>
       )}
 
-      {signInOpen && <SignInPrompt onClose={() => setSignInOpen(false)} />}
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to edit"
+          body={
+            <>
+              Editions are wiki-edit — any registered user can add, revise, reorder, or remove them.
+              Sign in or create an account to make your change.
+            </>
+          }
+        />
+      )}
       {addOpen && (
         <EditionAddModal
           pieceId={pieceId}
@@ -220,36 +232,6 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
 function prettyError(msg: string, fallback: string): string {
   if (msg.includes('rate limit')) return 'Too many edits — wait a moment.';
   return `${fallback}: ${msg}`;
-}
-
-function SignInPrompt({ onClose }: { onClose: () => void }) {
-  const handleSignIn = useCallback(async () => {
-    if (!hasSupabase) return;
-    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
-  }, []);
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', h);
-    return () => document.removeEventListener('keydown', h);
-  }, [onClose]);
-  return (
-    <>
-      <div className="movement-edit-backdrop" onClick={onClose} aria-hidden="true" />
-      <div className="movement-edit-modal movement-edit-signin" role="dialog" aria-modal="true" aria-labelledby="ed-signin-title">
-        <h2 id="ed-signin-title" className="movement-edit-title">Sign in to edit</h2>
-        <p className="movement-edit-signin-body">
-          Editions are wiki-edit — any registered user can add, revise, reorder, or remove them.
-          Sign in or create an account to make your change.
-        </p>
-        <div className="movement-edit-actions">
-          <button type="button" className="movement-edit-button movement-edit-button-ghost" onClick={onClose}>Cancel</button>
-          <button type="button" className="movement-edit-button movement-edit-button-primary" onClick={handleSignIn} autoFocus>
-            Sign in / Register
-          </button>
-        </div>
-      </div>
-    </>
-  );
 }
 
 // ----------------------------------------------------------------------------

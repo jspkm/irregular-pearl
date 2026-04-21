@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import type { Movement } from '../lib/movements';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   movement: Movement;
@@ -75,13 +76,6 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
   const closeSignInPrompt = useCallback(() => {
     setSignInPrompt(false);
     requestAnimationFrame(() => pencilRef.current?.focus());
-  }, []);
-
-  const handleSignIn = useCallback(async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.href },
-    });
   }, []);
 
   // Focus trap + Esc handler while modal is open.
@@ -288,43 +282,16 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
       )}
 
       {signInPrompt && (
-        <>
-          <div className="movement-edit-backdrop" onClick={closeSignInPrompt} aria-hidden="true" />
-          <div
-            className="movement-edit-modal movement-edit-signin"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="movement-signin-title"
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') closeSignInPrompt();
-            }}
-          >
-            <h2 id="movement-signin-title" className="movement-edit-title">
-              Sign in to edit
-            </h2>
-            <p className="movement-edit-signin-body">
+        <SignInPanel
+          onClose={closeSignInPrompt}
+          title="Sign in to edit"
+          body={
+            <>
               Movements are wiki-edit — any registered user can revise the name, tempo, key, or meter.
               Sign in or create an account to make your edit.
-            </p>
-            <div className="movement-edit-actions">
-              <button
-                type="button"
-                className="movement-edit-button movement-edit-button-ghost"
-                onClick={closeSignInPrompt}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="movement-edit-button movement-edit-button-primary"
-                onClick={handleSignIn}
-                autoFocus
-              >
-                Sign in / Register
-              </button>
-            </div>
-          </div>
-        </>
+            </>
+          }
+        />
       )}
     </>
   );

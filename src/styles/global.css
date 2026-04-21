@@ -158,3 +158,220 @@ body {
     min-width: 44px;
   }
 }
+
+/* =========================================================================
+   SignInPanel — shared auth modal. Used from the navbar and every anon
+   "requires auth" prompt, so primitives live here (global) not in
+   piece-page.css.
+   ========================================================================= */
+
+.ip-signin-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.4);
+  z-index: 90;
+}
+.ip-signin-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--r-card, 8px);
+  box-shadow: 0 12px 48px rgba(26, 26, 26, 0.18);
+  padding: 28px 28px 22px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ip-signin-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--ink);
+}
+.ip-signin-body {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+}
+.ip-signin-google,
+.ip-signin-alt {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0.5px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--ink);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.ip-signin-google:hover:not(:disabled),
+.ip-signin-alt:hover:not(:disabled) {
+  background: var(--bg-tint);
+  border-color: var(--ink);
+}
+.ip-signin-google:disabled,
+.ip-signin-alt:disabled { opacity: 0.55; cursor: default; }
+.ip-signin-sep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.ip-signin-sep::before,
+.ip-signin-sep::after {
+  content: "";
+  flex: 1;
+  height: 0;
+  border-top: 0.5px solid var(--border);
+}
+.ip-signin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.ip-signin-field + .ip-signin-field { margin-top: 6px; }
+.ip-signin-field > span {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.ip-signin-field input {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--bg);
+}
+.ip-signin-field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: var(--accent);
+}
+.ip-signin-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.ip-signin-btn {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 0.5px solid transparent;
+}
+.ip-signin-btn:disabled { opacity: 0.55; cursor: default; }
+.ip-signin-btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+.ip-signin-btn-ghost:hover:not(:disabled) { color: var(--ink); }
+.ip-signin-btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.ip-signin-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
+.ip-signin-error {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  padding: 10px 12px;
+  border-radius: 4px;
+}
+.ip-signin-info {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--success);
+  background: var(--success-soft);
+  padding: 10px 12px;
+  border-radius: 4px;
+}
+.ip-signin-sublinks {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.ip-signin-sublinks a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+.ip-signin-sublinks a:hover { color: var(--accent); }
+.ip-signin-link-btn {
+  display: inline;
+  margin-left: 6px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  font: inherit;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.ip-signin-link-btn:hover:not(:disabled) { color: var(--ink); }
+.ip-signin-link-btn:disabled { opacity: 0.55; cursor: default; }
+.ip-signin-close {
+  position: absolute;
+  top: 28px;
+  right: 22px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+.ip-signin-close:hover { color: var(--ink); background: var(--bg-tint); }
+.ip-signin-close:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+.ip-signin-create {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  border: 0.5px solid var(--accent);
+  transition: background-color 120ms ease;
+}
+.ip-signin-create:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
+.ip-signin-create:disabled { opacity: 0.55; cursor: default; }
