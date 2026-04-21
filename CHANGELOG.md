@@ -4,6 +4,10 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- **Movement wiki-edit was invisible on every piece page** — Slice C Step 2 shipped the `movements` table as schema-only, with row population deferred to `bun run supabase/seed.ts`. CI only applies migrations, not seed.ts, so production's `movements` table stayed empty across all 18 pieces. [MovementsList.tsx](src/components/MovementsList.tsx) correctly fell back to read-only rows from `src/data/seed.ts`, which by design render no edit affordances — pencil, ↑/↓, × were absent everywhere. New migration [20260512000000_backfill_seed_movements.sql](supabase/migrations/20260512000000_backfill_seed_movements.sql) inserts the 69 seed movements across 18 pieces plus their version-1 rows (authored_by null, marked "initial seed from src/data/seed.ts"). Idempotent via `NOT EXISTS (piece_id, ordinal)` guards — safe to re-run and won't overwrite any movement a user edited between ship and apply.
+
 ### Added (contributor approval pipeline — Slice B)
 
 Two more signed content types now flow through the pipeline Slice A proved. A contributor can publish named *interpretive schools* (plural-voices-per-piece, no canonical framing) and long-form *signed piece descriptions* carrying interpretive or pedagogical judgment. Schools render on the piece page as a grid that collapses to stacked cards on narrow viewports; signed descriptions render in the same 2px-purple-left-border signed-notes pattern. The navbar bell, approval queue, admin view, and daily digest all light up for every subject type through one codepath.
