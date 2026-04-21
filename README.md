@@ -10,6 +10,7 @@ A non-profit, cellist-forward classical music knowledge hub. Every piece gets a 
 - **Signed performer's notes** — real musicians leave signed prose on each piece, with a full approve-before-publish pipeline (bylines only appear with explicit contributor sign-off)
 - **Interpretive schools** — named families of interpretive choices per piece, plural by design (no canonical framing), each with a signed paragraph and optional tempo cues
 - **Signed piece descriptions** — long-form signed prose that carries interpretive or pedagogical judgment, distinct from the short unsigned reference copy
+- **Signed difficulty ratings** — any registered user can publish their own four-axis rating (technical / stamina / interpretive / ensemble) with optional per-axis commentary, stacked ahead of the seed card by community vote
 - **Structural landmarks** — measure-anchored bookmarks per movement with colored flag pills (informational / notable / significant), inline practice notes from each contributor, and silent up/down votes that drive stack ordering when more than one author lands at the same anchor
 - **Wiki-edit movements** — any signed-in user can fix a movement name, tempo, key, or ordinal in place, with version history and revert
 - **Edition comparisons** with publisher, editor, year, and editorial notes

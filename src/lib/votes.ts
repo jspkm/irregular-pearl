@@ -11,7 +11,9 @@ export type VoteSubjectTable =
   | 'interpretive_schools'
   | 'piece_descriptions'
   | 'landmarks'
-  | 'pieces_seed_description';
+  | 'pieces_seed_description'
+  | 'piece_difficulty_ratings'
+  | 'pieces_seed_difficulty';
 
 /**
  * Reorder a list of subject IDs by vote_tallies.net_score DESC (tie-break
