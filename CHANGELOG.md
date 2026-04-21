@@ -4,6 +4,12 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Changed (contributor pipeline — Slice C governance)
+
+- **Any registered user can now self-author signed content** on a piece: performer's notes, interpretive schools, and signed piece descriptions. Prior posture (Slice A → B) gated every self-publish and approval-queue RPC on a `users.is_contributor` flag granted out-of-band via `scripts/seed-contributor.ts` — in practice, exactly one user. Per PRD rev 2 and [PLAN-contributor-pipeline-slice-c.md](PLAN-contributor-pipeline-slice-c.md) §1.0, the flag is replaced by plain auth: if you have an account, you're an author. Draft-for-another-user (`create_*_draft`) stays admin/firstchair-only, but the draftee can now be any registered user. The `is_contributor` / `contributor_active` columns remain in the schema as an unused editorial marker — a follow-up cleanup will drop them once nothing else references them.
+- **Write entries are always visible.** `Write a performer's note →` / `Write a school →` / `Write a signed description →` render for every viewer — signed-in, signed-out, whoever. Anon click opens the shared sign-in panel (same pattern MovementsList + EditionsList + VoteThumbs use) rather than hiding the affordance. Matches the "anon click opens sign-in prompt, never hidden" rule.
+- Ownership guards on edit / remove paths are untouched. User A still cannot edit or remove User B's row — the `where contributor_id = auth.uid()` inside each mutation RPC does the enforcement, not the caller gate.
+
 ### Fixed
 
 - **Movement wiki-edit was invisible on every piece page** — Slice C Step 2 shipped the `movements` table as schema-only, with row population deferred to `bun run supabase/seed.ts`. CI only applies migrations, not seed.ts, so production's `movements` table stayed empty across all 18 pieces. [MovementsList.tsx](src/components/MovementsList.tsx) correctly fell back to read-only rows from `src/data/seed.ts`, which by design render no edit affordances — pencil, ↑/↓, × were absent everywhere. New migration [20260512000000_backfill_seed_movements.sql](supabase/migrations/20260512000000_backfill_seed_movements.sql) inserts the 69 seed movements across 18 pieces plus their version-1 rows (authored_by null, marked "initial seed from src/data/seed.ts"). Idempotent via `NOT EXISTS (piece_id, ordinal)` guards — safe to re-run and won't overwrite any movement a user edited between ship and apply.

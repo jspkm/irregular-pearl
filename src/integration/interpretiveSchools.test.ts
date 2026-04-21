@@ -423,14 +423,23 @@ describe('staff-drafted schools — approval flow', () => {
 });
 
 describe('authorization guards', () => {
-  test('normal user cannot publish_contributor_interpretive_school', async () => {
-    const { error } = await normalUser.client.rpc('publish_contributor_interpretive_school', {
-      p_piece_id: PIECE,
-      p_name: 'Should fail',
-      p_body: 'body',
-    });
-    expect(error).not.toBeNull();
-    expect(error!.message).toMatch(/not an active contributor/i);
+  test('any registered user can publish_contributor_interpretive_school', async () => {
+    // Post-Slice-C governance (20260513000000_open_self_authoring.sql):
+    // the is_contributor flag is no longer a gate; auth is all that's
+    // required. Ownership guards still prevent user A editing user B's row.
+    const { data: schoolId, error } = await normalUser.client.rpc(
+      'publish_contributor_interpretive_school',
+      { p_piece_id: PIECE, p_name: 'Self-authored by non-flagged user', p_body: 'body' },
+    );
+    expect(error).toBeNull();
+    expect(schoolId).toBeTruthy();
+    const { data: row } = await admin
+      .from('interpretive_schools')
+      .select('contributor_id, status')
+      .eq('id', schoolId as string)
+      .single();
+    expect(row?.contributor_id).toBe(normalUser.id);
+    expect(row?.status).toBe('published');
   });
 
   test('normal user cannot create_interpretive_school_draft', async () => {
