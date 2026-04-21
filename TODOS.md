@@ -148,6 +148,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Completed
 
+### Profile sidebar + Settings (Appearance theme picker) + Logout
+
+**What:** Avatar click on the navbar now opens `/profile/:id` inside a new [ProfileShell.tsx](src/components/ProfileShell.tsx) — left vertical nav (Profile / Setting / Logout) plus the existing `ArtistProfile` on the right. Anonymous or other-user views bypass the shell and render the single-column profile unchanged. Setting → Appearance shows three SVG preview cards ([AppearanceSettings.tsx](src/components/AppearanceSettings.tsx)): Light / System (split-diagonal preview) / Dark. Choice persists in `localStorage.theme`; a pre-paint inline script in [Layout.astro](src/layouts/Layout.astro) applies `html[data-theme="dark"]` before render to avoid FOUC. Logout calls `supabase.auth.signOut()` (added to [useAuth.ts](src/lib/useAuth.ts)) and redirects home. Profile header swapped from initials-in-cream-circle to `GenerativeAvatar` + `email.split('@')[0]` display name so the page header matches the navbar avatar/tooltip.
+
+**Why:** User ask — a dedicated place to change appearance and sign out, without crowding the navbar.
+
+**Context:** Dark palette in [global.css](src/styles/global.css) is provisional (DESIGN.md called out Phase 2); `piece-page.css` `.diff-panel` / `.school` / `.ed` flipped from `background: #fff` to `var(--bg)` so they render on the dark surface. Other components using hardcoded hex will need per-surface migration as they're touched. `accent-soft` was dropped from `#F2EEF5` → `#F4F3F5` (near-neutral grey) so the active sidebar item reads quiet rather than lavender.
+
+**Effort:** S
+**Priority:** P1
+**Completed:** 2026-04-20
+
 ### Open self-authoring to any registered user (Slice C governance relaxation)
 
 **What:** Rewrote `_require_active_contributor()` to require only `auth.uid() is not null` — 19 self-publish + approval-queue RPCs inherited the relaxation automatically. The 3 staff-draft-for-other RPCs dropped their "target must be flagged contributor" check in favor of "target must exist in public.users". On the UI side, the `canWrite` gate in [PerformersNotes.tsx](src/components/PerformersNotes.tsx), [InterpretiveSchools.tsx](src/components/InterpretiveSchools.tsx), and [SignedPieceDescription.tsx](src/components/SignedPieceDescription.tsx) dropped the `isContributor` check; write entries render unconditionally; anon click opens `SignInPanel` (shared pattern with MovementsList / EditionsList / VoteThumbs).

@@ -68,7 +68,7 @@ The palette is small and mostly neutral. Add a color only if it encodes meaning.
 
 **Accent — one, used sparingly**
 - `#6B4E7C` — quiet purple, derived from the site's logomark palette. Used for kicker eyebrows, selected states, featured-card emphasis borders, focus rings, interactive chrome.
-- Accent soft: `#F2EEF5` — band backgrounds, hover fills.
+- Accent soft: `#F4F3F5` — band backgrounds, hover fills. Near-neutral grey with a trace of purple so selected states read as quiet rather than lavender.
 
 **Semantic — used only for meaning, never decoration**
 | Meaning | Foreground | Soft background |
@@ -80,7 +80,7 @@ The palette is small and mostly neutral. Add a color only if it encodes meaning.
 
 Never introduce a new color outside this palette without updating this document first. If a surface needs a color that isn't here, ask whether the surface really needs it — often the answer is typography or spacing would do the same work better.
 
-**Dark mode:** Deferred to Phase 2. Primary users are on iPads in well-lit practice rooms.
+**Dark mode:** Opt-in via Settings → Appearance (Light / System / Dark). Light remains the default. The dark palette is provisional — derived from inverting the light neutrals and lightening the purple accent — and still needs a proper pass. A few piece-page and profile surfaces use hardcoded hex literals that don't flip; migrate to CSS variables as they're touched.
 
 ## Spacing
 - **Base unit:** 4px
@@ -204,3 +204,6 @@ Claude is an executor of this system, not its author. When the system needs to c
 | 2026-04-20 | Signed notes pattern now shipping live on the piece page | First signed content on the site. Slice A of the contributor approval pipeline shipped: performer's notes render in the existing `.signed` pattern (2px accent left border, 18px padding, Source Serif 4 prose, byline in Inter medium with one-line bio). Contributor self-authored vs staff-drafted-and-approved both produce the same public output; the difference is the state machine behind the scenes. Multi-voice treatment (second voice uses `border-strong` instead of accent) already wired in markup even though v1 ships one contributor. |
 | 2026-04-20 | Secondary outline button pattern codified | Four surfaces had four different secondary-button looks during the Slice A build. Aligned all to one spec: transparent bg, 0.5px `border-strong`, `text-muted`, Inter 11px, padding `4px 10px`, 6px radius, darkens to `ink` on hover. Applies to Edit/Remove on signed notes, Refresh on the queue, Edit profile on the owner bar, and all filter chips. Enshrined in Buttons spec. |
 | 2026-04-20 | Popover spec added | Slice A's navbar bell introduced the site's first popover surface. Spec: 320px desktop / full-width narrow, `bg-surface`, 0.5px `border`, 12px radius, `shadow-md` (popovers float above the page so they get the shadow exception already granted to search inputs), 0.5px row dividers, Esc/outside-click/route-change dismiss. |
+| 2026-04-20 | Profile page now a sidebar shell for the signed-in owner | Clicking the navbar avatar opens `/profile/:id`. For the owner, the page renders a two-column shell (`ProfileShell.tsx`) with a left vertical nav — Profile / Setting / Logout — and the existing `ArtistProfile` inside. Anonymous or other-user views render the single-column profile unchanged. Active nav item uses `bg-accent-light` (the new subtler `#F4F3F5`), inactive items hover to `bg-bg-tint`. Logout calls `supabase.auth.signOut()` and redirects home. Profile header now uses the same `GenerativeAvatar` and `email.split('@')[0]` derivation as the navbar so the two stay consistent. |
+| 2026-04-20 | Dark mode shipped as opt-in via Settings → Appearance | Supersedes the 2026-03-28 "no dark mode in Phase 1" decision. Light remains the default; System follows `prefers-color-scheme`; Dark forces. Preference stored in `localStorage.theme` and applied by a pre-paint inline script in `Layout.astro` via `html[data-theme="dark"]` to avoid FOUC. Tokens for dark live in `global.css` under that selector; the palette is provisional and inherits all existing variable consumers. Theme picker (`AppearanceSettings.tsx`) shows three SVG preview cards (Light / split-diagonal System / Dark). Known gap: piece-page cards (`diff-panel`, `school`, `ed`) were migrated from `background: #fff` to `background: var(--bg)`; other surfaces still using hardcoded hex will need per-component migration. |
+| 2026-04-20 | `accent-soft` softened from `#F2EEF5` → `#F4F3F5` | The Profile sidebar's active state used `bg-accent-light` and read as an obvious lavender pill. Dropped the purple cast from RGB(+7B vs G) to RGB(+2B vs G) — still distinguishable as "accent family" but close enough to neutral grey that it no longer competes with the content. Applied globally; affects every selected/soft-accent surface. |

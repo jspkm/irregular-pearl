@@ -3,6 +3,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import UsernameEditor from './UsernameEditor';
+import GenerativeAvatar from './GenerativeAvatar';
 
 interface ProfileData {
   id: string;
@@ -72,14 +73,21 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   if (loading) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Loading…</div>;
   if (!profile) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Profile not found.</div>;
 
+  const rawName = profile.display_name || '';
+  const displayName = rawName.includes('@') ? rawName.split('@')[0] : rawName;
+
   return (
     <main className="max-w-[760px] mx-auto px-4 md:px-8 py-8 md:py-12">
       <div className="flex items-start gap-5 mb-6">
-        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#E8DDD3] to-[#F5E6D3] flex items-center justify-center font-display italic text-3xl md:text-4xl text-[#6F6F6F] flex-shrink-0">
-          {profile.display_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
+        <div className="flex-shrink-0">
+          {profile.avatar_url ? (
+            <img src={profile.avatar_url} alt={displayName} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover" />
+          ) : (
+            <GenerativeAvatar userId={profile.id} size={96} />
+          )}
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{profile.display_name}</h1>
+          <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{displayName}</h1>
           {isOwnProfile && <UsernameEditor currentUsername={profile.username} userId={profile.id} />}
           <div className="mt-2 flex flex-wrap gap-2 items-center">
             {profile.instrument && profile.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (

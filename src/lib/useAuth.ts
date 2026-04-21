@@ -37,5 +37,11 @@ export function useAuth() {
     });
   };
 
-  return { user, session, loading, signIn };
+  const signOut = async () => {
+    if (!hasSupabase) return;
+    await supabase.auth.signOut();
+    window.location.href = '/';
+  };
+
+  return { user, session, loading, signIn, signOut };
 }
