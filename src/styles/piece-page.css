@@ -482,12 +482,15 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   align-items: center;
   gap: 8px;
 }
-.ext-refs li.ext-ref-row { display: flex; }
-.ext-refs li.ext-ref-row .ext-ref { flex: 1; }
-.ext-refs li .ed-ctrls { opacity: 0; transition: opacity 120ms ease; }
+.ext-refs li.ext-ref-row { display: flex; align-items: center; gap: 4px; }
+.ext-refs li.ext-ref-row .ext-ref { flex: 0 1 auto; }
+.ext-refs li .ed-ctrls { opacity: 0; transition: opacity 120ms ease; gap: 0; }
 .ext-refs li:hover .ed-ctrls,
 .ext-refs li:focus-within .ed-ctrls { opacity: 1; }
 @media (pointer: coarse) { .ext-refs li .ed-ctrls { opacity: 0.6; } }
+/* Keep controls flush next to the link, collapse disabled reorder buttons. */
+.ext-refs li .ed-ctrl { padding: 8px; }
+.ext-refs li .ed-ctrl:disabled { display: none; }
 .ext-refs a.ext-ref {
   font-family: var(--font-serif);
   font-size: 14px;
@@ -530,11 +533,17 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 }
 .ed-head {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  gap: 4px;
   margin-bottom: 4px;
   padding-right: 0;
 }
+/* Same treatment as .ped-row / .rec-row: collapse disabled reorder controls
+   so the visible ✎/× sit flush against the publisher title instead of
+   reserving empty padding slots for the hidden ↑/↓. */
+.ed-head .ed-ctrls { gap: 0; }
+.ed-head .ed-ctrl { padding: 8px; }
+.ed-head .ed-ctrl:disabled { display: none; }
 .ed-head h3 { margin: 0; flex-shrink: 0; transition: color 120ms ease; }
 /* Matches the External-references ↗: sans, muted, 14px. Positioned at
    right-middle of the card (vs inline ::after on ext-refs) since the
@@ -830,12 +839,47 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   transform: scale(1.05);
 }
 .vote-thumbs.is-pending .vote-thumb { opacity: 0.6; cursor: progress; }
+/* Celebration pulse. Fires only when the user transitions INTO an upvote —
+   the React layer remounts .vote-thumb-glyph with a fresh key so the
+   animation replays. Subtle: ~360ms, scale 1 → 1.18 → 1 with a tiny lift.
+   Downvote does NOT get this per the ask. */
+.vote-thumb-glyph {
+  display: inline-flex;
+  transform-origin: center 65%;
+  will-change: transform;
+}
+.vote-thumb-glyph.is-celebrating {
+  animation: vote-thumb-celebrate 900ms cubic-bezier(0.25, 0.8, 0.4, 1);
+}
+@keyframes vote-thumb-celebrate {
+  0% {
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--success) 0%, transparent));
+  }
+  25% {
+    transform: scale(1.45) translateY(-4px) rotate(-8deg);
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--success) 90%, transparent));
+  }
+  55% {
+    transform: scale(0.94) translateY(0) rotate(4deg);
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--success) 65%, transparent));
+  }
+  80% {
+    transform: scale(1.08) translateY(-1px) rotate(-2deg);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--success) 35%, transparent));
+  }
+  100% {
+    transform: scale(1) translateY(0) rotate(0);
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--success) 0%, transparent));
+  }
+}
 @media (pointer: coarse) {
   .vote-thumb { color: var(--muted); }
 }
 @media (prefers-reduced-motion: reduce) {
   .vote-thumb { transition: none; }
   .vote-thumb.is-active:hover:not(:disabled) { transform: none; }
+  .vote-thumb-glyph.is-celebrating { animation: none; }
 }
 .vote-error {
   display: inline-block;
@@ -859,11 +903,29 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .rec-item {
   border-bottom: 0.5px solid var(--border);
 }
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 4px;
+}
+.rec-row .ed-ctrls { opacity: 0; transition: opacity 120ms ease; gap: 0; }
+.rec-row:hover .ed-ctrls,
+.rec-row:focus-within .ed-ctrls { opacity: 1; }
+@media (pointer: coarse) { .rec-row .ed-ctrls { opacity: 0.6; } }
+/* Match the pedagogical-arc treatment: keep controls flush with the source
+   chip, collapse disabled reorder buttons so they don't reserve space. */
+.rec-row .ed-ctrl { padding: 8px; }
+.rec-row .ed-ctrl:disabled { display: none; }
+.rec-item-editing {
+  padding: 12px 4px 16px;
+}
 .rec-header {
   appearance: none;
   background: transparent;
   border: 0;
-  width: 100%;
+  flex: 0 1 auto;
+  min-width: 0;
   padding: 14px 4px;
   text-align: left;
   cursor: pointer;
@@ -892,7 +954,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 }
 .rec-item.is-open .rec-chevron { color: var(--accent); }
 .rec-label {
-  flex: 1;
+  flex: 0 1 auto;
   font-family: var(--font-serif);
   font-size: 15px;
   line-height: 1.45;
@@ -1031,6 +1093,41 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   padding: 4px 10px;
   border-radius: 999px;
   border: 0.5px solid transparent;
+  position: relative;
+}
+/* Hover legend: three rows mapping glyph → severity. No color coding in the
+   legend itself (per user note — the glyphs alone carry the signal there).
+   Positioned below the pill with a small offset, visibility gated on pill
+   hover/focus-within. */
+.flag-pill-legend {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 400;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.flag-pill:hover .flag-pill-legend,
+.flag-pill:focus-within .flag-pill-legend {
+  display: flex;
+}
+/* Each row of the legend is a real .flag-pill in its severity color. Items
+   shrink to content + left-align in the column. The legend-item modifier
+   keeps the inner pills slightly tighter than full-size pills. */
+.flag-pill-legend-item {
+  align-self: flex-start;
 }
 .flag-pill-informational {
   font-weight: 400;
@@ -1253,3 +1350,175 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   border-radius: 8px;
   padding: 8px 12px;
 }
+
+/* ---------- Pedagogical arc (wiki-edit) ---------- */
+.ped-section + .ped-section { margin-top: 22px; }
+.ped-section-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.ped-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  border-top: 0.5px solid var(--border);
+}
+.ped-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 4px;
+  padding: 12px 4px 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  position: relative;
+}
+.ped-row .ped-link { flex: 0 1 auto; }
+/* Disabled reorder controls reserve padding space via opacity:0 in the base
+   .ed-ctrls rules, which pushes the visible ✎/× away from the meta on this
+   surface. Collapse disabled controls here so the visible ones sit flush. */
+.ped-row .ed-ctrls { gap: 0; }
+.ped-row .ed-ctrl { padding: 8px; }
+.ped-row .ed-ctrl:disabled { display: none; }
+.ped-row .ed-ctrls { opacity: 0; transition: opacity 120ms ease; }
+.ped-row:hover .ed-ctrls,
+.ped-row:focus-within .ed-ctrls { opacity: 1; }
+@media (pointer: coarse) { .ped-row .ed-ctrls { opacity: 0.6; } }
+.ped-row-editing { padding: 14px 4px 16px; }
+.ped-link {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.ped-link:hover .ped-link-title { color: var(--accent); }
+.ped-link-arrow {
+  font-family: var(--font-serif);
+  color: var(--accent);
+  font-size: 15px;
+}
+.ped-link-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.4;
+  transition: color 120ms ease;
+}
+.ped-link-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.ped-note {
+  flex-basis: 100%;
+  margin: 2px 0 0;
+  padding-left: 22px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--secondary);
+}
+.ped-add { margin-top: 6px; }
+
+/* ---------- Piece picker (used inside pedagogical add/edit forms) ---------- */
+.piece-picker {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.piece-picker-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.piece-picker-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.piece-picker-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.piece-picker-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.piece-picker-item.is-active,
+.piece-picker-item:hover { background: var(--accent-soft); }
+.piece-picker-item-title {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+}
+.piece-picker-item-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.piece-picker-empty {
+  margin: 6px 0 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+.piece-picker-selected {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-tint);
+}
+.piece-picker-selected-title {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+}
+.piece-picker-selected-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.piece-picker-clear {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 0.5px;
+}
+.piece-picker-clear:hover { text-decoration-thickness: 1px; }

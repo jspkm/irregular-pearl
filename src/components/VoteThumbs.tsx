@@ -23,7 +23,8 @@ export type VoteSubjectTable =
   | 'performers_notes'
   | 'interpretive_schools'
   | 'piece_descriptions'
-  | 'landmarks';
+  | 'landmarks'
+  | 'pieces_seed_description';
 
 interface Props {
   subjectTable: VoteSubjectTable;
@@ -38,6 +39,10 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  // Bumps every time the user transitions INTO an upvote (not clear, not down).
+  // The upvote button reads this to trigger a one-shot celebration animation
+  // via a dynamic key + CSS class. Reduced motion respected in CSS.
+  const [celebrateKey, setCelebrateKey] = useState(0);
 
   // Load the user's existing vote on mount (or when auth resolves).
   useEffect(() => {
@@ -71,6 +76,10 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
       // Clicking the already-filled thumb clears the vote; otherwise sets.
       const next: Vote = prev === desired ? 0 : desired;
       setVote(next);
+      if (desired === 1 && next === 1 && prev !== 1) {
+        // Transitioning into an upvote — trigger the celebration pulse.
+        setCelebrateKey((k) => k + 1);
+      }
       setPending(true);
       setError(null);
       const { error: rpcErr } =
@@ -122,15 +131,17 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
           onClick={() => cast(1)}
           disabled={pending}
         >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path
-              d="M3 14V7h2.5l2-4.5a1.5 1.5 0 012.9.9L9.5 7H13a1.5 1.5 0 011.5 1.7l-.8 4.5A2 2 0 0111.7 15H5.5A2.5 2.5 0 013 14z"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinejoin="round"
-              fill={vote === 1 ? 'currentColor' : 'none'}
-            />
-          </svg>
+          <span key={celebrateKey} className={`vote-thumb-glyph${celebrateKey > 0 ? ' is-celebrating' : ''}`}>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M3 14V7h2.5l2-4.5a1.5 1.5 0 012.9.9L9.5 7H13a1.5 1.5 0 011.5 1.7l-.8 4.5A2 2 0 0111.7 15H5.5A2.5 2.5 0 013 14z"
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinejoin="round"
+                fill={vote === 1 ? 'currentColor' : 'none'}
+              />
+            </svg>
+          </span>
         </button>
         <button
           type="button"

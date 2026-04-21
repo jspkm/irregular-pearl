@@ -151,7 +151,6 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   // CM5: always visible. Any authed user can propose a school; anon sees
   // the entry and gets a sign-in panel on click.
   const canWrite = true;
-  const writeLabel = schools.length === 0 ? 'Write a school' : 'Add another school';
 
   return (
     <div>
@@ -165,9 +164,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
         </div>
       )}
 
-      {schools.length === 0 ? (
-        <p className="empty-state">No interpretive schools recorded yet.</p>
-      ) : (
+      {schools.length > 0 && (
         <div className={`schools-grid schools-grid-${Math.min(visibleSchools.length, 3)}`}>
           {visibleSchools.map((s) => {
             const isOwner = viewer?.userId === s.contributor.id;
@@ -249,9 +246,9 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
             if (!viewer?.userId) { setSignInOpen(true); return; }
             setMode('write');
           }}
-          className="write-entry"
+          className="mvmt-add"
         >
-          {writeLabel} &rarr;
+          + Add a school
         </button>
       )}
       {mode === 'write' && viewer?.userId && (
@@ -345,17 +342,6 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
         .school-card .by span:not(.name):not(.dot) {
           color: var(--muted);
         }
-        .write-entry {
-          margin-top: 24px;
-          background: transparent;
-          border: 0;
-          color: var(--accent);
-          font-family: var(--font-sans);
-          font-size: 13px;
-          padding: 0;
-          cursor: pointer;
-        }
-        .write-entry:hover { color: var(--ink); }
       `}</style>
     </div>
   );

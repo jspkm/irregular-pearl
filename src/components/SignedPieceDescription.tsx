@@ -17,9 +17,14 @@ interface Props {
   pieceId: string;
   initialDescriptions: PublishedPieceDescription[];
   // Unsigned pieces.description text — rendered as a synthetic "Seed data"
-  // card at the end of the stack. Seed has no votes; user-authored ties
-  // sort in front of it (§2.5 ordering rule plus client-side append).
+  // card at the end of the stack. User-authored ties sort in front of it
+  // (§2.5 ordering rule plus client-side append).
   seedDescription?: string | null;
+  // Deterministic UUID from pieces.seed_description_vote_id. Used as the
+  // votes.subject_id so the seed card can carry a thumbs affordance even
+  // though it isn't a row in piece_descriptions. May be null while offline
+  // or on a DB that predates migration 20260516.
+  seedDescriptionVoteId?: string | null;
 }
 
 type StackItem =
@@ -34,7 +39,7 @@ interface Viewer {
 
 type Mode = null | 'write' | { action: 'edit'; descriptionId: string };
 
-export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription }: Props) {
+export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription, seedDescriptionVoteId }: Props) {
   const [descriptions, setDescriptions] = useState<PublishedPieceDescription[]>(initialDescriptions);
   const [viewer, setViewer] = useState<Viewer | null>(null);
   const [mode, setMode] = useState<Mode>(null);
@@ -188,22 +193,26 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
                         {d.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
                       </div>
                       <div className="by">
-                        <span className="name">{d.contributor.displayName}</span>
-                        {d.contributor.bioShort && (
-                          <>
-                            <span className="dot" aria-hidden="true"></span>
-                            <span>{d.contributor.bioShort}</span>
-                          </>
-                        )}
-                        {isOwner && (
-                          <OwnerEditDelete
-                            itemLabel="piece description"
-                            onEdit={() => { setMode({ action: 'edit', descriptionId: d.descriptionId }); setError(null); }}
-                            onDelete={() => handleRemove(d.descriptionId)}
-                            busy={busy}
-                          />
-                        )}
-                        <VoteThumbs subjectTable="piece_descriptions" subjectId={d.descriptionId} />
+                        <div className="by-left">
+                          <span className="name">{d.contributor.displayName}</span>
+                          {d.contributor.bioShort && (
+                            <>
+                              <span className="dot" aria-hidden="true"></span>
+                              <span>{d.contributor.bioShort}</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="by-right">
+                          {isOwner && (
+                            <OwnerEditDelete
+                              itemLabel="piece description"
+                              onEdit={() => { setMode({ action: 'edit', descriptionId: d.descriptionId }); setError(null); }}
+                              onDelete={() => handleRemove(d.descriptionId)}
+                              busy={busy}
+                            />
+                          )}
+                          <VoteThumbs subjectTable="piece_descriptions" subjectId={d.descriptionId} />
+                        </div>
                       </div>
                     </>
                   )}
@@ -225,6 +234,11 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
                 <div className="prose">
                   {active.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
                 </div>
+                {seedDescriptionVoteId && (
+                  <div className="desc-seed-vote">
+                    <VoteThumbs subjectTable="pieces_seed_description" subjectId={seedDescriptionVoteId} />
+                  </div>
+                )}
               </article>
             )
           )}
@@ -299,8 +313,24 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           font-family: var(--font-sans);
           font-size: 13px;
           color: var(--ink);
-          text-align: right;
           max-width: 640px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 16px;
+        }
+        .description-essay .by-left {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          flex: 1 1 auto;
+          min-width: 0;
+        }
+        .description-essay .by-right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex: 0 0 auto;
         }
         .description-essay .by .name { font-weight: 500; }
         .description-essay .by .dot {
@@ -312,6 +342,12 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           vertical-align: middle;
         }
         .description-essay .by span:not(.name):not(.dot) { color: var(--muted); }
+        .desc-seed-vote {
+          margin-top: 10px;
+          max-width: 640px;
+          display: flex;
+          justify-content: flex-start;
+        }
         .write-entry {
           margin-top: 24px;
           background: transparent;

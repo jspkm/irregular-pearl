@@ -55,35 +55,66 @@ async function seed() {
     }
     console.log(`  ✓ ${piece.title}`);
 
-    // Insert editions
-    for (const edition of piece.editions) {
+    // Insert editions. Slice C Step 4 (20260507) added `ordinal` + a partial
+    // unique index on (piece_id, ordinal) WHERE deleted_at IS NULL, so every
+    // row needs an explicit ordinal. Pattern matches the movements block:
+    // skip any (piece_id, ordinal) slot that is already filled, so re-runs
+    // don't clobber user edits made through the wiki-edit UI.
+    for (let i = 0; i < piece.editions.length; i++) {
+      const edition = piece.editions[i];
+      const ordinal = i + 1;
+
+      const { data: existing } = await supabase
+        .from('editions')
+        .select('id')
+        .eq('piece_id', piece.id)
+        .eq('ordinal', ordinal)
+        .is('deleted_at', null)
+        .maybeSingle();
+      if (existing) continue;
+
       const { error } = await supabase
         .from('editions')
-        .upsert({
+        .insert({
           id: edition.id,
           piece_id: piece.id,
           publisher: edition.publisher,
           editor: edition.editor,
           year: edition.year,
           description: edition.description,
-        }, { onConflict: 'id' });
+          ordinal,
+        });
 
       if (error) {
         console.error(`    Failed to insert edition "${edition.publisher}":`, error.message);
       }
     }
 
-    // Insert external links
-    for (const link of piece.external_links) {
+    // Insert external links. Slice C Step 4 (20260508) added the same
+    // ordinal + partial unique index here. Same skip-if-slot-taken pattern.
+    for (let i = 0; i < piece.external_links.length; i++) {
+      const link = piece.external_links[i];
+      const ordinal = i + 1;
+
+      const { data: existing } = await supabase
+        .from('external_links')
+        .select('id')
+        .eq('piece_id', piece.id)
+        .eq('ordinal', ordinal)
+        .is('deleted_at', null)
+        .maybeSingle();
+      if (existing) continue;
+
       const { error } = await supabase
         .from('external_links')
-        .upsert({
-          id: `${piece.id}-${link.type}-${link.url.slice(-20)}`,
+        .insert({
+          id: `${piece.id}-${link.type}-${ordinal}`,
           piece_id: piece.id,
           type: link.type,
           url: link.url,
           label: link.label,
-        }, { onConflict: 'id' });
+          ordinal,
+        });
 
       if (error) {
         console.error(`    Failed to insert link "${link.label}":`, error.message);

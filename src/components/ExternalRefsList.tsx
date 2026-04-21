@@ -74,9 +74,7 @@ export default function ExternalRefsList({ pieceId, initialLinks }: Props) {
 
   return (
     <>
-      {links.length === 0 ? (
-        <p className="empty-state">No external references yet.</p>
-      ) : (
+      {links.length > 0 && (
         <ul className="ext-refs">
           {links.map((l, i) => {
             const isFirst = i === 0;

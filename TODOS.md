@@ -6,37 +6,11 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Piece page (PRD Tier 1)
 
-### Recordings CRUD UI (wiki-edit)
-
-**What:** Extend `RecordingsList.tsx` with the end-of-row pencil/×/↑/↓ controls and an "+ Add recording" modal. Backing RPCs (`create_external_link`, `update_external_link`, `delete_external_link`, `swap_external_link_ordinals`) already shipped in `20260508000000_external_links_wiki_crud.sql`. Filter rows to the recording subset of link types (`youtube | vimeo | spotify | internet_archive | soundcloud | bandcamp`).
-
-**Why:** Deferred from the Slice-C-Step-4 / wiki-edit push (the parallel PR brought CRUD to Editions + External references). Recordings is next in the same pattern and shares the underlying `external_links` schema + RPCs.
-
-**Context:** `RecordingsList.tsx` currently collapses each recording row and mounts an iframe on expand. Layering CRUD in-place needs care: edit/delete controls should live on the header row (visible when collapsed) and not reach inside the iframe panel. Follow `ExternalRefsList.tsx` for the pattern; reuse the same shared `SignInPrompt` and `ed-ctrls` CSS.
-
-**Effort:** S
-**Priority:** P2
-**Depends on:** None (schema + RPCs shipped)
-
-### Pedagogical arc CRUD UI + piece picker
-
-**What:** Build `PedagogicalArcList.tsx` (two subsections: "Prepare with" and "Natural next") with CRUD affordances per row. Needs a piece-picker autocomplete over `public.pieces` so contributors can select the related piece. Backing schema (`pedagogical_connections` table) and RPCs (`create_pedagogical_connection`, `update_pedagogical_connection`, `delete_pedagogical_connection`, `swap_pedagogical_ordinals`) already shipped in `20260509000000_pedagogical_arc.sql`.
-
-**Why:** Piece page Tier 1 calls for the pedagogical arc. Schema + RPCs landed in the Slice-C-Step-4 / wiki-edit push; UI was deferred because the picker UX deserves its own design pass.
-
-**Context:** Autocomplete matches existing `Autocomplete.tsx` pattern (if it covers pieces) or a new piece-scoped search. Per-row layout: `→ {related_piece.title}` with optional short note line below; reorder within section only (not across prepare/natural-next).
-
-**Effort:** M
-**Priority:** P2
-**Depends on:** None (schema + RPCs shipped)
-
-
-
 ### Redesign piece page per PRD revision 2
 
 **What:** Restructure the piece page into the sections PRD describes: header + difficulty panel, signed performer's notes, structural landmarks with flags and practice notes, interpretive schools grid, editions with passage comparison, recordings around landmark tempi, pedagogical arc.
 
-**Why:** The Claude-kit port (v0.1.0) stood up the 9-section shell and Slices A + B lit up signed performer's notes, interpretive schools, and signed piece descriptions with real data. Slice C added structural landmarks with flags + practice notes + votes + stacking, and wiki-edit movements. Still missing: edition passage comparison, recordings-around-landmark-tempi wiring, and the pedagogical arc UI (schema + RPCs already shipped). It is the atomic surface of the product per PRD.
+**Why:** The Claude-kit port (v0.1.0) stood up the 9-section shell and Slices A + B lit up signed performer's notes, interpretive schools, and signed piece descriptions with real data. Slice C added structural landmarks with flags + practice notes + votes + stacking, wiki-edit movements, wiki-edit recordings, and the pedagogical arc UI. Still missing: edition passage comparison and recordings-around-landmark-tempi wiring. It is the atomic surface of the product per PRD.
 
 **Context:** One responsive page, not two. Content, ordering, and hierarchy shared across viewports; narrow viewports reflow multi-column sections into stacks. Cold-start to structural landmarks under one second on a three-year-old phone on cellular is a Tier 1 perf target. Use `/design-shotgun` or `@agent-designer` to generate layout mockups honoring DESIGN.md tokens before coding.
 
@@ -131,6 +105,44 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Seed-description voting + piece-page UI polish
+
+**What:** Users can now thumbs up/down the unsigned `pieces.description` (seed card at the end of the signed-description stack) via a new deterministic vote subject. Migration [20260516](supabase/migrations/20260516000000_seed_description_votes.sql) adds `pieces.seed_description_vote_id uuid`, widens the `votes` + `vote_tallies` subject_table CHECK to accept `'pieces_seed_description'`, and installs a before-delete trigger on pieces that clears the synthetic votes when the piece goes away. [20260517](supabase/migrations/20260517000000_cast_vote_seed_description.sql) widens the `cast_vote` RPC whitelist to match. [VoteThumbs.tsx](src/components/VoteThumbs.tsx) + [src/lib/votes.ts](src/lib/votes.ts) pick up the new subject; [SignedPieceDescription.tsx](src/components/SignedPieceDescription.tsx) renders thumbs on the active seed card.
+
+Alongside: empty-state copy removed across five wiki-edit surfaces (performer's notes, interpretive schools, editions, recordings, external references, pedagogical arc); control clusters aligned flush with content across all of them (`align-items: center`, disabled reorder buttons collapse to `display: none`); signed description byline split into left user-info + right controls; flag-pill hover legend showing three pills (● significant, ○ notable, informational) in their severity colors; thumbs-up celebration animation (900ms scale bounce + success-colored glow, up-only, respects `prefers-reduced-motion`); pedagogical subsections always render their header + add button even when empty.
+
+**Why:** The seed description carries the reference voice on pieces without a signed description yet; users should still be able to register a reaction. The UI polish closes the visual gap between the wiki-edit surfaces now that Recordings and Pedagogical CRUD joined the family.
+
+**Context:** supabase/seed.ts also picked up a fix for a long-standing seed bug — it was inserting editions and external_links without setting `ordinal`, so every row past the first per piece collided on the partial unique index added by Slice C Step 4. Switched to the movements-block check-then-skip pattern so re-runs no-op and preserve user edits.
+
+**Effort:** M
+**Priority:** P2
+**Completed:** 2026-04-21 (on branch `slice-c-recordings-pedagogical-ui`, awaiting browser sign-off)
+
+### Recordings CRUD UI (wiki-edit)
+
+**What:** Extended [RecordingsList.tsx](src/components/RecordingsList.tsx) with the same end-of-row controls (↑ ↓ ✎ ×) + "+ Add recording" modal that movements / editions / external refs use, layered on top of the existing collapse-to-play disclosure. Header row split: the toggle button covers chevron + label + source chip; the control cluster is a sibling that stops click propagation so editing never also opens or closes the iframe. `recordingEmbedUrl` moved from `PiecePageLayout.astro` into [src/lib/externalLinks.ts](src/lib/externalLinks.ts) so the client-side list can recompute embeds after a wiki edit without a server round-trip.
+
+**Why:** Closed out the wiki-edit coverage across all piece-page link-type surfaces. Editions + external references already had CRUD; recordings was the last holdout.
+
+**Context:** Backing RPCs (`create_external_link`, `update_external_link`, `delete_external_link`, `swap_external_link_ordinals`) already shipped in [20260508000000_external_links_wiki_crud.sql](supabase/migrations/20260508000000_external_links_wiki_crud.sql), so UI-only. `PiecePageLayout.astro` now derives recordings from the live `external_links` DB rows (filtered by `RECORDING_TYPES`) instead of the seed in-memory copy, matching the editions + references pattern.
+
+**Effort:** S
+**Priority:** P2
+**Completed:** 2026-04-21 (on branch `slice-c-recordings-pedagogical-ui`)
+
+### Pedagogical arc CRUD UI + piece picker
+
+**What:** New [PedagogicalArcList.tsx](src/components/PedagogicalArcList.tsx) lights up the previously empty-state Pedagogical arc section. Two always-rendered subsections (Prepare with / Natural next) with per-row ↑/↓/✎/× and an "+ Add …" button each. Clicking Add opens a modal with a new small picker ([PiecePicker.tsx](src/components/PiecePicker.tsx), ~140 lines) that pre-fetches the catalog once on the server, filters on title + composer + catalog as the user types, navigates with ↑/↓ + Enter, and excludes the current piece + any already-connected pieces from suggestions. Selected state renders as a summary card with a "Change" affordance. [src/lib/pedagogical.ts](src/lib/pedagogical.ts) owns the read helpers: `fetchPedagogicalConnections` joins `pieces` via the `related_piece_id` FK so each row carries title + composer + catalog inline.
+
+**Why:** Piece page Tier 1 calls for the pedagogical arc. The picker UX was the design wrinkle that had deferred this; a piece-specific autocomplete (not the string-only `Autocomplete.tsx`) turned out to be the cleanest fit.
+
+**Context:** Backing schema (`pedagogical_connections` table) + RPCs already shipped in [20260509000000_pedagogical_arc.sql](supabase/migrations/20260509000000_pedagogical_arc.sql). Seed script seeds one sample connection (Bach Suite No. 1 → No. 2 "natural next") so the section has live data on first boot.
+
+**Effort:** M
+**Priority:** P2
+**Completed:** 2026-04-21 (on branch `slice-c-recordings-pedagogical-ui`)
 
 ### Slice C Step 9 — seed fixtures for stacked landmarks
 
