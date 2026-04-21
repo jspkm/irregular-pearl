@@ -17,3 +17,8 @@ dist-preview/
 .context/
 .claude/
 outreach-emails.csv
+
+# Local dev bring-up script — gitignored so it can carry real secrets.
+# The `bun run local` alias in package.json points at this path. Recreate
+# from your own template on a fresh clone.
+/scripts/local-up.sh
