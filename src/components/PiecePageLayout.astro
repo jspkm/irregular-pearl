@@ -24,6 +24,7 @@ import { getPublishedPerformersNotes } from '../lib/performersNotes';
 import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
 import { fetchMovementsForPiece } from '../lib/movements';
+import { getPublishedLandmarksForPiece, groupLandmarksByMovement } from '../lib/landmarks';
 import { fetchOrderedSubjects } from '../lib/votes';
 import { fetchEditionsForPiece } from '../lib/editions';
 import PerformersNotes from './PerformersNotes';
@@ -40,14 +41,16 @@ interface Props {
 }
 
 const { piece } = Astro.props;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
   fetchMovementsForPiece(piece.id),
   fetchEditionsForPiece(piece.id),
   fetchExternalLinksForPiece(piece.id),
+  getPublishedLandmarksForPiece(piece.id),
 ]);
+const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
 
 // Reorder signed content by vote_tallies.net_score DESC (tie-break by id)
@@ -195,6 +198,7 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
       pieceId={piece.id}
       initialMovements={dbMovements}
       seedMovements={seedMovements}
+      landmarksByMovement={landmarksByMovement}
     />
   </section>
 
