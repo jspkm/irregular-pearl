@@ -22,6 +22,32 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Piece page (PRD Tier 1)
 
+### Recordings CRUD UI (wiki-edit)
+
+**What:** Extend `RecordingsList.tsx` with the end-of-row pencil/×/↑/↓ controls and an "+ Add recording" modal. Backing RPCs (`create_external_link`, `update_external_link`, `delete_external_link`, `swap_external_link_ordinals`) already shipped in `20260508000000_external_links_wiki_crud.sql`. Filter rows to the recording subset of link types (`youtube | vimeo | spotify | internet_archive | soundcloud | bandcamp`).
+
+**Why:** Deferred from the Slice-C-Step-4 / wiki-edit push (the parallel PR brought CRUD to Editions + External references). Recordings is next in the same pattern and shares the underlying `external_links` schema + RPCs.
+
+**Context:** `RecordingsList.tsx` currently collapses each recording row and mounts an iframe on expand. Layering CRUD in-place needs care: edit/delete controls should live on the header row (visible when collapsed) and not reach inside the iframe panel. Follow `ExternalRefsList.tsx` for the pattern; reuse the same shared `SignInPrompt` and `ed-ctrls` CSS.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None (schema + RPCs shipped)
+
+### Pedagogical arc CRUD UI + piece picker
+
+**What:** Build `PedagogicalArcList.tsx` (two subsections: "Prepare with" and "Natural next") with CRUD affordances per row. Needs a piece-picker autocomplete over `public.pieces` so contributors can select the related piece. Backing schema (`pedagogical_connections` table) and RPCs (`create_pedagogical_connection`, `update_pedagogical_connection`, `delete_pedagogical_connection`, `swap_pedagogical_ordinals`) already shipped in `20260509000000_pedagogical_arc.sql`.
+
+**Why:** Piece page Tier 1 calls for the pedagogical arc. Schema + RPCs landed in the Slice-C-Step-4 / wiki-edit push; UI was deferred because the picker UX deserves its own design pass.
+
+**Context:** Autocomplete matches existing `Autocomplete.tsx` pattern (if it covers pieces) or a new piece-scoped search. Per-row layout: `→ {related_piece.title}` with optional short note line below; reorder within section only (not across prepare/natural-next).
+
+**Effort:** M
+**Priority:** P2
+**Depends on:** None (schema + RPCs shipped)
+
+
+
 ### Redesign piece page per PRD revision 2
 
 **What:** Restructure the piece page into the sections PRD describes: header + difficulty panel, signed performer's notes, structural landmarks with flags and practice notes, interpretive schools grid, editions with passage comparison, recordings around landmark tempi, pedagogical arc.

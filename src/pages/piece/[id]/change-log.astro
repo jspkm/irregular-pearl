@@ -4,6 +4,7 @@ import Navbar from '../../../components/Navbar.astro';
 import ChangeLog from '../../../components/ChangeLog';
 import { getPieceBasic } from '../../../lib/pieces';
 import { fetchPieceChangelog } from '../../../lib/movements';
+import '../../../styles/piece-page.css';
 
 const { id } = Astro.params;
 const piece = await getPieceBasic(id || '');
@@ -48,8 +49,6 @@ const seoDescription = `Change log for ${piece.title} by ${piece.composer_name} 
 </Layout>
 
 <style>
-  @import '../../../styles/piece-page.css';
-
   .change-log-page {
     max-width: 820px;
     margin: 0 auto;

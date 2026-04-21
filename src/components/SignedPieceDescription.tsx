@@ -9,11 +9,21 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedPieceDescription } from '../lib/pieceDescriptions';
+import VoteThumbs from './VoteThumbs';
+import OwnerEditDelete from './OwnerEditDelete';
 
 interface Props {
   pieceId: string;
   initialDescriptions: PublishedPieceDescription[];
+  // Unsigned pieces.description text — rendered as a synthetic "Seed data"
+  // card at the end of the stack. Seed has no votes; user-authored ties
+  // sort in front of it (§2.5 ordering rule plus client-side append).
+  seedDescription?: string | null;
 }
+
+type StackItem =
+  | { kind: 'user'; desc: PublishedPieceDescription }
+  | { kind: 'seed'; body: string };
 
 interface Viewer {
   userId: string | null;
@@ -24,12 +34,24 @@ interface Viewer {
 
 type Mode = null | 'write' | { action: 'edit'; descriptionId: string };
 
-export default function SignedPieceDescription({ pieceId, initialDescriptions }: Props) {
+export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription }: Props) {
   const [descriptions, setDescriptions] = useState<PublishedPieceDescription[]>(initialDescriptions);
   const [viewer, setViewer] = useState<Viewer | null>(null);
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stackIdx, setStackIdx] = useState(0);
+
+  const stackItems: StackItem[] = [
+    ...descriptions.map((desc) => ({ kind: 'user' as const, desc })),
+    ...(seedDescription && seedDescription.trim().length > 0
+      ? [{ kind: 'seed' as const, body: seedDescription }]
+      : []),
+  ];
+  const safeIdx = stackItems.length === 0 ? 0 : Math.min(stackIdx, stackItems.length - 1);
+  const active = stackItems[safeIdx];
+  const prev = () => setStackIdx((i) => (stackItems.length === 0 ? 0 : (i - 1 + stackItems.length) % stackItems.length));
+  const next = () => setStackIdx((i) => (stackItems.length === 0 ? 0 : (i + 1) % stackItems.length));
 
   const loadViewer = useCallback(async () => {
     if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
@@ -143,62 +165,81 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions }:
         </div>
       )}
 
-      {descriptions.length === 0 ? (
+      {stackItems.length === 0 ? (
         <p className="empty-state">No signed description yet.</p>
       ) : (
-        <div className="descriptions-list">
-          {descriptions.map((d) => {
-            const isOwner = viewer?.userId === d.contributor.id;
-            const isEditing = typeof mode === 'object' && mode?.action === 'edit' && mode.descriptionId === d.descriptionId;
-            return (
-              <article key={d.descriptionId} className="description-essay">
-                {!isEditing && (
-                  <>
-                    <div className="prose">
-                      {d.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
-                    </div>
-                    <div className="by">
-                      <span className="name">{d.contributor.displayName}</span>
-                      {d.contributor.bioShort && (
-                        <>
-                          <span className="dot" aria-hidden="true"></span>
-                          <span>{d.contributor.bioShort}</span>
-                        </>
-                      )}
-                    </div>
-                    {isOwner && (
-                      <div className="owner-actions">
-                        <button
-                          type="button"
-                          onClick={() => { setMode({ action: 'edit', descriptionId: d.descriptionId }); setError(null); }}
-                          className="owner-btn"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(d.descriptionId)}
-                          disabled={busy}
-                          className="owner-btn"
-                        >
-                          {busy ? 'Removing…' : 'Remove'}
-                        </button>
+        <div className={`desc-stack${stackItems.length > 1 ? ' has-more' : ''}`}>
+          {/* Visual "behind" cards imply the stack depth. Non-interactive. */}
+          {stackItems.length > 2 && <div className="desc-stack-behind depth-2" aria-hidden="true" />}
+          {stackItems.length > 1 && <div className="desc-stack-behind depth-1" aria-hidden="true" />}
+
+          {active?.kind === 'user' ? (
+            (() => {
+              const d = active.desc;
+              const isOwner = viewer?.userId === d.contributor.id;
+              const isEditing = typeof mode === 'object' && mode?.action === 'edit' && mode.descriptionId === d.descriptionId;
+              return (
+                <article className="description-essay desc-stack-top">
+                  {!isEditing && (
+                    <>
+                      <div className="prose">
+                        {d.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
                       </div>
-                    )}
-                  </>
-                )}
-                {isEditing && viewer && (
-                  <EssayEditForm
-                    initial={d.body}
-                    contributor={{ name: viewer.displayName ?? d.contributor.displayName, bio: viewer.bioShort }}
-                    submitting={busy}
-                    onCancel={() => { setMode(null); setError(null); }}
-                    onSubmit={(body) => handleEdit(d.descriptionId, body)}
-                  />
-                )}
+                      <div className="by">
+                        <span className="name">{d.contributor.displayName}</span>
+                        {d.contributor.bioShort && (
+                          <>
+                            <span className="dot" aria-hidden="true"></span>
+                            <span>{d.contributor.bioShort}</span>
+                          </>
+                        )}
+                        {isOwner && (
+                          <OwnerEditDelete
+                            itemLabel="piece description"
+                            onEdit={() => { setMode({ action: 'edit', descriptionId: d.descriptionId }); setError(null); }}
+                            onDelete={() => handleRemove(d.descriptionId)}
+                            busy={busy}
+                          />
+                        )}
+                        <VoteThumbs subjectTable="piece_descriptions" subjectId={d.descriptionId} />
+                      </div>
+                    </>
+                  )}
+                  {isEditing && viewer && (
+                    <EssayEditForm
+                      initial={d.body}
+                      contributor={{ name: viewer.displayName ?? d.contributor.displayName, bio: viewer.bioShort }}
+                      submitting={busy}
+                      onCancel={() => { setMode(null); setError(null); }}
+                      onSubmit={(body) => handleEdit(d.descriptionId, body)}
+                    />
+                  )}
+                </article>
+              );
+            })()
+          ) : (
+            active && (
+              <article className="description-essay desc-stack-top desc-seed">
+                <div className="prose">
+                  {active.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
+                </div>
               </article>
-            );
-          })}
+            )
+          )}
+
+          {stackItems.length > 1 && (
+            <div className="desc-stack-controls">
+              <button type="button" className="desc-stack-chev" aria-label="Previous description" onClick={prev}>
+                ←
+              </button>
+              <span className="desc-stack-indicator" aria-live="polite">
+                {safeIdx + 1} <span className="desc-stack-sep">of</span> {stackItems.length}
+              </span>
+              <button type="button" className="desc-stack-chev" aria-label="Next description" onClick={next}>
+                →
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -255,20 +296,6 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions }:
           vertical-align: middle;
         }
         .description-essay .by span:not(.name):not(.dot) { color: var(--muted); }
-        .owner-actions { display: flex; gap: 8px; margin-top: 14px; }
-        .owner-btn {
-          background: transparent;
-          border: 0.5px solid var(--border-strong);
-          color: var(--muted);
-          font-family: var(--font-sans);
-          font-size: 11px;
-          padding: 4px 10px;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: color 0.12s, border-color 0.12s;
-        }
-        .owner-btn:hover { color: var(--ink); border-color: var(--ink); }
-        .owner-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .write-entry {
           margin-top: 24px;
           background: transparent;

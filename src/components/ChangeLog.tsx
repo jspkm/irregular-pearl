@@ -96,6 +96,7 @@ function formatUtc(iso: string): string {
 }
 
 function defaultSummary(r: ChangeLogEntry): string {
-  if (r.versionNumber === 1) return 'initial version';
-  return 'edited';
+  if (r.versionNumber === 1) return 'published';
+  if (r.versionNumber != null && r.versionNumber > 1) return 'edited';
+  return 'changed';
 }

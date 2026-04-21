@@ -14,6 +14,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedInterpretiveSchool } from '../lib/interpretiveSchools';
+import VoteThumbs from './VoteThumbs';
+import OwnerEditDelete from './OwnerEditDelete';
 
 interface Props {
   pieceId: string;
@@ -35,6 +37,15 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pageIdx, setPageIdx] = useState(0);
+
+  const PAGE_SIZE = 3;
+  const totalPages = Math.max(1, Math.ceil(schools.length / PAGE_SIZE));
+  const safePage = Math.min(pageIdx, totalPages - 1);
+  const pageStart = safePage * PAGE_SIZE;
+  const visibleSchools = schools.slice(pageStart, pageStart + PAGE_SIZE);
+  const prevPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i - 1 + totalPages) % totalPages));
+  const nextPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i + 1) % totalPages));
 
   const loadViewer = useCallback(async () => {
     if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
@@ -156,8 +167,8 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
       {schools.length === 0 ? (
         <p className="empty-state">No interpretive schools recorded yet.</p>
       ) : (
-        <div className={`schools-grid schools-grid-${Math.min(schools.length, 3)}`}>
-          {schools.map((s) => {
+        <div className={`schools-grid schools-grid-${Math.min(visibleSchools.length, 3)}`}>
+          {visibleSchools.map((s) => {
             const isOwner = viewer?.userId === s.contributor.id;
             const isEditing = typeof mode === 'object' && mode?.action === 'edit' && mode.schoolId === s.schoolId;
             return (
@@ -185,26 +196,16 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
                           <span>{s.contributor.bioShort}</span>
                         </>
                       )}
+                      {isOwner && (
+                        <OwnerEditDelete
+                          itemLabel="interpretive school"
+                          onEdit={() => { setMode({ action: 'edit', schoolId: s.schoolId }); setError(null); }}
+                          onDelete={() => handleRemove(s.schoolId)}
+                          busy={busy}
+                        />
+                      )}
+                      <VoteThumbs subjectTable="interpretive_schools" subjectId={s.schoolId} />
                     </div>
-                    {isOwner && (
-                      <div className="owner-actions">
-                        <button
-                          type="button"
-                          onClick={() => { setMode({ action: 'edit', schoolId: s.schoolId }); setError(null); }}
-                          className="owner-btn"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(s.schoolId)}
-                          disabled={busy}
-                          className="owner-btn"
-                        >
-                          {busy ? 'Removing…' : 'Remove'}
-                        </button>
-                      </div>
-                    )}
                   </>
                 )}
 
@@ -222,6 +223,20 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
               </div>
             );
           })}
+        </div>
+      )}
+
+      {schools.length > PAGE_SIZE && (
+        <div className="notes-pager">
+          <button type="button" className="notes-pager-chev" aria-label="Previous schools" onClick={prevPage}>
+            ←
+          </button>
+          <span className="notes-pager-indicator" aria-live="polite">
+            {safePage + 1} <span className="notes-pager-sep">of</span> {totalPages}
+          </span>
+          <button type="button" className="notes-pager-chev" aria-label="Next schools" onClick={nextPage}>
+            →
+          </button>
         </div>
       )}
 
@@ -315,20 +330,6 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
         .school-card .by span:not(.name):not(.dot) {
           color: var(--muted);
         }
-        .owner-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .owner-btn {
-          background: transparent;
-          border: 0.5px solid var(--border-strong);
-          color: var(--muted);
-          font-family: var(--font-sans);
-          font-size: 11px;
-          padding: 4px 10px;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: color 0.12s, border-color 0.12s;
-        }
-        .owner-btn:hover { color: var(--ink); border-color: var(--ink); }
-        .owner-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .write-entry {
           margin-top: 24px;
           background: transparent;
