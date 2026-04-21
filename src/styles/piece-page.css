@@ -1267,3 +1267,172 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   border-radius: 8px;
   padding: 8px 12px;
 }
+
+/* ---------- Pedagogical arc (wiki-edit) ---------- */
+.ped-section + .ped-section { margin-top: 22px; }
+.ped-section-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.ped-section-empty {
+  margin: 0 0 8px;
+  font-style: italic;
+}
+.ped-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+  border-top: 0.5px solid var(--border);
+}
+.ped-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 6px 12px;
+  padding: 12px 4px 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  position: relative;
+}
+.ped-row .ed-ctrls { opacity: 0; transition: opacity 120ms ease; }
+.ped-row:hover .ed-ctrls,
+.ped-row:focus-within .ed-ctrls { opacity: 1; }
+@media (pointer: coarse) { .ped-row .ed-ctrls { opacity: 0.6; } }
+.ped-row-editing { padding: 14px 4px 16px; }
+.ped-link {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.ped-link:hover .ped-link-title { color: var(--accent); }
+.ped-link-arrow {
+  font-family: var(--font-serif);
+  color: var(--accent);
+  font-size: 15px;
+}
+.ped-link-title {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.4;
+  transition: color 120ms ease;
+}
+.ped-link-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.ped-note {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  padding-left: 22px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--secondary);
+}
+.ped-add { margin-top: 6px; }
+
+/* ---------- Piece picker (used inside pedagogical add/edit forms) ---------- */
+.piece-picker {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.piece-picker-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+}
+.piece-picker-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.piece-picker-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.piece-picker-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.piece-picker-item.is-active,
+.piece-picker-item:hover { background: var(--accent-soft); }
+.piece-picker-item-title {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+}
+.piece-picker-item-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.piece-picker-empty {
+  margin: 6px 0 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+.piece-picker-selected {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-tint);
+}
+.piece-picker-selected-title {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+}
+.piece-picker-selected-meta {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.piece-picker-clear {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 0.5px;
+}
+.piece-picker-clear:hover { text-decoration-thickness: 1px; }

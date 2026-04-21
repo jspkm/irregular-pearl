@@ -35,13 +35,15 @@ import RecordingsList from './RecordingsList';
 import EditionsList from './EditionsList';
 import ExternalRefsList from './ExternalRefsList';
 import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '../lib/externalLinks';
+import { fetchPedagogicalConnections, fetchAllPiecesForPicker } from '../lib/pedagogical';
+import PedagogicalArcList from './PedagogicalArcList';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
@@ -49,6 +51,8 @@ const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMove
   fetchEditionsForPiece(piece.id),
   fetchExternalLinksForPiece(piece.id),
   getPublishedLandmarksForPiece(piece.id),
+  fetchPedagogicalConnections(piece.id),
+  fetchAllPiecesForPicker(),
 ]);
 const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
@@ -179,10 +183,15 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     <RecordingsList client:load pieceId={piece.id} initialLinks={dbRecordingLinks} />
   </section>
 
-  {/* ---------- Pedagogical arc (empty state until schema lands) ---------- */}
+  {/* ---------- Pedagogical arc (wiki-edit) ---------- */}
   <section class="block">
     <div class="kicker">Pedagogical arc</div>
-    <p class="empty-state">Prepare-with and natural-next connections not yet curated.</p>
+    <PedagogicalArcList
+      client:load
+      pieceId={piece.id}
+      initialConnections={dbPedagogical}
+      pieceOptions={pedagogicalPickerOptions}
+    />
   </section>
 
   {/* ---------- External references (IMSLP, Wikipedia) — wiki-edit ---------- */}

@@ -315,6 +315,38 @@ if (prelude) {
   }
 }
 
+// --- Pedagogical-arc fixture: Bach Suite No. 1 → No. 2 (natural next) ---
+// Just one connection so the section renders with live data on first dev boot.
+// Idempotent: only insert if no active connection of this exact (piece_id,
+// related_piece_id, kind) tuple exists.
+
+let pedagogicalSeeded = false;
+const { data: pedagogicalNextPiece } = await admin
+  .from('pieces')
+  .select('id')
+  .eq('id', 'bach-cello-suite-2')
+  .maybeSingle();
+if (preludeId && pedagogicalNextPiece) {
+  const { data: existing } = await admin
+    .from('pedagogical_connections')
+    .select('id')
+    .eq('piece_id', LANDMARK_PIECE_ID)
+    .eq('related_piece_id', 'bach-cello-suite-2')
+    .eq('kind', 'natural_next')
+    .is('deleted_at', null)
+    .maybeSingle();
+  if (!existing) {
+    const { error } = await staffClient.rpc('create_pedagogical_connection', {
+      p_piece_id: LANDMARK_PIECE_ID,
+      p_related_piece_id: 'bach-cello-suite-2',
+      p_kind: 'natural_next',
+      p_note: 'The D minor Suite is the natural follow-on — same key architecture, fresh harmonic weight.',
+    });
+    if (error) throw new Error(`create_pedagogical_connection: ${error.message}`);
+    pedagogicalSeeded = true;
+  }
+}
+
 console.log('Local queue + piece-page fixtures seeded.');
 console.log(`  pending piece:      ${pendingPieceId}`);
 console.log(`    performer's note: ${noteId}   (awaiting approval)`);
@@ -351,4 +383,9 @@ if (publishedPieceId !== pendingPieceId) {
 if (preludeId) {
   console.log(`  5. Visit /piece/${LANDMARK_PIECE_ID} — Prélude shows two stacked landmarks (Haji on top, cycle to Ben)`);
   console.log(`  6. Visit /piece/${LANDMARK_PIECE_ID}/change-log — Prélude rename + landmark publishes appear in the feed`);
+}
+if (pedagogicalSeeded) {
+  console.log(`  7. Visit /piece/${LANDMARK_PIECE_ID} — Pedagogical arc shows "Natural next → Bach Cello Suite No. 2"`);
+} else if (preludeId && pedagogicalNextPiece) {
+  console.log(`  7. Pedagogical arc on ${LANDMARK_PIECE_ID} already has the seed connection — skipped`);
 }
