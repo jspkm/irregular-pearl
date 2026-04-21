@@ -276,13 +276,23 @@ describe('staff-drafted path', () => {
 });
 
 describe('forbidden transitions', () => {
-  test('non-contributor cannot call publish_contributor_note', async () => {
-    const { error } = await normalUser.client.rpc('publish_contributor_note', {
-      p_piece_id: PIECE,
-      p_body: 'should fail',
-    });
-    expect(error).not.toBeNull();
-    expect(error!.message).toContain('not an active contributor');
+  test('any registered user can publish_contributor_note', async () => {
+    // Post-Slice-C governance (20260513000000_open_self_authoring.sql):
+    // the is_contributor flag is no longer a gate; auth is all that's
+    // required. Ownership guards still prevent user A editing user B's row.
+    const { data: noteId, error } = await normalUser.client.rpc(
+      'publish_contributor_note',
+      { p_piece_id: PIECE, p_body: 'self-authored by non-flagged user' },
+    );
+    expect(error).toBeNull();
+    expect(noteId).toBeTruthy();
+    const { data: row } = await admin
+      .from('performers_notes')
+      .select('contributor_id, status')
+      .eq('id', noteId as string)
+      .single();
+    expect(row?.contributor_id).toBe(normalUser.id);
+    expect(row?.status).toBe('published');
   });
 
   test('non-staff cannot call create_performers_note_draft', async () => {

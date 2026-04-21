@@ -16,6 +16,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedInterpretiveSchool } from '../lib/interpretiveSchools';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -24,7 +25,6 @@ interface Props {
 
 interface Viewer {
   userId: string | null;
-  isContributor: boolean;
   displayName: string | null;
   bioShort: string | null;
 }
@@ -38,6 +38,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pageIdx, setPageIdx] = useState(0);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   const PAGE_SIZE = 3;
   const totalPages = Math.max(1, Math.ceil(schools.length / PAGE_SIZE));
@@ -48,23 +49,22 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const nextPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i + 1) % totalPages));
 
   const loadViewer = useCallback(async () => {
-    if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
+    if (!hasSupabase) { setViewer({ userId: null, displayName: null, bioShort: null }); return; }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
-      setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null });
+      setViewer({ userId: null, displayName: null, bioShort: null });
       return;
     }
 
     const { data } = await supabase
       .from('users')
-      .select('display_name, is_contributor, contributor_active, contributor_bio_short')
+      .select('display_name, contributor_bio_short')
       .eq('id', session.user.id)
       .single();
 
     setViewer({
       userId: session.user.id,
-      isContributor: Boolean(data?.is_contributor && data?.contributor_active),
       displayName: data?.display_name ?? null,
       bioShort: data?.contributor_bio_short ?? null,
     });
@@ -148,8 +148,9 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
-  // CM5: always visible for eligible contributors. Label adapts.
-  const canWrite = Boolean(viewer?.isContributor);
+  // CM5: always visible. Any authed user can propose a school; anon sees
+  // the entry and gets a sign-in panel on click.
+  const canWrite = true;
   const writeLabel = schools.length === 0 ? 'Write a school' : 'Add another school';
 
   return (
@@ -243,13 +244,17 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
       {mode !== 'write' && canWrite && (
         <button
           type="button"
-          onClick={() => { setMode('write'); setError(null); }}
+          onClick={() => {
+            setError(null);
+            if (!viewer?.userId) { setSignInOpen(true); return; }
+            setMode('write');
+          }}
           className="write-entry"
         >
           {writeLabel} &rarr;
         </button>
       )}
-      {mode === 'write' && viewer && (
+      {mode === 'write' && viewer?.userId && (
         <div className="mt-6 school-card">
           <EditForm
             initialName=""
@@ -264,6 +269,16 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
             submittingLabel="Publishing…"
           />
         </div>
+      )}
+
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to write"
+          body={
+            <>Interpretive schools are signed — any registered user can propose one. Sign in or create an account to post yours.</>
+          }
+        />
       )}
 
       <style>{`

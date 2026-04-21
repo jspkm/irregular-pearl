@@ -16,6 +16,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedPerformersNote } from '../lib/performersNotes';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -24,7 +25,6 @@ interface Props {
 
 interface Viewer {
   userId: string | null;
-  isContributor: boolean;
   displayName: string | null;
   bioShort: string | null;
 }
@@ -38,6 +38,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pageIdx, setPageIdx] = useState(0);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   const PAGE_SIZE = 3;
   const totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
@@ -48,23 +49,22 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
   const nextPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i + 1) % totalPages));
 
   const loadViewer = useCallback(async () => {
-    if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
+    if (!hasSupabase) { setViewer({ userId: null, displayName: null, bioShort: null }); return; }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
-      setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null });
+      setViewer({ userId: null, displayName: null, bioShort: null });
       return;
     }
 
     const { data } = await supabase
       .from('users')
-      .select('display_name, is_contributor, contributor_active, contributor_bio_short')
+      .select('display_name, contributor_bio_short')
       .eq('id', session.user.id)
       .single();
 
     setViewer({
       userId: session.user.id,
-      isContributor: Boolean(data?.is_contributor && data?.contributor_active),
       displayName: data?.display_name ?? null,
       bioShort: data?.contributor_bio_short ?? null,
     });
@@ -139,12 +139,14 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
-  // Can the viewer write a brand-new note? Only if they're an active
-  // contributor AND they don't already have a published note on this piece.
+  // Can the viewer write a brand-new note? Any authed user who doesn't
+  // already have a published note on this piece. Anon users see the entry
+  // too; clicking opens the sign-in panel (never hidden, per the "anon
+  // click opens sign-in prompt" pattern).
   const viewerHasNote = Boolean(
     viewer?.userId && notes.some((n) => n.contributor.id === viewer.userId),
   );
-  const canWrite = Boolean(viewer?.isContributor && !viewerHasNote);
+  const canWrite = !viewerHasNote;
 
   return (
     <div>
@@ -226,17 +228,22 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
         </div>
       )}
 
-      {/* Write-a-note entry (only for contributors without a published note here) */}
+      {/* Write-a-note entry — any authed user without an existing note.
+          Anon click opens the sign-in panel. */}
       {mode !== 'write' && canWrite && (
         <button
           type="button"
-          onClick={() => { setMode('write'); setError(null); }}
+          onClick={() => {
+            setError(null);
+            if (!viewer?.userId) { setSignInOpen(true); return; }
+            setMode('write');
+          }}
           className="write-entry"
         >
           Write a performer's note &rarr;
         </button>
       )}
-      {mode === 'write' && viewer && (
+      {mode === 'write' && viewer?.userId && (
         <div className="mt-6 signed">
           <EditForm
             initial=""
@@ -249,6 +256,16 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
             submittingLabel="Publishing…"
           />
         </div>
+      )}
+
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to write"
+          body={
+            <>Performer's notes are signed — any registered user can publish their own. Sign in or create an account to post yours.</>
+          }
+        />
       )}
 
       <style>{`

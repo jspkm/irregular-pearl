@@ -11,6 +11,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedPieceDescription } from '../lib/pieceDescriptions';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -27,7 +28,6 @@ type StackItem =
 
 interface Viewer {
   userId: string | null;
-  isContributor: boolean;
   displayName: string | null;
   bioShort: string | null;
 }
@@ -41,6 +41,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stackIdx, setStackIdx] = useState(0);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   const stackItems: StackItem[] = [
     ...descriptions.map((desc) => ({ kind: 'user' as const, desc })),
@@ -54,23 +55,22 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const next = () => setStackIdx((i) => (stackItems.length === 0 ? 0 : (i + 1) % stackItems.length));
 
   const loadViewer = useCallback(async () => {
-    if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
+    if (!hasSupabase) { setViewer({ userId: null, displayName: null, bioShort: null }); return; }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
-      setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null });
+      setViewer({ userId: null, displayName: null, bioShort: null });
       return;
     }
 
     const { data } = await supabase
       .from('users')
-      .select('display_name, is_contributor, contributor_active, contributor_bio_short')
+      .select('display_name, contributor_bio_short')
       .eq('id', session.user.id)
       .single();
 
     setViewer({
       userId: session.user.id,
-      isContributor: Boolean(data?.is_contributor && data?.contributor_active),
       displayName: data?.display_name ?? null,
       bioShort: data?.contributor_bio_short ?? null,
     });
@@ -150,7 +150,9 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
 
-  const canWrite = Boolean(viewer?.isContributor);
+  // Any authed user can write. Anon sees the entry and gets a sign-in
+  // panel on click.
+  const canWrite = true;
   const writeLabel = descriptions.length === 0 ? 'Write a signed description' : 'Add another description';
 
   return (
@@ -246,13 +248,17 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
       {mode !== 'write' && canWrite && (
         <button
           type="button"
-          onClick={() => { setMode('write'); setError(null); }}
+          onClick={() => {
+            setError(null);
+            if (!viewer?.userId) { setSignInOpen(true); return; }
+            setMode('write');
+          }}
           className="write-entry"
         >
           {writeLabel} &rarr;
         </button>
       )}
-      {mode === 'write' && viewer && (
+      {mode === 'write' && viewer?.userId && (
         <div className="mt-6 description-essay">
           <EssayEditForm
             initial=""
@@ -265,6 +271,16 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
             submittingLabel="Publishing…"
           />
         </div>
+      )}
+
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => setSignInOpen(false)}
+          title="Sign in to write"
+          body={
+            <>Signed descriptions are authored — any registered user can publish their take on a piece. Sign in or create an account to post yours.</>
+          }
+        />
       )}
 
       <style>{`
