@@ -1,6 +1,6 @@
 # Version
 
-Current: **0.2.0** (2026-04-21)
+Current: **0.3.0** (2026-04-21)
 
 The version number lives in three places that must stay in sync:
 
@@ -36,5 +36,6 @@ Pre-1.0, this project follows a relaxed semver:
 
 | Version | Date | Tag | GitHub release | Anchor commit | One-line summary |
 |---------|------|-----|----------------|---------------|------------------|
+| 0.3.0 | 2026-04-21 | `v0.3.0` | [v0.3.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.3.0) | release commit | Wiki-edit for recordings + pedagogical arc (with piece picker), seed-description voting, piece-page UI polish across every wiki-edit surface, thumbs-up celebration animation, seed.ts ordinal fix |
 | 0.2.0 | 2026-04-21 | `v0.2.0` | [v0.2.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.2.0) | release commit | Slice C: structural landmarks + silent voting + stacking + wiki-edit movements + page change log + email/password auth + profile sidebar + dark mode |
 | 0.1.0 | 2026-04-20 | `v0.1.0` | [v0.1.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.1.0) | [`36cb166`](https://github.com/jspkm/irregular-pearl/commit/36cb166) | Slices A + B: contributor approval pipeline (performer's notes, interpretive schools, signed piece descriptions), navbar bell, daily digest, Claude-kit aesthetic port, curated 18-piece catalog |
