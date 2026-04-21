@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import GenerativeAvatar from './GenerativeAvatar';
+import SignInPanel from './SignInPanel';
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -9,6 +10,7 @@ export default function AuthButton() {
   const [userRole, setUserRole] = useState<string>('user');
   const [isMaestro, setIsMaestro] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   useEffect(() => {
     if (!hasSupabase) {
@@ -18,17 +20,17 @@ export default function AuthButton() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      setLoading(false);
       if (session?.user) {
-        // Fetch avatar_url from public.users (respects user's choice)
+        // Fetch avatar_url from public.users (respects user's choice).
+        // Don't block the navbar on this — if the row is missing or the
+        // query fails, we still render the avatar via GenerativeAvatar.
         supabase.from('users').select('avatar_url, role, is_maestro').eq('id', session.user.id).single()
           .then(({ data }) => {
             setDbAvatarUrl(data?.avatar_url ?? null);
             setUserRole((data as any)?.role || 'user');
             setIsMaestro((data as any)?.is_maestro === true);
-            setLoading(false);
           });
-      } else {
-        setLoading(false);
       }
     });
 
@@ -38,15 +40,6 @@ export default function AuthButton() {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const handleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.href,
-      },
-    });
-  };
 
   if (loading) {
     return <span className="text-sm text-gray-400">...</span>;
@@ -84,11 +77,14 @@ export default function AuthButton() {
   }
 
   return (
-    <button
-      onClick={handleSignIn}
-      className="text-sm font-medium text-[#6B4E7C] hover:text-[#4C385C] transition-colors bg-transparent border-none cursor-pointer p-0"
-    >
-      Sign in
-    </button>
+    <>
+      <button
+        onClick={() => setSignInOpen(true)}
+        className="text-sm font-medium text-[#6B4E7C] hover:text-[#4C385C] transition-colors bg-transparent border-none cursor-pointer p-0"
+      >
+        Sign in
+      </button>
+      {signInOpen && <SignInPanel onClose={() => setSignInOpen(false)} />}
+    </>
   );
 }
