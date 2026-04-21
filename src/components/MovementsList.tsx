@@ -18,6 +18,8 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import { fetchMovementsForPiece, type Movement } from '../lib/movements';
 import SignInPanel from './SignInPanel';
+import StructuralLandmarks from './StructuralLandmarks';
+import type { PublishedLandmark } from '../lib/landmarks';
 
 export interface SeedMovement {
   name: string;
@@ -29,11 +31,17 @@ interface Props {
   pieceId: string;
   initialMovements: Movement[];
   seedMovements: SeedMovement[];
+  landmarksByMovement?: Record<string, PublishedLandmark[]>;
 }
 
 type Busy = { kind: 'idle' } | { kind: 'working'; movementId?: string } | { kind: 'error'; message: string };
 
-export default function MovementsList({ pieceId, initialMovements, seedMovements }: Props) {
+export default function MovementsList({
+  pieceId,
+  initialMovements,
+  seedMovements,
+  landmarksByMovement = {},
+}: Props) {
   const { user } = useAuth();
   const [movements, setMovements] = useState<Movement[]>(initialMovements);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -188,7 +196,11 @@ export default function MovementsList({ pieceId, initialMovements, seedMovements
                     )}
                   </div>
                 </div>
-                <p className="empty-state">Landmarks not yet curated for this movement.</p>
+                <StructuralLandmarks
+                  pieceId={pieceId}
+                  movementId={m.id}
+                  initialLandmarks={landmarksByMovement[m.id] ?? []}
+                />
               </div>
             );
           })}
