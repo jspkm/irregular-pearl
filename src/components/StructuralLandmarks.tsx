@@ -70,6 +70,19 @@ function FlagPill({ flag }: { flag: LandmarkFlag }) {
         {label}
         {suffix}
       </span>
+      <span className="flag-pill-legend" role="tooltip" aria-hidden="true">
+        <span className="flag-pill flag-pill-significant flag-pill-legend-item">
+          <span className="flag-pill-dot" aria-hidden="true">●</span>
+          <span className="flag-pill-label">significant</span>
+        </span>
+        <span className="flag-pill flag-pill-notable flag-pill-legend-item">
+          <span className="flag-pill-dot" aria-hidden="true">○</span>
+          <span className="flag-pill-label">notable</span>
+        </span>
+        <span className="flag-pill flag-pill-informational flag-pill-legend-item">
+          <span className="flag-pill-label">informational</span>
+        </span>
+      </span>
     </span>
   );
 }

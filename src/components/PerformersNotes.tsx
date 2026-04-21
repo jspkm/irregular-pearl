@@ -160,9 +160,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
         </div>
       )}
 
-      {notes.length === 0 ? (
-        <p className="empty-state">No performer's notes yet.</p>
-      ) : (
+      {notes.length > 0 && (
         <div className="performers-notes-list">
           {visibleNotes.map((note, idxInPage) => {
             const absoluteIdx = pageStart + idxInPage;

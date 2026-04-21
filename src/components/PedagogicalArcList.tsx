@@ -102,23 +102,14 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
     setBusy({ kind: 'idle' });
   }, [refetch, requireAuth]);
 
-  const isEmpty = connections.length === 0;
-
   return (
     <>
-      {isEmpty ? (
-        <p className="empty-state">Prepare-with and natural-next connections not yet curated.</p>
-      ) : null}
-
       {(['prepare_with', 'natural_next'] as PedagogicalKind[]).map((kind) => {
         const list = grouped[kind];
-        if (list.length === 0 && isEmpty) return null;
         return (
           <div key={kind} className="ped-section">
             <h3 className="ped-section-title">{KIND_LABELS[kind]}</h3>
-            {list.length === 0 ? (
-              <p className="empty-state ped-section-empty">No {KIND_LABELS[kind].toLowerCase()} connections yet.</p>
-            ) : (
+            {list.length > 0 && (
               <ul className="ped-list">
                 {list.map((c, i) => {
                   const isFirst = i === 0;
@@ -167,7 +158,6 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                           {c.relatedCatalogNumber ? ` · ${c.relatedCatalogNumber}` : ''}
                         </span>
                       </a>
-                      {c.note ? <p className="ped-note">{c.note}</p> : null}
                       <div className="ed-ctrls" aria-label={`Controls for ${c.relatedTitle}`}>
                         <button type="button" className="ed-ctrl" aria-label="Move up"
                           disabled={isFirst || rowWorking} onClick={() => handleSwap(kind, i, 'up')}>
@@ -202,6 +192,7 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                           </button>
                         )}
                       </div>
+                      {c.note ? <p className="ped-note">{c.note}</p> : null}
                     </li>
                   );
                 })}

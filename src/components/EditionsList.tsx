@@ -76,9 +76,7 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
 
   return (
     <>
-      {editions.length === 0 ? (
-        <p className="empty-state">No editions listed yet.</p>
-      ) : (
+      {editions.length > 0 && (
         <div className="editions">
           {editions.map((e, i) => {
             const isFirst = i === 0;

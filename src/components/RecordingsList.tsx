@@ -87,9 +87,7 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
 
   return (
     <>
-      {links.length === 0 ? (
-        <p className="empty-state">No reference recordings catalogued yet.</p>
-      ) : (
+      {links.length > 0 && (
         <ul className="rec-list">
           {links.map((r, i) => {
             const isFirst = i === 0;

@@ -25,7 +25,7 @@ import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
 import { fetchMovementsForPiece } from '../lib/movements';
 import { getPublishedLandmarksForPiece, groupLandmarksByMovement } from '../lib/landmarks';
-import { fetchOrderedSubjects } from '../lib/votes';
+import { fetchOrderedSubjects, fetchSeedDescriptionVoteId } from '../lib/votes';
 import { fetchEditionsForPiece } from '../lib/editions';
 import PerformersNotes from './PerformersNotes';
 import InterpretiveSchools from './InterpretiveSchools';
@@ -43,7 +43,7 @@ interface Props {
 }
 
 const { piece } = Astro.props;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
@@ -53,6 +53,7 @@ const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMove
   getPublishedLandmarksForPiece(piece.id),
   fetchPedagogicalConnections(piece.id),
   fetchAllPiecesForPicker(),
+  fetchSeedDescriptionVoteId(piece.id),
 ]);
 const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
@@ -123,7 +124,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
       a synthetic "Seed data" card at the bottom of the stack; user-authored
       entries sort above by vote score). */}
   <section class="block" id="signed-description">
-    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} />
+    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} seedDescriptionVoteId={seedDescriptionVoteId} />
   </section>
 
 
