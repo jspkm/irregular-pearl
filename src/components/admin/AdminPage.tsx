@@ -39,7 +39,7 @@ export default function AdminPage({ initialTab }: Props) {
 
       if (!data) { setDenied(true); setLoading(false); return; }
 
-      const isStaff = data.role === 'admin' || data.role === 'firstchair' || data.is_maestro;
+      const isStaff = data.role === 'admin' || data.role === 'moderator' || data.is_maestro;
       if (!isStaff) { setDenied(true); setLoading(false); return; }
 
       setProfile(data as StaffProfile);
@@ -60,7 +60,7 @@ export default function AdminPage({ initialTab }: Props) {
 
   const isAdmin = profile.role === 'admin';
   const isMaestro = profile.is_maestro || isAdmin;
-  const headerLabel = isAdmin ? 'Admin' : profile.role === 'firstchair' ? 'First Chair' : isMaestro ? 'Maestro' : 'Admin';
+  const headerLabel = isAdmin ? 'Admin' : profile.role === 'moderator' ? 'Moderator' : isMaestro ? 'Maestro' : 'Admin';
 
   const tabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
