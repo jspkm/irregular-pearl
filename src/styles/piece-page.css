@@ -469,6 +469,391 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .rec-table a.ext { color: var(--accent); text-decoration: none; font-size: 12px; }
 .rec-table a.ext:hover { text-decoration: underline; text-underline-offset: 2px; }
 
+/* External reference list (IMSLP, Wikipedia) — Option D: serif accent
+   with a trailing ↗ (muted) marking outbound. Border-underline fades in
+   on hover. Pills retired; the glyph carries the external signal. Lives
+   in global CSS (not the Astro scoped block) because the list is rendered
+   inside a React island whose DOM doesn't carry Astro's data-astro-cid
+   scope attribute. */
+.ext-refs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ext-refs li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ext-refs li.ext-ref-row { display: flex; }
+.ext-refs li.ext-ref-row .ext-ref { flex: 1; }
+.ext-refs li .ed-ctrls { opacity: 0; transition: opacity 120ms ease; }
+.ext-refs li:hover .ed-ctrls,
+.ext-refs li:focus-within .ed-ctrls { opacity: 1; }
+@media (pointer: coarse) { .ext-refs li .ed-ctrls { opacity: 0.6; } }
+.ext-refs a.ext-ref {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 0.5px solid transparent;
+  padding-bottom: 1px;
+  transition: border-color 160ms ease;
+}
+.ext-refs a.ext-ref::after {
+  content: ' ↗';
+  color: var(--muted);
+  font-family: var(--font-sans);
+  margin-left: 2px;
+}
+.ext-refs a.ext-ref:hover,
+.ext-refs a.ext-ref:focus-visible {
+  border-bottom-color: var(--accent);
+}
+.ext-refs a.ext-ref:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Editions wiki-edit row. When the edition has a url, the whole card is
+   clickable (JS navigation on click/Enter/Space); controls stopPropagation
+   via their closest('.ed-ctrls') check so they don't also fire the
+   navigation. A trailing ↗ glyph at right-middle signals the outbound link
+   (Option D link style: serif accent, lightweight). */
+.ed-row.ed {
+  display: block;
+  padding: 16px 22px;
+  position: relative;
+}
+.ed-row.ed-clickable { cursor: pointer; }
+.ed-row.ed-clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.ed-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+  padding-right: 0;
+}
+.ed-head h3 { margin: 0; flex-shrink: 0; transition: color 120ms ease; }
+/* Matches the External-references ↗: sans, muted, 14px. Positioned at
+   right-middle of the card (vs inline ::after on ext-refs) since the
+   edition card has other content below the title. */
+.ed-external-arrow {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+}
+.ed-row.ed-clickable:hover h3,
+.ed-row.ed-clickable:focus-visible h3 { color: var(--accent); }
+.ed-head .type-chip { margin-left: auto; }
+.ed-ctrls {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.ed-row:hover .ed-ctrls,
+.ed-row:focus-within .ed-ctrls {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .ed-ctrls { opacity: 0.6; }
+}
+.ed-ctrl {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 12px;
+  margin: 0;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 120ms ease;
+  line-height: 0;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.ed-ctrl:hover:not(:disabled),
+.ed-ctrl:focus-visible { color: var(--accent); }
+.ed-ctrl-delete:hover:not(:disabled),
+.ed-ctrl-delete:focus-visible { color: var(--danger); }
+.ed-ctrl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ed-ctrl:disabled { opacity: 0; cursor: default; }
+.ed-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--danger-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.ed-confirm-yes, .ed-confirm-no {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid transparent;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+}
+.ed-confirm-yes { color: var(--danger); border-color: var(--danger); }
+.ed-confirm-yes:hover:not(:disabled) { background: var(--danger); color: #fff; }
+.ed-confirm-no { color: var(--muted); border-color: var(--border-strong); }
+.ed-confirm-no:hover:not(:disabled) { color: var(--ink); }
+.ed-editing {
+  border: 0.5px solid var(--accent) !important;
+  padding: 16px 20px !important;
+  background: var(--bg);
+  display: block !important;
+}
+
+/* Signed description stack — a single active card with 1-2 "behind"
+   cards hinted by offset + shadow. Cycle chevrons below. Top card (active)
+   is the highest-voted; the synthetic "Seed data" card slots at the
+   bottom of the stack (user-authored ties win). */
+.desc-stack {
+  position: relative;
+  padding-bottom: 44px; /* room for controls */
+}
+.desc-stack-behind {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 44px;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(26, 26, 26, 0.04);
+  pointer-events: none;
+}
+.desc-stack-behind.depth-1 {
+  transform: translate(6px, 6px);
+  opacity: 0.65;
+}
+.desc-stack-behind.depth-2 {
+  transform: translate(12px, 12px);
+  opacity: 0.35;
+}
+.desc-stack-top {
+  position: relative;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.06);
+}
+.desc-seed .by .name {
+  font-style: italic;
+  color: var(--muted);
+}
+.desc-stack-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 12px;
+}
+.desc-stack-chev {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+.desc-stack-chev:hover,
+.desc-stack-chev:focus-visible {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.desc-stack-chev:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.desc-stack-indicator {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--tertiary);
+  font-variant-numeric: tabular-nums;
+}
+.desc-stack-sep {
+  font-style: italic;
+  margin: 0 2px;
+}
+
+/* Owner edit/delete affordance for signed content (performer's notes,
+   interpretive schools, signed piece descriptions). Mirrors the movement
+   header pattern: pencil + × at end of byline row, hover-reveal on desktop,
+   40% on mobile, inline "Delete? Yes/No" confirmation in place of the ×.
+   Placed adjacent to the byline text, before VoteThumbs. */
+.owner-ctrls {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 6px;
+}
+.owner-ctrl {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 10px;
+  margin: -10px 0;
+  cursor: pointer;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 120ms ease, color 120ms ease;
+  line-height: 0;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.owner-ctrl:hover:not(:disabled),
+.owner-ctrl:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
+.owner-ctrl-delete:hover:not(:disabled),
+.owner-ctrl-delete:focus-visible {
+  color: var(--danger);
+}
+.owner-ctrl:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.owner-ctrl:disabled { opacity: 0; cursor: default; }
+.by:hover .owner-ctrl:not(:disabled),
+.by:focus-within .owner-ctrl:not(:disabled) {
+  opacity: 0.7;
+}
+@media (pointer: coarse) {
+  .owner-ctrl:not(:disabled) { opacity: 0.4; }
+  .by:hover .owner-ctrl:not(:disabled) { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .owner-ctrl { transition: none; }
+}
+
+/* Inline delete confirmation, replaces the × while confirming. */
+.owner-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--danger-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.owner-confirm-yes,
+.owner-confirm-no {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid transparent;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+}
+.owner-confirm-yes {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.owner-confirm-yes:hover:not(:disabled) {
+  background: var(--danger);
+  color: #fff;
+}
+.owner-confirm-no {
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+.owner-confirm-no:hover:not(:disabled) { color: var(--ink); }
+.owner-confirm-yes:disabled,
+.owner-confirm-no:disabled { opacity: 0.55; cursor: default; }
+
+/* VoteThumbs — up/down affordance on signed content cards. Never renders
+   counts (plan §1.2). Active thumb uses success-emphasis (plan §7.3 /
+   §7.12) — NOT the brand purple, to avoid semantic collision with selected-
+   chrome. Placed at end of the byline row per user-feedback memory. */
+.vote-thumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+}
+.vote-thumb {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 10px;
+  margin: -10px 0;
+  cursor: pointer;
+  color: var(--tertiary);
+  transition: color 120ms ease, transform 120ms ease;
+  line-height: 0;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.vote-thumb:hover:not(:disabled),
+.vote-thumb:focus-visible {
+  color: var(--ink);
+}
+.vote-thumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.vote-thumb.is-active {
+  color: var(--success);
+}
+.vote-thumb.is-active:hover:not(:disabled) {
+  color: var(--success);
+  transform: scale(1.05);
+}
+.vote-thumbs.is-pending .vote-thumb { opacity: 0.6; cursor: progress; }
+@media (pointer: coarse) {
+  .vote-thumb { color: var(--muted); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vote-thumb { transition: none; }
+  .vote-thumb.is-active:hover:not(:disabled) { transform: none; }
+}
+.vote-error {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--danger);
+  margin-left: 8px;
+}
+
 /* Collapsed recordings list. One row per recording; click to expand the
    iframe inline. Iframe mounts on open (autoplay for YouTube/Vimeo) and
    unmounts on close so audio actually stops. */

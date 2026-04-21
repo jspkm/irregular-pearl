@@ -24,23 +24,48 @@ import { getPublishedPerformersNotes } from '../lib/performersNotes';
 import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
 import { fetchMovementsForPiece } from '../lib/movements';
+import { fetchOrderedSubjects } from '../lib/votes';
+import { fetchEditionsForPiece } from '../lib/editions';
 import PerformersNotes from './PerformersNotes';
 import InterpretiveSchools from './InterpretiveSchools';
 import SignedPieceDescription from './SignedPieceDescription';
 import MovementsList from './MovementsList';
 import RecordingsList from './RecordingsList';
+import EditionsList from './EditionsList';
+import ExternalRefsList from './ExternalRefsList';
+import { fetchExternalLinksForPiece, REFERENCE_TYPES } from '../lib/externalLinks';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
-const [performersNotes, interpretiveSchools, signedDescriptions, dbMovements] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
   fetchMovementsForPiece(piece.id),
+  fetchEditionsForPiece(piece.id),
+  fetchExternalLinksForPiece(piece.id),
 ]);
+const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
+
+// Reorder signed content by vote_tallies.net_score DESC (tie-break by id)
+// via the fetch_ordered_subjects RPC. Never exposes raw counts.
+const [orderedNoteIds, orderedSchoolIds, orderedDescriptionIds] = await Promise.all([
+  fetchOrderedSubjects('performers_notes', performersNotesRaw.map((n) => n.noteId)),
+  fetchOrderedSubjects('interpretive_schools', interpretiveSchoolsRaw.map((s) => s.schoolId)),
+  fetchOrderedSubjects('piece_descriptions', signedDescriptionsRaw.map((d) => d.descriptionId)),
+]);
+const performersNotes = orderedNoteIds
+  .map((id) => performersNotesRaw.find((n) => n.noteId === id))
+  .filter((n): n is NonNullable<typeof n> => n != null);
+const interpretiveSchools = orderedSchoolIds
+  .map((id) => interpretiveSchoolsRaw.find((s) => s.schoolId === id))
+  .filter((s): s is NonNullable<typeof s> => s != null);
+const signedDescriptions = orderedDescriptionIds
+  .map((id) => signedDescriptionsRaw.find((d) => d.descriptionId === id))
+  .filter((d): d is NonNullable<typeof d> => d != null);
 const seedMovements = (piece.movements ?? []).map((m) => ({
   name: m.name,
   key: m.key,
@@ -128,15 +153,11 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <span class="pill">{piece.difficulty}</span>
   </div>
 
-  {/* 7A: unsigned pieces.description renders as italic metadata strip when
-      a signed description coexists; as a fuller intro paragraph when alone. */}
-  {piece.description && (
-    <p class={hasSignedDescription ? 'piece-meta-strip' : 'piece-intro'}>{piece.description}</p>
-  )}
-
-  {/* 7A: signed description renders as the editorial essay below the header. */}
+  {/* Signed descriptions stack (includes the unsigned pieces.description as
+      a synthetic "Seed data" card at the bottom of the stack; user-authored
+      entries sort above by vote score). */}
   <section class="block" id="signed-description">
-    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} />
+    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} />
   </section>
 
 
@@ -183,33 +204,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <InterpretiveSchools client:load pieceId={piece.id} initialSchools={interpretiveSchools} />
   </section>
 
-  {/* ---------- Editions ---------- */}
+  {/* ---------- Editions (wiki-edit) ---------- */}
   <section class="block">
     <div class="kicker">Editions</div>
-    {piece.editions.length > 0 ? (
-      <div class="editions">
-        {piece.editions.map((e) => {
-          const Wrapper: any = e.url ? 'a' : 'div';
-          const wrapProps = e.url ? { href: e.url, target: '_blank', rel: 'noopener', class: 'ed' } : { class: 'ed' };
-          return (
-            <Wrapper {...wrapProps}>
-              <div class="ed-body">
-                <h3>{e.publisher}</h3>
-                <div class="meta">{e.editor}{e.year ? ` · ${e.year}` : ''}</div>
-                {e.description && <p class="desc">{e.description}</p>}
-              </div>
-              {e.type && (
-                <div class="right">
-                  <span class="type-chip">{e.type}</span>
-                </div>
-              )}
-            </Wrapper>
-          );
-        })}
-      </div>
-    ) : (
-      <p class="empty-state">No editions listed yet.</p>
-    )}
+    <EditionsList client:load pieceId={piece.id} initialEditions={dbEditions} />
   </section>
 
   {/* ---------- Recordings (collapsed list, open to play) ---------- */}
@@ -224,19 +222,11 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     <p class="empty-state">Prepare-with and natural-next connections not yet curated.</p>
   </section>
 
-  {/* ---------- External references (IMSLP, Wikipedia) ---------- */}
-  {refs.length > 0 && (
-    <section class="block">
-      <div class="kicker">External references</div>
-      <ul class="ext-refs">
-        {refs.map((r) => (
-          <li>
-            <a class="ext-ref" href={r.url} target="_blank" rel="noopener">{r.label}</a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+  {/* ---------- External references (IMSLP, Wikipedia) — wiki-edit ---------- */}
+  <section class="block">
+    <div class="kicker">External references</div>
+    <ExternalRefsList client:load pieceId={piece.id} initialLinks={dbReferenceLinks} />
+  </section>
 
   {/* ---------- Change log link (its own page) ---------- */}
   <p class="change-log-link">
@@ -302,44 +292,10 @@ const refs = piece.external_links.filter(l => l.type === 'imslp' || l.type === '
     border-bottom-color: var(--accent);
   }
 
-  /* External reference list (IMSLP, Wikipedia) — Option D: serif accent
-     with a trailing ↗ (muted) marking outbound. Border-underline fades in
-     on hover. Pills retired; the glyph carries the external signal. */
-  .ext-refs {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .ext-refs li {
-    display: block;
-  }
-  .ext-refs a.ext-ref {
-    font-family: var(--font-serif);
-    font-size: 14px;
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 0.5px solid transparent;
-    padding-bottom: 1px;
-    transition: border-color 160ms ease;
-  }
-  .ext-refs a.ext-ref::after {
-    content: ' ↗';
-    color: var(--muted);
-    font-family: var(--font-sans);
-    margin-left: 2px;
-  }
-  .ext-refs a.ext-ref:hover,
-  .ext-refs a.ext-ref:focus-visible {
-    border-bottom-color: var(--accent);
-  }
-  .ext-refs a.ext-ref:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
+  /* (External-references styling lives in src/styles/piece-page.css so
+     the React island's elements match the selectors — scoped Astro
+     styles here would be hashed to data-astro-cid-* attributes that the
+     island's DOM doesn't carry.) */
 
   /* Edition card list */
   .editions {

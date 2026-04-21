@@ -114,16 +114,25 @@ export async function fetchMovementHistory(movementId: string): Promise<Movement
 // Page-level change log
 // ============================================================================
 
+export type ChangeLogSubjectType =
+  | 'movement'
+  | "performer's note"
+  | 'interpretive school'
+  | 'piece description'
+  | 'edition'
+  | 'recording'
+  | 'external reference';
+
 export interface ChangeLogEntry {
   id: string;
   createdAt: string;
   authoredBy: string | null;
   authoredByDisplayName: string;
-  subjectType: 'movement'; // more types as they land
+  subjectType: ChangeLogSubjectType;
   subjectId: string;
   subjectLabel: string;
   editSummary: string | null;
-  versionNumber: number;
+  versionNumber: number | null;
 }
 
 /**

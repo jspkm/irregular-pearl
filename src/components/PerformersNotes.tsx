@@ -14,6 +14,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedPerformersNote } from '../lib/performersNotes';
+import VoteThumbs from './VoteThumbs';
+import OwnerEditDelete from './OwnerEditDelete';
 
 interface Props {
   pieceId: string;
@@ -35,6 +37,15 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pageIdx, setPageIdx] = useState(0);
+
+  const PAGE_SIZE = 3;
+  const totalPages = Math.max(1, Math.ceil(notes.length / PAGE_SIZE));
+  const safePage = Math.min(pageIdx, totalPages - 1);
+  const pageStart = safePage * PAGE_SIZE;
+  const visibleNotes = notes.slice(pageStart, pageStart + PAGE_SIZE);
+  const prevPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i - 1 + totalPages) % totalPages));
+  const nextPage = () => setPageIdx((i) => (totalPages === 0 ? 0 : (i + 1) % totalPages));
 
   const loadViewer = useCallback(async () => {
     if (!hasSupabase) { setViewer({ userId: null, isContributor: false, displayName: null, bioShort: null }); return; }
@@ -151,12 +162,13 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
         <p className="empty-state">No performer's notes yet.</p>
       ) : (
         <div className="performers-notes-list">
-          {notes.map((note, idx) => {
+          {visibleNotes.map((note, idxInPage) => {
+            const absoluteIdx = pageStart + idxInPage;
             const isOwner = viewer?.userId === note.contributor.id;
             const isEditing = typeof mode === 'object' && mode?.action === 'edit' && mode.noteId === note.noteId;
-            // First note is primary accent; any siblings get the muted
-            // contrasting-voice treatment per DESIGN.md.
-            const signedClass = idx === 0 ? 'signed' : 'signed alt';
+            // Leftmost (absolute index 0 — highest voted) gets the primary
+            // accent; everyone else gets the muted contrasting treatment.
+            const signedClass = absoluteIdx === 0 ? 'signed' : 'signed alt';
             return (
               <div key={note.noteId} className={signedClass}>
                 {!isEditing && (
@@ -172,26 +184,16 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
                           <span>{note.contributor.bioShort}</span>
                         </>
                       )}
+                      {isOwner && (
+                        <OwnerEditDelete
+                          itemLabel="performer's note"
+                          onEdit={() => { setMode({ action: 'edit', noteId: note.noteId }); setError(null); }}
+                          onDelete={() => handleRemove(note.noteId)}
+                          busy={busy}
+                        />
+                      )}
+                      <VoteThumbs subjectTable="performers_notes" subjectId={note.noteId} />
                     </div>
-                    {isOwner && (
-                      <div className="owner-actions">
-                        <button
-                          type="button"
-                          onClick={() => { setMode({ action: 'edit', noteId: note.noteId }); setError(null); }}
-                          className="owner-btn"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleRemove(note.noteId)}
-                          disabled={busy}
-                          className="owner-btn"
-                        >
-                          {busy ? 'Removing…' : 'Remove'}
-                        </button>
-                      </div>
-                    )}
                   </>
                 )}
 
@@ -207,6 +209,20 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {notes.length > PAGE_SIZE && (
+        <div className="notes-pager">
+          <button type="button" className="notes-pager-chev" aria-label="Previous notes" onClick={prevPage}>
+            ←
+          </button>
+          <span className="notes-pager-indicator" aria-live="polite">
+            {safePage + 1} <span className="notes-pager-sep">of</span> {totalPages}
+          </span>
+          <button type="button" className="notes-pager-chev" aria-label="Next notes" onClick={nextPage}>
+            →
+          </button>
         </div>
       )}
 
@@ -236,21 +252,57 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
       )}
 
       <style>{`
-        .performers-notes-list { display: flex; flex-direction: column; gap: 32px; }
-        .owner-actions { display: flex; gap: 8px; margin-top: 10px; }
-        .owner-btn {
-          background: transparent;
-          border: 0.5px solid var(--border-strong);
-          color: var(--muted);
-          font-family: var(--font-sans);
-          font-size: 11px;
-          padding: 4px 10px;
-          border-radius: 6px;
-          cursor: pointer;
-          transition: color 0.12s, border-color 0.12s;
+        .performers-notes-list {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 32px;
+          align-items: start;
         }
-        .owner-btn:hover { color: var(--ink); border-color: var(--ink); }
-        .owner-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        @media (max-width: 960px) {
+          .performers-notes-list { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+          .performers-notes-list { grid-template-columns: 1fr; }
+        }
+        .notes-pager {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          margin-top: 28px;
+        }
+        .notes-pager-chev {
+          appearance: none;
+          background: transparent;
+          border: 0;
+          font: inherit;
+          font-size: 18px;
+          color: var(--muted);
+          cursor: pointer;
+          padding: 6px 10px;
+          border-radius: 4px;
+          line-height: 1;
+          transition: color 120ms ease, background-color 120ms ease;
+        }
+        .notes-pager-chev:hover,
+        .notes-pager-chev:focus-visible {
+          color: var(--accent);
+          background: var(--accent-soft);
+        }
+        .notes-pager-chev:focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 2px;
+        }
+        .notes-pager-indicator {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--tertiary);
+          font-variant-numeric: tabular-nums;
+        }
+        .notes-pager-sep {
+          font-style: italic;
+          margin: 0 2px;
+        }
         .write-entry {
           margin-top: 24px;
           background: transparent;
