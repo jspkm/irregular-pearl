@@ -55,6 +55,372 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .mvmt-head h3 { font-family: var(--font-serif); font-size: 18px; font-weight: 500; margin: 0; }
 .mvmt-head .meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .mvmt-head .dur { font-size: 12px; color: var(--tertiary); margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* Wiki-edit pencil. Sits at the END of the movement header row — after the
+   name + meta chip. Adjacent to the last item, not floated to the far-right
+   edge. Hover-reveal on pointer:fine, always 40% opacity on pointer:coarse.
+   14px visual glyph inside a 44px tap target via negative margins. See plan §7.7. */
+.movement-edit-pencil {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 14px;
+  margin: -14px -10px -14px -10px;
+  cursor: pointer;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 120ms ease, color 120ms ease;
+  line-height: 0;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.movement-edit-pencil:hover,
+.movement-edit-pencil:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
+.movement-edit-pencil:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.mvmt-head:hover .movement-edit-pencil,
+.mvmt-head:focus-within .movement-edit-pencil {
+  opacity: 0.7;
+}
+@media (pointer: coarse) {
+  .movement-edit-pencil { opacity: 0.4; }
+  .mvmt-head:hover .movement-edit-pencil { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .movement-edit-pencil { transition: none; }
+}
+
+/* Edit modal — 40% ink scrim + centered card, focus-trapped in JS. */
+.movement-edit-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.4);
+  z-index: 90;
+}
+.movement-edit-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--bg);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--r-card, 8px);
+  box-shadow: 0 12px 48px rgba(26, 26, 26, 0.18);
+  padding: 28px 28px 22px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.movement-edit-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.movement-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.movement-edit-field > span {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.movement-edit-field input {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--bg);
+}
+.movement-edit-field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: var(--accent);
+}
+.movement-edit-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 12px;
+}
+.movement-edit-error {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  padding: 10px 12px;
+  border-radius: 4px;
+}
+.movement-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+.movement-edit-button {
+  font: inherit;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 0.5px solid transparent;
+}
+.movement-edit-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.movement-edit-button-ghost {
+  background: transparent;
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+.movement-edit-button-ghost:hover:not(:disabled) { color: var(--ink); }
+.movement-edit-button-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.movement-edit-button-primary:hover:not(:disabled) {
+  background: var(--accent-hover, #4C385C);
+}
+.movement-edit-signin-body {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Row-end control group: ↑ ↓ pencil × — sits adjacent to the last row item. */
+.mvmt-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.mvmt-ctrl {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 14px;
+  margin: -14px 0;
+  cursor: pointer;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 120ms ease, color 120ms ease;
+  line-height: 0;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.mvmt-ctrl:hover:not(:disabled),
+.mvmt-ctrl:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
+.mvmt-ctrl-delete:hover:not(:disabled),
+.mvmt-ctrl-delete:focus-visible {
+  color: var(--danger);
+}
+.mvmt-ctrl:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.mvmt-ctrl:disabled {
+  opacity: 0;
+  cursor: default;
+}
+.mvmt-head:hover .mvmt-ctrl:not(:disabled),
+.mvmt-head:focus-within .mvmt-ctrl:not(:disabled) {
+  opacity: 0.7;
+}
+@media (pointer: coarse) {
+  .mvmt-ctrl:not(:disabled) { opacity: 0.4; }
+  .mvmt-head:hover .mvmt-ctrl:not(:disabled) { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mvmt-ctrl { transition: none; }
+}
+
+/* Inline delete confirmation replacing the × button. */
+.mvmt-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--danger-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.mvmt-confirm-yes,
+.mvmt-confirm-no {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid transparent;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+}
+.mvmt-confirm-yes {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.mvmt-confirm-yes:hover {
+  background: var(--danger);
+  color: #fff;
+}
+.mvmt-confirm-no {
+  color: var(--muted);
+  border-color: var(--border-strong);
+}
+.mvmt-confirm-no:hover { color: var(--ink); }
+
+/* "+ Add movement" button at end of list. */
+.mvmt-add {
+  appearance: none;
+  background: transparent;
+  border: 0.5px dashed var(--border-strong);
+  border-radius: 4px;
+  padding: 10px 16px;
+  margin-top: 20px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.mvmt-add:hover,
+.mvmt-add:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mvmt-add:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Inline toast for reorder/delete errors. */
+.mvmt-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.18);
+  z-index: 120;
+}
+.mvmt-toast-dismiss {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mvmt-toast-dismiss:hover { border-color: #fff; }
+
+/* Page-level Change log. Rendered as its own section at the bottom of the
+   piece page. One row per versioned change across every subject (today
+   movements; later landmarks, signed content). */
+.changelog-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.changelog-row {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.55;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.changelog-row:last-child { border-bottom: 0; }
+.changelog-who {
+  color: var(--ink);
+  font-weight: 500;
+}
+.changelog-when {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--tertiary);
+}
+.changelog-subject {
+  font-size: 12px;
+  color: var(--muted);
+}
+.changelog-subject em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--ink);
+  font-size: 13px;
+}
+.changelog-what {
+  color: var(--muted);
+  font-style: italic;
+}
+.changelog-sep {
+  color: var(--tertiary);
+}
+.changelog-error {
+  margin: 0 0 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--danger);
+}
+.changelog-retry {
+  appearance: none;
+  background: transparent;
+  border: 0.5px solid var(--danger);
+  color: var(--danger);
+  font: inherit;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.changelog-retry:hover { background: var(--danger); color: #fff; }
+@media (max-width: 520px) {
+  .movement-edit-row { grid-template-columns: 1fr; }
+}
 .landmarks { display: flex; flex-direction: column; }
 .lm { display: grid; grid-template-columns: 82px 1fr; gap: 20px; padding: 10px 0; border-bottom: 0.5px solid var(--border); align-items: start; }
 .lm:last-child { border-bottom: 0; }
@@ -102,6 +468,107 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .rec-table .type-chip { font-size: 10px; padding: 1px 7px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; margin-left: 6px; }
 .rec-table a.ext { color: var(--accent); text-decoration: none; font-size: 12px; }
 .rec-table a.ext:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* Collapsed recordings list. One row per recording; click to expand the
+   iframe inline. Iframe mounts on open (autoplay for YouTube/Vimeo) and
+   unmounts on close so audio actually stops. */
+.rec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 0.5px solid var(--border);
+}
+.rec-item {
+  border-bottom: 0.5px solid var(--border);
+}
+.rec-header {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  padding: 14px 4px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  color: var(--ink);
+  transition: background-color 120ms ease;
+}
+.rec-header:hover,
+.rec-header:focus-visible {
+  background: var(--bg-tint);
+}
+.rec-header:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.rec-chevron {
+  font-family: var(--font-mono);
+  color: var(--tertiary);
+  font-size: 11px;
+  flex-shrink: 0;
+  width: 12px;
+  display: inline-block;
+}
+.rec-item.is-open .rec-chevron { color: var(--accent); }
+.rec-label {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.rec-item.is-open .rec-label { color: var(--accent); }
+.rec-source {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg-tint);
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-weight: 500;
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+}
+.rec-body {
+  padding: 4px 4px 18px;
+}
+.rec-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-tint);
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 760px;
+}
+.rec-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.rec-frame-spotify {
+  aspect-ratio: auto;
+  height: 152px;
+}
+.rec-frame-internet_archive {
+  aspect-ratio: 4 / 3;
+}
+.rec-fallback {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rec-header { transition: none; }
+}
 
 /* ---------- Pedagogical arc ---------- */
 .arc { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

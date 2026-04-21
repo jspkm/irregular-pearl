@@ -53,6 +53,7 @@ export async function fetchMovementsForPiece(pieceId: string): Promise<Movement[
       'id, piece_id, ordinal, name, tempo_indication, key_signature, meter, current_version_id, created_at, updated_at',
     )
     .eq('piece_id', pieceId)
+    .is('deleted_at', null)
     .order('ordinal', { ascending: true });
 
   if (error) {
@@ -64,7 +65,7 @@ export async function fetchMovementsForPiece(pieceId: string): Promise<Movement[
 }
 
 /**
- * Fetch a single movement by id.
+ * Fetch a single movement by id. Does not return soft-deleted rows.
  */
 export async function fetchMovement(movementId: string): Promise<Movement | null> {
   if (!hasSupabase) return null;
@@ -75,6 +76,7 @@ export async function fetchMovement(movementId: string): Promise<Movement | null
       'id, piece_id, ordinal, name, tempo_indication, key_signature, meter, current_version_id, created_at, updated_at',
     )
     .eq('id', movementId)
+    .is('deleted_at', null)
     .maybeSingle();
 
   if (error) {
@@ -106,6 +108,50 @@ export async function fetchMovementHistory(movementId: string): Promise<Movement
   }
 
   return (data ?? []).map(rowToMovementVersion);
+}
+
+// ============================================================================
+// Page-level change log
+// ============================================================================
+
+export interface ChangeLogEntry {
+  id: string;
+  createdAt: string;
+  authoredBy: string | null;
+  authoredByDisplayName: string;
+  subjectType: 'movement'; // more types as they land
+  subjectId: string;
+  subjectLabel: string;
+  editSummary: string | null;
+  versionNumber: number;
+}
+
+/**
+ * Fetch the unified change log for a piece across every versioned subject.
+ * Today only movement_versions is unioned in; landmarks + signed content
+ * will join as their versioning lands.
+ */
+export async function fetchPieceChangelog(pieceId: string): Promise<ChangeLogEntry[]> {
+  if (!hasSupabase) return [];
+
+  const { data, error } = await supabase.rpc('fetch_piece_changelog', {
+    p_piece_id: pieceId,
+  });
+  if (error) {
+    console.error('fetchPieceChangelog', error);
+    return [];
+  }
+  return ((data as any[]) ?? []).map((r) => ({
+    id: r.id,
+    createdAt: r.created_at,
+    authoredBy: r.authored_by,
+    authoredByDisplayName: r.authored_by_display_name,
+    subjectType: r.subject_type,
+    subjectId: r.subject_id,
+    subjectLabel: r.subject_label,
+    editSummary: r.edit_summary,
+    versionNumber: r.version_number,
+  }));
 }
 
 // ============================================================================
