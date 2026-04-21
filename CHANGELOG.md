@@ -4,6 +4,10 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Added (dev fixtures — Slice C Step 9)
+
+- **`scripts/seed-local-queue.ts` now seeds two stacked landmarks** on the Bach Suite No. 1 Prélude — Haji and a new second contributor (Ben Cellist, `ben@local.test` / `benlocal`) both publish a landmark at m. 1-4, with cross-votes that put Haji on top of the stack and Ben as the cycle target. Haji's landmark carries two flags (`bow_control` notable, `sustained_bowing` informational) and two practice notes; Ben's is sparser. The Prélude movement also picks up a tempo indication via `update_movement` so the page-level change log + version history have a row to render. Idempotent: landmarks hard-reset on each run; the movement edit is skipped if the tempo is already what we want, so re-runs don't pile up history.
+
 ## [0.2.0] — 2026-04-21
 
 The Slice C release. The piece page now carries the densest information surface PRD describes: structural landmarks anchored to measure ranges, with colored flag pills, signed practice notes, silent up/down votes that drive stack ordering when more than one author lands at the same anchor, and movement-grouped layout. Movements themselves became wiki-edit — any signed-in user can fix a name, tempo, key, or ordinal in place, with version history and revert. A unified page-level change log replays every edit (movements, editions, external references, signed content) into one chronological feed. Editions and external references gained the same wiki-edit affordances movements established. The contributor flag is gone: any registered user is an author, with the approval queue narrowed to its real purpose (byline-owner consent when one user drafts for another). Email/password joined Google as a sign-in option. Profile got a sidebar shell with appearance settings (Light / System / Dark) and logout.

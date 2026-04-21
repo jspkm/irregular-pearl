@@ -5,6 +5,7 @@
 //
 // Creates:
 //   - a contributor (haji@local.test / password: hajilocal)
+//   - a second contributor (ben@local.test / password: benlocal) — for stacking
 //   - a staff user   (staff@local.test / password: stafflocal)
 //   - one submitted pending performer's note (Slice A)
 //   - one submitted pending interpretive school (Slice B)
@@ -13,6 +14,11 @@
 //     in the schools grid on that piece page for visual QA without needing
 //     to click approve)
 //   - one published piece description on the same second piece (Slice B)
+//   - two published landmarks on the Bach Suite No. 1 Prélude at the same
+//     measure range, authored by haji and ben respectively, with cross-votes
+//     so the stack has a clear top (Slice C)
+//   - one movement edit on the Prélude so the change-log + version history
+//     have something to show
 //
 // Idempotent — re-running refreshes the drafts + republishes the visuals.
 //
@@ -49,6 +55,10 @@ const hajiId = await ensureUser('haji@local.test', 'hajilocal', {
   contributor_active: true,
   contributor_agreement_signed_at: new Date().toISOString(),
   contributor_bio_short: 'cellist, NYC',
+});
+const benId = await ensureUser('ben@local.test', 'benlocal', {
+  display_name: 'Ben Cellist',
+  contributor_bio_short: 'cellist + chamber player, Boston',
 });
 await ensureUser('staff@local.test', 'stafflocal', {
   display_name: 'Staff Local',
@@ -100,6 +110,7 @@ await admin.from('notifications').delete().eq('recipient_id', hajiId);
 const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY!;
 const staffClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const hajiClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+const benClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
 {
   const { error } = await staffClient.auth.signInWithPassword({ email: 'staff@local.test', password: 'stafflocal' });
@@ -108,6 +119,10 @@ const hajiClient = createClient(url, anonKey, { auth: { autoRefreshToken: false,
 {
   const { error } = await hajiClient.auth.signInWithPassword({ email: 'haji@local.test', password: 'hajilocal' });
   if (error) throw new Error(`sign-in haji: ${error.message}`);
+}
+{
+  const { error } = await benClient.auth.signInWithPassword({ email: 'ben@local.test', password: 'benlocal' });
+  if (error) throw new Error(`sign-in ben: ${error.message}`);
 }
 
 // --- Pending drafts on pendingPieceId (bell/queue fixtures) ---
@@ -184,6 +199,122 @@ if (publishedPieceId !== pendingPieceId) {
   publishedDescriptionId = d1 as string;
 }
 
+// --- Slice C: stacked landmarks on the Bach Suite No. 1 Prélude ---
+
+const LANDMARK_PIECE_ID = 'bach-cello-suite-1';
+let preludeId: string | null = null;
+let hajiLandmarkId: string | null = null;
+let benLandmarkId: string | null = null;
+let preludeMovementEdited = false;
+
+const { data: prelude } = await admin
+  .from('movements')
+  .select('id, ordinal, name, tempo_indication, key_signature, meter')
+  .eq('piece_id', LANDMARK_PIECE_ID)
+  .eq('ordinal', 1)
+  .is('deleted_at', null)
+  .maybeSingle();
+
+if (prelude) {
+  preludeId = prelude.id as string;
+
+  // Reset prior landmarks for both contributors on this piece so re-running is clean.
+  // Hard-delete to avoid orphan vote rows pointing at soft-removed landmarks.
+  const { data: existingLandmarks } = await admin
+    .from('landmarks')
+    .select('id')
+    .eq('piece_id', LANDMARK_PIECE_ID)
+    .in('contributor_id', [hajiId, benId]);
+  if (existingLandmarks && existingLandmarks.length > 0) {
+    const ids = existingLandmarks.map((r) => r.id as string);
+    await admin.from('votes').delete().eq('subject_table', 'landmarks').in('subject_id', ids);
+    await admin.from('landmark_versions').delete().in('landmark_id', ids);
+    await admin.from('landmarks').delete().in('id', ids);
+  }
+
+  // Haji's landmark — same anchor as Ben's (m. 1-4), rich payload (2 flags + 2 practice notes).
+  const { data: hajiLm, error: hajiLmErr } = await hajiClient.rpc('publish_contributor_landmark', {
+    p_piece_id: LANDMARK_PIECE_ID,
+    p_movement_id: preludeId,
+    p_measure_start: 1,
+    p_measure_end: 4,
+    p_label: 'Opening arpeggios — bow plan',
+    p_description:
+      'The first four bars set the rhetoric for the whole movement. Plan the bow so the dominant pedal at m. 4 still has somewhere to go.',
+    p_flags: [
+      { type: 'bow_control', severity: 'notable' },
+      { type: 'sustained_bowing', severity: 'informational' },
+    ],
+    p_practice_notes: [
+      {
+        body: 'Practice the four bars under a single down-bow at quarter=50 to hear the architecture before the printed slurring breaks it up.',
+      },
+      {
+        body: 'Then restore the printed bowing but keep the long arc in your ear — the slurs should feel like punctuation, not segmentation.',
+      },
+    ],
+  });
+  if (hajiLmErr) throw new Error(`publish haji landmark: ${hajiLmErr.message}`);
+  hajiLandmarkId = hajiLm as string;
+
+  // Ben's landmark — same opening, narrower (m. 1-2), sparser payload (no flags, 1 practice note).
+  // Renders as a sibling in the stack at the same anchor; vote ordering decides who is on top.
+  const { data: benLm, error: benLmErr } = await benClient.rpc('publish_contributor_landmark', {
+    p_piece_id: LANDMARK_PIECE_ID,
+    p_movement_id: preludeId,
+    p_measure_start: 1,
+    p_measure_end: 4,
+    p_label: 'Opening: let the string speak',
+    p_description:
+      'The opening pair of bars are about resonance, not articulation. Find the weight of the bow on the string and let the G-string ring under everything that follows.',
+    p_flags: [],
+    p_practice_notes: [
+      {
+        body: "Drop the bow from a few centimetres above the string on beat one — gravity, not pressure. If the resonance dies before m. 3, the bow plan is wrong.",
+      },
+    ],
+  });
+  if (benLmErr) throw new Error(`publish ben landmark: ${benLmErr.message}`);
+  benLandmarkId = benLm as string;
+
+  // Cross-votes so the stack has a clear top. Ben upvotes Haji; Haji downvotes Ben.
+  // Net: Haji +1, Ben -1 — Haji renders on top of the stack, Ben is the cycle target.
+  {
+    const { error } = await benClient.rpc('cast_vote', {
+      p_subject_table: 'landmarks',
+      p_subject_id: hajiLandmarkId,
+      p_vote_value: 1,
+    });
+    if (error) throw new Error(`cast_vote ben→haji: ${error.message}`);
+  }
+  {
+    const { error } = await hajiClient.rpc('cast_vote', {
+      p_subject_table: 'landmarks',
+      p_subject_id: benLandmarkId,
+      p_vote_value: -1,
+    });
+    if (error) throw new Error(`cast_vote haji→ben: ${error.message}`);
+  }
+
+  // Movement edit history — flip the Prélude's tempo_indication so the change-log
+  // and version history have something to render. Idempotent: only edit if the
+  // current value differs from what we want to set.
+  const targetTempo = 'Moderato';
+  if ((prelude.tempo_indication ?? null) !== targetTempo) {
+    const { error } = await staffClient.rpc('update_movement', {
+      p_movement_id: preludeId,
+      p_ordinal: prelude.ordinal,
+      p_name: prelude.name,
+      p_tempo_indication: targetTempo,
+      p_key_signature: prelude.key_signature,
+      p_meter: prelude.meter,
+      p_edit_summary: 'add tempo indication for the Prélude',
+    });
+    if (error) throw new Error(`update_movement Prélude: ${error.message}`);
+    preludeMovementEdited = true;
+  }
+}
+
 console.log('Local queue + piece-page fixtures seeded.');
 console.log(`  pending piece:      ${pendingPieceId}`);
 console.log(`    performer's note: ${noteId}   (awaiting approval)`);
@@ -196,12 +327,28 @@ if (publishedPieceId !== pendingPieceId) {
 } else {
   console.log('  (only one piece in catalog — skipped published fixtures)');
 }
-console.log('  contributor: haji@local.test / hajilocal');
-console.log('  staff:       staff@local.test / stafflocal');
+if (preludeId) {
+  console.log(`  landmarks on ${LANDMARK_PIECE_ID} Prélude:`);
+  console.log(`    haji landmark:    ${hajiLandmarkId}   (m. 1-4, +1, top of stack)`);
+  console.log(`    ben landmark:     ${benLandmarkId}   (m. 1-4, -1, cycle target)`);
+  if (preludeMovementEdited) {
+    console.log(`    movement edit:    Prélude tempo_indication set (history row created)`);
+  } else {
+    console.log(`    movement edit:    skipped (Prélude tempo already set)`);
+  }
+} else {
+  console.log(`  landmarks: skipped — ${LANDMARK_PIECE_ID} Prélude not found in movements`);
+}
+console.log('  contributors: haji@local.test / hajilocal, ben@local.test / benlocal');
+console.log('  staff:        staff@local.test / stafflocal');
 console.log('\nNext:');
 console.log('  1. bun run dev:local');
 console.log('  2. Sign in as haji@local.test / hajilocal (use scripts/magic-link.ts if needed)');
 console.log(`  3. Bell should show 3; queue at /notifications has three distinct kickers`);
 if (publishedPieceId !== pendingPieceId) {
   console.log(`  4. Visit /piece/${publishedPieceId} — schools grid (2-col) + signed essay render live`);
+}
+if (preludeId) {
+  console.log(`  5. Visit /piece/${LANDMARK_PIECE_ID} — Prélude shows two stacked landmarks (Haji on top, cycle to Ben)`);
+  console.log(`  6. Visit /piece/${LANDMARK_PIECE_ID}/change-log — Prélude rename + landmark publishes appear in the feed`);
 }

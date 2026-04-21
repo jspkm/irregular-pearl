@@ -4,22 +4,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ---
 
-## Data model (PRD Tier 1)
-
-### Slice C Step 9 — seed fixtures for stacked landmarks
-
-**What:** Seed two landmarks from different contributors at the same (or overlapping) measure range on the Bach Suite No. 1 Prélude so stacking is visible by default, plus one landmark with a realistic mix of flags and practice notes. Seed sample votes to prove the ordering path. Seed a movement edit history entry for at least one movement so the "View history" affordance has something to show.
-
-**Why:** Steps 1–8 shipped the pipeline end to end (schema, RPCs, UI, votes, stacking). Without fixtures, a fresh local stack renders every landmark section empty and the stacking pattern is invisible to reviewers and new contributors. Also unblocks visual QA of the stack cycle chevron.
-
-**Context:** Add to `scripts/seed-local-queue.ts` (or a sibling seed script) so `supabase start` + seed gives a piece page with live stacked landmarks. Ordering reads through `fetch_ordered_subjects`, so the sample votes must be cast via `cast_vote` (not raw inserts) to exercise the real path.
-
-**Effort:** S
-**Priority:** P2
-**Depends on:** Slice C Steps 1–8 (all shipped)
-
----
-
 ## Piece page (PRD Tier 1)
 
 ### Recordings CRUD UI (wiki-edit)
@@ -147,6 +131,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Slice C Step 9 — seed fixtures for stacked landmarks
+
+**What:** Extended [scripts/seed-local-queue.ts](scripts/seed-local-queue.ts) to seed a second contributor (Ben Cellist, `ben@local.test`), two landmarks from haji + ben at m. 1-4 of the Bach Suite No. 1 Prélude (haji's with two flags + two practice notes; ben's sparser), cross-votes via `cast_vote` (Haji +1, Ben −1) so the stack has a clear top, and a `tempo_indication` edit on the Prélude movement via `update_movement` to populate the change log + version history.
+
+**Why:** Closes Slice C end to end. Without fixtures, every fresh local stack rendered landmark sections empty and the stacking pattern was invisible to reviewers + new contributors. Also unblocks visual QA of the stack cycle chevron and the change-log feed.
+
+**Context:** Idempotent — landmarks hard-reset on each run (with their vote rows + version rows) so re-running doesn't accumulate; the movement edit only fires if the current tempo differs from the target so re-runs don't pile up history. Verified end to end: published landmarks visible, vote tallies show net +1 / -1, movement_versions has v1 (initial seed) + v2 (the tempo edit).
+
+**Effort:** S
+**Priority:** P2
+**Completed:** 2026-04-21
 
 ### Slice C Step 8 — Structural landmarks UI on piece pages
 
