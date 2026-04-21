@@ -4,6 +4,19 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Added (profile sidebar + appearance settings)
+
+- **Profile page now hosts a sidebar shell for signed-in owners.** Clicking the navbar avatar opens `/profile/:id`; for the owner, a new left vertical nav ([ProfileShell.tsx](src/components/ProfileShell.tsx)) — Profile / Setting / Logout — wraps the existing `ArtistProfile`. Anonymous or other-user views render the single-column profile unchanged (no sidebar leaks).
+- **Setting → Appearance** picks between Light / System / Dark ([AppearanceSettings.tsx](src/components/AppearanceSettings.tsx)) with three SVG preview cards (System shown as a diagonal split so both palettes are visible). Choice persists in `localStorage.theme`, and a pre-paint inline script in [Layout.astro](src/layouts/Layout.astro) applies `html[data-theme="dark"]` before render to avoid flash-of-wrong-theme.
+- **Logout** calls `supabase.auth.signOut()` (new `signOut` in [useAuth.ts](src/lib/useAuth.ts)) and redirects to `/`.
+- **Profile header matches the navbar.** Swapped the initials-in-cream-circle avatar stub for the same `GenerativeAvatar` the navbar uses, and derive the display name the same way (`email.split('@')[0]` when no full name is set).
+
+### Changed (design tokens + dark mode)
+
+- **Dark mode shipped as opt-in.** Supersedes the 2026-03-28 "no dark mode in Phase 1" decision recorded in DESIGN.md. Light stays the default; System follows `prefers-color-scheme`. Palette under `html[data-theme="dark"]` in [global.css](src/styles/global.css) is provisional — derived by inverting the light neutrals and lightening the purple accent; a proper dark kit pass is deferred.
+- **`accent-soft` softened** from `#F2EEF5` → `#F4F3F5`. Active sidebar items were reading as an obvious lavender pill; the new value keeps the accent family but sits close to neutral grey. Applied globally via the `--color-accent-soft` / `--color-accent-light` / `--accent-soft` tokens — every selected / soft-accent surface moves with it.
+- **Piece-page cards adapt to the theme.** `.diff-panel`, `.school`, `.ed` in [piece-page.css](src/styles/piece-page.css) moved from `background: #fff` to `background: var(--bg)` so the difficulty panel, interpretive schools, and editions list render on the dark surface instead of punching through as white cards. Other components still using hardcoded hex will need per-surface migration as they're touched.
+
 ### Changed (contributor pipeline — Slice C governance)
 
 - **Any registered user can now self-author signed content** on a piece: performer's notes, interpretive schools, and signed piece descriptions. Prior posture (Slice A → B) gated every self-publish and approval-queue RPC on a `users.is_contributor` flag granted out-of-band via `scripts/seed-contributor.ts` — in practice, exactly one user. Per PRD rev 2 and [PLAN-contributor-pipeline-slice-c.md](PLAN-contributor-pipeline-slice-c.md) §1.0, the flag is replaced by plain auth: if you have an account, you're an author. Draft-for-another-user (`create_*_draft`) stays admin/firstchair-only, but the draftee can now be any registered user. The `is_contributor` / `contributor_active` columns remain in the schema as an unused editorial marker — a follow-up cleanup will drop them once nothing else references them.

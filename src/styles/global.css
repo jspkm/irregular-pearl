@@ -25,11 +25,11 @@
 
   /* Accent — purple, used sparingly */
   --color-accent: #6B4E7C;
-  --color-accent-soft: #F2EEF5;
+  --color-accent-soft: #F4F3F5;
   /* Legacy tailwind class names kept as aliases so existing components
      that reference bg-accent-light / bg-accent-hover continue to resolve. */
   --color-accent-hover: #4C385C;
-  --color-accent-light: #F2EEF5;
+  --color-accent-light: #F4F3F5;
   --color-accent-border: #D9CCE1;
   --color-star: #6B4E7C;
 
@@ -67,7 +67,7 @@
 
   /* Accent */
   --accent: #6B4E7C;
-  --accent-soft: #F2EEF5;
+  --accent-soft: #F4F3F5;
 
   /* Semantic */
   --warning: #8B6914;
@@ -135,6 +135,55 @@
   /* Layout */
   --content-max-editorial: 960px;
   --content-max-catalog: 1100px;
+}
+
+/* =========================================================================
+   Dark theme — opt-in via html[data-theme="dark"]
+   Provisional palette derived from the light tokens; DESIGN.md defers dark
+   mode to Phase 2, so refine when the dark kit is authored.
+   ========================================================================= */
+
+html[data-theme="dark"] {
+  --color-bg: #1A1A1A;
+  --color-bg-tint: #242320;
+  --color-surface: #1F1F1F;
+  --color-ink: #F0EFEC;
+  --color-muted: #A8A6A0;
+  --color-tertiary: #77756F;
+  --color-border: #3A3732;
+  --color-border-strong: #524E47;
+  --color-accent: #B299C4;
+  --color-accent-soft: #2A2230;
+  --color-accent-hover: #D6C2E3;
+  --color-accent-light: #2A2230;
+  --color-accent-border: #4A3B56;
+  --color-star: #B299C4;
+  --color-success: #7FC592;
+  --color-success-bg: #1E2E22;
+  --color-error: #E38A8A;
+  --color-error-bg: #3A1F1F;
+  --color-warning: #D9B878;
+  --color-warning-bg: #332A18;
+  --color-info: #8FB0E0;
+  --color-info-bg: #1B2536;
+
+  --ink: #F0EFEC;
+  --muted: #A8A6A0;
+  --tertiary: #77756F;
+  --bg: #1A1A1A;
+  --bg-tint: #242320;
+  --border: #3A3732;
+  --border-strong: #524E47;
+  --accent: #B299C4;
+  --accent-soft: #2A2230;
+  --warning: #D9B878;
+  --warning-soft: #332A18;
+  --info: #8FB0E0;
+  --info-soft: #1B2536;
+  --success: #7FC592;
+  --success-soft: #1E2E22;
+  --danger: #E38A8A;
+  --danger-soft: #3A1F1F;
 }
 
 html {

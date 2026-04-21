@@ -1,11 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import ArtistProfile from '../../components/ArtistProfile';
+import ProfileShell from '../../components/ProfileShell';
 
 const { id } = Astro.params;
 ---
 <Layout title="Artist Profile">
   <Navbar />
-  <ArtistProfile userId={id!} client:load />
+  <ProfileShell userId={id!} client:load />
 </Layout>

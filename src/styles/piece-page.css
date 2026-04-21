@@ -17,7 +17,7 @@ h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--mut
 .pill { font-size: 12px; padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); border: 0.5px solid var(--border); }
 
 /* ---------- Four-axis difficulty panel (PRD) ---------- */
-.diff-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 24px; margin-bottom: 48px; background: #fff; }
+.diff-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 24px; margin-bottom: 48px; background: var(--bg); }
 @media (max-width: 1024px) {
   .diff-panel { grid-template-columns: repeat(2, 1fr); gap: 20px 24px; }
 }
@@ -435,7 +435,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 
 /* ---------- Interpretive schools (plural, signed) ---------- */
 .schools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.school { background: #fff; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 22px; }
+.school { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 22px; }
 .school .name { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin-bottom: 8px; }
 .school .prose { font-family: var(--font-serif); font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 14px; }
 .school .tempi { font-family: var(--font-mono); font-size: 11px; color: var(--muted); line-height: 1.7; padding-top: 10px; border-top: 0.5px solid var(--border); margin-bottom: 12px; }
@@ -447,7 +447,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 /* ---------- Editions — comparison-first ---------- */
 .editions-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
 .ed-list { display: flex; flex-direction: column; gap: 12px; }
-.ed { background: #fff; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 18px 22px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; transition: border-color 100ms ease-out; }
+.ed { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 18px 22px; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start; transition: border-color 100ms ease-out; }
 .ed:hover { border-color: var(--accent); }
 .ed h3 { font-family: var(--font-serif); font-size: 17px; font-weight: 500; margin: 0 0 4px; }
 .ed .meta { font-size: 13px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; }
