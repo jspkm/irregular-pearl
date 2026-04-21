@@ -60,9 +60,9 @@ export default function AuthButton() {
             Admin
           </a>
         )}
-        {userRole === 'firstchair' && (
-          <a href="/firstchair/reports" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
-            First Chair
+        {userRole === 'moderator' && (
+          <a href="/moderator/reports" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
+            Moderator
           </a>
         )}
         <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
