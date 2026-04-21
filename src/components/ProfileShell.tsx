@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/useAuth';
 import ArtistProfile from './ArtistProfile';
 import AppearanceSettings from './AppearanceSettings';
@@ -9,6 +9,13 @@ export default function ProfileShell({ userId }: { userId: string }) {
   const { user, signOut } = useAuth();
   const isOwnProfile = user?.id === userId;
   const [section, setSection] = useState<Section>('profile');
+  const [confirmLogout, setConfirmLogout] = useState(false);
+
+  useEffect(() => {
+    if (!confirmLogout) return;
+    const t = setTimeout(() => setConfirmLogout(false), 10_000);
+    return () => clearTimeout(t);
+  }, [confirmLogout]);
 
   if (!isOwnProfile) {
     return <ArtistProfile userId={userId} />;
@@ -28,10 +35,34 @@ export default function ProfileShell({ userId }: { userId: string }) {
             active={section === 'setting'}
             onClick={() => setSection('setting')}
           />
-          <SidebarItem
-            label="Logout"
-            onClick={signOut}
-          />
+          {confirmLogout ? (
+            <span
+              role="alertdialog"
+              className="text-sm px-3 py-2 rounded border border-border flex items-center gap-2"
+            >
+              <span className="text-ink">Log out?</span>
+              <button
+                type="button"
+                onClick={signOut}
+                className="text-accent underline underline-offset-2 hover:text-accent-dark"
+              >
+                Yes
+              </button>
+              <span className="text-muted">/</span>
+              <button
+                type="button"
+                onClick={() => setConfirmLogout(false)}
+                className="text-muted underline underline-offset-2 hover:text-ink"
+              >
+                No
+              </button>
+            </span>
+          ) : (
+            <SidebarItem
+              label="Logout"
+              onClick={() => setConfirmLogout(true)}
+            />
+          )}
         </nav>
       </aside>
 

@@ -4,6 +4,11 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- **Navbar search icon.** The search input in [Navbar.astro](src/components/Navbar.astro) (desktop and mobile overlay) picked up a persistent magnifying-glass glyph flush-left at 16px, with `pl-9` on the input so the cursor and typed text don't collide with the icon. Drop shadow on the input dropped from `shadow-md` to `shadow-sm` — quieter in the museum-catalog register. The `"Search pieces, composers..."` placeholder text is gone; `aria-label="Search"` keeps the input announced to screen readers.
+- **Profile sidebar logout now asks for confirmation.** Clicking "Logout" in [ProfileShell.tsx](src/components/ProfileShell.tsx) replaces the sidebar row with an inline `Log out? · Yes / No` chip (matching the existing confirm pattern from movements / editions / landmarks / pedagogical), with `role="alertdialog"` for screen readers. If the user doesn't confirm within 10 seconds, the chip auto-dismisses and the user stays signed in — the timer clears on mount/unmount. No native `confirm()` dialog, per the "no native dialogs" rule.
+
 ## [0.3.0] — 2026-04-21
 
 Recordings and the pedagogical arc joined the wiki-edit family — any signed-in user can add, edit, reorder, or remove a recording or a prepare-with / natural-next connection, same end-of-row controls movements + editions + external references already had. A new piece picker autocompletes the catalog for the pedagogical-arc add/edit forms. The unsigned seed description (the default copy each piece carries before a signed description lands) is now voteable via a new `pieces_seed_description` virtual subject on the votes table. A pass of UI polish: empty-state paragraphs removed across every wiki-edit surface, control clusters aligned flush with content instead of floating to the row's right edge, signed-description byline split into left user-info + right control cluster, flag-pill hover legend shows the three severities as colored pills, and a celebration animation fires on thumbs-up (scale bounce + success-colored glow) that `prefers-reduced-motion` honors. A fix for a long-standing seed script bug: `supabase/seed.ts` was silently failing past the first edition or link per piece because it never set `ordinal` after Slice C Step 4 added the partial unique index.
