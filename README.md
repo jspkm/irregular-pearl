@@ -143,6 +143,7 @@ public/
 - [DESIGN.md](./DESIGN.md) — design system: tokens, typography, components, voice.
 - [TODOS.md](./TODOS.md) — tracked work, sorted by priority.
 - [CHANGELOG.md](./CHANGELOG.md) — what shipped, when.
+- [VERSION.md](./VERSION.md) — current version, history, and how to cut a release.
 - [PLAN-contributor-pipeline-slice-a.md](./PLAN-contributor-pipeline-slice-a.md) — reference implementation plan for the contributor approval pipeline. Slice A shipped; Slices B and C reuse the same shape.
 - [PLAN-contributor-pipeline-slice-b.md](./PLAN-contributor-pipeline-slice-b.md) — Slice B plan: InterpretiveSchool + signed PieceDescription through the same pipeline, plus the notifications polymorphic pivot. Shipped in 6 rollout steps (PRs #42–#45).
 - [PLAN-contributor-pipeline-slice-c.md](./PLAN-contributor-pipeline-slice-c.md) — Slice C plan: landmark aggregate (landmark + nested flags + nested practice notes, versioned together), universal silent voting + stacking, wiki-edit movements, and the "any registered user === contributor" governance shift. Steps 1–8 shipped (PRs #48–#58); Step 9 (seed fixtures) remaining.
