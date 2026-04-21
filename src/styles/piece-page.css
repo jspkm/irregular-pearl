@@ -801,9 +801,9 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .owner-confirm-no:disabled { opacity: 0.55; cursor: default; }
 
 /* VoteThumbs — up/down affordance on signed content cards. Never renders
-   counts (plan §1.2). Active thumb uses success-emphasis (plan §7.3 /
-   §7.12) — NOT the brand purple, to avoid semantic collision with selected-
-   chrome. Placed at end of the byline row per user-feedback memory. */
+   counts (plan §1.2). Active thumb stays in the hint tone (--tertiary)
+   and leans on the filled-vs-outlined SVG to carry the state signal.
+   Placed at end of the byline row per user-feedback memory. */
 .vote-thumbs {
   display: inline-flex;
   align-items: center;
@@ -832,10 +832,10 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   outline-offset: 2px;
 }
 .vote-thumb.is-active {
-  color: var(--success);
+  color: var(--tertiary);
 }
 .vote-thumb.is-active:hover:not(:disabled) {
-  color: var(--success);
+  color: var(--tertiary);
   transform: scale(1.05);
 }
 .vote-thumbs.is-pending .vote-thumb { opacity: 0.6; cursor: progress; }
@@ -854,23 +854,23 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 @keyframes vote-thumb-celebrate {
   0% {
     transform: scale(1) translateY(0);
-    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--success) 0%, transparent));
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--tertiary) 0%, transparent));
   }
   25% {
     transform: scale(1.45) translateY(-4px) rotate(-8deg);
-    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--success) 90%, transparent));
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--tertiary) 90%, transparent));
   }
   55% {
     transform: scale(0.94) translateY(0) rotate(4deg);
-    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--success) 65%, transparent));
+    filter: drop-shadow(0 0 14px color-mix(in srgb, var(--tertiary) 65%, transparent));
   }
   80% {
     transform: scale(1.08) translateY(-1px) rotate(-2deg);
-    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--success) 35%, transparent));
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--tertiary) 35%, transparent));
   }
   100% {
     transform: scale(1) translateY(0) rotate(0);
-    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--success) 0%, transparent));
+    filter: drop-shadow(0 0 0 color-mix(in srgb, var(--tertiary) 0%, transparent));
   }
 }
 @media (pointer: coarse) {

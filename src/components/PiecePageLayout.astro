@@ -1,25 +1,24 @@
 ---
 // Piece page layout — ported from the Claude design kit, adapted for the
-// curated 19-piece catalog and the current schema. Uses the kit-namespace
-// CSS variables (see src/styles/global.css :root) via src/styles/piece-page.css.
+// curated catalog and the current schema. Uses the kit-namespace CSS
+// variables (see src/styles/global.css :root) via src/styles/piece-page.css.
 //
-// Sections present now (wired to seed data):
+// All Tier 1 sections are wired to live data:
 //   - Breadcrumbs, piece header, metadata pills
-//   - Editions (seed.editions)
-//   - Recordings (derived from seed.external_links)
-//
-// Sections with empty states (schema not yet built per TODOS.md):
-//   - Performer's notes (plural signed — needs performers_notes schema)
-//   - Structural landmarks + flags (needs landmarks + flags schema)
-//   - Interpretive schools (needs interpretive_schools schema)
-//   - Pedagogical arc (needs prepare-with / natural-next schema)
-//   - Four-axis difficulty panel (needs per-axis scoring — shown as single pill in header for now)
-//
-// Empty-state copy follows the feedback-memory rule: state, not philosophy.
+//   - Signed piece descriptions (stack: user-authored + unsigned seed)
+//   - Signed four-axis difficulty (stack: user ratings + seed from difficulty-axes.ts)
+//   - Performer's notes (plural signed, ordered by net_score)
+//   - Structural landmarks + flags + practice notes (grouped by movement)
+//   - Interpretive schools (plural signed)
+//   - Editions (wiki-edit)
+//   - Recordings (wiki-edit, per-row iframe disclosure)
+//   - Pedagogical arc (prepare-with / natural-next, wiki-edit)
+//   - External references (IMSLP / Wikipedia, wiki-edit)
+//   - Change log link (per-piece chronological feed)
 
 import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
-import { difficultyAxes, type DifficultyAxis } from '../data/difficulty-axes';
+import { difficultyAxes } from '../data/difficulty-axes';
 import { getPublishedPerformersNotes } from '../lib/performersNotes';
 import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
@@ -27,9 +26,11 @@ import { fetchMovementsForPiece } from '../lib/movements';
 import { getPublishedLandmarksForPiece, groupLandmarksByMovement } from '../lib/landmarks';
 import { fetchOrderedSubjects, fetchSeedDescriptionVoteId } from '../lib/votes';
 import { fetchEditionsForPiece } from '../lib/editions';
+import { getPublishedPieceDifficultyRatings, fetchSeedDifficultyVoteId } from '../lib/pieceDifficulty';
 import PerformersNotes from './PerformersNotes';
 import InterpretiveSchools from './InterpretiveSchools';
 import SignedPieceDescription from './SignedPieceDescription';
+import SignedPieceDifficulty from './SignedPieceDifficulty';
 import MovementsList from './MovementsList';
 import RecordingsList from './RecordingsList';
 import EditionsList from './EditionsList';
@@ -43,7 +44,7 @@ interface Props {
 }
 
 const { piece } = Astro.props;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
@@ -54,16 +55,19 @@ const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMove
   fetchPedagogicalConnections(piece.id),
   fetchAllPiecesForPicker(),
   fetchSeedDescriptionVoteId(piece.id),
+  getPublishedPieceDifficultyRatings(piece.id),
+  fetchSeedDifficultyVoteId(piece.id),
 ]);
 const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
 
 // Reorder signed content by vote_tallies.net_score DESC (tie-break by id)
 // via the fetch_ordered_subjects RPC. Never exposes raw counts.
-const [orderedNoteIds, orderedSchoolIds, orderedDescriptionIds] = await Promise.all([
+const [orderedNoteIds, orderedSchoolIds, orderedDescriptionIds, orderedDifficultyIds] = await Promise.all([
   fetchOrderedSubjects('performers_notes', performersNotesRaw.map((n) => n.noteId)),
   fetchOrderedSubjects('interpretive_schools', interpretiveSchoolsRaw.map((s) => s.schoolId)),
   fetchOrderedSubjects('piece_descriptions', signedDescriptionsRaw.map((d) => d.descriptionId)),
+  fetchOrderedSubjects('piece_difficulty_ratings', difficultyRatingsRaw.map((r) => r.ratingId)),
 ]);
 const performersNotes = orderedNoteIds
   .map((id) => performersNotesRaw.find((n) => n.noteId === id))
@@ -74,6 +78,9 @@ const interpretiveSchools = orderedSchoolIds
 const signedDescriptions = orderedDescriptionIds
   .map((id) => signedDescriptionsRaw.find((d) => d.descriptionId === id))
   .filter((d): d is NonNullable<typeof d> => d != null);
+const difficultyRatings = orderedDifficultyIds
+  .map((id) => difficultyRatingsRaw.find((r) => r.ratingId === id))
+  .filter((r): r is NonNullable<typeof r> => r != null);
 const seedMovements = (piece.movements ?? []).map((m) => ({
   name: m.name,
   key: m.key,
@@ -81,12 +88,6 @@ const seedMovements = (piece.movements ?? []).map((m) => ({
 }));
 const hasSignedDescription = signedDescriptions.length > 0;
 const axes = difficultyAxes[piece.id];
-const axisOrder: Array<{ key: keyof typeof axes; label: string }> = [
-  { key: 'technical', label: 'Technical' },
-  { key: 'stamina', label: 'Stamina' },
-  { key: 'interpretive', label: 'Interpretive' },
-  { key: 'ensemble', label: 'Ensemble' },
-];
 
 const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
 
@@ -128,25 +129,17 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
   </section>
 
 
-  {axes && (
-    <div class="diff-panel">
-      {axisOrder.map(({ key, label }) => {
-        const a: DifficultyAxis = axes[key];
-        return (
-          <div class="diff-axis">
-            <div class="lab">{label}</div>
-            <div class="bars">
-              {[1, 2, 3, 4, 5].map(n => (
-                <span class={n <= a.level ? 'on' : ''}></span>
-              ))}
-            </div>
-            <div class="val">{a.label}</div>
-            <div class="note">{a.note}</div>
-          </div>
-        );
-      })}
-    </div>
-  )}
+  <section class="block" id="difficulty">
+    <div class="kicker">Difficulty</div>
+    <SignedPieceDifficulty
+      client:load
+      pieceId={piece.id}
+      initialRatings={difficultyRatings}
+      seedAxes={axes ?? null}
+      seedDifficultyVoteId={seedDifficultyVoteId}
+    />
+  </section>
+
 
   {/* ---------- Performer's notes ---------- */}
   <section class="block" id="performers-notes">

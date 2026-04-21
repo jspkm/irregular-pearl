@@ -6,8 +6,9 @@
 // Plural markup — typically one per piece, but supports N for plural-voice
 // expansion. Contributor affordances mirror InterpretiveSchools + PerformersNotes.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { useAuth } from '../lib/useAuth';
 import type { PublishedPieceDescription } from '../lib/pieceDescriptions';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
@@ -31,8 +32,7 @@ type StackItem =
   | { kind: 'user'; desc: PublishedPieceDescription }
   | { kind: 'seed'; body: string };
 
-interface Viewer {
-  userId: string | null;
+interface ViewerProfile {
   displayName: string | null;
   bioShort: string | null;
 }
@@ -40,8 +40,9 @@ interface Viewer {
 type Mode = null | 'write' | { action: 'edit'; descriptionId: string };
 
 export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription, seedDescriptionVoteId }: Props) {
+  const { user } = useAuth();
   const [descriptions, setDescriptions] = useState<PublishedPieceDescription[]>(initialDescriptions);
-  const [viewer, setViewer] = useState<Viewer | null>(null);
+  const [profile, setProfile] = useState<ViewerProfile>({ displayName: null, bioShort: null });
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,29 +60,28 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const prev = () => setStackIdx((i) => (stackItems.length === 0 ? 0 : (i - 1 + stackItems.length) % stackItems.length));
   const next = () => setStackIdx((i) => (stackItems.length === 0 ? 0 : (i + 1) % stackItems.length));
 
-  const loadViewer = useCallback(async () => {
-    if (!hasSupabase) { setViewer({ userId: null, displayName: null, bioShort: null }); return; }
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
-      setViewer({ userId: null, displayName: null, bioShort: null });
+  useEffect(() => {
+    let cancelled = false;
+    if (!hasSupabase || !user) {
+      setProfile({ displayName: null, bioShort: null });
       return;
     }
-
-    const { data } = await supabase
-      .from('users')
-      .select('display_name, contributor_bio_short')
-      .eq('id', session.user.id)
-      .single();
-
-    setViewer({
-      userId: session.user.id,
-      displayName: data?.display_name ?? null,
-      bioShort: data?.contributor_bio_short ?? null,
-    });
-  }, []);
-
-  useEffect(() => { void loadViewer(); }, [loadViewer]);
+    (async () => {
+      const { data } = await supabase
+        .from('users')
+        .select('display_name, contributor_bio_short')
+        .eq('id', user.id)
+        .single();
+      if (cancelled) return;
+      setProfile({
+        displayName: data?.display_name ?? null,
+        bioShort: data?.contributor_bio_short ?? null,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   async function refetch() {
     const { data } = await supabase
@@ -183,7 +183,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           {active?.kind === 'user' ? (
             (() => {
               const d = active.desc;
-              const isOwner = viewer?.userId === d.contributor.id;
+              const isOwner = user?.id === d.contributor.id;
               const isEditing = typeof mode === 'object' && mode?.action === 'edit' && mode.descriptionId === d.descriptionId;
               return (
                 <article className="description-essay desc-stack-top">
@@ -216,10 +216,10 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
                       </div>
                     </>
                   )}
-                  {isEditing && viewer && (
+                  {isEditing && user && (
                     <EssayEditForm
                       initial={d.body}
-                      contributor={{ name: viewer.displayName ?? d.contributor.displayName, bio: viewer.bioShort }}
+                      contributor={{ name: profile.displayName ?? d.contributor.displayName, bio: profile.bioShort }}
                       submitting={busy}
                       onCancel={() => { setMode(null); setError(null); }}
                       onSubmit={(body) => handleEdit(d.descriptionId, body)}
@@ -264,7 +264,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           type="button"
           onClick={() => {
             setError(null);
-            if (!viewer?.userId) { setSignInOpen(true); return; }
+            if (!user) { setSignInOpen(true); return; }
             setMode('write');
           }}
           className="write-entry"
@@ -272,12 +272,12 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           {writeLabel} &rarr;
         </button>
       )}
-      {mode === 'write' && viewer?.userId && (
+      {mode === 'write' && user && (
         <div className="mt-6 description-essay">
           <EssayEditForm
             initial=""
             placeholder="What is this piece, to you, as a working musician?"
-            contributor={{ name: viewer.displayName ?? 'You', bio: viewer.bioShort }}
+            contributor={{ name: profile.displayName ?? 'You', bio: profile.bioShort }}
             submitting={busy}
             onCancel={() => { setMode(null); setError(null); }}
             onSubmit={handleWrite}
@@ -304,7 +304,6 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           font-size: 17px;
           line-height: 1.72;
           color: var(--ink);
-          max-width: 640px;
           margin: 0 0 18px;
         }
         .description-essay .prose p { margin: 0 0 14px; }
@@ -313,7 +312,6 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           font-family: var(--font-sans);
           font-size: 13px;
           color: var(--ink);
-          max-width: 640px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -344,9 +342,8 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
         .description-essay .by span:not(.name):not(.dot) { color: var(--muted); }
         .desc-seed-vote {
           margin-top: 10px;
-          max-width: 640px;
           display: flex;
-          justify-content: flex-start;
+          justify-content: flex-end;
         }
         .write-entry {
           margin-top: 24px;
@@ -388,7 +385,6 @@ function EssayEditForm(props: {
         placeholder={props.placeholder}
         style={{
           width: '100%',
-          maxWidth: '640px',
           fontFamily: 'var(--font-serif)',
           fontSize: '17px',
           lineHeight: 1.72,
@@ -400,7 +396,7 @@ function EssayEditForm(props: {
           resize: 'vertical',
         }}
       />
-      <div style={{ marginTop: '12px', fontFamily: 'var(--font-sans)', fontSize: '13px', textAlign: 'right', maxWidth: '640px' }}>
+      <div style={{ marginTop: '12px', fontFamily: 'var(--font-sans)', fontSize: '13px', textAlign: 'right' }}>
         <span style={{ fontWeight: 500 }}>{props.contributor.name}</span>
         {props.contributor.bio && (
           <>

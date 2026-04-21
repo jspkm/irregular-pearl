@@ -24,7 +24,9 @@ export type VoteSubjectTable =
   | 'interpretive_schools'
   | 'piece_descriptions'
   | 'landmarks'
-  | 'pieces_seed_description';
+  | 'pieces_seed_description'
+  | 'piece_difficulty_ratings'
+  | 'pieces_seed_difficulty';
 
 interface Props {
   subjectTable: VoteSubjectTable;
