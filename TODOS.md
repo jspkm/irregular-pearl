@@ -120,17 +120,17 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Contributor pipeline (post-Slice-A)
 
-### Drop vestigial `notifications.performers_note_id` + remove dual-write
+### Drop vestigial `is_contributor` + `contributor_active` columns on `users`
 
-**What:** A cleanup migration that drops `notifications.performers_note_id` (nullable narrow FK kept vestigial during the Slice B polymorphic pivot) and removes the dual-write branches from Slice A's submit RPCs. After the drop, every notification row lives on `(subject_table, subject_id)` only.
+**What:** Cleanup migration to drop `users.is_contributor` and `users.contributor_active`. Both are now unused as gates — Slice C governance (PR #56, 20260513000000_open_self_authoring.sql) rewrote `_require_active_contributor()` to require only auth, and the 3 staff-drafts-for-other RPCs check only that the target user exists. The columns remain purely as an editorial marker that nothing reads.
 
-**Why:** Eng-review decision 1A deferred the drop out of Slice B so the pivot could ship without a destructive change riding with it. Once Slice B has one week of live traffic and no regressions, the vestigial column is load-bearing only to old rows — and those already have `(subject_table='performers_notes', subject_id=...)` populated via the dual-write.
+**Why:** The old flagged-contributor posture is gone — any registered user can self-author. Keeping vestigial columns invites regression (a future code path might re-adopt them). Dropping them makes the schema state match the governance state.
 
-**Context:** One migration file, one pass through the three performer's-notes submit RPCs to strip the `performers_note_id` insert. Tracked as a Slice C prerequisite so landmark notifications don't inherit the vestigial shape.
+**Context:** Audit `supabase/migrations/` and `src/` for any remaining `is_contributor` / `contributor_active` references before dropping. `scripts/seed-contributor.ts` currently sets them; keep the script but have it set only the bio fields and `role`. One migration, one script patch, grep sweep to verify zero runtime references.
 
 **Effort:** S
-**Priority:** P2
-**Depends on:** Slice B shipped + one week of live traffic
+**Priority:** P3
+**Depends on:** Slice C governance (shipped in #56)
 
 ### Diff block in NotificationsQueue
 
@@ -147,6 +147,42 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Open self-authoring to any registered user (Slice C governance relaxation)
+
+**What:** Rewrote `_require_active_contributor()` to require only `auth.uid() is not null` — 19 self-publish + approval-queue RPCs inherited the relaxation automatically. The 3 staff-draft-for-other RPCs dropped their "target must be flagged contributor" check in favor of "target must exist in public.users". On the UI side, the `canWrite` gate in [PerformersNotes.tsx](src/components/PerformersNotes.tsx), [InterpretiveSchools.tsx](src/components/InterpretiveSchools.tsx), and [SignedPieceDescription.tsx](src/components/SignedPieceDescription.tsx) dropped the `isContributor` check; write entries render unconditionally; anon click opens `SignInPanel` (shared pattern with MovementsList / EditionsList / VoteThumbs).
+
+**Why:** PRD rev 2 and [PLAN-contributor-pipeline-slice-c.md §1.0](PLAN-contributor-pipeline-slice-c.md) moved the site from "one-flagged-contributor" to "any-registered-user === contributor". Slice C Step 1 (#48) shipped the cleanup half; this PR ships the governance half. Ownership is still enforced inside each edit/remove RPC via `where contributor_id = auth.uid()`, so relaxing the caller gate doesn't let user A edit user B's row.
+
+**Context:** One migration ([20260513000000_open_self_authoring.sql](supabase/migrations/20260513000000_open_self_authoring.sql)), three React components, three integration tests flipped from "normal user cannot publish" to "any registered user can publish" (with `contributor_id + status` verification). `users.is_contributor` + `contributor_active` columns remain in the schema as an unused editorial marker — tracked as P3 follow-up above.
+
+**Effort:** S
+**Priority:** P1
+**Completed:** 2026-04-20 (PR #56)
+
+### Backfill seed movements so wiki-edit renders
+
+**What:** Hotfix migration ([20260512000000_backfill_seed_movements.sql](supabase/migrations/20260512000000_backfill_seed_movements.sql)) that inserts the 69 seed movements across 18 pieces plus their version-1 rows. Slice C Step 2 (#51) shipped the `movements` table as schema-only with population deferred to `bun run supabase/seed.ts`; CI applies migrations but never ran seed.ts, so production's table stayed empty and every piece page fell back to the read-only `seedMovements` branch in [MovementsList.tsx](src/components/MovementsList.tsx). The pencil / ↑↓ / × controls never appeared anywhere.
+
+**Why:** Surface bug — the wiki-edit capability shipped in #52 was invisible in production. Fix had to be self-applying (CI auto-apply) rather than a manual seed run so every env stays correct.
+
+**Context:** Temp table with the 69 literal rows, three DML statements (CTE races made a single `WITH ... UPDATE` return `UPDATE 0` on first try, split explicitly), fully idempotent via `NOT EXISTS (piece_id, ordinal) WHERE deleted_at IS NULL` — safe to re-run, cannot overwrite any movement a user edited between deploys.
+
+**Effort:** S
+**Priority:** P0 (live bug)
+**Completed:** 2026-04-20 (PR #55)
+
+### Drop vestigial `notifications.performers_note_id` + remove dual-write (Slice C Step 1)
+
+**What:** Post-Slice-B cleanup migration ([20260426000000_drop_vestigial_performers_note_id.sql](supabase/migrations/20260426000000_drop_vestigial_performers_note_id.sql)) that dropped the narrow FK column kept vestigial during the polymorphic pivot, plus a sweep through the three performer's-notes submit RPCs to strip the `performers_note_id` insert. Every notification row now lives on `(subject_table, subject_id)` only.
+
+**Why:** The Slice B pivot landed dual-write so existing rows kept working during the vestigial window. Once both codepaths resolved cleanly, the column became pure scaffolding and blocked clean landmark notifications in Slice C.
+
+**Context:** One migration, one RPC sweep. Shipped as Slice C Step 1 (PR #48) before any of the subsequent movements / voting / wiki-edit work.
+
+**Effort:** S
+**Priority:** P2
+**Completed:** 2026-04-20 (PR #48)
 
 ### Contributor approval pipeline — Slice B (InterpretiveSchool + signed PieceDescription)
 
