@@ -4,6 +4,16 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Added (contributor pipeline — Slice C landmarks)
+
+- **Structural landmarks now render on every piece page.** New [StructuralLandmarks.tsx](src/components/StructuralLandmarks.tsx) island groups published landmarks by movement and shows each one with its measure range, label, signed contributor byline in the footer, vote thumbs, colored flag pills (informational / notable / significant), and inline practice notes in the DESIGN.md signed-notes pattern. Owners see edit + delete affordances on their own cards; anyone signed in can vote; anon click on a write affordance opens the shared sign-in panel. Wired into [PiecePageLayout.astro](src/components/PiecePageLayout.astro). Page-load reads centralized in [src/lib/landmarks.ts](src/lib/landmarks.ts).
+- **Landmark aggregate as a single signed subject.** New tables `landmarks` + `landmark_versions` with the same six-audit-column trail and append-only versioning Slice A and B established. Flags and practice notes ride inside the versioned payload as JSONB, so every approve / reject / retract / remove transition acts atomically on the whole landmark and its children. CHECK enforces array shape and length; an `_validate_landmark_payload` helper enforces per-element rules CHECK can't (enum values, body length 1..4000). Code-defined `flag_type` and `flag_severity` enums lock the PRD vocabulary in place. RLS matches the rest of the pipeline: public reads published, owner sees drafts, staff sees all. Notifications subject_table CHECK widened to include `'landmarks'`; the polymorphic pivot picks up the new subject for free. Full design in [PLAN-contributor-pipeline-slice-c.md](PLAN-contributor-pipeline-slice-c.md).
+- **10 new security-definer RPCs** for the landmark family — self-author (`publish_contributor_landmark`, `publish_contributor_landmark_edit`, `remove_landmark`), staff-drafted (`create_landmark_draft`, `update_landmark_draft`, `submit_landmark`, `retract_landmark`), and contributor approval (`approve_landmark`, `approve_and_edit_landmark`, `reject_landmark`). Reuse the same governance posture relaxed in #56 (`_require_active_contributor` = any authenticated user; `_require_staff` still gates draft-for-another-user). Rate limits ride the existing `_check_rate_limit` infra: 30/hr on publish + edit, 20/hr on staff submit.
+
+### Changed (piece page — confirm chip)
+
+- **Confirm chips unified across movements, editions, and landmarks.** Inline destructive confirms (rename, delete, retract) now share a single subtle pill outline with underlined Yes / No text links. Replaces the per-component visual treatments that drifted as wiki-edit shipped across surfaces. See [docs/screenshots/confirm-pill.png](docs/screenshots/confirm-pill.png).
+
 ### Added (profile sidebar + appearance settings)
 
 - **Profile page now hosts a sidebar shell for signed-in owners.** Clicking the navbar avatar opens `/profile/:id`; for the owner, a new left vertical nav ([ProfileShell.tsx](src/components/ProfileShell.tsx)) — Profile / Setting / Logout — wraps the existing `ArtistProfile`. Anonymous or other-user views render the single-column profile unchanged (no sidebar leaks).

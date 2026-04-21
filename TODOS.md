@@ -6,17 +6,17 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Data model (PRD Tier 1)
 
-### Contributor pipeline — Slice C (landmarks + PracticeNote + flags)
+### Slice C Step 9 — seed fixtures for stacked landmarks
 
-**What:** Add `landmarks` (movement, measure range, label, ordinal), `flags` (controlled vocabulary, severity, instrument specificity), and `practice_notes` (signed prose attached to landmarks). PracticeNotes route through the Slice A pipeline; landmarks + flags are editorially-owned structural data (not contributor-signed per-row).
+**What:** Seed two landmarks from different contributors at the same (or overlapping) measure range on the Bach Suite No. 1 Prélude so stacking is visible by default, plus one landmark with a realistic mix of flags and practice notes. Seed sample votes to prove the ordering path. Seed a movement edit history entry for at least one movement so the "View history" affordance has something to show.
 
-**Why:** Landmarks is "the densest information surface on the piece page and the place where the site's expertise is most visibly load-bearing" (PRD). Without these entities there is no Tier 1 piece page.
+**Why:** Steps 1–8 shipped the pipeline end to end (schema, RPCs, UI, votes, stacking). Without fixtures, a fresh local stack renders every landmark section empty and the stacking pattern is invisible to reviewers and new contributors. Also unblocks visual QA of the stack cycle chevron.
 
-**Context:** Flag vocabulary is governed by the Editorial Director per PRD — start with the PRD list (stamina, bow control, stretch, voicing, double stops, sustained bowing, articulation, rhythmic lift, intonation, ensemble coordination) and keep it as a code-defined enum, not a user-editable table. Signed practice notes reuse Slice A's pipeline — the approval queue and bell already show "a draft awaits your review" for any subject type added to the `notification_type` enum.
+**Context:** Add to `scripts/seed-local-queue.ts` (or a sibling seed script) so `supabase start` + seed gives a piece page with live stacked landmarks. Ordering reads through `fetch_ordered_subjects`, so the sample votes must be cast via `cast_vote` (not raw inserts) to exercise the real path.
 
-**Effort:** L
-**Priority:** P1
-**Depends on:** Slice A (shipped), Slice B (shipped)
+**Effort:** S
+**Priority:** P2
+**Depends on:** Slice C Steps 1–8 (all shipped)
 
 ---
 
@@ -52,13 +52,13 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 **What:** Restructure the piece page into the sections PRD describes: header + difficulty panel, signed performer's notes, structural landmarks with flags and practice notes, interpretive schools grid, editions with passage comparison, recordings around landmark tempi, pedagogical arc.
 
-**Why:** The Claude-kit port (v0.1.0) stood up the 9-section shell and Slices A + B lit up signed performer's notes, interpretive schools, and signed piece descriptions with real data. Still missing: structural landmarks + flags + practice notes (Slice C), edition passage comparison, recordings-around-landmark-tempi wiring, and the pedagogical arc. It is the atomic surface of the product per PRD.
+**Why:** The Claude-kit port (v0.1.0) stood up the 9-section shell and Slices A + B lit up signed performer's notes, interpretive schools, and signed piece descriptions with real data. Slice C added structural landmarks with flags + practice notes + votes + stacking, and wiki-edit movements. Still missing: edition passage comparison, recordings-around-landmark-tempi wiring, and the pedagogical arc UI (schema + RPCs already shipped). It is the atomic surface of the product per PRD.
 
 **Context:** One responsive page, not two. Content, ordering, and hierarchy shared across viewports; narrow viewports reflow multi-column sections into stacks. Cold-start to structural landmarks under one second on a three-year-old phone on cellular is a Tier 1 perf target. Use `/design-shotgun` or `@agent-designer` to generate layout mockups honoring DESIGN.md tokens before coding.
 
-**Effort:** L
-**Priority:** P1
-**Depends on:** Structural landmarks + flags schema (Slice C)
+**Effort:** M
+**Priority:** P2
+**Depends on:** None (landmarks shipped in Slice C)
 
 ### Edition comparison at measure level
 
@@ -147,6 +147,30 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Completed
+
+### Slice C Step 8 — Structural landmarks UI on piece pages
+
+**What:** New [StructuralLandmarks.tsx](src/components/StructuralLandmarks.tsx) island renders published landmarks grouped by movement, with measure range, label, signed contributor footer, vote thumbs, colored flag pills (informational / notable / significant), and inline practice notes in the DESIGN.md signed-notes pattern. Owner-only edit + delete affordances per card; stacking inline when more than one author lands at the same measure range. Page-load reads in [src/lib/landmarks.ts](src/lib/landmarks.ts). Wired into [PiecePageLayout.astro](src/components/PiecePageLayout.astro). Confirm chips across [MovementsList.tsx](src/components/MovementsList.tsx), editions, and landmarks unified into a single subtle pill outline with underlined Yes / No links.
+
+**Why:** Closes the Tier 1 piece page redesign for landmarks — the densest information surface per PRD, the section the rest of the page was waiting on.
+
+**Context:** Stack rendering ships inline inside `StructuralLandmarks` rather than as a separate `LandmarkStack.tsx` (the plan called for two files; one component was cleaner). 436-line component covers SSR + island augmentation + edit/create modes + inline confirm. Companion CSS expansion in [src/styles/piece-page.css](src/styles/piece-page.css) (+391 lines) carries flag-pill colors, stack chevron, and the unified confirm chip.
+
+**Effort:** M
+**Priority:** P1
+**Completed:** 2026-04-21 (PR #58)
+
+### Slice C Step 7 — Landmark aggregate schema + 10 RPCs
+
+**What:** Lands the LandmarkPacket aggregate as a single signed subject. Tables `landmarks` + `landmark_versions` ([20260514000000_contributor_pipeline_slice_c_landmarks.sql](supabase/migrations/20260514000000_contributor_pipeline_slice_c_landmarks.sql)) carry the same six-audit-column trail and append-only versioning Slices A and B established. Flags and practice notes ride inside the versioned payload as JSONB so every approve / reject / retract / remove transition acts atomically on the whole landmark and its children. CHECK enforces array shape and length; `_validate_landmark_payload` enforces per-element rules CHECK can't (enum values, body length 1..4000). Code-defined `flag_type` and `flag_severity` enums lock the PRD vocabulary in place. Notifications subject_table CHECK widened to include `'landmarks'`; the polymorphic pivot picks up the new subject for free. 10 RPCs ([20260515000000_contributor_pipeline_slice_c_landmark_rpcs.sql](supabase/migrations/20260515000000_contributor_pipeline_slice_c_landmark_rpcs.sql)): self-author (`publish_contributor_landmark` + `_edit` + `remove_landmark`), staff-drafted (`create_landmark_draft`, `update_landmark_draft`, `submit_landmark`, `retract_landmark`), contributor approval (`approve_landmark`, `approve_and_edit_landmark`, `reject_landmark`).
+
+**Why:** Closes the Slice C data-model gap. With the schema + RPCs in place, Step 8 (UI) became a thin React layer over the same RPC + RLS surface Slices A and B already proved.
+
+**Context:** Verified via `supabase db reset` + full state-machine smoke test: self-publish, edit, payload validation (bad flag enum, over-cap practice notes, invalid measure_start), soft-remove, staff draft → submit (notification appears) → contributor approve (notification cleared). Rate limits reuse `_check_rate_limit` + `rate_limit_log` from the movements wiki infra: 30/hr on publish + edit, 20/hr on staff submit. Governance-aligned with #56: `_require_active_contributor` = any authenticated user; `_require_staff` still gates draft-for-another-user.
+
+**Effort:** M
+**Priority:** P1
+**Completed:** 2026-04-20
 
 ### Profile sidebar + Settings (Appearance theme picker) + Logout
 
