@@ -284,12 +284,12 @@ export default function NotificationsQueue() {
   }
 
   if (status === 'loading') {
-    return <div className="text-sm text-muted font-body">Loading your queue…</div>;
+    return <div className="text-sm text-muted font-body">Loading…</div>;
   }
   if (status === 'unauthed') {
     return (
       <div className="font-body">
-        <h1 className="text-2xl font-display text-ink mb-3">Your queue</h1>
+        <h1 className="text-2xl font-display text-ink mb-3">Messages</h1>
         <p className="text-sm text-muted">You need to be signed in to see your approval queue.</p>
       </div>
     );
@@ -297,7 +297,7 @@ export default function NotificationsQueue() {
   if (status === 'not-contributor') {
     return (
       <div className="font-body">
-        <h1 className="text-2xl font-display text-ink mb-3">Your queue</h1>
+        <h1 className="text-2xl font-display text-ink mb-3">Messages</h1>
         <p className="text-sm text-muted">
           The queue is for signed contributors. If you think you should have access, reach out to the
           Editorial Director.
@@ -308,7 +308,7 @@ export default function NotificationsQueue() {
 
   return (
     <div className="font-body">
-      <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Your queue</h1>
+      <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Messages</h1>
       <p className="text-sm text-muted mb-8">
         Drafts waiting for your review. Approve as-is, edit and then approve, or send back with a note.
       </p>
