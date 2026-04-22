@@ -22,7 +22,13 @@ if (!piece) {
   return Astro.redirect('/');
 }
 
-const stub = isStub(piece);
+// A piece renders as a stub (pre-piece) when it has no signed content.
+// Users can override this by appending ?expand=1 to the URL — that's how
+// "Start the first contribution" routes them into the full writeable
+// layout without waiting for a published contribution. The underlying
+// data is identical; the CTA just decides which surface to render.
+const expand = Astro.url.searchParams.get('expand') === '1';
+const stub = !expand && isStub(piece);
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`

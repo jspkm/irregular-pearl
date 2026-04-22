@@ -26,7 +26,6 @@ import PiecePills from './PiecePills';
 import RequestContributionDialog from './RequestContributionDialog';
 import RecipientRibbon from './RecipientRibbon';
 import StartContributionButton from './StartContributionButton';
-import PerformersNotes from './PerformersNotes';
 
 interface Props {
   piece: PieceFull;
@@ -58,7 +57,7 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
     by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
   </p>
 
-  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
+  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly />
 
   <RecipientRibbon client:load pieceId={piece.id} />
 
@@ -71,7 +70,7 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
       or an interpretive school you'd defend in front of colleagues.
     </p>
     <div class="pp-cta-row">
-      <StartContributionButton client:load />
+      <StartContributionButton client:load pieceId={piece.id} />
       <RequestContributionDialog
         client:load
         pieceId={piece.id}
@@ -81,11 +80,6 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
         triggerClassName="pp-cta-ghost"
       />
     </div>
-  </section>
-
-  <section class="block" id="contribute">
-    <div class="kicker">Performer's notes</div>
-    <PerformersNotes client:load pieceId={piece.id} initialNotes={[]} />
   </section>
 </main>
 

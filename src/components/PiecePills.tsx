@@ -29,6 +29,12 @@ import type { Pill } from '../lib/piecePills';
 interface Props {
   pieceId: string;
   initialPills: Pill[];
+  /**
+   * Display-only mode: hides the + add affordance and the per-pill ×
+   * delete affordance. Used on the pre-piece (stub) page where no
+   * edit surfaces should appear until the viewer clicks the primary CTA.
+   */
+  readOnly?: boolean;
 }
 
 const CATEGORY_LABEL: Record<PillCategory, string> = {
@@ -39,7 +45,7 @@ const CATEGORY_LABEL: Record<PillCategory, string> = {
   difficulty: 'difficulty',
 };
 
-export default function PiecePills({ pieceId, initialPills }: Props) {
+export default function PiecePills({ pieceId, initialPills, readOnly = false }: Props) {
   const { user } = useAuth();
   const [pills, setPills] = useState<Pill[]>(initialPills);
   const [role, setRole] = useState<'user' | 'moderator' | 'admin' | null>(null);
@@ -198,17 +204,17 @@ export default function PiecePills({ pieceId, initialPills }: Props) {
         <PillChip
           key={pill.id}
           pill={pill}
-          deletable={canDelete(pill)}
+          deletable={!readOnly && canDelete(pill)}
           // Staff get a subtle dot cue on pills they cannot remove via the
           // user-source rule (i.e. seed and mod), so they know which were
           // staff-curated vs. drive-by user adds.
-          showStaffCue={isStaff && pill.source !== 'user'}
+          showStaffCue={!readOnly && isStaff && pill.source !== 'user'}
           busy={busy}
           onDelete={() => removePill(pill)}
         />
       ))}
 
-      {showAddButton && !pickerOpen && (
+      {!readOnly && showAddButton && !pickerOpen && (
         <button
           type="button"
           className="pill pill-add"
@@ -219,7 +225,7 @@ export default function PiecePills({ pieceId, initialPills }: Props) {
         </button>
       )}
 
-      {pickerOpen && (
+      {!readOnly && pickerOpen && (
         <span className="pill-picker" role="group" aria-label="Add pill">
           {pickerCategory == null ? (
             <>
