@@ -445,6 +445,7 @@ The entities below are the atomic units of the product. Relationships between th
 -   User library reflections are private by default. Publication requires an explicit user action, per reflection, with a visible signed byline, routed through the contributor approval pipeline.
 -   Revisions to PerformersNotes, InterpretiveSchools, and PracticeNotes are versioned. A contributor may request the current version be replaced or withdrawn; prior versions are retained for audit but removed from public view on request.
 -   A Notification is only generated when the recipient has a direct action to take (approve a draft, respond to an edit request). Notifications are not used for activity feeds, social signals, marketing, or system announcements. The type list is controlled by the Editorial Director.
+-   **Piece identity originates from the canonical index, not from human entry.** A `Piece` row is only ever created by a materialize action triggered when a logged-in user selects an entry from the `CanonicalPieceIndex`. The index itself is populated exclusively by an automated backend process (initial multi-source import + ongoing worker consuming the unmatched-query signal); no human-facing form or admin UI writes to the index. This removes the human-typed-title failure mode entirely: the humans typing names in the product (typeahead, search) are always selecting from a curated corpus, never authoring new piece metadata. The worker's scope is deliberately small — canonical title, native title, composer, catalog number, era, instrumentation, and movements when confidence is high; nothing editorial. Source set is restricted to providers that publish for programmatic consumption (MusicBrainz API, Wikidata SPARQL, IMSLP XML dumps, Wikipedia REST, VIAF). Bot-blocked sites and paywalled catalogs are excluded by design. An index entry is written when two independent sources agree on the core facts, or when a single authoritative source has high confidence; ambiguous entries are skipped and surfaced for human review.
 
 # **Part three: surfaces**
 
@@ -525,6 +526,7 @@ The Tier 1 comparison covers a handful of iconic passages per piece. Tier 2 exte
 -   A composer biography section expanded beyond what is performance-relevant. Wikipedia wins.
 -   A general concert events directory. Bachtrack wins.
 -   A music-theoretic analysis tool.
+-   A user-facing "add a piece to the catalog" form. Human entry of piece identity is the failure mode the canonical-index invariant exists to prevent. Users searching for a piece that isn't in the catalog leave a silent signal via unmatched-query logging; the automated worker consumes that signal to prioritize index growth.
 
 # **Appendix: using this document**
 
