@@ -269,33 +269,29 @@ export default function RequestContributionDialog({
                     onFocus={() => setSuggestOpen(true)}
                     onKeyDown={(e) => {
                       if (!suggestOpen || suggestions.length === 0) return;
-                      const soleMatch = suggestions.length === 1;
                       if (e.key === 'ArrowDown') {
                         e.preventDefault();
                         setActiveSuggestIdx((i) => Math.min(i + 1, suggestions.length - 1));
                       } else if (e.key === 'ArrowUp') {
                         e.preventDefault();
                         setActiveSuggestIdx((i) => Math.max(i - 1, 0));
-                      } else if (e.key === 'Enter') {
-                        e.preventDefault();
+                      } else if (e.key === 'Enter' || e.key === 'Tab' || e.key === ' ') {
+                        // Accept the active suggestion — which defaults to the
+                        // top-most row (activeSuggestIdx starts at 0 on every
+                        // query change). Arrow keys still reposition it if
+                        // the sender wants a different row.
+                        //
+                        // Enter / Space: preventDefault so the space/newline
+                        // doesn't land in the field. Tab: let default focus
+                        // movement proceed after accepting, so focus advances
+                        // to the note textarea.
                         const pick = suggestions[activeSuggestIdx];
-                        if (pick) {
-                          setUsername(pick.username);
-                          setSuggestOpen(false);
-                        }
-                      } else if (soleMatch && (e.key === 'Tab' || e.key === ' ')) {
-                        // Sole-match shortcut: when autocomplete has narrowed
-                        // to a single candidate, Tab and Space also accept
-                        // it (Enter handled above). Space would otherwise
-                        // be typed into the field; Tab proceeds to the next
-                        // field after selection.
-                        const pick = suggestions[0];
+                        if (!pick) return;
                         setUsername(pick.username);
                         setSuggestOpen(false);
-                        if (e.key === ' ') {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
                         }
-                        // Tab: don't preventDefault so focus moves naturally.
                       } else if (e.key === 'Escape') {
                         // Close suggestions without closing the modal.
                         e.stopPropagation();
