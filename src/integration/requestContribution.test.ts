@@ -498,7 +498,11 @@ describe('search_pieces_typeahead', () => {
     expect(data).toEqual([]);
   });
 
-  test('query >=6 chars with no matches logs to search_misses', async () => {
+  test('search_pieces_typeahead no longer auto-logs misses on its own', async () => {
+    // Per-keystroke logging was dropped — one typing session would
+    // produce 10+ near-duplicate rows. The client now calls
+    // log_search_miss on dismiss with zero matches. Verify the
+    // typeahead RPC alone doesn't touch search_misses.
     const { createClient } = await import('@supabase/supabase-js');
     const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
     const query = 'xqxqxqxq-not-a-real-piece';
@@ -508,6 +512,30 @@ describe('search_pieces_typeahead', () => {
       .from('search_misses')
       .select('query')
       .like('query', '%xqxqxq%');
-    expect(misses!.length).toBeGreaterThanOrEqual(1);
+    expect(misses!.length).toBe(0);
+  });
+
+  test('log_search_miss inserts when called explicitly (>=6 chars)', async () => {
+    const { createClient } = await import('@supabase/supabase-js');
+    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+    const query = 'xqxqxq-explicit-miss-test';
+    await client.rpc('log_search_miss', { p_query: query });
+
+    const { data: misses } = await admin
+      .from('search_misses')
+      .select('query')
+      .eq('query', query);
+    expect(misses!.length).toBe(1);
+  });
+
+  test('log_search_miss ignores queries shorter than 6 chars', async () => {
+    const { createClient } = await import('@supabase/supabase-js');
+    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+    await client.rpc('log_search_miss', { p_query: 'xqxqx' });
+    const { data: misses } = await admin
+      .from('search_misses')
+      .select('query')
+      .eq('query', 'xqxqx');
+    expect(misses!.length).toBe(0);
   });
 });

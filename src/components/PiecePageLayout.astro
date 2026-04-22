@@ -43,6 +43,7 @@ import RecipientRibbon from './RecipientRibbon';
 import PiecePills from './PiecePills';
 import StartContributionButton from './StartContributionButton';
 import RequestContributionDialog from './RequestContributionDialog';
+import PieceViewLogger from './PieceViewLogger';
 
 interface Props {
   piece: PieceFull;
@@ -118,6 +119,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
 ---
 
 <main class="page">
+  <PieceViewLogger client:load pieceId={piece.id} />
 
   <div class="crumbs">
     <a href="/">Pieces</a><span class="sep">/</span>

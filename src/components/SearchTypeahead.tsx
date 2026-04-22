@@ -36,6 +36,36 @@ interface Props {
   onDismiss?: () => void;
 }
 
+const SEARCH_MISS_LOGGED_KEY = 'ip.search-miss.logged';
+const SEARCH_MISS_MIN_LEN = 6;
+
+function alreadyLoggedMiss(query: string): boolean {
+  try {
+    const raw = sessionStorage.getItem(SEARCH_MISS_LOGGED_KEY);
+    if (!raw) return false;
+    const logged = JSON.parse(raw) as string[];
+    return Array.isArray(logged) && logged.includes(query);
+  } catch {
+    return false;
+  }
+}
+
+function rememberLoggedMiss(query: string) {
+  try {
+    const raw = sessionStorage.getItem(SEARCH_MISS_LOGGED_KEY);
+    const logged = raw ? (JSON.parse(raw) as string[]) : [];
+    if (!Array.isArray(logged)) return;
+    if (!logged.includes(query)) {
+      logged.push(query);
+      // Bound the set so sessions don't grow forever.
+      if (logged.length > 200) logged.splice(0, logged.length - 200);
+      sessionStorage.setItem(SEARCH_MISS_LOGGED_KEY, JSON.stringify(logged));
+    }
+  } catch {
+    // Storage disabled — skip dedup, accept some duplicate logs.
+  }
+}
+
 export default function SearchTypeahead({ className, autoFocus, onDismiss }: Props) {
   const [q, setQ] = useState('');
   const [results, setResults] = useState<Result[]>([]);
@@ -48,11 +78,29 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Track the latest (trimmed) query + its result count so the dismiss
+  // handler can decide whether to log a miss. Refs because we read them
+  // inside listeners that shouldn't re-bind on every render.
+  const lastQueryRef = useRef('');
+  const lastResultCountRef = useRef(0);
+
+  function maybeLogDismissedMiss() {
+    if (!hasSupabase) return;
+    const query = lastQueryRef.current;
+    if (query.length < SEARCH_MISS_MIN_LEN) return;
+    if (lastResultCountRef.current > 0) return;
+    if (alreadyLoggedMiss(query)) return;
+    rememberLoggedMiss(query);
+    void supabase.rpc('log_search_miss', { p_query: query });
+  }
+
   // Debounced search
   useEffect(() => {
     const trimmed = q.trim();
+    lastQueryRef.current = trimmed;
     if (trimmed.length < 2) {
       setResults([]);
+      lastResultCountRef.current = 0;
       setLoading(false);
       return;
     }
@@ -67,8 +115,11 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
         // Fail soft: just clear results. Log for debugging.
         console.error('typeahead:', error.message);
         setResults([]);
+        lastResultCountRef.current = 0;
       } else {
-        setResults((data || []) as Result[]);
+        const rows = (data || []) as Result[];
+        setResults(rows);
+        lastResultCountRef.current = rows.length;
         setActiveIdx(0);
       }
       setLoading(false);
@@ -80,12 +131,13 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        if (open) maybeLogDismissedMiss();
         setOpen(false);
       }
     }
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  }, [open]);
 
   // Escape dismiss
   useEffect(() => {
@@ -96,6 +148,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
           return;
         }
         if (open) {
+          maybeLogDismissedMiss();
           setOpen(false);
         } else if (onDismiss) {
           onDismiss();
@@ -105,6 +158,15 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [open, needsSignIn, onDismiss]);
+
+  // Page unload (nav away with dropdown still open)
+  useEffect(() => {
+    function handler() {
+      if (open) maybeLogDismissedMiss();
+    }
+    window.addEventListener('pagehide', handler);
+    return () => window.removeEventListener('pagehide', handler);
+  }, [open]);
 
   async function handleSelect(r: Result) {
     if (r.result_type === 'materialized') {
