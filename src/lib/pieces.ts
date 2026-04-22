@@ -50,6 +50,13 @@ export interface PieceFull extends PieceBasic {
   editions: Edition[];
   external_links: ExternalLink[];
   movements: Movement[];
+  /**
+   * True when at least one published signed contribution exists on the piece
+   * (performer's note, interpretive school, landmark, or piece description).
+   * Derived from `v_pieces_with_content_state` for Supabase-backed pieces.
+   * Always false for seed-only pieces that haven't been materialized.
+   */
+  has_signed_content: boolean;
 }
 
 // ---------- seed helpers ----------
@@ -96,6 +103,9 @@ function seedToFull(s: SeedPiece): PieceFull {
       key: m.key,
       meter: m.meter,
     })),
+    // Seed pieces never carry signed content directly; if they're also
+    // materialized in Supabase, getPieceFull overrides this via the DB path.
+    has_signed_content: false,
   };
 }
 
@@ -143,23 +153,53 @@ export async function getPieceBasic(id: string): Promise<PieceBasic | null> {
  */
 export async function getPieceFull(id: string): Promise<PieceFull | null> {
   const seed = seedMap.get(id);
-  if (seed) return seedToFull(seed);
+
+  // Seed short-circuit: pieces authored in src/data/seed.ts have richer
+  // shape (movements, curated editions/links) than the raw Supabase row.
+  // For those, we still want to know has_signed_content — look it up as a
+  // lightweight side query without disturbing the richer seed data.
+  if (seed) {
+    const base = seedToFull(seed);
+    if (hasSupabase) {
+      const { data: state } = await supabase
+        .from('v_pieces_with_content_state')
+        .select('has_signed_content')
+        .eq('id', id)
+        .maybeSingle();
+      return { ...base, has_signed_content: state?.has_signed_content ?? false };
+    }
+    return base;
+  }
 
   if (!hasSupabase) return null;
 
   try {
-    const { data, error } = await supabase
-      .from('pieces')
-      .select(`
+    // Non-seed piece: source of truth is Supabase. Fetch piece + child tables
+    // in parallel with the signed-content state view.
+    const [pieceResult, stateResult] = await Promise.all([
+      supabase
+        .from('pieces')
+        .select(
+          `
         id, title, composer_name, catalog_number, instruments, era, form,
         difficulty, duration_minutes, description, source,
         editions ( id, publisher, editor, year, description ),
         external_links ( id, type, url, label, source )
-      `)
-      .eq('id', id)
-      .single();
+      `,
+        )
+        .eq('id', id)
+        .single(),
+      supabase
+        .from('v_pieces_with_content_state')
+        .select('has_signed_content')
+        .eq('id', id)
+        .maybeSingle(),
+    ]);
 
-    if (error || !data) return null;
+    if (pieceResult.error || !pieceResult.data) return null;
+
+    const data = pieceResult.data;
+    const has_signed_content = stateResult.data?.has_signed_content ?? false;
 
     return {
       id: data.id,
@@ -186,7 +226,8 @@ export async function getPieceFull(id: string): Promise<PieceFull | null> {
         label: l.label,
         source: l.source,
       })),
-      movements: [], // Supabase pieces don't have movements yet
+      movements: [], // materialize-only pieces don't carry movements yet
+      has_signed_content,
     };
   } catch {
     return null;
@@ -194,12 +235,16 @@ export async function getPieceFull(id: string): Promise<PieceFull | null> {
 }
 
 /**
- * Returns true if the piece is a "stub" — has 0 editions AND 0 user-sourced external_links.
- * Used to decide whether to show stub page UI or full page.
+ * Returns true when the piece is in its "pre-piece" state — no published
+ * signed content (performer's note, interpretive school, landmark, piece
+ * description). The URL exists but the page is a deliberate blank slot,
+ * inviting the first contributor.
+ *
+ * Design doc: the pre-piece page is visibly different from an active piece
+ * page. This predicate drives that branch.
  */
 export function isStub(piece: PieceFull): boolean {
-  const userLinks = piece.external_links.filter((l) => l.source === 'user');
-  return piece.editions.length === 0 && userLinks.length === 0;
+  return !piece.has_signed_content;
 }
 
 /**

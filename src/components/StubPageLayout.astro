@@ -32,6 +32,12 @@ const spotifyLink = piece.external_links.find(l => l.type === 'spotify');
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 items-start">
     <!-- Main content -->
     <div>
+      <!-- Kicker eyebrow: matches the NOT YET CURATED label used in typeahead
+           so the language stays continuous from search → landing. -->
+      <div class="font-sans text-[11px] tracking-[0.08em] uppercase text-accent font-medium mb-2">
+        Not yet curated
+      </div>
+
       <!-- Title block -->
       <h1 class="font-display text-[28px] leading-tight mb-1">{piece.title}</h1>
       <a href={`/composer/${encodeURIComponent(piece.composer_name)}`} class="text-[15px] text-accent no-underline hover:underline">{piece.composer_name}</a>
@@ -52,12 +58,12 @@ const spotifyLink = piece.external_links.find(l => l.type === 'spotify');
           loading="lazy"
         />
         <div>
-          <p class="font-display text-lg text-ink font-normal leading-snug mb-1">
-            <strong>This piece is waiting for someone who knows it.</strong>
+          <p class="font-display text-lg text-ink font-normal leading-snug mb-2">
+            This piece has no signed contributions yet.
           </p>
-          <span class="text-[13px] text-muted font-medium">
-            Add a description, list the movements, or share what makes it worth playing.
-          </span>
+          <p class="text-[14px] text-muted leading-relaxed">
+            Write the first performer&apos;s note, a practice note on a specific passage, or an interpretive school you&apos;d defend in front of colleagues.
+          </p>
         </div>
       </div>
 

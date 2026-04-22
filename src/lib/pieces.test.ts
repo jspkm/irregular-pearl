@@ -34,8 +34,15 @@ describe('getPieceFull', () => {
 });
 
 describe('isStub', () => {
-  test('returns true for piece with no editions and no user links', () => {
-    const stub: PieceFull = {
+  // Pre-piece semantics (current): a piece is a "stub" iff it has no
+  // published signed content. Editions, external links, and seed-sourced
+  // metadata are NOT sufficient to lift a piece out of pre-piece state —
+  // only a published performer's note / interpretive school / landmark /
+  // piece description counts. Matches the design doc's pre-piece model and
+  // aligns the language with the typeahead's NOT YET CURATED group.
+
+  function pieceBase(overrides: Partial<PieceFull> = {}): PieceFull {
+    return {
       id: 'test',
       title: 'Test',
       composer_name: 'Test',
@@ -50,68 +57,42 @@ describe('isStub', () => {
       editions: [],
       external_links: [],
       movements: [],
+      has_signed_content: false,
+      ...overrides,
     };
-    expect(isStub(stub)).toBe(true);
+  }
+
+  test('returns true for piece with no signed content', () => {
+    expect(isStub(pieceBase({ has_signed_content: false }))).toBe(true);
   });
 
-  test('returns false for piece with editions', () => {
-    const full: PieceFull = {
-      id: 'test',
-      title: 'Test',
-      composer_name: 'Test',
-      catalog_number: null,
-      instruments: [],
-      era: 'Modern',
-      form: 'Sonata',
-      difficulty: null,
-      duration_minutes: null,
-      description: '',
-      source: 'seed',
+  test('returns false for piece with signed content', () => {
+    expect(isStub(pieceBase({ has_signed_content: true }))).toBe(false);
+  });
+
+  test('editions alone do not lift a piece out of pre-piece state', () => {
+    const withEditions = pieceBase({
+      has_signed_content: false,
       editions: [{ id: 'e1', publisher: 'Henle', editor: 'Ed', year: 2020, description: 'Good' }],
-      external_links: [],
-      movements: [],
-    };
-    expect(isStub(full)).toBe(false);
+    });
+    expect(isStub(withEditions)).toBe(true);
   });
 
-  test('returns false for piece with user-sourced links but no editions', () => {
-    const withUserLinks: PieceFull = {
-      id: 'test',
-      title: 'Test',
-      composer_name: 'Test',
-      catalog_number: null,
-      instruments: [],
-      era: 'Modern',
-      form: 'Sonata',
-      difficulty: null,
-      duration_minutes: null,
-      description: '',
-      source: 'import',
-      editions: [],
+  test('external links alone do not lift a piece out of pre-piece state', () => {
+    const withLinks = pieceBase({
+      has_signed_content: false,
       external_links: [{ type: 'youtube', url: 'https://youtube.com/x', label: 'Video', source: 'user' }],
-      movements: [],
-    };
-    expect(isStub(withUserLinks)).toBe(false);
+    });
+    expect(isStub(withLinks)).toBe(true);
   });
 
-  test('returns true for piece with only seed-sourced links and no editions', () => {
-    const seedOnly: PieceFull = {
-      id: 'test',
-      title: 'Test',
-      composer_name: 'Test',
-      catalog_number: null,
-      instruments: [],
-      era: 'Modern',
-      form: 'Sonata',
-      difficulty: null,
-      duration_minutes: null,
-      description: '',
-      source: 'seed',
+  test('signed content + no editions/links still renders as active piece', () => {
+    const activeNoResources = pieceBase({
+      has_signed_content: true,
       editions: [],
-      external_links: [{ type: 'youtube', url: 'https://youtube.com/x', label: 'Video', source: 'seed' }],
-      movements: [],
-    };
-    expect(isStub(seedOnly)).toBe(true);
+      external_links: [],
+    });
+    expect(isStub(activeNoResources)).toBe(false);
   });
 });
 
