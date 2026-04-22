@@ -126,9 +126,7 @@ export default function RecipientRibbon({ pieceId }: Props) {
       {latest.note && others === 0 && (
         <div className="recipient-ribbon-note">&ldquo;{latest.note}&rdquo;</div>
       )}
-      <div className="recipient-ribbon-privacy">
-        This message is only visible to you.
-      </div>
+      <div className="recipient-ribbon-privacy">Only you see this.</div>
     </aside>
   );
 }
