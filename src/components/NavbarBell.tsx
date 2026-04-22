@@ -237,10 +237,18 @@ export default function NavbarBell() {
           aria-label="Notifications"
         >
           <div className="px-4 py-3 border-b-[0.5px] border-border">
-            <div className="flex items-baseline justify-between">
-              <span className="text-[11px] uppercase tracking-wider font-medium" style={{ color: 'var(--color-accent)' }}>
-                Notifications
-              </span>
+            <div className="flex items-baseline justify-between gap-3">
+              <a
+                href="/notifications"
+                onClick={() => {
+                  acknowledgeBell();
+                  setOpen(false);
+                }}
+                className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-medium no-underline hover:underline"
+                style={{ color: 'var(--color-accent)' }}
+              >
+                Go to Messages <span aria-hidden="true">→</span>
+              </a>
               <span className="text-[11px] text-tertiary">
                 {count === 0 ? 'All clear' : `${count} waiting`}
               </span>
