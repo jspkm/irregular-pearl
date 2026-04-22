@@ -2,7 +2,6 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import PiecePageLayout from '../../components/PiecePageLayout.astro';
-import StubPageLayout from '../../components/StubPageLayout.astro';
 import { getPieceFull, isStub } from '../../lib/pieces';
 import { resolvePieceRedirect } from '../../lib/pieceRedirects';
 
@@ -22,13 +21,15 @@ if (!piece) {
   return Astro.redirect('/');
 }
 
-// A piece renders as a stub (pre-piece) when it has no signed content.
-// Users can override this by appending ?expand=1 to the URL — that's how
-// "Start the first contribution" routes them into the full writeable
-// layout without waiting for a published contribution. The underlying
-// data is identical; the CTA just decides which surface to render.
+// One piece page, one layout. Mode decides whether write surfaces are
+// visible. Pre-piece mode (the page has no signed content yet, and the
+// viewer hasn't clicked the primary CTA) hides every write affordance
+// and shows only the invitation block. ?expand=1 flips to the full
+// writeable mode — that's where "Start the first contribution" routes.
+// Pieces that already have signed content always render 'full' regardless.
 const expand = Astro.url.searchParams.get('expand') === '1';
-const stub = !expand && isStub(piece);
+const stub = isStub(piece);
+const mode: 'pre-piece' | 'full' = !expand && stub ? 'pre-piece' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`
@@ -97,12 +98,6 @@ const breadcrumbLd = {
 >
   <Navbar />
 
-  {/* Breadcrumbs are rendered inside PiecePageLayout / StubPageLayout so the
-      layout-level wrapper stays off (the piece-page.css .crumbs token owns
-      this row). */}
-  {stub ? (
-    <StubPageLayout piece={piece} />
-  ) : (
-    <PiecePageLayout piece={piece} />
-  )}
+  {/* Breadcrumbs are rendered inside PiecePageLayout. One layout, one page. */}
+  <PiecePageLayout piece={piece} mode={mode} />
 </Layout>
