@@ -253,12 +253,29 @@ describe('sync trigger', () => {
 
 describe('new-piece backfill trigger', () => {
   const NEW_PIECE = 'pills-newpiece-test';
+  let canonicalIndexId: string;
   afterAll(async () => {
     await admin.from('piece_pills').delete().eq('piece_id', NEW_PIECE);
     await admin.from('pieces').delete().eq('id', NEW_PIECE);
+    if (canonicalIndexId) {
+      await admin.from('canonical_piece_index').delete().eq('id', canonicalIndexId);
+    }
   });
 
   test('inserts seed pills automatically when a new piece is inserted', async () => {
+    const { data: idx } = await admin
+      .from('canonical_piece_index')
+      .insert({
+        canonical_title: 'New Piece',
+        composer_name: 'Anonymous',
+        era: 'Romantic',
+        form: 'sonata',
+        instruments: ['Violin', 'Piano'],
+      })
+      .select('id')
+      .single();
+    canonicalIndexId = idx!.id;
+
     await admin.from('pieces').insert({
       id: NEW_PIECE,
       title: 'New Piece',
@@ -269,6 +286,7 @@ describe('new-piece backfill trigger', () => {
       duration_minutes: 25,
       difficulty: 'advanced',
       description: '',
+      canonical_index_id: canonicalIndexId,
     });
 
     const { data: pills } = await admin

@@ -88,6 +88,21 @@ export async function deleteAuthUser(id: string): Promise<void> {
 }
 
 export async function createTestPiece(id: string, title = 'Test Piece'): Promise<void> {
+  // Every piece traces back to a canonical_piece_index row. Create the
+  // index entry first so the NOT NULL canonical_index_id invariant holds.
+  const { data: idxRow, error: idxErr } = await admin
+    .from('canonical_piece_index')
+    .insert({
+      canonical_title: title,
+      composer_name: 'Anonymous',
+      era: 'Baroque',
+      form: 'test',
+      instruments: [],
+    })
+    .select('id')
+    .single();
+  if (idxErr || !idxRow) throw new Error(`insert canonical_piece_index: ${idxErr?.message}`);
+
   const { error } = await admin.from('pieces').upsert({
     id,
     title,
@@ -97,6 +112,7 @@ export async function createTestPiece(id: string, title = 'Test Piece'): Promise
     instruments: [],
     difficulty: 'intermediate',
     description: '',
+    canonical_index_id: idxRow.id,
   });
   if (error) throw new Error(`insert piece: ${error.message}`);
 }
@@ -107,7 +123,13 @@ export async function deleteTestPiece(id: string): Promise<void> {
   await admin.from('performers_notes').update({ current_version_id: null, status: 'removed' }).eq('piece_id', id);
   await admin.from('performers_note_versions').delete().eq('piece_id', id);
   await admin.from('performers_notes').delete().eq('piece_id', id);
+  // Capture canonical_index_id before deleting the piece so we can clean up
+  // the orphan index row after.
+  const { data: piece } = await admin.from('pieces').select('canonical_index_id').eq('id', id).single();
   await admin.from('pieces').delete().eq('id', id);
+  if (piece?.canonical_index_id) {
+    await admin.from('canonical_piece_index').delete().eq('id', piece.canonical_index_id);
+  }
 }
 
 // Convenience: count notifications scoped to a performer's note (polymorphic).
