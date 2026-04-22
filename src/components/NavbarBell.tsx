@@ -37,6 +37,7 @@ export function bellBadgeText(count: number): string | null {
 
 export default function NavbarBell() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [hasQueueAccess, setHasQueueAccess] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,8 +46,22 @@ export default function NavbarBell() {
     if (!hasSupabase) { setSignedIn(false); return; }
 
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) { setSignedIn(false); setItems([]); return; }
+    if (!session?.user) { setSignedIn(false); setItems([]); setHasQueueAccess(false); return; }
     setSignedIn(true);
+
+    // Queue access: active signed contributors only. Non-contributors get
+    // a reduced popover (no "Open queue" footer, since the queue page just
+    // tells them they don't belong there).
+    const { data: profile } = await supabase
+      .from('users')
+      .select('is_contributor, contributor_active')
+      .eq('id', session.user.id)
+      .single();
+    const canQueue = Boolean(
+      (profile as { is_contributor?: boolean; contributor_active?: boolean } | null)?.is_contributor &&
+        (profile as { is_contributor?: boolean; contributor_active?: boolean } | null)?.contributor_active,
+    );
+    setHasQueueAccess(canQueue);
 
     const { data: notifRows } = await supabase
       .from('notifications')
@@ -192,15 +207,17 @@ export default function NavbarBell() {
                   );
                 })}
               </ul>
-              <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint">
-                <a
-                  href="/notifications"
-                  className="text-xs text-accent no-underline hover:underline"
-                  onClick={() => setOpen(false)}
-                >
-                  Open queue &rarr;
-                </a>
-              </div>
+              {hasQueueAccess && (
+                <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint">
+                  <a
+                    href="/notifications"
+                    className="text-xs text-accent no-underline hover:underline"
+                    onClick={() => setOpen(false)}
+                  >
+                    Open queue &rarr;
+                  </a>
+                </div>
+              )}
             </>
           )}
         </div>
