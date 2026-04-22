@@ -235,8 +235,10 @@ describe('request_contribution', () => {
     expect(notif!.subject_table).toBe('contribution_requests');
     expect(notif!.recipient_id).toBe(recipient.id);
     expect(notif!.body).toMatch(/Staff Sender/);
-    // Regression pin: piece page lives at /piece/[slug], not /p/[slug].
-    expect(notif!.link_path).toBe(`/piece/${PIECE}`);
+    // Regression pin: contribution_requested notifications deep-link to
+    // /notifications (where messages + queue are unified), not to the piece
+    // page directly. The piece link lives inside the message card.
+    expect(notif!.link_path).toBe('/notifications');
   });
 
   test('sender gate passes after publishing a signed contribution', async () => {

@@ -23,9 +23,10 @@ import {
   type SubjectTable,
 } from '../lib/contributorSubjects';
 
-type Status = 'loading' | 'unauthed' | 'not-contributor' | 'ready';
+type Status = 'loading' | 'unauthed' | 'ready';
 
 interface PendingDraft {
+  kind: 'draft';
   subjectTable: SubjectTable;
   subjectId: string;
   pieceId: string;
@@ -40,6 +41,21 @@ interface PendingDraft {
   /** Schools only; null for other subject types. */
   schoolName: string | null;
 }
+
+interface ContributionRequestMessage {
+  kind: 'message';
+  notificationId: string;
+  requestId: string;
+  pieceId: string;
+  pieceTitle: string;
+  composerName: string;
+  catalogNumber: string | null;
+  senderName: string;
+  note: string | null;
+  createdAt: string;
+}
+
+type Item = PendingDraft | ContributionRequestMessage;
 
 interface ContributorProfile {
   displayName: string;
@@ -56,6 +72,7 @@ export default function NotificationsQueue() {
   const [status, setStatus] = useState<Status>('loading');
   const [profile, setProfile] = useState<ContributorProfile | null>(null);
   const [drafts, setDrafts] = useState<PendingDraft[]>([]);
+  const [messages, setMessages] = useState<ContributionRequestMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [actionByKey, setActionByKey] = useState<Record<string, ItemAction>>({});
   const [busyByKey, setBusyByKey] = useState<Record<string, boolean>>({});
@@ -63,7 +80,8 @@ export default function NotificationsQueue() {
   const loadQueue = useCallback(async (session: Session) => {
     setError(null);
 
-    // Profile: must be an active contributor.
+    // Profile: any signed-in user can reach Messages. Contributor fields
+    // decide whether we also load draft_awaiting_approval items below.
     const { data: profileRow, error: profileErr } = await supabase
       .from('users')
       .select('is_contributor, contributor_active, display_name, contributor_bio_short')
@@ -73,13 +91,12 @@ export default function NotificationsQueue() {
       setError(profileErr.message);
       return;
     }
-    if (!profileRow?.is_contributor || !profileRow.contributor_active) {
-      setStatus('not-contributor');
-      return;
-    }
+    const isContributor = Boolean(
+      profileRow?.is_contributor && profileRow?.contributor_active,
+    );
     setProfile({
-      displayName: profileRow.display_name,
-      bioShort: profileRow.contributor_bio_short ?? null,
+      displayName: profileRow?.display_name ?? '',
+      bioShort: profileRow?.contributor_bio_short ?? null,
     });
 
     // One query for un-cleared notifications. Subject-specific data is
@@ -95,13 +112,22 @@ export default function NotificationsQueue() {
     }
     if (!notifs || notifs.length === 0) {
       setDrafts([]);
+      setMessages([]);
       setStatus('ready');
       return;
     }
 
     // Group subject ids by table so we can issue one query per table.
+    // Drafts are loaded only for contributors; contribution_requests are
+    // loaded for everyone.
     const idsByTable = new Map<SubjectTable, string[]>();
+    const contribRequestIds: string[] = [];
     for (const n of notifs) {
+      if (n.subject_table === 'contribution_requests') {
+        contribRequestIds.push(n.subject_id);
+        continue;
+      }
+      if (!isContributor) continue; // non-contributors never see drafts
       if (!isSubjectTable(n.subject_table)) continue;
       const arr = idsByTable.get(n.subject_table) ?? [];
       arr.push(n.subject_id);
@@ -189,6 +215,7 @@ export default function NotificationsQueue() {
 
     const rows: PendingDraft[] = [];
     for (const n of notifs) {
+      if (n.subject_table === 'contribution_requests') continue;
       if (!isSubjectTable(n.subject_table)) continue;
       const key = `${n.subject_table}:${n.subject_id}`;
       const subject = subjectByKey.get(key);
@@ -197,6 +224,7 @@ export default function NotificationsQueue() {
       const piece = pieceById.get(subject.row.piece_id);
       if (!piece) continue;
       rows.push({
+        kind: 'draft',
         subjectTable: n.subject_table,
         subjectId: n.subject_id,
         pieceId: subject.row.piece_id,
@@ -212,7 +240,83 @@ export default function NotificationsQueue() {
       });
     }
 
+    // Load contribution_request messages (everyone — not gated to contributors).
+    let msgs: ContributionRequestMessage[] = [];
+    if (contribRequestIds.length > 0) {
+      const { data: crRows, error: crErr } = await supabase
+        .from('contribution_requests')
+        .select('id, piece_id, sender_id, note, created_at')
+        .in('id', contribRequestIds);
+      if (crErr) {
+        setError(crErr.message);
+        return;
+      }
+      const crList = (crRows ?? []) as {
+        id: string;
+        piece_id: string;
+        sender_id: string;
+        note: string | null;
+        created_at: string;
+      }[];
+
+      // Batch-fetch sender display names and pieces referenced by the requests.
+      const senderIds = [...new Set(crList.map((r) => r.sender_id))];
+      const pieceIdsForMsgs = [...new Set(crList.map((r) => r.piece_id))];
+      const [sendersRes, piecesForMsgsRes] = await Promise.all([
+        senderIds.length
+          ? supabase.from('users').select('id, display_name').in('id', senderIds)
+          : Promise.resolve({ data: [], error: null }),
+        pieceIdsForMsgs.length
+          ? supabase
+              .from('pieces')
+              .select('id, title, composer_name, catalog_number')
+              .in('id', pieceIdsForMsgs)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+      const senderById = new Map(
+        ((sendersRes.data ?? []) as { id: string; display_name: string }[]).map((u) => [
+          u.id,
+          u.display_name,
+        ]),
+      );
+      const pieceForMsgsById = new Map(
+        (
+          (piecesForMsgsRes.data ?? []) as {
+            id: string;
+            title: string;
+            composer_name: string;
+            catalog_number: string | null;
+          }[]
+        ).map((p) => [p.id, p]),
+      );
+      const crById = new Map(crList.map((r) => [r.id, r]));
+
+      msgs = notifs
+        .filter((n) => n.subject_table === 'contribution_requests')
+        .flatMap((n) => {
+          const cr = crById.get(n.subject_id);
+          if (!cr) return [];
+          const piece = pieceForMsgsById.get(cr.piece_id);
+          if (!piece) return [];
+          return [
+            {
+              kind: 'message' as const,
+              notificationId: n.id,
+              requestId: cr.id,
+              pieceId: cr.piece_id,
+              pieceTitle: piece.title,
+              composerName: piece.composer_name,
+              catalogNumber: piece.catalog_number ?? null,
+              senderName: senderById.get(cr.sender_id) ?? 'Someone',
+              note: cr.note,
+              createdAt: cr.created_at,
+            },
+          ];
+        });
+    }
+
     setDrafts(rows);
+    setMessages(msgs);
     setStatus('ready');
   }, []);
 
@@ -290,27 +394,24 @@ export default function NotificationsQueue() {
     return (
       <div className="font-body">
         <h1 className="text-2xl font-display text-ink mb-3">Messages</h1>
-        <p className="text-sm text-muted">You need to be signed in to see your approval queue.</p>
+        <p className="text-sm text-muted">You need to be signed in to see your messages.</p>
       </div>
     );
   }
-  if (status === 'not-contributor') {
-    return (
-      <div className="font-body">
-        <h1 className="text-2xl font-display text-ink mb-3">Messages</h1>
-        <p className="text-sm text-muted">
-          The queue is for signed contributors. If you think you should have access, reach out to the
-          Editorial Director.
-        </p>
-      </div>
-    );
-  }
+
+  // Merge drafts and messages into a single reverse-chron list.
+  const items: Item[] = [...drafts, ...messages].sort(
+    (a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0),
+  );
+  const hasDrafts = drafts.length > 0;
 
   return (
     <div className="font-body">
       <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Messages</h1>
       <p className="text-sm text-muted mb-8">
-        Drafts waiting for your review. Approve as-is, edit and then approve, or send back with a note.
+        {hasDrafts
+          ? 'Requests from colleagues and drafts waiting for your review.'
+          : 'Requests from colleagues. When someone asks you to contribute to a piece, it appears here.'}
       </p>
 
       {error && (
@@ -319,13 +420,19 @@ export default function NotificationsQueue() {
         </div>
       )}
 
-      {drafts.length === 0 ? (
+      {items.length === 0 ? (
         <div className="rounded-xl border-[0.5px] border-border bg-surface px-5 py-8 text-center">
-          <p className="text-sm text-muted">Nothing waiting. When staff routes a draft to you, it'll appear here.</p>
+          <p className="text-sm text-muted">
+            Nothing waiting. When someone asks you to contribute to a piece, it will appear here.
+          </p>
         </div>
       ) : (
         <ul className="space-y-4">
-          {drafts.map((d) => {
+          {items.map((item) => {
+            if (item.kind === 'message') {
+              return <MessageCard key={`msg:${item.notificationId}`} m={item} />;
+            }
+            const d = item;
             const key = itemKey(d);
             const cfg = SUBJECT_CONFIG[d.subjectTable];
             const currentAction = actionByKey[key] ?? null;
@@ -523,5 +630,84 @@ function RejectForm(props: {
         </button>
       </div>
     </div>
+  );
+}
+
+// ---------- MessageCard ----------
+// Renders a contribution_requested notification as a message card. Unlike
+// draft approval cards, there's no inline approval action — the recipient
+// acts by visiting the piece and publishing signed content (which triggers
+// the auto-clear trigger and removes this message).
+
+function formatTimestamp(iso: string): string {
+  try {
+    const d = new Date(iso);
+    // "Apr 22, 2026, 3:42 PM" — precise for recipients who are deciding
+    // whether a request is recent or stale.
+    return d.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function MessageCard({ m }: { m: ContributionRequestMessage }) {
+  return (
+    <li className="rounded-xl border-[0.5px] border-border bg-surface p-5">
+      <div
+        className="text-[11px] font-medium tracking-[0.08em] uppercase mb-4"
+        style={{ color: 'var(--color-accent)' }}
+      >
+        Contribution request
+      </div>
+
+      <div className="pb-4 mb-5 border-b-[0.5px] border-border">
+        <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+          <a
+            href={`/piece/${m.pieceId}`}
+            className="font-display text-[22px] text-ink leading-tight tracking-tight no-underline hover:underline"
+          >
+            {m.pieceTitle}
+          </a>
+          {m.catalogNumber && (
+            <span className="text-[11px] font-mono text-tertiary tracking-wide">
+              {m.catalogNumber}
+            </span>
+          )}
+        </div>
+        <div className="mt-1 text-sm text-muted">
+          by <span className="text-ink">{m.composerName}</span>
+        </div>
+      </div>
+
+      <div className="text-sm text-ink font-body mb-2">
+        <span className="font-medium">{m.senderName}</span>
+        <span className="text-muted"> asked you to contribute.</span>
+      </div>
+      <div className="text-[11px] text-tertiary mb-4">{formatTimestamp(m.createdAt)}</div>
+
+      {m.note && (
+        <div
+          className="pl-[18px] border-l-2 font-display text-[15px] text-ink leading-[1.68] whitespace-pre-wrap italic mb-2"
+          style={{ borderLeftColor: 'var(--color-accent)' }}
+        >
+          &ldquo;{m.note}&rdquo;
+        </div>
+      )}
+
+      <div className="mt-5">
+        <a
+          href={`/piece/${m.pieceId}`}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
+        >
+          Open piece <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </li>
   );
 }
