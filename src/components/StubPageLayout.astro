@@ -21,12 +21,22 @@
 
 import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
+import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
+import PiecePills from './PiecePills';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
+
+// Match PiecePageLayout: the canonical pill row comes from piece_pills
+// (source of truth, lowercased on seed). Fall back to scalar piece fields
+// only when the DB has nothing (no Supabase, or a piece the seed pipeline
+// missed). Keeps the pill display consistent between pre-piece and active
+// pages.
+const dbPills = await getPiecePills(piece.id);
+const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
 ---
 
 <main class="page">
@@ -44,11 +54,7 @@ const { piece } = Astro.props;
     by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
   </p>
 
-  <div class="pills">
-    {piece.era && <span class="pill">{piece.era}</span>}
-    {piece.form && <span class="pill">{piece.form}</span>}
-    {piece.instruments.slice(0, 3).map((i) => <span class="pill">{i}</span>)}
-  </div>
+  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
 
   <section class="block pp-invite" id="invitation">
     <p class="pp-invite-lede">
