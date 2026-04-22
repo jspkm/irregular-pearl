@@ -19,6 +19,12 @@ interface DraftRequest {
   composerName?: string;
 }
 
+// User-facing copy for any failure. Implementation details (missing key,
+// bad request, upstream error, etc.) go to the server log, never to the
+// response body.
+const USER_FACING_FAILURE =
+  'Note drafting is unavailable right now. Try again shortly, or write the note yourself.';
+
 export const POST: APIRoute = async ({ request, locals }) => {
   const apiKey =
     (locals as { runtime?: { env?: { ANTHROPIC_API_KEY?: string } } }).runtime?.env
@@ -27,20 +33,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
     (typeof process !== 'undefined' ? process.env.ANTHROPIC_API_KEY : undefined);
 
   if (!apiKey) {
-    return json(
-      {
-        error:
-          'Note drafting is not configured. Set ANTHROPIC_API_KEY in your environment.',
-      },
-      503,
-    );
+    console.error('draft-note: ANTHROPIC_API_KEY is not set');
+    return json({ error: USER_FACING_FAILURE }, 503);
   }
 
   let body: DraftRequest;
   try {
     body = (await request.json()) as DraftRequest;
-  } catch {
-    return json({ error: 'Invalid JSON body.' }, 400);
+  } catch (err) {
+    console.error('draft-note: invalid json body', err);
+    return json({ error: USER_FACING_FAILURE }, 400);
   }
 
   const senderName = (body.senderName ?? '').trim();
@@ -50,7 +52,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const composerName = (body.composerName ?? '').trim();
 
   if (!recipientName || !pieceTitle || !composerName) {
-    return json({ error: 'Missing required fields.' }, 400);
+    console.error('draft-note: missing fields', {
+      hasRecipient: !!recipientName,
+      hasPiece: !!pieceTitle,
+      hasComposer: !!composerName,
+    });
+    return json({ error: USER_FACING_FAILURE }, 400);
   }
 
   const prompt = [
@@ -86,8 +93,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('anthropic error:', res.status, errText);
-      return json({ error: 'Drafting failed. Try again.' }, 502);
+      console.error('draft-note: anthropic error', res.status, errText);
+      return json({ error: USER_FACING_FAILURE }, 502);
     }
 
     const data = (await res.json()) as {
@@ -95,7 +102,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     };
     const text = (data.content?.[0]?.text ?? '').trim();
     if (!text) {
-      return json({ error: 'Drafting returned empty result.' }, 502);
+      console.error('draft-note: anthropic returned empty content');
+      return json({ error: USER_FACING_FAILURE }, 502);
     }
 
     // Hard cap to match contribution_requests.note length constraint.
@@ -103,8 +111,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     return json({ note }, 200);
   } catch (err) {
-    console.error('draft-note fetch error:', err);
-    return json({ error: 'Drafting failed. Try again.' }, 502);
+    console.error('draft-note: fetch threw', err);
+    return json({ error: USER_FACING_FAILURE }, 502);
   }
 };
 
