@@ -27,6 +27,12 @@ interface Props {
 
 type Mode = 'username' | 'email';
 
+interface UserSuggestion {
+  id: string;
+  username: string;
+  display_name: string;
+}
+
 export default function RequestContributionDialog({
   pieceId,
   pieceTitle,
@@ -45,6 +51,12 @@ export default function RequestContributionDialog({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
+
+  // Username autocomplete state
+  const [suggestions, setSuggestions] = useState<UserSuggestion[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [activeSuggestIdx, setActiveSuggestIdx] = useState(0);
+  const usernameFieldRef = useRef<HTMLDivElement>(null);
 
   // Look up staff role when the user session hydrates.
   useEffect(() => {
@@ -84,6 +96,52 @@ export default function RequestContributionDialog({
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open]);
+
+  // Debounced username autocomplete. Queries public.users by username
+  // substring (falling back to display_name match) and excludes the
+  // current user. users table is publicly readable so we don't need an
+  // RPC. Suggestions close on outside click.
+  useEffect(() => {
+    if (mode !== 'username' || !hasSupabase) {
+      setSuggestions([]);
+      return;
+    }
+    const q = username.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      const pattern = `%${q}%`;
+      const query = supabase
+        .from('users')
+        .select('id, username, display_name')
+        .not('username', 'is', null)
+        .or(`username.ilike.${pattern},display_name.ilike.${pattern}`)
+        .limit(6);
+      if (user) {
+        // Exclude the sender themselves.
+        query.neq('id', user.id);
+      }
+      const { data, error: qErr } = await query;
+      if (qErr) return;
+      setSuggestions((data ?? []) as UserSuggestion[]);
+      setActiveSuggestIdx(0);
+    }, 120);
+    return () => clearTimeout(handle);
+  }, [username, mode, user]);
+
+  // Outside-click closes the suggestion dropdown (not the whole modal).
+  useEffect(() => {
+    if (!suggestOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (usernameFieldRef.current && !usernameFieldRef.current.contains(e.target as Node)) {
+        setSuggestOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, [suggestOpen]);
 
   function handleOpen() {
     if (!user) {
@@ -197,18 +255,80 @@ export default function RequestContributionDialog({
 
             <form onSubmit={handleSubmit}>
               {mode === 'username' && (
-                <div className="rcd-field">
+                <div className="rcd-field" ref={usernameFieldRef}>
                   <label htmlFor="rcd-username">Recipient</label>
                   <input
                     id="rcd-username"
                     ref={firstInputRef}
                     type="text"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      setSuggestOpen(true);
+                    }}
+                    onFocus={() => setSuggestOpen(true)}
+                    onKeyDown={(e) => {
+                      if (!suggestOpen || suggestions.length === 0) return;
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setActiveSuggestIdx((i) => Math.min(i + 1, suggestions.length - 1));
+                      } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        setActiveSuggestIdx((i) => Math.max(i - 1, 0));
+                      } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const pick = suggestions[activeSuggestIdx];
+                        if (pick) {
+                          setUsername(pick.username);
+                          setSuggestOpen(false);
+                        }
+                      } else if (e.key === 'Escape') {
+                        // Close suggestions without closing the modal.
+                        e.stopPropagation();
+                        setSuggestOpen(false);
+                      }
+                    }}
                     placeholder="Irregular Pearl username"
                     autoComplete="off"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={suggestOpen && suggestions.length > 0}
+                    aria-controls={suggestOpen ? 'rcd-suggest-list' : undefined}
+                    aria-activedescendant={
+                      suggestOpen && suggestions.length > 0
+                        ? `rcd-suggest-${activeSuggestIdx}`
+                        : undefined
+                    }
                     required
                   />
+                  {suggestOpen && suggestions.length > 0 && (
+                    <ul
+                      id="rcd-suggest-list"
+                      role="listbox"
+                      className="rcd-suggest-list"
+                    >
+                      {suggestions.map((s, i) => (
+                        <li
+                          key={s.id}
+                          id={`rcd-suggest-${i}`}
+                          role="option"
+                          aria-selected={i === activeSuggestIdx}
+                          onMouseDown={(e) => {
+                            // mousedown (not click) so the input doesn't blur first
+                            e.preventDefault();
+                            setUsername(s.username);
+                            setSuggestOpen(false);
+                            firstInputRef.current?.focus();
+                          }}
+                          onMouseEnter={() => setActiveSuggestIdx(i)}
+                          className={`rcd-suggest-item${i === activeSuggestIdx ? ' is-active' : ''}`}
+                        >
+                          <span className="rcd-suggest-username">{s.username}</span>
+                          <span className="rcd-suggest-display">{s.display_name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               )}
               {mode === 'email' && (

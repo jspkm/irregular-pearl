@@ -1793,3 +1793,46 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* ---------- Request dialog: username autocomplete ---------- */
+.rcd-field { position: relative; }
+.rcd-suggest-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  list-style: none;
+  padding: 4px 0;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(26, 26, 26, 0.08);
+  z-index: 10;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.rcd-suggest-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 120ms ease;
+}
+.rcd-suggest-item.is-active,
+.rcd-suggest-item:hover { background: var(--accent-soft); }
+.rcd-suggest-username {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+.rcd-suggest-display {
+  font-family: var(--font-sans);
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
