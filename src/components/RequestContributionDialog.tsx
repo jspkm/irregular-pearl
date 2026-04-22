@@ -269,6 +269,7 @@ export default function RequestContributionDialog({
                     onFocus={() => setSuggestOpen(true)}
                     onKeyDown={(e) => {
                       if (!suggestOpen || suggestions.length === 0) return;
+                      const soleMatch = suggestions.length === 1;
                       if (e.key === 'ArrowDown') {
                         e.preventDefault();
                         setActiveSuggestIdx((i) => Math.min(i + 1, suggestions.length - 1));
@@ -282,6 +283,19 @@ export default function RequestContributionDialog({
                           setUsername(pick.username);
                           setSuggestOpen(false);
                         }
+                      } else if (soleMatch && (e.key === 'Tab' || e.key === ' ')) {
+                        // Sole-match shortcut: when autocomplete has narrowed
+                        // to a single candidate, Tab and Space also accept
+                        // it (Enter handled above). Space would otherwise
+                        // be typed into the field; Tab proceeds to the next
+                        // field after selection.
+                        const pick = suggestions[0];
+                        setUsername(pick.username);
+                        setSuggestOpen(false);
+                        if (e.key === ' ') {
+                          e.preventDefault();
+                        }
+                        // Tab: don't preventDefault so focus moves naturally.
                       } else if (e.key === 'Escape') {
                         // Close suggestions without closing the modal.
                         e.stopPropagation();
