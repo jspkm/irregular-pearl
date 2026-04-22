@@ -39,6 +39,7 @@ import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '..
 import { fetchPedagogicalConnections, fetchAllPiecesForPicker } from '../lib/pedagogical';
 import PedagogicalArcList from './PedagogicalArcList';
 import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
+import RecipientRibbon from './RecipientRibbon';
 import PiecePills from './PiecePills';
 
 interface Props {
@@ -121,6 +122,8 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
   </p>
 
   <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
+
+  <RecipientRibbon client:load pieceId={piece.id} />
 
 
   {/* Signed descriptions stack (includes the unsigned pieces.description as

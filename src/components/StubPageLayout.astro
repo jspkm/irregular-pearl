@@ -24,6 +24,7 @@ import type { PieceFull } from '../lib/pieces';
 import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
 import PiecePills from './PiecePills';
 import RequestContributionDialog from './RequestContributionDialog';
+import RecipientRibbon from './RecipientRibbon';
 
 interface Props {
   piece: PieceFull;
@@ -56,6 +57,8 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
   </p>
 
   <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
+
+  <RecipientRibbon client:load pieceId={piece.id} />
 
   <section class="block pp-invite" id="invitation">
     <p class="pp-invite-lede">
