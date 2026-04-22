@@ -224,6 +224,7 @@ declare
   v_normalized text;
   v_pill_id uuid;
   v_existing_count int;
+  v_duration_min int;
 begin
   if v_uid is null then
     raise exception 'unauthenticated';
@@ -241,11 +242,17 @@ begin
   v_source := case when v_is_staff then 'mod' else 'user' end;
 
   -- Normalize the value. duration is the only category that keeps its raw
-  -- format (validated below); the others lowercase + trim.
+  -- format — must be "~N min" with 3 ≤ N ≤ 90 (the UI submits already-
+  -- formatted "~N min" so the storage shape stays uniform). The others
+  -- lowercase + trim.
   if p_category = 'duration' then
     v_normalized := trim(p_value);
     if v_normalized !~ '^~\d{1,3} min$' then
       raise exception 'duration must match the format "~N min" (e.g. "~18 min")';
+    end if;
+    v_duration_min := (regexp_replace(v_normalized, '^~(\d+) min$', '\1'))::int;
+    if v_duration_min < 3 or v_duration_min > 90 then
+      raise exception 'duration minutes must be between 3 and 90 (got %)', v_duration_min;
     end if;
   else
     v_normalized := lower(trim(p_value));

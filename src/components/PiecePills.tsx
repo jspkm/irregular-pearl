@@ -224,17 +224,23 @@ export default function PiecePills({ pieceId, initialPills }: Props) {
           {pickerCategory == null ? (
             <>
               <span className="pill-picker-label">add</span>
-              {addableCategories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  className="pill pill-picker-cat"
-                  onClick={() => setPickerCategory(cat)}
-                  disabled={busy}
-                >
-                  {CATEGORY_LABEL[cat]}
-                </button>
-              ))}
+              {/* Single-value categories first (era → form → duration → difficulty),
+                  then instrument flushed to the right — instrument is the only
+                  multi-value category, so it stays available the longest and
+                  reads better as the trailing option. */}
+              {[...addableCategories]
+                .sort((a, b) => (a === 'instrument' ? 1 : b === 'instrument' ? -1 : 0))
+                .map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    className="pill pill-picker-cat"
+                    onClick={() => setPickerCategory(cat)}
+                    disabled={busy}
+                  >
+                    {CATEGORY_LABEL[cat]}
+                  </button>
+                ))}
               <button type="button" className="pill-picker-cancel" onClick={closePicker} disabled={busy} aria-label="Cancel">
                 ×
               </button>
@@ -242,19 +248,31 @@ export default function PiecePills({ pieceId, initialPills }: Props) {
           ) : pickerCategory === 'duration' ? (
             <>
               <span className="pill-picker-label">{CATEGORY_LABEL[pickerCategory]}</span>
+              <span className="pill-picker-affix">~</span>
               <input
-                type="text"
-                className="pill-picker-input"
-                placeholder="~18 min"
+                type="number"
+                className="pill-picker-input pill-picker-input-num"
+                placeholder="18"
+                min={3}
+                max={90}
+                step={1}
                 value={durationDraft}
                 onChange={(e) => setDurationDraft(e.target.value)}
                 disabled={busy}
                 autoFocus
               />
+              <span className="pill-picker-affix">min</span>
               <button
                 type="button"
                 className="pill pill-picker-go"
-                onClick={() => addPill('duration', durationDraft)}
+                onClick={() => {
+                  const n = parseInt(durationDraft, 10);
+                  if (!Number.isFinite(n) || n < 3 || n > 90) {
+                    setError('duration must be between 3 and 90 minutes');
+                    return;
+                  }
+                  addPill('duration', `~${n} min`);
+                }}
                 disabled={busy || durationDraft.trim() === ''}
               >
                 add

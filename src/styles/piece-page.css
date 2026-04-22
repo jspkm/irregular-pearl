@@ -42,6 +42,10 @@ h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--mut
 .pill-picker-cat:hover { color: var(--ink); background: var(--bg-tint); }
 .pill-picker-input, .pill-picker-select { font-size: 12px; padding: 2px 6px; border: 0.5px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--ink); font-family: inherit; }
 .pill-picker-input { width: 96px; }
+.pill-picker-input-num { width: 48px; text-align: center; -moz-appearance: textfield; }
+.pill-picker-input-num::-webkit-outer-spin-button,
+.pill-picker-input-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.pill-picker-affix { color: var(--muted); font-size: 12px; }
 .pill-picker-go { cursor: pointer; padding: 2px 8px; color: var(--ink); }
 .pill-picker-cancel { background: transparent; border: 0; padding: 0 4px; cursor: pointer; color: var(--muted); font-size: 14px; line-height: 1; }
 .pill-picker-cancel:hover { color: var(--ink); }

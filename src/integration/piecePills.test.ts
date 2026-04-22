@@ -116,6 +116,27 @@ describe('add_piece_pill', () => {
     expect(error!.message).toMatch(/format/i);
   });
 
+  test('duration rejects below-3 minutes', async () => {
+    const { error } = await addPill(userA.client, 'duration', '~2 min');
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/between 3 and 90/);
+  });
+
+  test('duration rejects above-90 minutes', async () => {
+    const { error } = await addPill(userA.client, 'duration', '~91 min');
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/between 3 and 90/);
+  });
+
+  test('duration accepts boundary 3 and 90', async () => {
+    const r3 = await addPill(userA.client, 'duration', '~3 min');
+    expect(r3.error).toBeNull();
+    // Same piece can only hold one duration pill — clear and try the upper bound.
+    await admin.from('piece_pills').delete().eq('piece_id', PIECE).eq('category', 'duration');
+    const r90 = await addPill(userA.client, 'duration', '~90 min');
+    expect(r90.error).toBeNull();
+  });
+
   test('rejects second pill in single-value category', async () => {
     const r1 = await addPill(userA.client, 'era', 'baroque');
     expect(r1.error).toBeNull();
