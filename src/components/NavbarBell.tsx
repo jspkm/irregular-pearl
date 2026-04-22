@@ -26,6 +26,8 @@ interface PieceRef {
 
 interface NotificationItem extends NotificationRow {
   piece: PieceRef | null;
+  /** Present on contribution_requested rows when the sender left a note. */
+  note: string | null;
 }
 
 /** Badge-text rule per plan: hidden at 0, exact 1–9, "9+" at 10+. */
@@ -70,11 +72,16 @@ export default function NavbarBell() {
       .order('created_at', { ascending: false });
     if (!notifRows || notifRows.length === 0) { setItems([]); return; }
 
-    // Batch-fetch subjects per subject_table (O(tables) round trips). Every
-    // supported subject table has a `piece_id` column, so the projection is
-    // uniform.
+    // Batch-fetch subjects per subject_table (O(tables) round trips). Signed-
+    // content subjects have a `piece_id` column; contribution_requests has
+    // both piece_id and a `note` we want to render inline.
     const idsByTable = new Map<SubjectTable, string[]>();
+    const contribRequestIds: string[] = [];
     for (const n of notifRows) {
+      if (n.subject_table === 'contribution_requests') {
+        contribRequestIds.push(n.subject_id);
+        continue;
+      }
       if (!isSubjectTable(n.subject_table)) continue;
       const arr = idsByTable.get(n.subject_table) ?? [];
       arr.push(n.subject_id);
@@ -87,12 +94,29 @@ export default function NavbarBell() {
       ),
     );
     const pieceIdBySubjectKey = new Map<string, string>();
+    const noteByRequestId = new Map<string, string>();
     const pieceIdSet = new Set<string>();
     for (const [idx, [table]] of [...idsByTable.entries()].entries()) {
       const res = subjectResults[idx];
       for (const row of (res.data ?? []) as { id: string; piece_id: string }[]) {
         pieceIdBySubjectKey.set(`${table}:${row.id}`, row.piece_id);
         pieceIdSet.add(row.piece_id);
+      }
+    }
+
+    if (contribRequestIds.length > 0) {
+      const { data: crRows } = await supabase
+        .from('contribution_requests')
+        .select('id, piece_id, note')
+        .in('id', contribRequestIds);
+      for (const row of (crRows ?? []) as {
+        id: string;
+        piece_id: string;
+        note: string | null;
+      }[]) {
+        pieceIdBySubjectKey.set(`contribution_requests:${row.id}`, row.piece_id);
+        pieceIdSet.add(row.piece_id);
+        if (row.note) noteByRequestId.set(row.id, row.note);
       }
     }
 
@@ -104,7 +128,9 @@ export default function NavbarBell() {
     setItems(
       notifRows.map((n) => {
         const pieceId = pieceIdBySubjectKey.get(`${n.subject_table}:${n.subject_id}`);
-        return { ...n, piece: pieceId ? pieceById.get(pieceId) ?? null : null };
+        const note =
+          n.subject_table === 'contribution_requests' ? noteByRequestId.get(n.subject_id) ?? null : null;
+        return { ...n, piece: pieceId ? pieceById.get(pieceId) ?? null : null, note };
       }),
     );
   }, []);
@@ -202,6 +228,14 @@ export default function NavbarBell() {
                           <div className="font-display text-[15px] leading-tight mb-0.5">{pieceLabel}</div>
                         )}
                         <div className="text-xs text-muted leading-snug">{n.body}</div>
+                        {n.note && (
+                          <div
+                            className="mt-1.5 text-xs text-ink leading-snug italic border-l-2 border-accent pl-2"
+                            style={{ fontFamily: 'var(--font-serif)' }}
+                          >
+                            &ldquo;{n.note}&rdquo;
+                          </div>
+                        )}
                       </a>
                     </li>
                   );
