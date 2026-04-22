@@ -61,7 +61,10 @@ export default function AdminSignals() {
   useEffect(() => {
     if (authLoading) return;
     if (!user || !hasSupabase) {
-      setGate('unauthorized');
+      // Non-staff (including signed-out) don't get to learn this URL
+      // exists. Bounce to the project-wide 404 page, replacing history
+      // so the back button doesn't land back on this URL.
+      window.location.replace('/404');
       return;
     }
     let cancelled = false;
@@ -78,7 +81,7 @@ export default function AdminSignals() {
       if (queriesRes.error || piecesRes.error) {
         const msg = queriesRes.error?.message ?? piecesRes.error?.message ?? '';
         if (msg.toLowerCase().includes('staff only')) {
-          setGate('unauthorized');
+          window.location.replace('/404');
           return;
         }
         setError(msg || 'Could not load signals.');
@@ -97,18 +100,10 @@ export default function AdminSignals() {
     };
   }, [authLoading, user, limit]);
 
-  if (gate === 'loading') {
-    return <div className="text-sm text-muted font-body">Loading signals…</div>;
-  }
-  if (gate === 'unauthorized') {
-    return (
-      <div className="font-body">
-        <h1 className="text-[28px] font-display text-ink mb-2">Editorial signals</h1>
-        <p className="text-sm text-muted">
-          This dashboard is for moderators and admins.
-        </p>
-      </div>
-    );
+  // Render nothing while loading or bouncing — the dashboard body below
+  // mounts only after the RPC calls succeed as staff.
+  if (gate === 'loading' || gate === 'unauthorized') {
+    return null;
   }
 
   return (
