@@ -60,11 +60,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: USER_FACING_FAILURE }, 400);
   }
 
+  // Framing distribution: default (≈90%) is "your insight would be valuable"
+  // — the sender is inviting the recipient to contribute because their
+  // perspective on this piece is worth capturing. About 10% of the time
+  // the sender is personally working on the piece and is curious how the
+  // recipient approaches it. Both stay warm and musician-to-musician; the
+  // distribution keeps the notes from reading identically across requests.
+  const personalAngle = Math.random() < 0.1;
+  const framingInstruction = personalAngle
+    ? `The sender is personally working on this piece right now and is curious how ${recipientFirstName} approaches it. Lead with that context — "I've been working on this and ..." or similar. Ask a specific, inviting question or request.`
+    : `Emphasize that ${recipientFirstName}'s insight and contribution would be valuable — their perspective or experience with this piece would genuinely help other musicians approaching it. Frame it as "your insight would be valuable" rather than "please do me a favor."`;
+
   const prompt = [
     `You are drafting a short personal note from one classical musician to another.`,
     `The sender${senderName ? ` (${senderName})` : ''} is using Irregular Pearl — a classical music knowledge platform where musicians write signed notes on pieces — to ask ${recipientName} to contribute on:`,
     `  Piece: ${pieceTitle}`,
     `  Composer: ${composerName}`,
+    ``,
+    `Framing for this note: ${framingInstruction}`,
     ``,
     `Write the note the sender would write. Constraints:`,
     `  - Greet by first name ("Dear ${recipientFirstName}," or "Hi ${recipientFirstName}," or similar warmth).`,
