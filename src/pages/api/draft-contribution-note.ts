@@ -61,15 +61,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   // Framing distribution: default (≈90%) is "your insight would be valuable"
-  // — the sender is inviting the recipient to contribute because their
-  // perspective on this piece is worth capturing. About 10% of the time
-  // the sender is personally working on the piece and is curious how the
-  // recipient approaches it. Both stay warm and musician-to-musician; the
-  // distribution keeps the notes from reading identically across requests.
+  // — recipient-centric, their perspective matters. About 10% of the time
+  // the sender is personally working on the piece and asks for the
+  // recipient's approach. Both stay warm and musician-to-musician.
   const personalAngle = Math.random() < 0.1;
   const framingInstruction = personalAngle
-    ? `The sender is personally working on this piece right now and is curious how ${recipientFirstName} approaches it. Lead with that context — "I've been working on this and ..." or similar. Ask a specific, inviting question or request.`
-    : `Emphasize that ${recipientFirstName}'s insight and contribution would be valuable — their perspective or experience with this piece would genuinely help other musicians approaching it. Frame it as "your insight would be valuable" rather than "please do me a favor."`;
+    ? [
+        `FRAMING: The sender is personally working on this piece right now.`,
+        `  - Lead with the sender's own work: "I've been working on this piece and..." or "I'm preparing this for a performance and..."`,
+        `  - Ask a specific, inviting question about how ${recipientFirstName} approaches it.`,
+        `  - The sender's curiosity is the hook.`,
+      ].join('\n')
+    : [
+        `FRAMING: The recipient's voice is what matters. The sender wants ${recipientFirstName}'s insight captured on this piece because other musicians would benefit from hearing it.`,
+        `  - DO NOT start with "I've been working on..." or "I'm preparing..." or anything about the sender's own playing or practice. The sender is not the subject; ${recipientFirstName} is.`,
+        `  - DO NOT frame this as a favor ("would you mind", "could you help me"). Frame it as: their perspective would be valuable to readers.`,
+        `  - Openers that work: "Your reading of..." / "You're one of the voices I'd want on..." / "Few people have lived with this piece the way you have..." / "I'd love for your perspective on ${pieceTitle} to be on the site." Pick a natural one.`,
+      ].join('\n');
 
   const prompt = [
     `You are drafting a short personal note from one classical musician to another.`,
@@ -77,7 +85,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     `  Piece: ${pieceTitle}`,
     `  Composer: ${composerName}`,
     ``,
-    `Framing for this note: ${framingInstruction}`,
+    framingInstruction,
     ``,
     `Write the note the sender would write. Constraints:`,
     `  - Greet by first name ("Dear ${recipientFirstName}," or "Hi ${recipientFirstName}," or similar warmth).`,
