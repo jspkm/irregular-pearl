@@ -6,12 +6,12 @@
 //
 // Design doc spec (minimalist blank slot):
 //   1. Crumbs (Pieces / Composer / Title) — identical to active page
-//   2. NOT YET CURATED kicker — continuous with the typeahead section label
-//   3. H1 title + catalog + byline — identical to active page
-//   4. Pills row (era / form / instruments) — identical
-//   5. Invitation block: "This piece has no signed contributions yet" +
-//      editorial prose framing what kinds of contributions fit.
-//   6. CTAs: primary "Start the first contribution" + ghost-link
+//   2. H1 title + catalog + byline — identical to active page
+//   3. Pills row (era / form / instruments) — identical
+//   4. Invitation block: "This piece has no signed contributions yet" +
+//      editorial prose framing what kinds of contributions fit. The lede
+//      itself names the state; no separate kicker eyebrow is needed.
+//   5. CTAs: primary "Start the first contribution" + ghost-link
 //      "Know someone who should? Request a contribution."
 //
 // The page is deliberately short. No inline description form, no movements
@@ -35,8 +35,6 @@ const { piece } = Astro.props;
     <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a><span class="sep">/</span>
     <span>{piece.title}</span>
   </div>
-
-  <div class="kicker">Not yet curated</div>
 
   <h1 class="piece">
     {piece.title}
