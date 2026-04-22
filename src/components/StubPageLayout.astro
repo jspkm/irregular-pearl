@@ -23,6 +23,7 @@ import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
 import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
 import PiecePills from './PiecePills';
+import RequestContributionDialog from './RequestContributionDialog';
 
 interface Props {
   piece: PieceFull;
@@ -73,14 +74,14 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
       >
         Start the first contribution
       </button>
-      <button
-        type="button"
-        class="pp-cta-ghost"
-        data-cta="request-contribution"
-        data-piece-id={piece.id}
-      >
-        Know someone who should? Request a contribution.
-      </button>
+      <RequestContributionDialog
+        client:load
+        pieceId={piece.id}
+        pieceTitle={piece.title}
+        composerName={piece.composer_name}
+        triggerLabel="Know someone who should? Request a contribution."
+        triggerClassName="pp-cta-ghost"
+      />
     </div>
   </section>
 </main>
