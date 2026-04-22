@@ -125,17 +125,23 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     <span>{piece.title}</span>
   </div>
 
-  <h1 class="piece">
-    {piece.title}
-    {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
-  </h1>
-  <p class="byline">
-    by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
-  </p>
+  <div class="piece-header-row">
+    <div class="piece-header-main">
+      <h1 class="piece">
+        {piece.title}
+        {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
+      </h1>
+      <p class="byline">
+        by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
+      </p>
 
-  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isPrePiece} />
+      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isPrePiece} />
+    </div>
 
-  <RecipientRibbon client:load pieceId={piece.id} />
+    <div class="piece-header-aside">
+      <RecipientRibbon client:load pieceId={piece.id} />
+    </div>
+  </div>
 
   {isPrePiece && (
     <section class="block pp-invite" id="invitation">

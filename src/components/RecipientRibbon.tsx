@@ -110,7 +110,7 @@ export default function RecipientRibbon({ pieceId }: Props) {
   const others = requests.length - 1;
 
   return (
-    <div className="recipient-ribbon" role="status">
+    <aside className="recipient-ribbon" role="status">
       <div className="recipient-ribbon-copy">
         {others > 0 ? (
           <>
@@ -126,9 +126,9 @@ export default function RecipientRibbon({ pieceId }: Props) {
       {latest.note && others === 0 && (
         <div className="recipient-ribbon-note">&ldquo;{latest.note}&rdquo;</div>
       )}
-      <a href="/notifications" className="recipient-ribbon-link">
-        Open in Messages <span aria-hidden="true">→</span>
-      </a>
-    </div>
+      <div className="recipient-ribbon-privacy">
+        This message is only visible to you.
+      </div>
+    </aside>
   );
 }
