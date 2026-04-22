@@ -12,7 +12,7 @@ export interface SeedPiece {
   era: string;
   form: string;
   duration_minutes: number | null;
-  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'professional';
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'virtuoso';
   description: string;
   editions: {
     id: string;
@@ -56,7 +56,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Baroque',
     form: 'Chaconne',
     duration_minutes: 15,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'The closing movement of Bach\'s Partita No. 2 for solo violin, a monumental set of variations over a repeating bass pattern. Multiple cello arrangements exist, transposing the work into a register and idiom the cello can sustain; none is canonical. Most cellists work from their own adaptation or a colleague\'s. The Chaconne on cello retains the violin original\'s architectural logic across some sixty-four variations, three movements in one, and has become a staple of solo cello recital programming despite not being written for the instrument.',
     editions: [
       { id: 'e-bach-chaconne-busch', publisher: 'Schott', editor: 'Hermann Busch (arr.)', year: 1984, description: 'Transcription for solo cello by the Busch brothers\' cellist. Playable in its original key with extensive double stops; a demanding but idiomatic reading.', type: 'performer', url: 'https://www.schott-music.com/en/' },
@@ -205,7 +205,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Baroque',
     form: 'Suite',
     duration_minutes: 27,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'The fifth suite requires scordatura tuning (the A string lowered to G), giving the instrument a darker, veiled sonority. The Prélude opens with a grave French overture before launching into an elaborate fugue. The Sarabande, built from stark single notes and double stops, is one of Bach\'s most profound slow movements.',
     editions: [
       { id: 'e-bach-cs5-henle', publisher: 'Henle Verlag', editor: 'Egon Voss', year: 2000, description: 'Urtext with clear notation of scordatura tuning. Source-critical commentary included.', type: 'urtext', url: 'https://www.henle.de/en/search/?q=Cello+Suites+BWV+1011' },
@@ -234,7 +234,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Baroque',
     form: 'Suite',
     duration_minutes: 30,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'The final and most technically demanding of the six suites, likely written for a five-stringed instrument (viola pomposa or violoncello piccolo). The addition of a high E string allows passages in the soprano register that are extremely challenging on a standard four-string cello. The Prélude is a virtuosic showpiece, and the Gavottes are joyful and dance-like.',
     editions: [
       { id: 'e-bach-cs6-henle', publisher: 'Henle Verlag', editor: 'Egon Voss', year: 2000, description: 'Urtext with notes on the five-string instrument question. Part of the complete suites volume.', type: 'urtext', url: 'https://www.henle.de/en/search/?q=Cello+Suites+BWV+1012' },
@@ -317,7 +317,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Baroque',
     form: 'Sonata',
     duration_minutes: 15,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'The darkest and most ambitious of the three gamba sonatas, cast in three movements rather than the usual four and closer in scale to a concerto. The opening Vivace is built on a driving figure passed between the instruments; the Adagio is a plaintive siciliana; the closing Allegro is a rigorous double fugue. The cellist and keyboardist are true equals throughout, and the writing rewards chamber-music-level rehearsal rather than soloist framing.',
     editions: [
       { id: 'e-bach-bwv1029-henle', publisher: 'Henle Verlag', editor: 'Hans Eppstein', year: 1987, description: 'Urtext edition with separate parts. Includes both the keyboard realisation and the gamba part with minimal editorial additions.', type: 'urtext', url: 'https://www.henle.de/en/search/?q=BWV+1029+Viola+da+Gamba' },
@@ -342,7 +342,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Classical',
     form: 'Concerto',
     duration_minutes: 25,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'Lost for nearly two centuries and rediscovered in Prague in 1961, this concerto has since become a cornerstone of the cello repertoire. Its brilliant first movement, lyrical Adagio, and spirited finale display a Classical elegance that demands both technical precision and stylistic finesse. The work dates from Haydn\'s early years at Esterházy.',
     editions: [
       { id: 'e-haydn-cc1-henle', publisher: 'Henle Verlag', editor: 'Sonja Gerlach', year: 1981, description: 'Urtext edition based on the recovered autograph. The standard scholarly text.', type: 'urtext', url: 'https://www.henle.de/en/search/?q=Haydn+Cello+Concerto+C+major' },
@@ -394,7 +394,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Romantic',
     form: 'Concerto',
     duration_minutes: 20,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'A compact, single-movement concerto in three connected sections that unfolds with irresistible momentum. The opening theme bursts in immediately with urgent energy. Saint-Saëns masterfully balances virtuoso display with elegant French lyricism, and the work has remained one of the most popular cello concertos since its 1873 premiere.',
     editions: [
       { id: 'e-ss-cc1-durand', publisher: 'Durand', editor: 'Original publication', year: 1873, description: 'The original Durand edition, published in the composer\'s lifetime. The standard French source.', type: 'practical', url: 'https://imslp.org/wiki/Cello_Concerto_No.1,_Op.33_(Saint-Sa%C3%ABns,_Camille)' },
@@ -422,7 +422,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Post-Romantic',
     form: 'Concerto',
     duration_minutes: 30,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'Elgar\'s last major work, composed in 1919 in the shadow of World War I. Its autumnal, elegiac character makes it one of the most emotionally profound concertos in the repertoire. Forever associated with Jacqueline du Pré\'s legendary 1965 recording.',
     editions: [
       { id: 'e-elgar-cc-novello', publisher: 'Novello', editor: 'Original publication', year: 1919, description: 'The original Novello edition, overseen by Elgar. Standard performance edition.', type: 'practical', url: 'https://imslp.org/wiki/Cello_Concerto,_Op.85_(Elgar,_Edward)' },
@@ -449,7 +449,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Late Romantic',
     form: 'Sonata',
     duration_minutes: 28,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'Strauss\'s only cello sonata, written at nineteen and published in 1883. The work sits just before his turn to the tone poems: it is still in the conservative Brahmsian vein, with a first movement built on broad lyrical themes, a brooding slow movement in F minor, and a dashing finale. Cellists value the sonata as one of the major late-Romantic German chamber works for the instrument, sitting in repertoire alongside the Brahms sonatas and predating the Rachmaninoff.',
     editions: [
       { id: 'e-strauss-cs-universal', publisher: 'Universal Edition', editor: 'Original publication', year: 1883, description: 'Original Aibl edition, later acquired by Universal. The standard source text.', type: 'practical', url: 'https://imslp.org/wiki/Cello_Sonata,_Op.6_(Strauss,_Richard)' },
@@ -520,7 +520,7 @@ export const seedPieces: SeedPiece[] = [
     era: 'Contemporary',
     form: 'Sonata',
     duration_minutes: 15,
-    difficulty: 'professional',
+    difficulty: 'virtuoso',
     description: 'Crumb\'s early (1955) sonata for unaccompanied cello, composed during his graduate years at the University of Michigan. The work predates the experimental sonorities Crumb became known for: it is written in a post-Bartók idiom with clear formal architecture, aggressive rhythmic drive, and folk-inflected melodic material. The three movements are a Fantasia, a set of character pieces titled "Tema pastorale con variazioni", and a Toccata. The sonata has become a core 20th-century solo cello work and is often paired with Kodály\'s Op. 8 and the Bach Suites in recital programmes.',
     editions: [
       { id: 'e-crumb-ss-peters', publisher: 'C. F. Peters', editor: 'Original publication', year: 1955, description: 'The original Peters edition. Remains the only published score; no critical edition has been prepared.', type: 'performer', url: 'https://www.wisemusicclassical.com/publishers/edition-peters/' }
