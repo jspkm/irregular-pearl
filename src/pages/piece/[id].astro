@@ -4,11 +4,21 @@ import Navbar from '../../components/Navbar.astro';
 import PiecePageLayout from '../../components/PiecePageLayout.astro';
 import StubPageLayout from '../../components/StubPageLayout.astro';
 import { getPieceFull, isStub } from '../../lib/pieces';
+import { resolvePieceRedirect } from '../../lib/pieceRedirects';
 
 const { id } = Astro.params;
-const piece = await getPieceFull(id || '');
+const slug = id || '';
+const piece = await getPieceFull(slug);
 
+// Identity-immutability fallback: if the slug isn't a current piece, check
+// piece_redirects. Old slugs 301 forever to their canonical target. This is
+// the only supported path for slug corrections — pieces.id is never updated
+// in place.
 if (!piece) {
+  const toSlug = await resolvePieceRedirect(slug);
+  if (toSlug) {
+    return Astro.redirect(`/piece/${toSlug}`, 301);
+  }
   return Astro.redirect('/');
 }
 
