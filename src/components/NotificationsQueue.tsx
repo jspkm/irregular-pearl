@@ -333,11 +333,6 @@ export default function NotificationsQueue() {
     });
   }, [loadQueue]);
 
-  async function refresh() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) await loadQueue(session);
-  }
-
   function notifyChanged() {
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
   }
@@ -408,16 +403,10 @@ export default function NotificationsQueue() {
   const items: Item[] = [...drafts, ...messages].sort(
     (a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0),
   );
-  const hasDrafts = drafts.length > 0;
 
   return (
     <div className="font-body">
-      <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Messages</h1>
-      <p className="text-sm text-muted mb-8">
-        {hasDrafts
-          ? 'Requests from colleagues and drafts waiting for your review.'
-          : 'Requests from colleagues. When someone asks you to contribute to a piece, it appears here.'}
-      </p>
+      <h1 className="text-[28px] font-display text-ink mb-8 tracking-tight">Messages</h1>
 
       {error && (
         <div className="mb-6 rounded-lg border-[0.5px] border-[#A32D2D] bg-[#F7E4E4] px-4 py-3 text-sm text-[#A32D2D]">
@@ -426,11 +415,7 @@ export default function NotificationsQueue() {
       )}
 
       {items.length === 0 ? (
-        <div className="rounded-xl border-[0.5px] border-border bg-surface px-5 py-8 text-center">
-          <p className="text-sm text-muted">
-            Nothing waiting. When someone asks you to contribute to a piece, it will appear here.
-          </p>
-        </div>
+        <EmptyState />
       ) : (
         <ul className="space-y-4">
           {items.map((item) => {
@@ -556,16 +541,6 @@ export default function NotificationsQueue() {
           })}
         </ul>
       )}
-
-      <div className="mt-10">
-        <button
-          type="button"
-          onClick={refresh}
-          className="inline-flex items-center bg-transparent border-[0.5px] border-border-strong text-muted font-body text-[11px] px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:text-ink hover:border-ink"
-        >
-          Refresh
-        </button>
-      </div>
     </div>
   );
 }
@@ -767,5 +742,34 @@ function MessageCard({
         )}
       </div>
     </li>
+  );
+}
+
+// ---------- EmptyState ----------
+// Clear-inbox celebration. Borrows the 404 page's musical-glyph at-accent/15
+// pattern: one symbol rendered large and faded above a serif line.
+
+const EMPTY_STATE_SYMBOLS = [
+  // Whole rest — literally "silence"
+  '<svg viewBox="0 0 80 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="80" height="2"/><rect x="20" y="2" width="40" height="14"/></svg>',
+  // Fermata — a held moment
+  '<svg viewBox="0 0 120 80" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M60 0C30 0 4 22 4 50h6c0-24 22-44 50-44s50 20 50 44h6C116 22 90 0 60 0z"/><circle cx="60" cy="62" r="8"/></svg>',
+  // Quarter rest
+  '<svg viewBox="0 0 40 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M22 0L8 28l16 16-16 20c4 8 10 14 16 18l-4 10c-1 3-4 8-4 14 0 6 4 12 10 14 2-4 3-8 3-12 0-6-2-10-5-14l4-10 4-8-14-16L30 40z"/></svg>',
+];
+
+function EmptyState() {
+  const symbolIdx = Math.floor(Math.random() * EMPTY_STATE_SYMBOLS.length);
+  const symbol = EMPTY_STATE_SYMBOLS[symbolIdx];
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+      <div
+        className="w-24 h-24 md:w-36 md:h-36 mb-6 text-accent/15"
+        dangerouslySetInnerHTML={{ __html: symbol }}
+      />
+      <p className="font-display italic text-2xl md:text-3xl text-ink max-w-md leading-tight">
+        Hooray, all clear. More time for music-making.
+      </p>
+    </div>
   );
 }
