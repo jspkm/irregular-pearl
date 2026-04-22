@@ -4,79 +4,135 @@
 // is continuous — the pre-piece page is a stripped-down materialized piece
 // page, not a different product.
 //
-// Section ordering reflects the design doc:
+// Design doc spec (minimalist blank slot):
 //   1. Crumbs (Pieces / Composer / Title) — identical to active page
-//   2. H1 title + catalog + byline — identical
-//   3. Metadata pills (era + form) — identical
-//   4. NOT YET CURATED kicker + invitation + CTAs — the pre-piece block
-//   5. (Optional) About this piece — inline description author (staff/any
-//      logged-in user), will later route through the piece-description
-//      signed-content pipeline
-//   6. (Optional) Movements — inline wiki-edit
+//   2. NOT YET CURATED kicker — continuous with the typeahead section label
+//   3. H1 title + catalog + byline — identical to active page
+//   4. Pills row (era / form / instruments) — identical
+//   5. Invitation block: "This piece has no signed contributions yet" +
+//      editorial prose framing what kinds of contributions fit.
+//   6. CTAs: primary "Start the first contribution" + ghost-link
+//      "Know someone who should? Request a contribution."
+//
+// The page is deliberately short. No inline description form, no movements
+// editor, no sidebar. When a contributor arrives, this page is a promise:
+// the piece is real, the page is real, the first signed voice is the thing
+// that's missing. That's what the CTAs are for.
 
 import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
-import StubContributionForms from './StubContributionForms';
+
+interface Props {
+  piece: PieceFull;
+}
+
+const { piece } = Astro.props;
 ---
 
 <main class="page">
   <div class="crumbs">
     <a href="/">Pieces</a><span class="sep">/</span>
-    <a href={`/composer/${encodeURIComponent(Astro.props.piece.composer_name)}`}>{Astro.props.piece.composer_name}</a><span class="sep">/</span>
-    <span>{Astro.props.piece.title}</span>
+    <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a><span class="sep">/</span>
+    <span>{piece.title}</span>
   </div>
 
   <div class="kicker">Not yet curated</div>
 
   <h1 class="piece">
-    {Astro.props.piece.title}
-    {Astro.props.piece.catalog_number && <span class="cat">{Astro.props.piece.catalog_number}</span>}
+    {piece.title}
+    {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
   </h1>
   <p class="byline">
-    by <a href={`/composer/${encodeURIComponent(Astro.props.piece.composer_name)}`}>{Astro.props.piece.composer_name}</a>
+    by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
   </p>
 
   <div class="pills">
-    {Astro.props.piece.era && <span class="pill">{Astro.props.piece.era}</span>}
-    {Astro.props.piece.form && <span class="pill">{Astro.props.piece.form}</span>}
-    {Astro.props.piece.instruments.slice(0, 3).map((i) => <span class="pill">{i}</span>)}
+    {piece.era && <span class="pill">{piece.era}</span>}
+    {piece.form && <span class="pill">{piece.form}</span>}
+    {piece.instruments.slice(0, 3).map((i) => <span class="pill">{i}</span>)}
   </div>
 
-  <section class="block" id="invitation">
-    <p class="invitation-lede">
+  <section class="block pp-invite" id="invitation">
+    <p class="pp-invite-lede">
       This piece has no signed contributions yet.
     </p>
-    <p class="invitation-prose">
+    <p class="pp-invite-prose">
       Write the first performer's note, a practice note on a specific passage,
       or an interpretive school you'd defend in front of colleagues.
     </p>
-  </section>
-
-  <section class="block" id="about">
-    <div class="kicker">About this piece</div>
-    <StubContributionForms
-      pieceId={Astro.props.piece.id}
-      existingDescription={Astro.props.piece.description}
-      existingMovements={Astro.props.piece.movements}
-      client:load
-    />
+    <div class="pp-cta-row">
+      <button
+        type="button"
+        class="pp-cta-primary"
+        data-cta="start-contribution"
+        data-piece-id={piece.id}
+      >
+        Start the first contribution
+      </button>
+      <button
+        type="button"
+        class="pp-cta-ghost"
+        data-cta="request-contribution"
+        data-piece-id={piece.id}
+      >
+        Know someone who should? Request a contribution.
+      </button>
+    </div>
   </section>
 </main>
 
 <style>
-  .invitation-lede {
+  .pp-invite { margin-bottom: 0; }
+  .pp-invite-lede {
     font-family: var(--font-serif);
     font-size: 22px;
     line-height: 1.35;
     color: var(--ink);
-    margin: 0 0 12px;
+    margin: 16px 0 12px;
     font-weight: 500;
   }
-  .invitation-prose {
+  .pp-invite-prose {
     font-size: 15px;
     color: var(--muted);
     line-height: 1.6;
     max-width: 640px;
-    margin: 0;
+    margin: 0 0 24px;
+  }
+  .pp-cta-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .pp-cta-primary {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--ink);
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+  }
+  .pp-cta-primary:hover {
+    opacity: 0.88;
+  }
+  .pp-cta-ghost {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    padding: 4px 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 3px;
+    transition: color 150ms ease;
+  }
+  .pp-cta-ghost:hover {
+    color: var(--ink);
   }
 </style>
