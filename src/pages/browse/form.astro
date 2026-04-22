@@ -26,7 +26,7 @@ if (hasSupabase) {
 
 // Fallback to seed data
 if (Object.keys(formCounts).length === 0) {
-  formPieces = groupBy(seedPieces, p => p.form);
+  formPieces = groupBy(seedPieces, p => p.form.toLowerCase());
   for (const [form, pieces] of Object.entries(formPieces)) {
     formCounts[form] = pieces.length;
   }
@@ -62,10 +62,10 @@ const jsonLd = {
       const pieces = formPieces[form] || [];
       return (
         <details class="mb-8" open={pieces.length <= 20}>
-          <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2">
+          <summary class="font-display text-xl mb-4 cursor-pointer hover:text-accent transition-colors list-none flex items-center gap-2 capitalize">
             <svg class="w-4 h-4 text-muted transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             {form}
-            <span class="text-sm font-sans text-muted font-normal">({pieces.length.toLocaleString()} pieces)</span>
+            <span class="text-sm font-sans text-muted font-normal normal-case">({pieces.length.toLocaleString()} pieces)</span>
           </summary>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {pieces.slice(0, 15).map((piece: any) => (

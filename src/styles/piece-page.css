@@ -13,8 +13,40 @@ h1.piece { font-family: var(--font-serif); font-weight: 500; font-size: 34px; li
 h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 6px; }
 .byline { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
 .byline a { color: var(--ink); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
-.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
-.pill { font-size: 12px; padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); border: 0.5px solid var(--border); }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; align-items: center; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-tint); color: var(--muted); border: 0.5px solid var(--border); display: inline-flex; align-items: center; gap: 6px; line-height: 1.4; }
+
+/* ---------- Pill row: add (+) and per-pill delete (×) affordances ---------- */
+.pill-add { cursor: pointer; padding: 2px 8px; font-weight: 500; color: var(--muted); background: transparent; border-style: dashed; border-color: var(--border-strong); }
+.pill-add:hover { color: var(--ink); border-color: var(--ink); background: var(--bg-tint); }
+
+.pill-delete { background: transparent; border: 0; padding: 0; margin-left: 2px; cursor: pointer; color: var(--muted); font-size: 14px; line-height: 1; opacity: 0; transition: opacity 100ms ease; }
+.pill:hover .pill-delete, .pill:focus-within .pill-delete { opacity: 1; }
+.pill-delete:hover { color: var(--ink); }
+.pill-delete:disabled { cursor: not-allowed; }
+
+/* Subtle staff cue: a tiny dot before the × area, visible only to mods/admins
+   on pills they cannot delete via the user-source rule (i.e. seed and mod). */
+.pill-staff-cue { width: 4px; height: 4px; border-radius: 50%; background: var(--tertiary); display: inline-block; margin-left: 2px; opacity: 0.6; }
+
+/* Confirming-delete chip: replaces the pill in place. */
+.pill-confirming { color: var(--ink); border-color: var(--border-strong); background: var(--bg); }
+.pill-confirm-yes, .pill-confirm-no { background: transparent; border: 0; padding: 0 4px; cursor: pointer; font-size: 12px; color: var(--muted); }
+.pill-confirm-yes:hover { color: var(--ink); }
+.pill-confirm-no:hover { color: var(--ink); }
+
+/* Picker chip: sits inline in the pill row when adding. */
+.pill-picker { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--bg); border: 0.5px dashed var(--border-strong); }
+.pill-picker-label { color: var(--muted); }
+.pill-picker-cat { cursor: pointer; padding: 2px 8px; }
+.pill-picker-cat:hover { color: var(--ink); background: var(--bg-tint); }
+.pill-picker-input, .pill-picker-select { font-size: 12px; padding: 2px 6px; border: 0.5px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--ink); font-family: inherit; }
+.pill-picker-input { width: 96px; }
+.pill-picker-go { cursor: pointer; padding: 2px 8px; color: var(--ink); }
+.pill-picker-cancel { background: transparent; border: 0; padding: 0 4px; cursor: pointer; color: var(--muted); font-size: 14px; line-height: 1; }
+.pill-picker-cancel:hover { color: var(--ink); }
+
+.pill-error { font-size: 12px; color: var(--danger, #b3261e); margin-left: 8px; }
 
 /* ---------- Four-axis difficulty panel (PRD) ---------- */
 .diff-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; border: 0.5px solid var(--border); border-radius: var(--r-card); padding: 20px 24px; margin-bottom: 48px; background: var(--bg); }
