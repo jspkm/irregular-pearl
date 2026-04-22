@@ -25,6 +25,8 @@ import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
 import PiecePills from './PiecePills';
 import RequestContributionDialog from './RequestContributionDialog';
 import RecipientRibbon from './RecipientRibbon';
+import StartContributionButton from './StartContributionButton';
+import PerformersNotes from './PerformersNotes';
 
 interface Props {
   piece: PieceFull;
@@ -69,14 +71,7 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
       or an interpretive school you'd defend in front of colleagues.
     </p>
     <div class="pp-cta-row">
-      <button
-        type="button"
-        class="pp-cta-primary"
-        data-cta="start-contribution"
-        data-piece-id={piece.id}
-      >
-        Start the first contribution
-      </button>
+      <StartContributionButton client:load />
       <RequestContributionDialog
         client:load
         pieceId={piece.id}
@@ -86,6 +81,11 @@ const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
         triggerClassName="pp-cta-ghost"
       />
     </div>
+  </section>
+
+  <section class="block" id="contribute">
+    <div class="kicker">Performer's notes</div>
+    <PerformersNotes client:load pieceId={piece.id} initialNotes={[]} />
   </section>
 </main>
 

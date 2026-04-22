@@ -62,6 +62,39 @@ export default function RequestContributionDialog({
   const [drafting, setDrafting] = useState(false);
   const [hasDrafted, setHasDrafted] = useState(false);
 
+  // Recipient self-hide. If the current viewer is themselves a recipient of
+  // an un-cleared contribution_request on this piece, suppress the whole
+  // trigger + dialog. Purpose: lessen request cascading — we don't want
+  // someone who just received an ask to immediately fan it out to more
+  // colleagues. They should respond (publish or dismiss) first.
+  const [isRecipient, setIsRecipient] = useState(false);
+
+  useEffect(() => {
+    if (!user || !hasSupabase) {
+      setIsRecipient(false);
+      return;
+    }
+    let cancelled = false;
+    async function check() {
+      const { data } = await supabase
+        .from('contribution_requests')
+        .select('id')
+        .eq('piece_id', pieceId)
+        .eq('recipient_id', user!.id)
+        .is('cleared_at', null)
+        .limit(1);
+      if (cancelled) return;
+      setIsRecipient((data ?? []).length > 0);
+    }
+    void check();
+    const onChanged = () => void check();
+    window.addEventListener('notifications:changed', onChanged);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('notifications:changed', onChanged);
+    };
+  }, [user, pieceId]);
+
   // Look up staff role when the user session hydrates.
   useEffect(() => {
     if (!user || !hasSupabase) {
@@ -267,6 +300,10 @@ export default function RequestContributionDialog({
     !submitting &&
     ((mode === 'username' && username.trim().length > 0) ||
       (mode === 'email' && email.trim().length > 0));
+
+  // Suppress the whole surface if viewer is already a recipient for this
+  // piece — prevents request cascading (see state declaration above).
+  if (isRecipient) return null;
 
   return (
     <>
