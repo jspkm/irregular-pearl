@@ -81,22 +81,12 @@ const breadcrumbLd = {
 >
   <Navbar />
 
-  <!-- Breadcrumb -->
-  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
-    <a href="/" class="hover:text-ink">Home</a>
-    {breadcrumb.map((crumb) => (
-      <span>
-        <span class="mx-1">›</span>
-        <span class="text-muted">{crumb}</span>
-      </span>
-    ))}
-  </div>
-
+  {/* Breadcrumbs are rendered inside PiecePageLayout / StubPageLayout so the
+      layout-level wrapper stays off (the piece-page.css .crumbs token owns
+      this row). */}
   {stub ? (
-    <!-- Stub page: illustration + inline contribution forms -->
     <StubPageLayout piece={piece} />
   ) : (
-    <!-- Full page: ported from the Claude design kit -->
     <PiecePageLayout piece={piece} />
   )}
 </Layout>

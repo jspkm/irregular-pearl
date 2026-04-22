@@ -1,135 +1,82 @@
 ---
+// Pre-piece page: materialized piece with no published signed content yet.
+// Uses the same piece-page.css tokens as PiecePageLayout so visual identity
+// is continuous — the pre-piece page is a stripped-down materialized piece
+// page, not a different product.
+//
+// Section ordering reflects the design doc:
+//   1. Crumbs (Pieces / Composer / Title) — identical to active page
+//   2. H1 title + catalog + byline — identical
+//   3. Metadata pills (era + form) — identical
+//   4. NOT YET CURATED kicker + invitation + CTAs — the pre-piece block
+//   5. (Optional) About this piece — inline description author (staff/any
+//      logged-in user), will later route through the piece-description
+//      signed-content pipeline
+//   6. (Optional) Movements — inline wiki-edit
+
+import '../styles/piece-page.css';
 import type { PieceFull } from '../lib/pieces';
 import StubContributionForms from './StubContributionForms';
-
-interface Props {
-  piece: PieceFull;
-}
-
-const { piece } = Astro.props;
-
-const illustrations = [
-  { src: '/illustrations/cellist.png', alt: 'A cellist looking at you' },
-  { src: '/illustrations/pianist.png', alt: 'A pianist with a cat' },
-  { src: '/illustrations/violinist.png', alt: 'A violinist with a dog' },
-  { src: '/illustrations/flutist.png', alt: 'A flutist with coffee' },
-  { src: '/illustrations/horn-player.png', alt: 'A horn player with a bird' },
-  { src: '/illustrations/singer.png', alt: 'An opera singer' },
-  { src: '/illustrations/percussionist.png', alt: 'A percussionist' },
-  { src: '/illustrations/guitarist.png', alt: 'A guitarist with a cat' },
-];
-
-// Pick a random illustration based on piece ID (deterministic per piece)
-const hash = piece.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-const illustration = illustrations[hash % illustrations.length];
-
-const wikipediaLink = piece.external_links.find(l => l.type === 'wikipedia');
-const imslpLink = piece.external_links.find(l => l.type === 'imslp');
-const spotifyLink = piece.external_links.find(l => l.type === 'spotify');
 ---
 
-<main class="max-w-[1100px] mx-auto px-4 md:px-6 py-7">
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8 items-start">
-    <!-- Main content -->
-    <div>
-      <!-- Kicker eyebrow: matches the NOT YET CURATED label used in typeahead
-           so the language stays continuous from search → landing. -->
-      <div class="font-sans text-[11px] tracking-[0.08em] uppercase text-accent font-medium mb-2">
-        Not yet curated
-      </div>
-
-      <!-- Title block -->
-      <h1 class="font-display text-[28px] leading-tight mb-1">{piece.title}</h1>
-      <a href={`/composer/${encodeURIComponent(piece.composer_name)}`} class="text-[15px] text-accent no-underline hover:underline">{piece.composer_name}</a>
-      {piece.catalog_number && (
-        <div class="font-mono text-[11px] text-muted mt-0.5">{piece.catalog_number}</div>
-      )}
-      <div class="flex gap-1.5 mt-3 mb-7">
-        <span class="text-[11px] px-2.5 py-0.5 border border-border rounded bg-bg text-muted">{piece.era}</span>
-        <span class="text-[11px] px-2.5 py-0.5 border border-border rounded bg-bg text-muted">{piece.form}</span>
-      </div>
-
-      <!-- Illustration + invite -->
-      <div class="flex items-center gap-6 mb-8 flex-col sm:flex-row">
-        <img
-          src={illustration.src}
-          alt={illustration.alt}
-          class="w-[140px] h-auto flex-shrink-0 opacity-85"
-          loading="lazy"
-        />
-        <div>
-          <p class="font-display text-lg text-ink font-normal leading-snug mb-2">
-            This piece has no signed contributions yet.
-          </p>
-          <p class="text-[14px] text-muted leading-relaxed">
-            Write the first performer&apos;s note, a practice note on a specific passage, or an interpretive school you&apos;d defend in front of colleagues.
-          </p>
-        </div>
-      </div>
-
-      <!-- Interactive contribution forms (React island) -->
-      <StubContributionForms
-        pieceId={piece.id}
-        existingDescription={piece.description}
-        existingMovements={piece.movements}
-        client:load
-      />
-    </div>
-
-    <!-- Sidebar -->
-    <aside>
-      <!-- Resources -->
-      <div class="bg-surface border border-border rounded-xl p-5 mb-3.5">
-        <h4 class="font-sans font-semibold text-[11px] text-muted uppercase tracking-wider mb-3">Resources</h4>
-        {imslpLink && (
-          <a href={imslpLink.url} target="_blank" rel="noopener" class="flex items-center gap-2.5 py-2.5 border-b border-border text-[13px] text-ink no-underline hover:text-accent transition-colors">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            {imslpLink.label || 'View scores on IMSLP'}
-          </a>
-        )}
-        {wikipediaLink && (
-          <a href={wikipediaLink.url} target="_blank" rel="noopener" class="flex items-center gap-2.5 py-2.5 text-[13px] text-ink no-underline hover:text-accent transition-colors">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            {wikipediaLink.label || `${piece.composer_name} on Wikipedia`}
-          </a>
-        )}
-        {!imslpLink && !wikipediaLink && (
-          <p class="text-[13px] text-muted italic">No external resources linked yet.</p>
-        )}
-      </div>
-
-      <!-- Details -->
-      <div class="bg-surface border border-border rounded-xl p-5 mb-3.5">
-        <h4 class="font-sans font-semibold text-[11px] text-muted uppercase tracking-wider mb-3">Details</h4>
-        <div class="flex justify-between py-2 border-b border-border text-[13px]">
-          <span class="text-muted">Instruments</span>
-          <span class="text-ink font-medium">{piece.instruments.join(', ')}</span>
-        </div>
-        <div class="flex justify-between py-2 border-b border-border text-[13px]">
-          <span class="text-muted">Era</span>
-          <span class="text-ink font-medium">{piece.era}</span>
-        </div>
-        <div class="flex justify-between py-2 border-b border-border text-[13px]">
-          <span class="text-muted">Form</span>
-          <span class="text-ink font-medium">{piece.form}</span>
-        </div>
-        {piece.duration_minutes && (
-          <div class="flex justify-between py-2 border-b border-border text-[13px]">
-            <span class="text-muted">Duration</span>
-            <span class="text-ink font-medium font-mono text-[11px]">~{piece.duration_minutes} min</span>
-          </div>
-        )}
-        <div class="flex justify-between py-2 text-[13px]">
-          <span class="text-muted">Difficulty</span>
-          <span class="text-muted italic font-normal">Not yet tagged</span>
-        </div>
-      </div>
-
-      <!-- Request button -->
-      <button class="flex items-center justify-center gap-1.5 w-full py-2 px-3.5 bg-transparent text-muted border border-border rounded-lg text-[12px] cursor-pointer hover:border-accent hover:text-accent transition-all mt-3">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Request more info for this piece
-      </button>
-    </aside>
+<main class="page">
+  <div class="crumbs">
+    <a href="/">Pieces</a><span class="sep">/</span>
+    <a href={`/composer/${encodeURIComponent(Astro.props.piece.composer_name)}`}>{Astro.props.piece.composer_name}</a><span class="sep">/</span>
+    <span>{Astro.props.piece.title}</span>
   </div>
+
+  <div class="kicker">Not yet curated</div>
+
+  <h1 class="piece">
+    {Astro.props.piece.title}
+    {Astro.props.piece.catalog_number && <span class="cat">{Astro.props.piece.catalog_number}</span>}
+  </h1>
+  <p class="byline">
+    by <a href={`/composer/${encodeURIComponent(Astro.props.piece.composer_name)}`}>{Astro.props.piece.composer_name}</a>
+  </p>
+
+  <div class="pills">
+    {Astro.props.piece.era && <span class="pill">{Astro.props.piece.era}</span>}
+    {Astro.props.piece.form && <span class="pill">{Astro.props.piece.form}</span>}
+    {Astro.props.piece.instruments.slice(0, 3).map((i) => <span class="pill">{i}</span>)}
+  </div>
+
+  <section class="block" id="invitation">
+    <p class="invitation-lede">
+      This piece has no signed contributions yet.
+    </p>
+    <p class="invitation-prose">
+      Write the first performer's note, a practice note on a specific passage,
+      or an interpretive school you'd defend in front of colleagues.
+    </p>
+  </section>
+
+  <section class="block" id="about">
+    <div class="kicker">About this piece</div>
+    <StubContributionForms
+      pieceId={Astro.props.piece.id}
+      existingDescription={Astro.props.piece.description}
+      existingMovements={Astro.props.piece.movements}
+      client:load
+    />
+  </section>
 </main>
+
+<style>
+  .invitation-lede {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0 0 12px;
+    font-weight: 500;
+  }
+  .invitation-prose {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 640px;
+    margin: 0;
+  }
+</style>
