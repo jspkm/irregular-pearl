@@ -71,6 +71,7 @@ function itemKey(d: Pick<PendingDraft, 'subjectTable' | 'subjectId'>): string {
 export default function NotificationsQueue() {
   const [status, setStatus] = useState<Status>('loading');
   const [profile, setProfile] = useState<ContributorProfile | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
   const [drafts, setDrafts] = useState<PendingDraft[]>([]);
   const [messages, setMessages] = useState<ContributionRequestMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -82,9 +83,11 @@ export default function NotificationsQueue() {
 
     // Profile: any signed-in user can reach Messages. Contributor fields
     // decide whether we also load draft_awaiting_approval items below.
+    // Role decides whether the Dismiss action is available on message
+    // cards (staff can't dismiss; they publish or leave pending).
     const { data: profileRow, error: profileErr } = await supabase
       .from('users')
-      .select('is_contributor, contributor_active, display_name, contributor_bio_short')
+      .select('is_contributor, contributor_active, display_name, contributor_bio_short, role')
       .eq('id', session.user.id)
       .single();
     if (profileErr) {
@@ -94,6 +97,8 @@ export default function NotificationsQueue() {
     const isContributor = Boolean(
       profileRow?.is_contributor && profileRow?.contributor_active,
     );
+    const role = (profileRow as { role?: string } | null)?.role;
+    setIsStaff(role === 'moderator' || role === 'admin');
     setProfile({
       displayName: profileRow?.display_name ?? '',
       bioShort: profileRow?.contributor_bio_short ?? null,
@@ -430,7 +435,16 @@ export default function NotificationsQueue() {
         <ul className="space-y-4">
           {items.map((item) => {
             if (item.kind === 'message') {
-              return <MessageCard key={`msg:${item.notificationId}`} m={item} />;
+              return (
+                <MessageCard
+                  key={`msg:${item.notificationId}`}
+                  m={item}
+                  canDismiss={!isStaff}
+                  onDismissed={(requestId) =>
+                    setMessages((rows) => rows.filter((r) => r.requestId !== requestId))
+                  }
+                />
+              );
             }
             const d = item;
             const key = itemKey(d);
@@ -656,7 +670,35 @@ function formatTimestamp(iso: string): string {
   }
 }
 
-function MessageCard({ m }: { m: ContributionRequestMessage }) {
+function MessageCard({
+  m,
+  canDismiss,
+  onDismissed,
+}: {
+  m: ContributionRequestMessage;
+  /** False for staff recipients — they can't dismiss (must publish or
+   * leave pending). Matches the RPC's staff-rejection. */
+  canDismiss: boolean;
+  onDismissed: (requestId: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function handleDismiss() {
+    setBusy(true);
+    setErr(null);
+    const { error } = await supabase.rpc('dismiss_contribution_request', {
+      p_request_id: m.requestId,
+    });
+    setBusy(false);
+    if (error) {
+      setErr(error.message);
+      return;
+    }
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
+    onDismissed(m.requestId);
+  }
+
   return (
     <li className="rounded-xl border-[0.5px] border-border bg-surface p-5">
       <div
@@ -700,13 +742,29 @@ function MessageCard({ m }: { m: ContributionRequestMessage }) {
         </div>
       )}
 
-      <div className="mt-5">
+      {err && (
+        <div className="mt-3 text-xs text-[#A32D2D]" role="alert">
+          {err}
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <a
           href={`/piece/${m.pieceId}`}
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
         >
           Open piece <span aria-hidden="true">→</span>
         </a>
+        {canDismiss && (
+          <button
+            type="button"
+            onClick={handleDismiss}
+            disabled={busy}
+            className="inline-flex items-center px-4 py-2 bg-transparent text-muted text-sm font-medium border-[0.5px] border-border-strong rounded-lg hover:text-ink hover:border-ink disabled:opacity-50 transition-colors"
+          >
+            {busy ? 'Dismissing…' : 'Dismiss'}
+          </button>
+        )}
       </div>
     </li>
   );

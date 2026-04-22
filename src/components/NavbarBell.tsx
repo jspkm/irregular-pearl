@@ -37,10 +37,36 @@ export function bellBadgeText(count: number): string | null {
   return String(count);
 }
 
+// Bell acknowledgement: clicking any notification in the popover counts
+// as "I've seen the bell for now" across all current items. Stamped in
+// localStorage so subsequent loads hide anything created before the last
+// interaction. Device-local by design — clicking on the laptop doesn't
+// clear the phone's bell, which matches the bell's semantics (it's a
+// surface for the current session, not a persistent inbox). The real
+// inbox is the Messages page.
+const BELL_LAST_VIEWED_KEY = 'ip.bell.lastViewedAt';
+
+function readBellLastViewed(): string | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage.getItem(BELL_LAST_VIEWED_KEY) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeBellLastViewed(iso: string) {
+  try {
+    if (typeof window !== 'undefined') window.localStorage.setItem(BELL_LAST_VIEWED_KEY, iso);
+  } catch {
+    // Storage may be disabled; bell still works, just won't auto-clear.
+  }
+}
+
 export default function NavbarBell() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [hasQueueAccess, setHasQueueAccess] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const [lastViewedAt, setLastViewedAt] = useState<string | null>(() => readBellLastViewed());
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -165,8 +191,21 @@ export default function NavbarBell() {
   // Invisible when not signed in (loading or anon).
   if (signedIn !== true) return null;
 
-  const count = items.length;
+  // Filter items by the bell acknowledgement watermark: anything created
+  // before the last bell interaction is considered "seen" in the bell
+  // context and hidden from both count and list. The underlying
+  // notifications are still live on the Messages page.
+  const visibleItems = lastViewedAt
+    ? items.filter((n) => n.created_at > lastViewedAt)
+    : items;
+  const count = visibleItems.length;
   const badgeText = bellBadgeText(count);
+
+  function acknowledgeBell() {
+    const now = new Date().toISOString();
+    writeBellLastViewed(now);
+    setLastViewedAt(now);
+  }
 
   return (
     <div ref={containerRef} className="relative inline-flex">
@@ -208,12 +247,12 @@ export default function NavbarBell() {
             </div>
           </div>
 
-          {items.length === 0 ? (
+          {visibleItems.length === 0 ? (
             <div className="px-4 py-6 text-center text-xs text-muted">Nothing waiting.</div>
           ) : (
             <>
               <ul className="max-h-[360px] overflow-y-auto">
-                {items.map((n) => {
+                {visibleItems.map((n) => {
                   const pieceLabel = n.piece
                     ? `${n.piece.title}${n.piece.catalog_number ? ` (${n.piece.catalog_number})` : ''}`
                     : null;
@@ -222,7 +261,10 @@ export default function NavbarBell() {
                       <a
                         href={n.link_path}
                         className="block px-4 py-3 text-sm text-ink no-underline hover:bg-bg-tint"
-                        onClick={() => setOpen(false)}
+                        onClick={() => {
+                          acknowledgeBell();
+                          setOpen(false);
+                        }}
                       >
                         {pieceLabel && (
                           <div className="font-display text-[15px] leading-tight mb-0.5">{pieceLabel}</div>

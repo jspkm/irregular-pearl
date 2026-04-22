@@ -322,6 +322,136 @@ describe('request_contribution', () => {
 });
 
 // -----------------------------
+// dismiss_contribution_request
+// -----------------------------
+
+describe('dismiss_contribution_request', () => {
+  let sender: Awaited<ReturnType<typeof createAuthUser>>;
+  let recipient: Awaited<ReturnType<typeof createAuthUser>>;
+  let staffRecipient: Awaited<ReturnType<typeof createAuthUser>>;
+  let stranger: Awaited<ReturnType<typeof createAuthUser>>;
+  const PIECE = 'test-dismiss-piece';
+
+  beforeAll(async () => {
+    await createTestPiece(PIECE, 'Dismiss Test');
+    sender = await createAuthUser({ displayName: 'Dismiss Sender', isStaff: true });
+    recipient = await createAuthUser({ displayName: 'Dismiss Recipient' });
+    staffRecipient = await createAuthUser({ displayName: 'Staff Recipient', isStaff: true });
+    stranger = await createAuthUser({ displayName: 'Dismiss Stranger' });
+    await admin.from('users').update({ username: 'dismiss_recipient' }).eq('id', recipient.id);
+    await admin.from('users').update({ username: 'dismiss_staff_recipient' }).eq('id', staffRecipient.id);
+  });
+
+  afterAll(async () => {
+    await admin.from('notifications').delete().eq('subject_table', 'contribution_requests');
+    await admin.from('contribution_requests').delete().eq('piece_id', PIECE);
+    await deleteTestPiece(PIECE);
+    await deleteAuthUser(sender.id);
+    await deleteAuthUser(recipient.id);
+    await deleteAuthUser(staffRecipient.id);
+    await deleteAuthUser(stranger.id);
+  });
+
+  async function freshRequest(): Promise<string> {
+    const { data: requestId, error } = await sender.client.rpc('request_contribution', {
+      p_piece_id: PIECE,
+      p_recipient_username: 'dismiss_recipient',
+    });
+    if (error) throw new Error(error.message);
+    return requestId as string;
+  }
+
+  test('recipient can dismiss their own request', async () => {
+    const reqId = await freshRequest();
+
+    const { error } = await recipient.client.rpc('dismiss_contribution_request', {
+      p_request_id: reqId,
+    });
+    expect(error).toBeNull();
+
+    // contribution_requests.cleared_at is set, fulfilled_at is NOT
+    const { data: cr } = await admin
+      .from('contribution_requests')
+      .select('cleared_at, fulfilled_at')
+      .eq('id', reqId)
+      .single();
+    expect(cr!.cleared_at).not.toBeNull();
+    expect(cr!.fulfilled_at).toBeNull();
+
+    // notification.cleared_at is set
+    const { data: notif } = await admin
+      .from('notifications')
+      .select('cleared_at')
+      .eq('subject_table', 'contribution_requests')
+      .eq('subject_id', reqId)
+      .single();
+    expect(notif!.cleared_at).not.toBeNull();
+  });
+
+  test('sender cannot dismiss their own sent request', async () => {
+    const reqId = await freshRequest();
+
+    const { error } = await sender.client.rpc('dismiss_contribution_request', {
+      p_request_id: reqId,
+    });
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/only the recipient/i);
+  });
+
+  test('third party cannot dismiss someone else\u2019s request', async () => {
+    const reqId = await freshRequest();
+
+    const { error } = await stranger.client.rpc('dismiss_contribution_request', {
+      p_request_id: reqId,
+    });
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/only the recipient/i);
+  });
+
+  test('unauthenticated rejected', async () => {
+    const reqId = await freshRequest();
+
+    const { createClient } = await import('@supabase/supabase-js');
+    const anonClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+    const { error } = await anonClient.rpc('dismiss_contribution_request', { p_request_id: reqId });
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/unauthenticated/i);
+  });
+
+  test('dismissing already-dismissed request is a no-op', async () => {
+    const reqId = await freshRequest();
+
+    await recipient.client.rpc('dismiss_contribution_request', { p_request_id: reqId });
+    const { error } = await recipient.client.rpc('dismiss_contribution_request', {
+      p_request_id: reqId,
+    });
+    expect(error).toBeNull();
+  });
+
+  test('nonexistent request rejected', async () => {
+    const { error } = await recipient.client.rpc('dismiss_contribution_request', {
+      p_request_id: '00000000-0000-0000-0000-000000000000',
+    });
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/not found/i);
+  });
+
+  test('staff recipient cannot dismiss (must publish or leave pending)', async () => {
+    const { data: reqId, error: reqErr } = await sender.client.rpc('request_contribution', {
+      p_piece_id: PIECE,
+      p_recipient_username: 'dismiss_staff_recipient',
+    });
+    expect(reqErr).toBeNull();
+
+    const { error } = await staffRecipient.client.rpc('dismiss_contribution_request', {
+      p_request_id: reqId,
+    });
+    expect(error).not.toBeNull();
+    expect(error!.message).toMatch(/staff cannot dismiss/i);
+  });
+});
+
+// -----------------------------
 // search_pieces_typeahead
 // -----------------------------
 
