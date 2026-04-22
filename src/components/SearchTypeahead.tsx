@@ -22,6 +22,12 @@ interface Result {
   instruments: string[] | null;
 }
 
+// Piece pages live at /piece/[slug]. Exported so a unit test can pin the
+// path shape against the /p/ vs /piece/ regression.
+export function piecePath(slug: string): string {
+  return `/piece/${slug}`;
+}
+
 interface Props {
   className?: string;
   /** When set, the input autofocuses on mount (used in the mobile overlay). */
@@ -102,7 +108,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
 
   async function handleSelect(r: Result) {
     if (r.result_type === 'materialized') {
-      window.location.href = `/p/${r.id}`;
+      window.location.href = piecePath(r.id);
       return;
     }
     // Seed: materialize (signed-in only)
@@ -123,7 +129,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
       window.alert(`Could not open this piece: ${error.message}`);
       return;
     }
-    window.location.href = `/p/${pieceId}`;
+    window.location.href = piecePath(pieceId as string);
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {

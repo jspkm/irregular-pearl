@@ -33,6 +33,38 @@ async function seed() {
   }
 
   for (const piece of seedPieces) {
+    // canonical_index_id became NOT NULL in migration 20260522000000. Every
+    // piece traces back to an index row. For the idempotent seed path, we
+    // reuse the existing index row if the piece already has one; otherwise
+    // we create a fresh index row and link it.
+    let canonicalIndexId: string | null = null;
+    const { data: existingPiece } = await supabase
+      .from('pieces')
+      .select('canonical_index_id')
+      .eq('id', piece.id)
+      .maybeSingle();
+    if (existingPiece?.canonical_index_id) {
+      canonicalIndexId = existingPiece.canonical_index_id;
+    } else {
+      const { data: idx, error: idxErr } = await supabase
+        .from('canonical_piece_index')
+        .insert({
+          canonical_title: piece.title,
+          composer_name: piece.composer_name,
+          catalog_number: piece.catalog_number,
+          era: piece.era,
+          form: piece.form,
+          instruments: piece.instruments,
+        })
+        .select('id')
+        .single();
+      if (idxErr || !idx) {
+        console.error(`  Failed to insert canonical_piece_index for "${piece.title}":`, idxErr?.message);
+        continue;
+      }
+      canonicalIndexId = idx.id;
+    }
+
     // Insert piece
     const { error: pieceError } = await supabase
       .from('pieces')
@@ -47,6 +79,7 @@ async function seed() {
         duration_minutes: piece.duration_minutes,
         difficulty: piece.difficulty,
         description: piece.description,
+        canonical_index_id: canonicalIndexId,
       }, { onConflict: 'id' });
 
     if (pieceError) {

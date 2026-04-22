@@ -325,7 +325,7 @@ begin
       format('%s asked you to contribute to %s.',
              coalesce(v_sender_display_name, 'Someone'),
              v_piece_title),
-      format('/p/%s', p_piece_id)
+      format('/piece/%s', p_piece_id)
     )
     on conflict (subject_table, subject_id, type) where cleared_at is null
     do nothing;

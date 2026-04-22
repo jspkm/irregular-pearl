@@ -225,16 +225,18 @@ describe('request_contribution', () => {
     expect(error).toBeNull();
     expect(requestId).toBeDefined();
 
-    // Notification row exists
+    // Notification row exists with correct link_path
     const { data: notif } = await admin
       .from('notifications')
-      .select('id, type, subject_table, subject_id, recipient_id, body')
+      .select('id, type, subject_table, subject_id, recipient_id, body, link_path')
       .eq('subject_id', requestId)
       .single();
     expect(notif!.type).toBe('contribution_requested');
     expect(notif!.subject_table).toBe('contribution_requests');
     expect(notif!.recipient_id).toBe(recipient.id);
     expect(notif!.body).toMatch(/Staff Sender/);
+    // Regression pin: piece page lives at /piece/[slug], not /p/[slug].
+    expect(notif!.link_path).toBe(`/piece/${PIECE}`);
   });
 
   test('sender gate passes after publishing a signed contribution', async () => {
