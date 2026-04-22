@@ -3,7 +3,7 @@ import type { Difficulty, UserLevel, LinkType, Database } from './database.types
 
 describe('database types', () => {
   test('Difficulty enum values', () => {
-    const difficulties: Difficulty[] = ['beginner', 'intermediate', 'advanced', 'professional'];
+    const difficulties: Difficulty[] = ['beginner', 'intermediate', 'advanced', 'virtuoso'];
     expect(difficulties).toHaveLength(4);
   });
 

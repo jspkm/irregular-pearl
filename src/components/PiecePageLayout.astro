@@ -38,13 +38,15 @@ import ExternalRefsList from './ExternalRefsList';
 import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '../lib/externalLinks';
 import { fetchPedagogicalConnections, fetchAllPiecesForPicker } from '../lib/pedagogical';
 import PedagogicalArcList from './PedagogicalArcList';
+import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
+import PiecePills from './PiecePills';
 
 interface Props {
   piece: PieceFull;
 }
 
 const { piece } = Astro.props;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId, dbPills] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
@@ -57,7 +59,12 @@ const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMove
   fetchSeedDescriptionVoteId(piece.id),
   getPublishedPieceDifficultyRatings(piece.id),
   fetchSeedDifficultyVoteId(piece.id),
+  getPiecePills(piece.id),
 ]);
+// If the DB has no pills (e.g. preview build with no Supabase, or a piece
+// the seed pipeline missed), fall back to constructing read-only pills
+// from the piece's scalar fields.
+const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
 const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
 
@@ -113,13 +120,8 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
   </p>
 
-  <div class="pills">
-    {piece.instruments.map(i => <span class="pill">{i.toLowerCase()}</span>)}
-    {piece.era && <span class="pill">{piece.era.toLowerCase()}</span>}
-    {piece.form && <span class="pill">{piece.form.toLowerCase()}</span>}
-    {piece.duration_minutes && <span class="pill">~{piece.duration_minutes} min</span>}
-    <span class="pill">{piece.difficulty}</span>
-  </div>
+  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
+
 
   {/* Signed descriptions stack (includes the unsigned pieces.description as
       a synthetic "Seed data" card at the bottom of the stack; user-authored

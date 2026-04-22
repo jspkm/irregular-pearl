@@ -1,4 +1,4 @@
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'professional';
+export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'virtuoso';
 export type UserLevel = 'student' | 'amateur' | 'professional' | 'teacher';
 export type LinkType = 'imslp' | 'youtube' | 'wikipedia' | 'spotify' | 'soundcloud' | 'bandcamp' | 'internet_archive' | 'vimeo';
 
@@ -43,14 +43,27 @@ export interface Database {
           composer_name: string;
           catalog_number: string | null;
           instruments: string[];
-          era: string;
-          form: string;
+          era: string | null;
+          form: string | null;
           duration_minutes: number | null;
-          difficulty: Difficulty;
+          difficulty: Difficulty | null;
           description: string;
         };
         Insert: Database['public']['Tables']['pieces']['Row'];
         Update: Partial<Database['public']['Tables']['pieces']['Insert']>;
+      };
+      piece_pills: {
+        Row: {
+          id: string;
+          piece_id: string;
+          category: 'instrument' | 'era' | 'form' | 'duration' | 'difficulty';
+          value: string;
+          source: 'seed' | 'user' | 'mod';
+          added_by: string | null;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['piece_pills']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['piece_pills']['Insert']>;
       };
       editions: {
         Row: {

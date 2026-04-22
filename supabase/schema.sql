@@ -2,7 +2,7 @@
 -- Run this in Supabase SQL Editor to set up the database
 
 -- Enums
-create type difficulty as enum ('beginner', 'intermediate', 'advanced', 'professional');
+create type difficulty as enum ('beginner', 'intermediate', 'advanced', 'virtuoso');
 create type user_level as enum ('student', 'amateur', 'professional', 'teacher');
 create type link_type as enum ('imslp', 'youtube', 'wikipedia');
 

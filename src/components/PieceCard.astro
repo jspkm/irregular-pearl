@@ -24,9 +24,9 @@ const { id, title, composer_name, catalog_number, instruments, era, difficulty, 
   {description && <p class="text-xs text-muted leading-relaxed mb-3 line-clamp-3">{description.slice(0, 140)}...</p>}
   <div class="flex gap-1.5 flex-wrap">
     {instruments.map((inst) => (
-      <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{inst}</span>
+      <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted lowercase">{inst}</span>
     ))}
-    <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{era}</span>
+    <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted lowercase">{era}</span>
     {edition_count && (
       <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{edition_count} editions</span>
     )}

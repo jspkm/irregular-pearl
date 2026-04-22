@@ -23,7 +23,7 @@ describe('seed data integrity', () => {
       expect(piece.era).toBeTruthy();
       expect(piece.form).toBeTruthy();
       expect(piece.description).toBeTruthy();
-      expect(['beginner', 'intermediate', 'advanced', 'professional']).toContain(piece.difficulty);
+      expect(['beginner', 'intermediate', 'advanced', 'virtuoso']).toContain(piece.difficulty);
     }
   });
 
