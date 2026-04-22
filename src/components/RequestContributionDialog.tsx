@@ -364,7 +364,7 @@ export default function RequestContributionDialog({
                   value={note}
                   onChange={(e) => setNote(e.target.value.slice(0, 280))}
                   placeholder="One sentence. The recipient will see this with the request. Keep it human."
-                  rows={3}
+                  rows={8}
                   maxLength={280}
                 />
                 <div className="rcd-counter">{note.length}/280</div>
