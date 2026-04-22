@@ -1688,9 +1688,48 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 }
 .rcd-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-top: 20px;
+  flex-wrap: wrap;
+}
+.rcd-actions-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.rcd-draft-link {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  padding: 7px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.rcd-draft-link:hover:not(:disabled) {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink);
+  text-underline-offset: 3px;
+}
+.rcd-draft-link:disabled { color: var(--tertiary); cursor: not-allowed; }
+.rcd-draft-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  line-height: 1;
 }
 .rcd-cancel {
   font-family: var(--font-sans);

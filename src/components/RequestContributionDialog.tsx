@@ -58,6 +58,10 @@ export default function RequestContributionDialog({
   const [activeSuggestIdx, setActiveSuggestIdx] = useState(0);
   const usernameFieldRef = useRef<HTMLDivElement>(null);
 
+  // LLM note drafting state
+  const [drafting, setDrafting] = useState(false);
+  const [hasDrafted, setHasDrafted] = useState(false);
+
   // Look up staff role when the user session hydrates.
   useEffect(() => {
     if (!user || !hasSupabase) {
@@ -161,6 +165,74 @@ export default function RequestContributionDialog({
     setError(null);
     setSuccess(null);
     setMode('username');
+    setHasDrafted(false);
+  }
+
+  async function handleDraftNote() {
+    setDrafting(true);
+    setError(null);
+
+    // Resolve recipient first name. Prefer users.display_name's first
+    // token; if that's empty (rare for accounts with only an email +
+    // username), fall back to the username itself so the greeting is
+    // always present.
+    let recipientDisplayName = '';
+    let recipientFirstName = '';
+    if (mode === 'username' && username.trim()) {
+      const { data } = await supabase
+        .from('users')
+        .select('display_name')
+        .eq('username', username.trim())
+        .maybeSingle();
+      const display = ((data as { display_name?: string } | null)?.display_name ?? '').trim();
+      recipientDisplayName = display || username.trim();
+      const firstToken = display.split(/\s+/)[0] ?? '';
+      recipientFirstName = firstToken || username.trim();
+    } else if (mode === 'email' && email.trim()) {
+      recipientDisplayName = email.trim();
+      recipientFirstName = email.trim().split('@')[0] || email.trim();
+    }
+
+    // Sender display name — purely informational for the prompt.
+    let senderName = '';
+    if (user) {
+      const { data } = await supabase
+        .from('users')
+        .select('display_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      senderName = ((data as { display_name?: string } | null)?.display_name ?? '').trim();
+    }
+
+    try {
+      const res = await fetch('/api/draft-contribution-note', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          senderName,
+          recipientName: recipientDisplayName,
+          recipientFirstName,
+          pieceTitle,
+          composerName,
+        }),
+      });
+
+      if (!res.ok) {
+        const errBody = (await res.json().catch(() => ({ error: 'Drafting failed.' }))) as {
+          error?: string;
+        };
+        setError(errBody.error ?? 'Drafting failed.');
+        return;
+      }
+
+      const { note: draftedNote } = (await res.json()) as { note: string };
+      setNote(draftedNote.slice(0, 280));
+      setHasDrafted(true);
+    } catch {
+      setError('Drafting failed. Check your connection and try again.');
+    } finally {
+      setDrafting(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -363,7 +435,7 @@ export default function RequestContributionDialog({
                   id="rcd-note"
                   value={note}
                   onChange={(e) => setNote(e.target.value.slice(0, 280))}
-                  placeholder="One sentence. The recipient will see this with the request. Keep it human."
+                  placeholder="One sentence. The recipient will see this with the request."
                   rows={8}
                   maxLength={280}
                 />
@@ -382,12 +454,38 @@ export default function RequestContributionDialog({
               )}
 
               <div className="rcd-actions">
-                <button type="button" onClick={handleClose} className="rcd-cancel">
-                  Cancel
+                <button
+                  type="button"
+                  onClick={handleDraftNote}
+                  disabled={
+                    drafting ||
+                    (mode === 'username' && !username.trim()) ||
+                    (mode === 'email' && !email.trim())
+                  }
+                  className="rcd-draft-link"
+                  aria-label={hasDrafted ? 'Rewrite the note' : 'Help me with the note'}
+                >
+                  {drafting ? (
+                    'Drafting…'
+                  ) : hasDrafted ? (
+                    <>
+                      <span aria-hidden="true" className="rcd-draft-icon">
+                        ↻
+                      </span>
+                      Rewrite
+                    </>
+                  ) : (
+                    'Help me with note'
+                  )}
                 </button>
-                <button type="submit" disabled={!canSubmit} className="rcd-submit">
-                  {submitting ? 'Sending…' : 'Send request'}
-                </button>
+                <div className="rcd-actions-right">
+                  <button type="button" onClick={handleClose} className="rcd-cancel">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={!canSubmit} className="rcd-submit">
+                    {submitting ? 'Sending…' : 'Send request'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
