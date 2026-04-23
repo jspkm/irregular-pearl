@@ -124,18 +124,6 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 **Priority:** P1
 **Depends on:** `canonical_piece_index` table migration (part of the request-a-contribution PR1)
 
-### `search_misses` logging + admin dashboard
-
-**What:** New table `search_misses(id, query text, query_length int, result_count int, user_id uuid null, created_at timestamptz)`. Typeahead RPC writes to it when a query is ≥ 6 chars AND returns zero or low-confidence matches. Admin dashboard route (`/admin/unmatched-queries`) is a read-only staff surface that groups queries by frequency over the last 30 days, sorted descending. No "Add to index" button — the dashboard is observational; the writing happens via the automated worker.
-
-**Why:** Data-driven curation. Staff sees exactly what musicians are looking for that the catalog doesn't cover, without a user-facing suggest form that would invite drive-by submissions.
-
-**Context:** Small table, one trigger (or inline insert from the typeahead RPC), one admin page. The admin page is staff-only (`role IN ('moderator','admin')`). No authenticated user attribution required — `user_id` is optional and nullable because signed-out queries are also valid signals.
-
-**Effort:** S
-**Priority:** P1
-**Depends on:** Typeahead RPC (part of request-a-contribution PR1)
-
 ### Automated canonical-index worker (GitHub Action or Claude routine)
 
 **What:** Scheduled worker that consumes the top entries from the `search_misses` admin view, queries MusicBrainz for each, and opens a pull request adding high-confidence matches to `canonical_piece_index` via a SQL migration. Each PR is a reviewable batch (10–50 candidates per run). Low-confidence or ambiguous matches are skipped with a one-line reason logged in the PR description. Human reviewer (staff) approves and merges; the migration applies on deploy. No direct writes to prod from the worker.
@@ -159,6 +147,12 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 ---
 
 ## Completed
+
+### Request a contribution + pre-piece surface + editorial signals
+
+**What:** End-to-end request-a-contribution flow — navbar typeahead with grouped IN THE CATALOG / NOT YET CURATED results, seed-to-materialized piece on first CTA click via `materialize_piece_from_index` (race-safe, idempotent), recipient ribbon on piece page, unified Messages page with dismiss/auto-clear, username autocomplete, LLM-drafted personal notes (staff-only, rate-limited). Sender gate (>= 1 published signed contribution), per-recipient-30d + per-sender-24h rate limits (`app_config`-tunable), staff bypass. Email invites staff-only. New tables: `canonical_piece_index`, `contribution_requests`, `piece_redirects`, `search_misses`, `piece_views`, `draft_note_requests`, `app_config`. Admin Signals tab surfaces unmatched-query leaderboard + most-viewed-no-contribution pieces. Recent Curation section on admin dashboard (union across all four signed-content tables). `/piece/[slug]` uses one layout (`PiecePageLayout` with `mode` prop); `StubPageLayout` retired.
+
+**Completed:** v0.4.0 (2026-04-22)
 
 ### Seed-description voting + piece-page UI polish
 
