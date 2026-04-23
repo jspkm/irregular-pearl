@@ -1,18 +1,44 @@
 // Seed script: bun run supabase/seed.ts
-// Inserts seed pieces, editions, and external links into Supabase.
-// Requires PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars.
+// Inserts seed pieces, editions, and external links into LOCAL Supabase.
+//
+// Reads the local URL + service-role key from `supabase status -o env` rather
+// than process.env. Bun auto-loads .env AND .env.local, and developers often
+// keep prod keys in .env.local — letting the seed read process.env can shadow
+// the local demo key with a prod key, producing a bewildering JWT-decode error
+// against the local instance ("No suitable key or wrong key type" / PGRST301).
+// Resolving via supabase CLI sidesteps that entirely.
 
 import { createClient } from '@supabase/supabase-js';
+import { spawnSync } from 'node:child_process';
 import { seedPieces } from '../src/data/seed';
 
-const url = process.env.PUBLIC_SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!url || !serviceKey) {
-  console.error('Missing env vars: PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
-  process.exit(1);
+function readLocalSupabaseKeys(): { url: string; serviceKey: string } {
+  const result = spawnSync('supabase', ['status', '-o', 'env'], {
+    encoding: 'utf-8',
+  });
+  if (result.status !== 0) {
+    console.error(
+      'Failed to read local Supabase status. Is the local stack running? ' +
+        '(Try `supabase start`.)\n' +
+        (result.stderr || ''),
+    );
+    process.exit(1);
+  }
+  const env: Record<string, string> = {};
+  for (const line of result.stdout.split('\n')) {
+    const m = line.match(/^([A-Z_]+)="?([^"]*)"?$/);
+    if (m) env[m[1]] = m[2];
+  }
+  const url = env.API_URL;
+  const serviceKey = env.SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
+    console.error('supabase status -o env did not return API_URL + SERVICE_ROLE_KEY');
+    process.exit(1);
+  }
+  return { url, serviceKey };
 }
 
+const { url, serviceKey } = readLocalSupabaseKeys();
 const supabase = createClient(url, serviceKey);
 
 async function seed() {
