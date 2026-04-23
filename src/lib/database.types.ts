@@ -181,6 +181,53 @@ export type Database = {
           },
         ]
       }
+      contribution_request_drafts: {
+        Row: {
+          accepted_as_id: string | null
+          created_at: string
+          disposition: string | null
+          dispositioned_at: string | null
+          id: string
+          inline_dismissed_at: string | null
+          kind: Database["public"]["Enums"]["draft_kind"]
+          ordinal: number
+          payload: Json
+          request_id: string
+        }
+        Insert: {
+          accepted_as_id?: string | null
+          created_at?: string
+          disposition?: string | null
+          dispositioned_at?: string | null
+          id?: string
+          inline_dismissed_at?: string | null
+          kind: Database["public"]["Enums"]["draft_kind"]
+          ordinal: number
+          payload: Json
+          request_id: string
+        }
+        Update: {
+          accepted_as_id?: string | null
+          created_at?: string
+          disposition?: string | null
+          dispositioned_at?: string | null
+          id?: string
+          inline_dismissed_at?: string | null
+          kind?: Database["public"]["Enums"]["draft_kind"]
+          ordinal?: number
+          payload?: Json
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_request_drafts_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contribution_requests: {
         Row: {
           cleared_at: string | null
@@ -192,6 +239,7 @@ export type Database = {
           recipient_email: string | null
           recipient_id: string | null
           sender_id: string
+          sent_at: string | null
         }
         Insert: {
           cleared_at?: string | null
@@ -203,6 +251,7 @@ export type Database = {
           recipient_email?: string | null
           recipient_id?: string | null
           sender_id: string
+          sent_at?: string | null
         }
         Update: {
           cleared_at?: string | null
@@ -214,6 +263,7 @@ export type Database = {
           recipient_email?: string | null
           recipient_id?: string | null
           sender_id?: string
+          sent_at?: string | null
         }
         Relationships: [
           {
@@ -1121,6 +1171,7 @@ export type Database = {
           id: string
           last_digest_sent_at: string | null
           link_path: string
+          metadata: Json | null
           recipient_id: string
           subject_id: string
           subject_table: string
@@ -1133,6 +1184,7 @@ export type Database = {
           id?: string
           last_digest_sent_at?: string | null
           link_path: string
+          metadata?: Json | null
           recipient_id: string
           subject_id: string
           subject_table: string
@@ -1145,6 +1197,7 @@ export type Database = {
           id?: string
           last_digest_sent_at?: string | null
           link_path?: string
+          metadata?: Json | null
           recipient_id?: string
           subject_id?: string
           subject_table?: string
@@ -2035,6 +2088,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sent_request_archive: {
+        Row: {
+          drafts: Json
+          id: string
+          note: string | null
+          original_request_id: string
+          piece_id: string
+          recipient_display_name: string | null
+          recipient_id: string | null
+          sender_id: string
+          sent_at: string
+        }
+        Insert: {
+          drafts: Json
+          id?: string
+          note?: string | null
+          original_request_id: string
+          piece_id: string
+          recipient_display_name?: string | null
+          recipient_id?: string | null
+          sender_id: string
+          sent_at: string
+        }
+        Update: {
+          drafts?: Json
+          id?: string
+          note?: string | null
+          original_request_id?: string
+          piece_id?: string
+          recipient_display_name?: string | null
+          recipient_id?: string | null
+          sender_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sent_request_archive_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sent_request_archive_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
@@ -2482,6 +2586,10 @@ export type Database = {
         Args: { p_action: string; p_limit: number; p_window_seconds: number }
         Returns: undefined
       }
+      _check_sender_eligible: {
+        Args: { p_recipient_id: string }
+        Returns: undefined
+      }
       _clear_notifications_for: {
         Args: { p_subject_id: string; p_subject_table: string }
         Returns: undefined
@@ -2556,8 +2664,16 @@ export type Database = {
         Returns: string
       }
       _require_active_contributor: { Args: never; Returns: undefined }
+      _require_drafting_staff: { Args: never; Returns: undefined }
       _require_staff: { Args: never; Returns: undefined }
       _slugify: { Args: { p_input: string }; Returns: string }
+      _validate_draft_payload: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["draft_kind"]
+          p_payload: Json
+        }
+        Returns: undefined
+      }
       _validate_landmark_payload: {
         Args: {
           p_description: string
@@ -2566,6 +2682,14 @@ export type Database = {
           p_practice_notes: Json
         }
         Returns: undefined
+      }
+      act_on_draft: {
+        Args: {
+          p_action: string
+          p_draft_id: string
+          p_payload_override?: Json
+        }
+        Returns: string
       }
       add_piece_pill: {
         Args: { p_category: string; p_piece_id: string; p_value: string }
@@ -2713,6 +2837,10 @@ export type Database = {
         }
         Returns: string
       }
+      create_outbox_request: {
+        Args: { p_note?: string; p_piece_id: string; p_recipient_id: string }
+        Returns: string
+      }
       create_pedagogical_connection: {
         Args: {
           p_kind: string
@@ -2736,6 +2864,11 @@ export type Database = {
         Args: { p_edit_summary?: string; p_movement_id: string }
         Returns: undefined
       }
+      delete_outbox_draft: { Args: { p_draft_id: string }; Returns: undefined }
+      delete_outbox_request: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
       delete_pedagogical_connection: {
         Args: { p_id: string }
         Returns: undefined
@@ -2744,6 +2877,7 @@ export type Database = {
         Args: { p_request_id: string }
         Returns: undefined
       }
+      dismiss_draft_inline: { Args: { p_draft_id: string }; Returns: undefined }
       fetch_movement_history: {
         Args: { p_movement_id: string }
         Returns: {
@@ -2782,6 +2916,17 @@ export type Database = {
           version_number: number
         }[]
       }
+      fetch_sender_drafts_archive: {
+        Args: { p_request_id?: string }
+        Returns: {
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["draft_kind"]
+          ordinal: number
+          payload: Json
+          request_id: string
+        }[]
+      }
       fuzzy_search: {
         Args: { search_query: string }
         Returns: {
@@ -2803,6 +2948,14 @@ export type Database = {
       log_search_miss: { Args: { p_query: string }; Returns: undefined }
       materialize_piece_from_index: {
         Args: { p_index_id: string }
+        Returns: string
+      }
+      propose_draft: {
+        Args: {
+          p_kind: Database["public"]["Enums"]["draft_kind"]
+          p_payload: Json
+          p_request_id: string
+        }
         Returns: string
       }
       publish_contributor_edit: {
@@ -2962,6 +3115,7 @@ export type Database = {
           title: string
         }[]
       }
+      send_request: { Args: { p_request_id: string }; Returns: undefined }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       submit_interpretive_school: {
@@ -3046,6 +3200,10 @@ export type Database = {
         }
         Returns: string
       }
+      update_outbox_draft: {
+        Args: { p_draft_id: string; p_payload: Json }
+        Returns: undefined
+      }
       update_pedagogical_connection: {
         Args: {
           p_id: string
@@ -3066,6 +3224,11 @@ export type Database = {
     }
     Enums: {
       difficulty: "beginner" | "intermediate" | "advanced" | "virtuoso"
+      draft_kind:
+        | "performers_note"
+        | "interpretive_school"
+        | "piece_description"
+        | "landmark"
       draft_status:
         | "draft"
         | "awaiting_contributor_approval"
@@ -3233,6 +3396,12 @@ export const Constants = {
   public: {
     Enums: {
       difficulty: ["beginner", "intermediate", "advanced", "virtuoso"],
+      draft_kind: [
+        "performers_note",
+        "interpretive_school",
+        "piece_description",
+        "landmark",
+      ],
       draft_status: [
         "draft",
         "awaiting_contributor_approval",
