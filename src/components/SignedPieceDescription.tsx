@@ -6,12 +6,14 @@
 // Plural markup — typically one per piece, but supports N for plural-voice
 // expansion. Contributor affordances mirror InterpretiveSchools + PerformersNotes.
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
 import type { PublishedPieceDescription } from '../lib/pieceDescriptions';
+import { fetchPendingDraftsOnPiece, type PendingDraft } from '../lib/contributionDrafts';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 
 interface Props {
@@ -46,6 +48,8 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [stackIdx, setStackIdx] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
 
@@ -82,6 +86,28 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
       cancelled = true;
     };
   }, [user]);
+
+  const refetchPendingDrafts = useCallback(async () => {
+    if (!hasSupabase || !user) { setPendingDrafts([]); return; }
+    const all = await fetchPendingDraftsOnPiece(pieceId);
+    setPendingDrafts(all.filter((d) => d.kind === 'piece_description' && !d.inlineDismissedAt));
+  }, [pieceId, user]);
+  useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
+
+  function handleDraftResolved(draftId: string, message: string | null) {
+    setPendingDrafts((prev) => prev.filter((d) => d.draftId !== draftId));
+    if (message) setToast(message);
+    void refetch();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('notifications:changed'));
+    }
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   async function refetch() {
     const { data } = await supabase
@@ -169,6 +195,18 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           style={{ background: 'var(--color-error-bg)', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
         >
           {error}
+        </div>
+      )}
+
+      {toast && (
+        <div role="status" className="pending-draft-toast">{toast}</div>
+      )}
+
+      {pendingDrafts.length > 0 && (
+        <div className="pending-drafts-list">
+          {pendingDrafts.map((d) => (
+            <PendingDraftCard key={d.draftId} draft={d} onResolved={handleDraftResolved} />
+          ))}
         </div>
       )}
 
