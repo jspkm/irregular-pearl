@@ -1,9 +1,9 @@
 // Client-side helpers for the contribution-request drafts surface.
 //
-// PR 1 landed the schema + RPCs. PR 2 (recipient piece-page UX) consumes
-// them: fetch live drafts addressed to the current viewer on a piece, render
-// inline proposal cards in each section, dispatch act_on_draft and
-// dismiss_draft_inline.
+// PR 1 landed the schema + RPCs. PR 2 (recipient piece-page UX) +
+// PR 3 (/notifications Open items tab) consume them: fetch live drafts
+// addressed to the current viewer, render proposal cards with three
+// actions (Accept as-is / Edit & accept / Decline), dispatch act_on_draft.
 //
 // All reads + writes go through Supabase RLS / RPCs. The recipient SELECT
 // policy on contribution_request_drafts already filters
@@ -26,12 +26,9 @@ export interface PendingDraft {
   kind: DraftKind;
   payload: Record<string, unknown>;
   createdAt: string;
-  /** Stamped by Add to Todo. Card is hidden from inline render but still
-   * lives on the recipient's Drafts tab (/notifications). */
-  inlineDismissedAt: string | null;
   sender: { id: string; displayName: string | null };
-  /** Populated by fetchPendingDraftsForViewer() (Drafts tab needs piece
-   * context to render cross-piece). Null when fetched via
+  /** Populated by fetchPendingDraftsForViewer() (Open items tab needs
+   * piece context to render cross-piece). Null when fetched via
    * fetchPendingDraftsOnPiece() — the piece is implicit there. */
   piece: { id: string; title: string; composerName: string | null } | null;
 }
@@ -58,12 +55,12 @@ export interface ActOnDraftResult {
  *
  * The returned drafts have `piece: null` — the piece is implicit (the section
  * components rendering this know the pieceId). For cross-piece reads (the
- * Drafts tab on /notifications), use fetchPendingDraftsForViewer() instead.
+ * Open items tab on /notifications), use fetchPendingDraftsForViewer() instead.
  */
 export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<PendingDraft[]> {
   const { data: drafts, error: draftsErr } = await supabase
     .from('contribution_request_drafts')
-    .select('id, request_id, kind, payload, created_at, inline_dismissed_at')
+    .select('id, request_id, kind, payload, created_at')
     .order('created_at', { ascending: true });
   if (draftsErr || !drafts || drafts.length === 0) return [];
 
@@ -94,7 +91,6 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
       kind: d.kind as DraftKind,
       payload: (d.payload as Record<string, unknown>) ?? {},
       createdAt: d.created_at,
-      inlineDismissedAt: d.inline_dismissed_at,
       sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
       piece: null,
     });
@@ -104,17 +100,17 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
 
 /**
  * Fetch all live (non-dispositioned) drafts addressed to the current viewer
- * across every piece. Used by the Drafts tab on /notifications. Recipient
- * RLS scopes the query to drafts the viewer can see; we then join piece
- * + sender for cross-piece display.
+ * across every piece. Used by the Open items tab on /notifications.
+ * Recipient RLS scopes the query to drafts the viewer can see; we then
+ * join piece + sender for cross-piece display.
  *
- * Returns drafts with `piece` populated. Sorted oldest-first so the
- * Drafts tab renders in receipt order (matches the Messages tab pattern).
+ * Returns drafts with `piece` populated. Sorted newest-first so the
+ * Open items tab matches the Messages tab pattern.
  */
 export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
   const { data: drafts, error: draftsErr } = await supabase
     .from('contribution_request_drafts')
-    .select('id, request_id, kind, payload, created_at, inline_dismissed_at')
+    .select('id, request_id, kind, payload, created_at')
     .order('created_at', { ascending: false });
   if (draftsErr || !drafts || drafts.length === 0) return [];
 
@@ -151,7 +147,6 @@ export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
       kind: d.kind as DraftKind,
       payload: (d.payload as Record<string, unknown>) ?? {},
       createdAt: d.created_at,
-      inlineDismissedAt: d.inline_dismissed_at,
       sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
       piece,
     });
@@ -184,17 +179,8 @@ export async function actOnDraft(
   return { contentId: (data as string | null) ?? null, errorCode: null, errorMessage: null };
 }
 
-/** Hide the inline draft card on the piece page; row persists for Todos screen. */
-export async function dismissDraftInline(
-  draftId: string,
-): Promise<{ errorCode: ActOnDraftResult['errorCode']; errorMessage: string | null }> {
-  const { error } = await supabase.rpc('dismiss_draft_inline', { p_draft_id: draftId });
-  if (error) {
-    const m = error.message.toLowerCase();
-    let errorCode: ActOnDraftResult['errorCode'] = 'unknown';
-    if (m.includes('not found') || m.includes('no longer')) errorCode = 'draft_no_longer_available';
-    else if (m.includes('already dispositioned')) errorCode = 'draft_already_dispositioned';
-    return { errorCode, errorMessage: error.message };
-  }
-  return { errorCode: null, errorMessage: null };
-}
+// Note: the dismiss_draft_inline RPC + contribution_request_drafts
+// .inline_dismissed_at column remain in the DB (shipped in PR 1).
+// They are unused after Option C — the client no longer stamps the
+// column and no UI surface filters on it. PR 5's destructive cleanup
+// migration will drop both.

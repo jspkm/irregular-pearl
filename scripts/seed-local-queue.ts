@@ -401,16 +401,6 @@ if (preludeId) {
   });
 
   await staffClient.rpc('send_request', { p_request_id: pr2RequestId });
-
-  // PR 3 demo: stamp one draft (the piece_description) as inline-dismissed
-  // so the Drafts tab on /notifications shows content out of the box.
-  // The recipient (haji) sees TWO inline cards on the piece page (note +
-  // school) and ONE row in the Drafts tab (description).
-  await admin
-    .from('contribution_request_drafts')
-    .update({ inline_dismissed_at: new Date().toISOString() })
-    .eq('request_id', pr2RequestId)
-    .eq('kind', 'piece_description');
 }
 
 console.log('Local queue + piece-page fixtures seeded.');
@@ -456,11 +446,10 @@ if (pedagogicalSeeded) {
   console.log(`  7. Pedagogical arc on ${LANDMARK_PIECE_ID} already has the seed connection — skipped`);
 }
 if (pr2RequestId) {
-  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — TWO "Proposed by Staff Local" cards inline (PR 2)`);
-  console.log(`     in performer's notes + schools sections (the description draft is`);
-  console.log(`     pre-stamped Add-to-Todo so it shows up on the Drafts tab instead)`);
-  console.log(`  9. Visit /notifications as haji — Drafts tab has a 1-count badge (PR 3)`);
-  console.log(`     with the piece-description proposal listed cross-piece`);
+  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — THREE "Proposed by Staff Local" cards inline (PR 2)`);
+  console.log(`     in performer's notes + schools + signed descriptions sections`);
+  console.log(`  9. Visit /notifications as haji — Open items tab has a 3-count badge (PR 3)`);
+  console.log(`     with all three proposals listed cross-piece`);
 }
 console.log(`  Private routes redirect anon users silently:`);
 console.log(`    /admin /maestro /notifications /settings → /?signin=1`);

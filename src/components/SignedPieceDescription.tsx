@@ -90,7 +90,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const refetchPendingDrafts = useCallback(async () => {
     if (!hasSupabase || !user) { setPendingDrafts([]); return; }
     const all = await fetchPendingDraftsOnPiece(pieceId);
-    setPendingDrafts(all.filter((d) => d.kind === 'piece_description' && !d.inlineDismissedAt));
+    setPendingDrafts(all.filter((d) => d.kind === 'piece_description'));
   }, [pieceId, user]);
   useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
 

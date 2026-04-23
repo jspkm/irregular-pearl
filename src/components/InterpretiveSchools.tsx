@@ -79,7 +79,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const refetchPendingDrafts = useCallback(async () => {
     if (!hasSupabase || !viewer?.userId) { setPendingDrafts([]); return; }
     const all = await fetchPendingDraftsOnPiece(pieceId);
-    setPendingDrafts(all.filter((d) => d.kind === 'interpretive_school' && !d.inlineDismissedAt));
+    setPendingDrafts(all.filter((d) => d.kind === 'interpretive_school'));
   }, [pieceId, viewer?.userId]);
   useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
 

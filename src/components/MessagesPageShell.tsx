@@ -1,6 +1,6 @@
 // Shell for /notifications: tab nav between the existing Messages list
 // (draft-approval queue + contribution-request messages) and the new
-// Drafts tab (recipient's cross-piece view of contribution_request_drafts,
+// Open items tab (recipient's cross-piece view of contribution_request_drafts,
 // including Add-to-Todo rows).
 //
 // Tab state is a single useState — no router hash, no URL coupling. Keeps
@@ -8,15 +8,15 @@
 // add a ?tab=drafts param; for now the simple model is fine.
 //
 // Live counts on each tab label update from the current data fetches so
-// the user can see "Drafts · 3" without switching over.
+// the user can see "Open items · 3" without switching over.
 
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { fetchPendingDraftsForViewer } from '../lib/contributionDrafts';
+import { fetchPendingOpen itemsForViewer } from '../lib/contributionOpen items';
 import { redirectFromPrivateRoute } from '../lib/privateRoute';
 import NotificationsQueue from './NotificationsQueue';
-import RecipientDraftsTab from './RecipientDraftsTab';
+import RecipientOpen itemsTab from './RecipientOpen itemsTab';
 
 type Tab = 'messages' | 'drafts';
 type AuthStatus = 'loading' | 'unauthed' | 'authed';
@@ -59,13 +59,13 @@ export default function MessagesPageShell() {
     if (authStatus !== 'authed') { setDraftCount(null); return; }
     let cancelled = false;
     async function loadCount() {
-      const all = await fetchPendingDraftsForViewer();
+      const all = await fetchPendingOpen itemsForViewer();
       if (!cancelled) setDraftCount(all.length);
     }
     void loadCount();
 
     // Refresh count when the navbar bell fires (draft resolved on piece
-    // page → Drafts tab count should reflect).
+    // page → Open items tab count should reflect).
     function onChange() { void loadCount(); }
     if (typeof window !== 'undefined') {
       window.addEventListener('notifications:changed', onChange);
@@ -101,16 +101,16 @@ export default function MessagesPageShell() {
           className={`messages-tab${tab === 'drafts' ? ' is-active' : ''}`}
           onClick={() => setTab('drafts')}
         >
-          Drafts
+          Open items
           {draftCount !== null && draftCount > 0 && (
-            <span className="messages-tab-count" aria-label={`${draftCount} drafts`}>
+            <span className="messages-tab-count" aria-label={`${draftCount} open items`}>
               {draftCount}
             </span>
           )}
         </button>
       </div>
       <div className="messages-tab-panel">
-        {tab === 'messages' ? <NotificationsQueue /> : <RecipientDraftsTab />}
+        {tab === 'messages' ? <NotificationsQueue /> : <RecipientOpen itemsTab />}
       </div>
     </div>
   );

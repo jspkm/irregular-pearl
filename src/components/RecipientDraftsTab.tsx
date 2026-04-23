@@ -122,15 +122,14 @@ export default function RecipientDraftsTab() {
             <PendingDraftCard
               draft={d}
               onResolved={handleResolved}
-              hideAddToTodo
+              trailingAction={
+                d.piece && (
+                  <a href={`/piece/${d.piece.id}`} className="pending-draft-trailing-link">
+                    Open piece page →
+                  </a>
+                )
+              }
             />
-            {d.piece && (
-              <div className="drafts-tab-row-foot">
-                <a href={`/piece/${d.piece.id}`} className="drafts-tab-piece-link">
-                  Open piece page →
-                </a>
-              </div>
-            )}
           </li>
         ))}
       </ul>

@@ -526,22 +526,6 @@ body {
 }
 .drafts-tab-piece:hover { border-bottom-color: var(--accent); }
 .drafts-tab-composer { font-style: italic; color: var(--muted); }
-.drafts-tab-row-foot {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 4px;
-}
-.drafts-tab-piece-link {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  color: var(--muted);
-  text-decoration: none;
-  border-bottom: 0.5px solid transparent;
-}
-.drafts-tab-piece-link:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
 
 
 /* ---------- PendingDraftCard (PR 2 + PR 3) ---------- */
@@ -651,6 +635,7 @@ body {
 .pending-draft-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 .pending-draft-btn {
@@ -689,4 +674,37 @@ body {
   padding: 8px 12px;
   border-radius: 4px;
   margin-bottom: 12px;
+}
+.pending-draft-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pending-draft-confirm-q {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-error);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-right: 2px;
+}
+.pending-draft-trailing {
+  margin-left: auto;
+  padding-left: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+.pending-draft-trailing-link {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--accent);
+  padding-bottom: 1px;
+  transition: color 0.12s, border-color 0.12s;
+}
+.pending-draft-trailing-link:hover {
+  color: var(--accent-hover, #4C385C);
+  border-bottom-width: 1px;
 }

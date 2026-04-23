@@ -1,15 +1,12 @@
-// Pending-draft proposal card rendered inline on the recipient's piece page.
-// Used by PerformersNotes / InterpretiveSchools / SignedPieceDescription /
-// StructuralLandmarks when a sent draft of the matching kind is addressed
-// to the current viewer.
+// Pending-draft proposal card rendered in both places a recipient sees
+// their drafts: inline on the piece page (in its kind's native section)
+// and on the /notifications Open items tab (cross-piece list).
 //
-// Four actions per draft (PR 2 spec):
-//   - Accept as-is: act_on_draft('accept_as_is')
-//   - Edit & accept: open inline editor pre-loaded with payload, then
-//                    act_on_draft('edit_and_accept', { ...edited })
-//   - Decline:      act_on_draft('decline')
-//   - Add to Todo:  dismiss_draft_inline (card disappears from inline view,
-//                                          persists on /messages Drafts tab — PR 3)
+// Three actions per draft:
+//   - Accept as-is:   act_on_draft('accept_as_is')
+//   - Edit & accept:  open inline editor pre-loaded with payload, then
+//                     act_on_draft('edit_and_accept', { ...edited })
+//   - Decline:        act_on_draft('decline'), with inline confirm chip
 //
 // Edit form is per-kind:
 //   performers_note + piece_description: textarea (body)
@@ -22,10 +19,9 @@
 // card hides itself and tells the parent via onResolved so the list
 // re-renders without it.
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   actOnDraft,
-  dismissDraftInline,
   type DraftKind,
   type PendingDraft,
 } from '../lib/contributionDrafts';
@@ -33,17 +29,18 @@ import {
 interface Props {
   draft: PendingDraft;
   /** Called with a soft-toast message and the draft id whenever the card
-   * resolves (acted, dismissed, or auto-removed due to a race). The parent
-   * removes the draft from its local state and may show the toast. */
+   * resolves (acted or auto-removed due to a race). The parent removes
+   * the draft from its local state and may show the toast. */
   onResolved: (draftId: string, toast: string | null) => void;
-  /** Set true on the Drafts tab — that surface IS the Todos screen, so
-   * "Add to Todo" doesn't make sense as an action there. */
-  hideAddToTodo?: boolean;
+  /** Slot rendered at the end of the action row. Used by the Open items
+   * tab to inline an "Open piece page →" link next to the action buttons. */
+  trailingAction?: ReactNode;
 }
 
-export default function PendingDraftCard({ draft, onResolved, hideAddToTodo = false }: Props) {
+export default function PendingDraftCard({ draft, onResolved, trailingAction }: Props) {
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [confirmingDecline, setConfirmingDecline] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Edit-form local state (initialized from payload when the editor opens).
@@ -139,22 +136,6 @@ export default function PendingDraftCard({ draft, onResolved, hideAddToTodo = fa
         ? 'Saved. Published under your byline.'
         : 'Declined.';
     onResolved(draft.draftId, toast);
-  }
-
-  async function handleAddToTodo() {
-    setBusy(true);
-    setError(null);
-    const result = await dismissDraftInline(draft.draftId);
-    setBusy(false);
-    if (result.errorCode && result.errorCode !== 'unknown') {
-      onResolved(draft.draftId, null);
-      return;
-    }
-    if (result.errorCode === 'unknown') {
-      setError('Could not save for later. Try again.');
-      return;
-    }
-    onResolved(draft.draftId, 'Saved to your Drafts tab.');
   }
 
   return (
@@ -257,7 +238,7 @@ export default function PendingDraftCard({ draft, onResolved, hideAddToTodo = fa
             <button
               type="button"
               className="pending-draft-btn primary"
-              disabled={busy}
+              disabled={busy || confirmingDecline}
               onClick={() => handleAction('accept_as_is')}
             >
               Accept as-is
@@ -265,28 +246,43 @@ export default function PendingDraftCard({ draft, onResolved, hideAddToTodo = fa
             <button
               type="button"
               className="pending-draft-btn"
-              disabled={busy}
+              disabled={busy || confirmingDecline}
               onClick={openEditor}
             >
               Edit & accept
             </button>
-            <button
-              type="button"
-              className="pending-draft-btn"
-              disabled={busy}
-              onClick={() => handleAction('decline')}
-            >
-              Decline
-            </button>
-            {!hideAddToTodo && (
+            {confirmingDecline ? (
+              <span className="pending-draft-confirm" role="alertdialog" aria-label="Confirm decline">
+                <span className="pending-draft-confirm-q">Decline?</span>
+                <button
+                  type="button"
+                  className="pending-draft-btn"
+                  disabled={busy}
+                  onClick={() => { setConfirmingDecline(false); void handleAction('decline'); }}
+                >
+                  Yes, decline
+                </button>
+                <button
+                  type="button"
+                  className="pending-draft-btn"
+                  disabled={busy}
+                  onClick={() => setConfirmingDecline(false)}
+                >
+                  Cancel
+                </button>
+              </span>
+            ) : (
               <button
                 type="button"
                 className="pending-draft-btn"
                 disabled={busy}
-                onClick={handleAddToTodo}
+                onClick={() => setConfirmingDecline(true)}
               >
-                Add to Todo
+                Decline
               </button>
+            )}
+            {trailingAction && (
+              <span className="pending-draft-trailing">{trailingAction}</span>
             )}
           </>
         )}

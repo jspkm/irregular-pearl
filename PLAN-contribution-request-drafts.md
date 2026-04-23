@@ -19,6 +19,15 @@
   - **Landmark drafting unambiguously in scope** (resolved Draft 1 contradiction).
   - **Effort recalibrated** from 3.5 hr CC to 6-8 hr CC across the 6 PRs.
   - **User decisions:** dangling `accepted_as_id` is cleaned up via after-delete triggers; destructive enum/column drops happen in PR 5 (not deferred); one-draft-per-kind-per-request lock holds; metadata-on-notification approach confirmed.
+- **Draft 3 (2026-04-23):** Recipient surface simplified mid-PR-3 ("Option C"). User feedback during PR 3 browser verification surfaced a UX ambiguity: the "Add to Todo" action filtered drafts off the piece page but kept them on the Drafts tab, leaving recipients confused about where a given draft "lives." Resolved by dropping the hide-from-piece-page action entirely. Substantive changes:
+  - **No more 4th action.** Recipient cards now expose three actions only: Accept as-is / Edit & accept / Decline. The "Add to Todo" button (Drafts 1+2 design) is removed from `PendingDraftCard`. Decline gains an inline confirmation chip ("Decline? [Yes, decline] [Cancel]") because it's the only destructive terminal action.
+  - **Tab renamed.** /notifications tabs are now Messages | **Open items** (was Messages | Drafts). The new label matches the comprehensive-inbox semantic — every undecided draft addressed to the viewer is listed there, not just ones explicitly saved-for-later.
+  - **No filtering on `inline_dismissed_at`.** All four piece-page section components (`PerformersNotes`, `InterpretiveSchools`, `SignedPieceDescription`, `StructuralLandmarks`) drop their `!d.inlineDismissedAt` filter. The same draft now renders on both surfaces simultaneously (piece page in its native section + Open items tab cross-piece).
+  - **`hideAddToTodo` prop removed** from `PendingDraftCard`. `RecipientDraftsTab` no longer passes it. The `dismissDraftInline` lib wrapper is removed from the client.
+  - **Backend dead code accepted, deferred to PR 5b cleanup.** `dismiss_draft_inline` RPC and `contribution_request_drafts.inline_dismissed_at` column remain in the database (shipped in PR 1) but have no client caller. Both join the PR 5b destructive cleanup migration alongside the legacy enum values + columns.
+  - **PR 6 PRD revision absorbs the action-count change** — § 478 amendment drops the four-action recipient model and references three.
+  - **Drive-by during PR 3 browser verification:** unified all four private routes (`/admin`, `/maestro`, `/notifications`, `/settings`) on a single `redirectFromPrivateRoute(isSignedIn)` helper that silently redirects anon viewers to `/?signin=1` (modal pop) or signed-in-but-unauthorized viewers to `/`. No leak about what any private page contains. `AdminPage` drops its prior "Access denied" block; `EmailPreferences` drops its inline gate copy. `AuthButton` reads `?signin=1` on mount → opens `SignInPanel`.
+  - **Drive-by during PR 3 browser verification:** `NavbarBell` subscribes to `supabase.auth.onAuthStateChange` so the bell appears immediately after sign-in instead of waiting for `visibilitychange` or `notifications:changed`.
 
 ## 1. Scope and non-goals
 
@@ -63,20 +72,19 @@ Each section that has at least one pending draft for this recipient renders the 
 ┌─ ✦ Proposed by H. ───────────────────────────────────────┐
 │ "The opening should be felt as one long downbow…"        │
 │                                                            │
-│ [Accept as-is] [Edit & accept] [Decline] [Add to Todo]    │
+│ [Accept as-is] [Edit & accept] [Decline]                  │
 └────────────────────────────────────────────────────────────┘
 ```
 
-Four actions, all per-draft:
+Three actions per draft (Draft 3 amendment — was four; see §0):
 
 - **Accept as-is:** creates a published content row in the appropriate table under the recipient's `contributor_id`, with `drafted_by = sender_id`, body copied from the draft payload. Stamps `dispositioned_at = now()`, `disposition = 'accepted'`, `accepted_as_id = <new content row id>` on the draft.
 - **Edit & accept:** opens the section's existing editor pre-loaded with the draft body. Recipient edits, saves. Same row-creation as accept-as-is, but with the edited body. Stamps `disposition = 'accepted'` on the draft.
-- **Decline:** stamps `dispositioned_at = now()`, `disposition = 'declined'` on the draft. No row created. No notification to sender. Card disappears for recipient.
-- **Add to Todo:** stamps `inline_dismissed_at = now()`. Draft persists, no longer renders inline on the piece page, still renders on the recipient's Todos screen.
+- **Decline:** swaps the button for an inline confirm chip ("Decline? [Yes, decline] [Cancel]"). On confirm: stamps `dispositioned_at = now()`, `disposition = 'declined'` on the draft. No row created. No notification to sender. Card disappears for recipient.
 
 After every disposition action, a trigger checks whether all drafts on the parent request are now dispositioned. If yes, the request row is hard-deleted (cascading the drafts) and the recipient's notification is auto-cleared. See §3.6 for the lifecycle trigger spec.
 
-**Recipient's Todos screen** (new surface) lives at `/messages` as a new tab alongside the existing Messages list. Lists every undecided draft for this recipient across all pieces. Same four actions on each row. Clicking through to the piece is one option; acting from the Todos screen directly is the other.
+**Recipient's Open items tab** (new surface, was "Drafts" pre-Draft-3) lives at `/notifications` as a new tab alongside the existing Messages list. Lists every undecided draft for this recipient across all pieces. Same three actions on each row, plus an "Open piece page →" link out for context. The same draft simultaneously renders inline on the piece page in its native section — no hide-from-page action; comprehensive inbox semantic.
 
 ### 1.3 No-feedback principle (enforced at storage layer)
 
@@ -208,7 +216,9 @@ create table public.contribution_request_drafts (
   disposition text check (disposition in ('accepted', 'declined')),
   accepted_as_id uuid,  -- nulled out by after-delete triggers on content tables
 
-  -- Inline-render dismissal (Add to Todo). NULL = render inline + on todos.
+  -- Inline-render dismissal (was: Add to Todo, retired in Draft 3).
+  -- Column kept by PR 1 ship; PR 5b destructive cleanup drops it.
+  -- NULL = render inline + on todos.
   -- NON-NULL = render only on todos.
   inline_dismissed_at timestamptz,
 
@@ -360,6 +370,12 @@ update public.notifications
 -- Drop fulfilled_at column + the trigger that stamps it
 alter table public.contribution_requests drop column fulfilled_at;
 drop function if exists public._stamp_contribution_request_fulfilled() cascade;
+
+-- Drop the inline-dismissed mechanism (Draft 3 retired Add-to-Todo).
+-- The column + RPC remain after PR 1 ship; the client never calls the
+-- RPC and never reads the column. Drop both as part of cleanup.
+alter table public.contribution_request_drafts drop column inline_dismissed_at;
+drop function if exists public.dismiss_draft_inline(uuid) cascade;
 
 -- Drop draft_status enum values 'awaiting_contributor_approval' and 'draft'
 -- (Postgres requires enum rebuild)
@@ -541,7 +557,7 @@ Every recipient-side and sender-side RPC handles the row-not-found and already-a
 
 ### 3.4 Notification body copy (per user decision on Variant A)
 
-Renderers (NavbarBell, NotificationsQueue, MessagesPage Drafts tab) read `metadata->>'draft_count'` and select copy:
+Renderers (NavbarBell, NotificationsQueue, MessagesPage Open items tab) read `metadata->>'draft_count'` and select copy:
 
 - **draft_count = 0** (plain ask, also the existing v0.4.0 behavior): `"H. asked you to contribute to Bach Suite No. 1."` — unchanged from current.
 - **draft_count = 1** (one draft attached): `"H. asked you to contribute to Bach Suite No. 1, with a draft performer's note to start from."` — kind-named for the singular case. Kind label resolved from a small client-side map: `performers_note → "performer's note"`, `interpretive_school → "interpretive school"`, `piece_description → "piece description"`, `landmark → "landmark"`.
@@ -714,46 +730,44 @@ The `view` and `self-author` modes are existing behavior. The two new modes:
 
 #### `review-pending-drafts` mode (recipient)
 
-- Section renders normally PLUS an inline pending-draft card for any draft of this kind on a sent request to this recipient that isn't dispositioned and isn't `inline_dismissed_at`.
-- Card UI (4 actions per draft):
+- Section renders normally PLUS an inline pending-draft card for any draft of this kind on a sent request to this recipient that isn't dispositioned. Draft 3 dropped the `inline_dismissed_at` filter — drafts render on both surfaces simultaneously now.
+- Card UI (3 actions per draft, Draft 3 — was 4):
 
 ```
 ┌─ ✦ Proposed by H. ───────────────────────────────────────┐
 │ <body preview, full body on click>                        │
 │                                                            │
-│ [Accept as-is] [Edit & accept] [Decline] [Add to Todo]    │
+│ [Accept as-is] [Edit & accept] [Decline]                  │
 └────────────────────────────────────────────────────────────┘
 ```
 
 - **Accept as-is** → `act_on_draft(draft_id, 'accept_as_is')`. New content row appears in the section under the recipient's byline. Card disappears.
 - **Edit & accept** → opens the section's existing editor pre-loaded with the draft body. On save, calls `act_on_draft(draft_id, 'edit_and_accept', { body: editedBody })`. New content row appears with edited body. Card disappears.
-- **Decline** → `act_on_draft(draft_id, 'decline')`. Card disappears. Soft toast: "Declined."
-- **Add to Todo** → `dismiss_draft_inline(draft_id)`. Card disappears from this section but persists on the recipient's Todos screen.
+- **Decline** → swaps for inline confirm chip ("Decline? [Yes, decline] [Cancel]"). On confirm: `act_on_draft(draft_id, 'decline')`. Card disappears. Soft toast: "Declined."
 
-### 4.4 Recipient Todos screen
+### 4.4 Recipient Open items tab
 
-New surface at `/messages` as a tab alongside the existing Messages list (per user decision — default option).
+New surface at `/notifications` as a tab alongside the existing Messages list (renamed from "Drafts" in Draft 3).
 
-Tab structure on `/messages`:
+Tab structure on `/notifications`:
 - **Messages** (existing) — incoming requests, dismiss/auto-clear, etc.
-- **Drafts** (new) — undecided drafts across all pieces
+- **Open items** (new) — every undecided draft for this recipient across all pieces
 
-Drafts tab UI: chronological list (most recent first), each row:
+Open items tab UI: chronological list (newest first), each row:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Bach Cello Suite No. 1 in G Major   ← Performer's note from H.       │
-│ "The opening should be felt as one long downbow…"  [view full]       │
-│                                                                        │
-│ [Accept as-is] [Edit & accept] [Decline]   [Open piece page →]        │
+│ PERFORMER'S NOTE · Bach Cello Suite No. 1 in G major — J.S. Bach    │
+│ ┌─ ✦ Proposed by H. ────────────────────────────────────────────┐   │
+│ │ "The opening should be felt as one long downbow…"             │   │
+│ │ [Accept as-is] [Edit & accept] [Decline]   Open piece page →  │   │
+│ └────────────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-- Accept / Edit & accept / Decline buttons call the same RPCs as the inline cards on the piece page.
-- "Open piece page →" navigates to the piece (where the recipient sees the draft in its native section, plus all the surrounding piece content for context).
-- "Add to Todo" is NOT shown here — this IS the Todos screen. The action that hides drafts from inline only applies on the piece page itself.
-
-Empty state: "Nothing in your inbox. Anyone you've collaborated with would land their proposed drafts here."
+- Accept / Edit & accept / Decline call the same RPCs as the inline cards on the piece page.
+- "Open piece page →" sits inline in the action row (right-aligned, accent purple); navigates to the piece where the recipient sees the same draft in its native section.
+- Empty state: "Nothing in your inbox. Anyone you've collaborated with would land their proposed drafts here."
 
 ### 4.5 Sender's Requests admin tab (PR 5a)
 
@@ -980,13 +994,13 @@ NEW CODE PATHS                                       USER FLOWS
   │       written atomically with sent_at stamp       ├── [GAP] Edit & accept → editor opens pre-loaded,
   ├── act_on_draft                                    │         save creates content with edited body
   │   ├── [GAP] FOR UPDATE lock acquired              ├── [GAP] Decline → soft toast, draft disposition'd
-  │   ├── [GAP] recipient-only                        ├── [GAP] Add to Todo → card hidden inline,
-  │   ├── [GAP] sent-state-only                       │         appears on Todos screen
+  │   ├── [GAP] recipient-only                        ├── [GAP] decline → confirm chip → Yes,
+  │   ├── [GAP] sent-state-only                       │         draft disposition'd
   │   ├── [GAP] live-state-only                       └── [GAP] lifecycle trigger fires when all drafts
   │   ├── [GAP] accept_as_is creates content row              dispositioned → request row + drafts deleted,
   │   │         with contributor_id = recipient_id            notification auto-clears, archive survives
   │   ├── [GAP] edit_and_accept uses override
-  │   ├── [GAP] decline does not create row          [+] Recipient: Todos screen
+  │   ├── [GAP] decline does not create row          [+] Recipient: Open items tab
   │   ├── [GAP] disposition stamping correct           ├── [GAP] empty state copy
   │   ├── [GAP] accepted_as_id polymorphic check       ├── [GAP] drafts across multiple pieces listed
   │   └── [GAP] idempotency on already-dispositioned   ├── [GAP] act from Todos screen → same outcome
@@ -1050,7 +1064,7 @@ This whole feature is greenfield — every code path is a GAP to be written alon
 
 ### 6.3 Test plan artifact
 
-Will be written to `~/.gstack/projects/jspkm-irregular-pearl/jspkm-main-eng-review-test-plan-<datetime>.md` after this plan is approved, listing affected URLs (`/piece/[slug]?compose=*`, `/messages` Drafts tab, `/admin/requests`), key interactions to verify, edge cases, and critical paths.
+Will be written to `~/.gstack/projects/jspkm-irregular-pearl/jspkm-main-eng-review-test-plan-<datetime>.md` after this plan is approved, listing affected URLs (`/piece/[slug]?compose=*`, `/notifications` Open items tab, `/admin/requests`), key interactions to verify, edge cases, and critical paths.
 
 ## 7. Rollout — six PRs (PR 5 is two commits)
 
@@ -1070,20 +1084,20 @@ Effort: ~1.5 hr CC (was 45 min in Draft 1; codex's safety additions roughly doub
 ### PR 2 — Recipient piece-page UX
 
 - `review-pending-drafts` mode added to all four section components (incl. landmark, per resolved scope).
-- Inline proposal cards with 4 actions, wired to `act_on_draft` and `dismiss_draft_inline`.
+- Inline proposal cards with 3 actions (Draft 3 — was 4), wired to `act_on_draft`. Decline gets an inline confirm chip.
 - Soft-toast handling for `draft_no_longer_available` and `draft_already_dispositioned`.
 - Tests: recipient interaction flows, idempotency, two-tab race.
 
 Effort: ~1.5 hr CC.
 
-### PR 3 — Recipient Todos screen
+### PR 3 — Recipient Open items tab + project-wide private-route redirect
 
-- `/messages` page gets a Drafts tab.
-- List view, three actions per row (no Add to Todo).
-- Empty state copy.
-- Tests: list rendering, action wiring, navigation to piece.
+- `/notifications` mounts a new `MessagesPageShell` with tabs (Messages | Open items). Open items tab lists every undecided draft for this recipient cross-piece, same 3 actions as the inline cards, plus an "Open piece page →" link.
+- Private-route consistency drive-by: `/admin`, `/maestro`, `/notifications`, `/settings` all use the new `lib/privateRoute.ts:redirectFromPrivateRoute(isSignedIn)` helper. Anon viewers silently redirect to `/?signin=1` (modal pop via new query-param trigger in `AuthButton`); signed-in-but-unauthorized to `/`. No leak about what any private page contains.
+- Tests: cross-piece read, lib error-code mapping.
+- Drive-by: `NavbarBell` subscribes to `supabase.auth.onAuthStateChange` so the bell appears immediately on sign-in.
 
-Effort: ~30 min CC.
+Effort: ~1 hr CC (was ~30 min — Option C amendment + private-route consolidation expanded scope).
 
 ### PR 4 — Sender drafting mode + Send
 
@@ -1156,7 +1170,7 @@ Effort: ~15 min CC. Doc-only.
 | Subject registry | [src/lib/contributorSubjects.ts](src/lib/contributorSubjects.ts) + `SUBJECT_CONFIG` | Reused — add `draft_kind` parallel registry for draft payload shapes |
 | Per-section editors | `PerformersNotes.tsx`, `InterpretiveSchools.tsx`, `SignedPieceDescription.tsx`, `StructuralLandmarks.tsx` | Extended — add `compose-draft` and `review-pending-drafts` modes |
 | Recipient ribbon | Already shipped in v0.4.0 | Reused as the entry surface for recipients with pending drafts |
-| Messages page | `/messages` with dismiss/auto-clear (v0.4.0) | Extended — add Drafts tab |
+| Messages page | `/notifications` with dismiss/auto-clear (v0.4.0) | Extended — add Open items tab |
 | Admin tab framework | `AdminPage.tsx` tab list + dispatch | Extended — drop 3 tabs, add 1 |
 | Recipient gate / sender gate | `request_contribution` RPC enforces sender gate, recipient existence | Refactored — `_check_sender_eligible(p_recipient_id)` shared helper |
 | Inline confirm chip | `InlineConfirm.tsx` (Slice C) | Reused for Delete request confirmation |
@@ -1232,13 +1246,13 @@ No changes to invariants (§ 444-446). Plurality, signed-content, version retent
 
 ### Contribution-request drafts (staff bootstrap surface)
 
-Staff-drafted contributions now compose inline on the piece page in a "drafting for [recipient]" mode and ride attached to a single contribution request. Recipients triage each draft on the piece page or via the new Drafts tab on /messages. Three admin pages retired (Performer's notes, Schools, Descriptions) — staff drafts inline, no separate admin surface.
+Staff-drafted contributions now compose inline on the piece page in a "drafting for [recipient]" mode and ride attached to a single contribution request. Recipients triage each draft on the piece page or via the new Open items tab on /notifications. Three admin pages retired (Performer's notes, Schools, Descriptions) — staff drafts inline, no separate admin surface.
 
 **Email-semantic:** sent is final. Sender keeps a read-only archive in /admin/requests; cannot edit, delete, or recall after sending. Recipient disposition (accept / decline / add-to-todo) is not surfaced to the sender at any layer.
 
 **Sender flow:** click "Compose drafts inline" in the request dialog → land on the piece page in drafting mode → use the same section editors a contributor uses for self-authoring → "Send drafts" bundles the proposed content + the request and routes to the recipient. Save & exit preserves the outbox for later resume.
 
-**Recipient flow:** receive one notification per request → land on the piece page → see "Proposed by H." cards inline in each section with [Accept as-is] [Edit & accept] [Decline] [Add to Todo] per draft. Acted-on drafts disappear; "Add to Todo" hides inline but keeps the draft on the new Drafts tab. When all drafts are dispositioned, the request auto-clears.
+**Recipient flow:** receive one notification per request → land on the piece page → see "Proposed by H." cards inline in each section with [Accept as-is] [Edit & accept] [Decline] per draft (Decline opens an inline confirm chip). Acted-on drafts disappear. The same drafts also list cross-piece on the Open items tab at /notifications. When all drafts are dispositioned, the request auto-clears.
 
 **Schema:** new `contribution_request_drafts` and `sent_request_archive` tables. `contribution_requests` gains `sent_at` (NULL = outbox). `notifications` gains `metadata jsonb` for draft-count rendering. Retired: `fulfilled_at`, `submitted_by`, `retracted_by`, `retracted_at`, `awaiting_contributor_approval` and `draft` enum values, 21 staff-draft RPCs from Slices A and B.
 
