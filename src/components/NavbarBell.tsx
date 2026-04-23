@@ -167,9 +167,18 @@ export default function NavbarBell() {
     const onEvent = () => { void refresh(); };
     document.addEventListener('visibilitychange', onVis);
     window.addEventListener('notifications:changed', onEvent);
+
+    // Refresh on auth-state changes so the bell appears immediately after
+    // sign-in (and disappears on sign-out) instead of waiting for the next
+    // visibilitychange / notifications:changed event.
+    const authSub = hasSupabase
+      ? supabase.auth.onAuthStateChange(() => { void refresh(); }).data.subscription
+      : null;
+
     return () => {
       document.removeEventListener('visibilitychange', onVis);
       window.removeEventListener('notifications:changed', onEvent);
+      authSub?.unsubscribe();
     };
   }, [refresh]);
 
