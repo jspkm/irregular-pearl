@@ -238,9 +238,17 @@ export default function RequestContributionDialog({
     }
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError('Sign in to draft a note.');
+        return;
+      }
       const res = await fetch('/api/draft-contribution-note', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           senderName,
           recipientName: recipientDisplayName,
@@ -491,30 +499,34 @@ export default function RequestContributionDialog({
               )}
 
               <div className="rcd-actions">
-                <button
-                  type="button"
-                  onClick={handleDraftNote}
-                  disabled={
-                    drafting ||
-                    (mode === 'username' && !username.trim()) ||
-                    (mode === 'email' && !email.trim())
-                  }
-                  className="rcd-draft-link"
-                  aria-label={hasDrafted ? 'Rewrite the note' : 'Help me with the note'}
-                >
-                  {drafting ? (
-                    'Drafting…'
-                  ) : hasDrafted ? (
-                    <>
-                      <span aria-hidden="true" className="rcd-draft-icon">
-                        ↻
-                      </span>
-                      Rewrite
-                    </>
-                  ) : (
-                    'Help me with note'
-                  )}
-                </button>
+                {isStaff ? (
+                  <button
+                    type="button"
+                    onClick={handleDraftNote}
+                    disabled={
+                      drafting ||
+                      (mode === 'username' && !username.trim()) ||
+                      (mode === 'email' && !email.trim())
+                    }
+                    className="rcd-draft-link"
+                    aria-label={hasDrafted ? 'Rewrite the note' : 'Help me with the note'}
+                  >
+                    {drafting ? (
+                      'Drafting…'
+                    ) : hasDrafted ? (
+                      <>
+                        <span aria-hidden="true" className="rcd-draft-icon">
+                          ↻
+                        </span>
+                        Rewrite
+                      </>
+                    ) : (
+                      'Help me with note'
+                    )}
+                  </button>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
                 <div className="rcd-actions-right">
                   <button type="button" onClick={handleClose} className="rcd-cancel">
                     Cancel

@@ -1,4 +1,3 @@
-Connecting to db 5432
 export type Json =
   | string
   | number
@@ -284,6 +283,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      draft_note_requests: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       edition_reviews: {
         Row: {
@@ -1819,6 +1836,52 @@ export type Database = {
           },
         ]
       }
+      piece_views: {
+        Row: {
+          created_at: string
+          id: string
+          piece_id: string
+          user_id: string | null
+          visitor_token: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          piece_id: string
+          user_id?: string | null
+          visitor_token?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          piece_id?: string
+          user_id?: string | null
+          visitor_token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "piece_views_piece_id_fkey"
+            columns: ["piece_id"]
+            isOneToOne: false
+            referencedRelation: "pieces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "piece_views_piece_id_fkey"
+            columns: ["piece_id"]
+            isOneToOne: false
+            referencedRelation: "v_pieces_with_content_state"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "piece_views_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pieces: {
         Row: {
           canonical_index_id: string
@@ -2508,6 +2571,42 @@ export type Database = {
         Args: { p_category: string; p_piece_id: string; p_value: string }
         Returns: string
       }
+      admin_recent_curation: {
+        Args: { p_limit?: number }
+        Returns: {
+          contributor_display_name: string
+          contributor_email: string
+          contributor_id: string
+          contributor_username: string
+          piece_id: string
+          piece_title: string
+          published_at: string
+          subject_id: string
+          subject_type: string
+        }[]
+      }
+      admin_top_unmatched_queries: {
+        Args: { p_limit?: number }
+        Returns: {
+          count: number
+          distinct_users: number
+          first_seen: string
+          last_seen: string
+          query: string
+        }[]
+      }
+      admin_top_viewed_no_content_pieces: {
+        Args: { p_limit?: number }
+        Returns: {
+          catalog_number: string
+          composer_name: string
+          last_viewed: string
+          piece_id: string
+          title: string
+          total_views: number
+          unique_viewers: number
+        }[]
+      }
       approve_and_edit_interpretive_school: {
         Args: { p_body: string; p_school_id: string }
         Returns: string
@@ -2641,6 +2740,10 @@ export type Database = {
         Args: { p_id: string }
         Returns: undefined
       }
+      dismiss_contribution_request: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
       fetch_movement_history: {
         Args: { p_movement_id: string }
         Returns: {
@@ -2692,6 +2795,12 @@ export type Database = {
       gc_unconfirmed_auth_users: { Args: never; Returns: number }
       is_admin: { Args: never; Returns: boolean }
       is_staff: { Args: never; Returns: boolean }
+      log_draft_note_request: { Args: never; Returns: undefined }
+      log_piece_view: {
+        Args: { p_piece_id: string; p_visitor_token?: string }
+        Returns: undefined
+      }
+      log_search_miss: { Args: { p_query: string }; Returns: undefined }
       materialize_piece_from_index: {
         Args: { p_index_id: string }
         Returns: string
@@ -3169,5 +3278,3 @@ export const Constants = {
   },
 } as const
 
-A new version of Supabase CLI is available: v2.90.0 (currently installed v2.84.2)
-We recommend updating regularly for new features and bug fixes: https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli

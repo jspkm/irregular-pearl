@@ -6,8 +6,15 @@
 //
 // Requires ANTHROPIC_API_KEY as an env var. In local dev set it in
 // .env; in production set it via the Cloudflare Worker environment.
+//
+// Auth: the caller must pass a Supabase session access token as
+// `Authorization: Bearer <token>`. We verify the token against the
+// project and rate-limit via log_draft_note_request() (20/user/24h
+// default, tunable in app_config). Anonymous callers are rejected —
+// this endpoint costs real Anthropic tokens per request.
 
 import type { APIRoute } from 'astro';
+import { createClient } from '@supabase/supabase-js';
 
 export const prerender = false;
 
@@ -24,16 +31,72 @@ interface DraftRequest {
 // response body.
 const USER_FACING_FAILURE =
   'Note drafting is unavailable right now. Try again shortly, or write the note yourself.';
+const USER_FACING_RATE_LIMIT =
+  "You've drafted a lot of notes in the last day. Try again tomorrow, or write the note yourself.";
+
+// User-controlled strings get interpolated into the LLM prompt. Strip
+// newlines and control chars so an attacker can't smuggle a "IGNORE
+// ABOVE" block via a piece title, and cap length to keep the prompt
+// bounded.
+function sanitize(s: string, maxLen = 200): string {
+  return s.replace(/[\r\n\t\x00-\x1f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, maxLen);
+}
 
 export const POST: APIRoute = async ({ request, locals }) => {
+  const env = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime?.env ?? {};
+
   const apiKey =
-    (locals as { runtime?: { env?: { ANTHROPIC_API_KEY?: string } } }).runtime?.env
-      ?.ANTHROPIC_API_KEY ||
+    env.ANTHROPIC_API_KEY ||
     import.meta.env.ANTHROPIC_API_KEY ||
     (typeof process !== 'undefined' ? process.env.ANTHROPIC_API_KEY : undefined);
 
+  const supabaseUrl =
+    env.PUBLIC_SUPABASE_URL ||
+    import.meta.env.PUBLIC_SUPABASE_URL ||
+    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_URL : undefined);
+
+  const supabaseAnonKey =
+    env.PUBLIC_SUPABASE_ANON_KEY ||
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY ||
+    (typeof process !== 'undefined' ? process.env.PUBLIC_SUPABASE_ANON_KEY : undefined);
+
   if (!apiKey) {
     console.error('draft-note: ANTHROPIC_API_KEY is not set');
+    return json({ error: USER_FACING_FAILURE }, 503);
+  }
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('draft-note: Supabase env is not set');
+    return json({ error: USER_FACING_FAILURE }, 503);
+  }
+
+  // Auth gate: require a Supabase access token and verify it.
+  const authHeader = request.headers.get('authorization') ?? '';
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  const accessToken = match?.[1]?.trim();
+  if (!accessToken) {
+    return json({ error: 'Sign in to draft a note.' }, 401);
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const { data: userData, error: userErr } = await supabase.auth.getUser(accessToken);
+  if (userErr || !userData?.user) {
+    return json({ error: 'Sign in to draft a note.' }, 401);
+  }
+
+  // Staff gate + rate limit + log. RPC checks auth.uid() and role itself.
+  const { error: rpcErr } = await supabase.rpc('log_draft_note_request');
+  if (rpcErr) {
+    if (/rate_limit/i.test(rpcErr.message)) {
+      return json({ error: USER_FACING_RATE_LIMIT }, 429);
+    }
+    if (/staff only/i.test(rpcErr.message)) {
+      return json({ error: 'Note drafting is available to staff only.' }, 403);
+    }
+    console.error('draft-note: log_draft_note_request failed', rpcErr);
     return json({ error: USER_FACING_FAILURE }, 503);
   }
 
@@ -45,11 +108,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json({ error: USER_FACING_FAILURE }, 400);
   }
 
-  const senderName = (body.senderName ?? '').trim();
-  const recipientName = (body.recipientName ?? '').trim();
-  const recipientFirstName = (body.recipientFirstName ?? recipientName).trim();
-  const pieceTitle = (body.pieceTitle ?? '').trim();
-  const composerName = (body.composerName ?? '').trim();
+  const senderName = sanitize(body.senderName ?? '');
+  const recipientName = sanitize(body.recipientName ?? '');
+  const recipientFirstName = sanitize(body.recipientFirstName ?? recipientName);
+  const pieceTitle = sanitize(body.pieceTitle ?? '');
+  const composerName = sanitize(body.composerName ?? '');
 
   if (!recipientName || !pieceTitle || !composerName) {
     console.error('draft-note: missing fields', {
