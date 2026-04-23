@@ -14,8 +14,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedInterpretiveSchool } from '../lib/interpretiveSchools';
+import { fetchPendingDraftsOnPiece, type PendingDraft } from '../lib/contributionDrafts';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 
 interface Props {
@@ -37,6 +39,8 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [pageIdx, setPageIdx] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
 
@@ -71,6 +75,28 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   }, []);
 
   useEffect(() => { void loadViewer(); }, [loadViewer]);
+
+  const refetchPendingDrafts = useCallback(async () => {
+    if (!hasSupabase || !viewer?.userId) { setPendingDrafts([]); return; }
+    const all = await fetchPendingDraftsOnPiece(pieceId);
+    setPendingDrafts(all.filter((d) => d.kind === 'interpretive_school' && !d.inlineDismissedAt));
+  }, [pieceId, viewer?.userId]);
+  useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
+
+  function handleDraftResolved(draftId: string, message: string | null) {
+    setPendingDrafts((prev) => prev.filter((d) => d.draftId !== draftId));
+    if (message) setToast(message);
+    void refetchSchools();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('notifications:changed'));
+    }
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   async function refetchSchools() {
     const { data } = await supabase
@@ -161,6 +187,18 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
           style={{ background: 'var(--color-error-bg)', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
         >
           {error}
+        </div>
+      )}
+
+      {toast && (
+        <div role="status" className="pending-draft-toast">{toast}</div>
+      )}
+
+      {pendingDrafts.length > 0 && (
+        <div className="pending-drafts-list">
+          {pendingDrafts.map((d) => (
+            <PendingDraftCard key={d.draftId} draft={d} onResolved={handleDraftResolved} />
+          ))}
         </div>
       )}
 

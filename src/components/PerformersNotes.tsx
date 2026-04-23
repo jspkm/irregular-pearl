@@ -14,8 +14,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedPerformersNote } from '../lib/performersNotes';
+import { fetchPendingDraftsOnPiece, type PendingDraft } from '../lib/contributionDrafts';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 
 interface Props {
@@ -37,6 +39,8 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
   const [mode, setMode] = useState<Mode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [pageIdx, setPageIdx] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
 
@@ -71,6 +75,34 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
   }, []);
 
   useEffect(() => { void loadViewer(); }, [loadViewer]);
+
+  // Pending drafts addressed to this viewer on this piece, of kind
+  // 'performers_note'. Empty for anon, for non-recipients, and for
+  // pieces with no live drafts. Refetched after viewer changes (sign-in,
+  // sign-out) and after a draft is acted on (so the new published note
+  // appears alongside the disappearing card).
+  const refetchPendingDrafts = useCallback(async () => {
+    if (!hasSupabase || !viewer?.userId) { setPendingDrafts([]); return; }
+    const all = await fetchPendingDraftsOnPiece(pieceId);
+    setPendingDrafts(all.filter((d) => d.kind === 'performers_note' && !d.inlineDismissedAt));
+  }, [pieceId, viewer?.userId]);
+  useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
+
+  function handleDraftResolved(draftId: string, message: string | null) {
+    setPendingDrafts((prev) => prev.filter((d) => d.draftId !== draftId));
+    if (message) setToast(message);
+    void refetchNotes();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('notifications:changed'));
+    }
+  }
+
+  // Auto-clear toast after 4s
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   async function refetchNotes() {
     const { data } = await supabase
@@ -157,6 +189,18 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
           style={{ background: 'var(--color-error-bg)', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
         >
           {error}
+        </div>
+      )}
+
+      {toast && (
+        <div role="status" className="pending-draft-toast">{toast}</div>
+      )}
+
+      {pendingDrafts.length > 0 && (
+        <div className="pending-drafts-list">
+          {pendingDrafts.map((d) => (
+            <PendingDraftCard key={d.draftId} draft={d} onResolved={handleDraftResolved} />
+          ))}
         </div>
       )}
 

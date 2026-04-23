@@ -17,8 +17,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import type { PublishedLandmark, LandmarkFlag } from '../lib/landmarks';
 import { getPublishedLandmarksForPiece } from '../lib/landmarks';
+import { fetchPendingDraftsOnPiece, type PendingDraft } from '../lib/contributionDrafts';
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
+import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 
 interface Props {
@@ -97,6 +99,8 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
   const [mode, setMode] = useState<EditMode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [signInOpen, setSignInOpen] = useState(false);
 
   useEffect(() => {
@@ -112,6 +116,38 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
     const all = await getPublishedLandmarksForPiece(pieceId);
     setLandmarks(all.filter((l) => l.movementId === movementId));
   }, [pieceId, movementId]);
+
+  // Pending landmark drafts addressed to this viewer on this piece + movement.
+  // Filter by movement_id in the payload so the proposal renders inside the
+  // right movement section, not all of them.
+  const refetchPendingDrafts = useCallback(async () => {
+    if (!hasSupabase || !viewerId) { setPendingDrafts([]); return; }
+    const all = await fetchPendingDraftsOnPiece(pieceId);
+    setPendingDrafts(
+      all.filter(
+        (d) =>
+          d.kind === 'landmark' &&
+          !d.inlineDismissedAt &&
+          d.payload.movement_id === movementId,
+      ),
+    );
+  }, [pieceId, movementId, viewerId]);
+  useEffect(() => { void refetchPendingDrafts(); }, [refetchPendingDrafts]);
+
+  function handleDraftResolved(draftId: string, message: string | null) {
+    setPendingDrafts((prev) => prev.filter((d) => d.draftId !== draftId));
+    if (message) setToast(message);
+    void refetch();
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('notifications:changed'));
+    }
+  }
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const onAddClick = () => {
     if (authed === false) { setSignInOpen(true); return; }
@@ -131,6 +167,18 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
     <>
       {error && (
         <div className="landmark-form-error" role="alert">{error}</div>
+      )}
+
+      {toast && (
+        <div role="status" className="pending-draft-toast">{toast}</div>
+      )}
+
+      {pendingDrafts.length > 0 && (
+        <div className="pending-drafts-list">
+          {pendingDrafts.map((d) => (
+            <PendingDraftCard key={d.draftId} draft={d} onResolved={handleDraftResolved} />
+          ))}
+        </div>
       )}
 
       {landmarks.length > 0 && (

@@ -347,6 +347,64 @@ if (preludeId && pedagogicalNextPiece) {
   }
 }
 
+// --- PR 2: bundled-drafts contribution_request addressed to Haji on the Bach Suite ---
+// Demonstrates the new recipient piece-page UX: visit /piece/bach-cello-suite-1
+// signed in as haji and the section components render proposal cards.
+
+let pr2RequestId: string | null = null;
+if (preludeId) {
+  // Reset any prior PR 2 sample so re-runs are clean. Cascades the drafts.
+  await admin
+    .from('contribution_requests')
+    .delete()
+    .eq('sender_id', (await admin.auth.admin.listUsers({ perPage: 1000 })).data.users.find((u) => u.email === 'staff@local.test')?.id ?? '00000000-0000-0000-0000-000000000000')
+    .eq('recipient_id', hajiId)
+    .is('sent_at', null);
+  // Also clean any leftover sent test-request
+  const { data: prevSent } = await admin
+    .from('contribution_requests')
+    .select('id, note')
+    .eq('recipient_id', hajiId)
+    .eq('piece_id', LANDMARK_PIECE_ID)
+    .like('note', 'PR2-DEMO%');
+  if (prevSent && prevSent.length > 0) {
+    await admin.from('contribution_requests').delete().in('id', prevSent.map((r) => r.id));
+  }
+
+  const { data: outboxId, error: outboxErr } = await staffClient.rpc('create_outbox_request', {
+    p_piece_id: LANDMARK_PIECE_ID,
+    p_recipient_id: hajiId,
+    p_note: 'PR2-DEMO: drafted these for you on the G major Suite — your landmarks would round it out.',
+  });
+  if (outboxErr) throw new Error(`create_outbox_request: ${outboxErr.message}`);
+  pr2RequestId = outboxId as string;
+
+  await staffClient.rpc('propose_draft', {
+    p_request_id: pr2RequestId,
+    p_kind: 'performers_note',
+    p_payload: {
+      body: "Sender's draft (PR 2 demo): the opening prelude rewards a single mental down-bow across the first four bars before the printed bowing kicks in — try practicing it that way once before restoring the marked slurs.",
+    },
+  });
+  await staffClient.rpc('propose_draft', {
+    p_request_id: pr2RequestId,
+    p_kind: 'interpretive_school',
+    p_payload: {
+      name: 'Modernist clarity',
+      body: "Sender's school draft (PR 2 demo): a metronomic, evenly weighted reading that treats every sixteenth as equal architecture — minimal rubato, maximal counterpoint visibility. Suits a hall, suits a recording, doesn't pretend to be HIP.",
+    },
+  });
+  await staffClient.rpc('propose_draft', {
+    p_request_id: pr2RequestId,
+    p_kind: 'piece_description',
+    p_payload: {
+      body: "Sender's description draft (PR 2 demo): the G major Suite is the cellist's first long-form solo conversation with their instrument. Every register, every gesture, the entire bow plan tested across a single key center.",
+    },
+  });
+
+  await staffClient.rpc('send_request', { p_request_id: pr2RequestId });
+}
+
 console.log('Local queue + piece-page fixtures seeded.');
 console.log(`  pending piece:      ${pendingPieceId}`);
 console.log(`    performer's note: ${noteId}   (awaiting approval)`);
@@ -388,4 +446,9 @@ if (pedagogicalSeeded) {
   console.log(`  7. Visit /piece/${LANDMARK_PIECE_ID} — Pedagogical arc shows "Natural next → Bach Cello Suite No. 2"`);
 } else if (preludeId && pedagogicalNextPiece) {
   console.log(`  7. Pedagogical arc on ${LANDMARK_PIECE_ID} already has the seed connection — skipped`);
+}
+if (pr2RequestId) {
+  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — three "Proposed by Staff Local" cards inline (PR 2)`);
+  console.log(`     in performer's notes / schools / signed descriptions sections, each with`);
+  console.log(`     [Accept as-is] [Edit & accept] [Decline] [Add to Todo] buttons`);
 }
