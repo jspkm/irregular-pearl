@@ -4,6 +4,23 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-04-23
+
+### Changed
+
+- **Profile became a single horizontal nav at every viewport.** The vertical sidebar at md+ collapsed into the same horizontal tab bar mobile already had: `Profile | Setting | [Maestro/Admin/Moderator if applicable]   ……   Logout`, with Logout flushed right via `ml-auto`. Role links (Maestro / Admin / Moderator) moved out of the navbar and into this row, sitting immediately after Setting so they're discoverable from the avatar instead of crowding the top chrome. [ProfileShell.tsx](src/components/ProfileShell.tsx).
+- **Navbar slimmed.** Removed the Maestro / Admin / Moderator badges and the "About" link from the top nav. About now lives in the footer (before Terms / Privacy on desktop and mobile rows). The right side of the nav is just the bell + avatar. [Navbar.astro](src/components/Navbar.astro), [AuthButton.tsx](src/components/AuthButton.tsx), [Layout.astro](src/layouts/Layout.astro).
+- **Mobile search promoted from overlay to a second navbar row.** Below 640px, the search input now renders as a full-width second row inside the sticky nav (with `px-2 pb-2` for minimal margin) instead of an icon that opens an overlay. Removed the search-open / search-close buttons and the overlay div + script. [Navbar.astro](src/components/Navbar.astro).
+
+### Fixed
+
+- **Navbar icons aligned at every viewport.** Below 1025px the global touch-target rule (`@media (max-width: 1024px) { button, a { min-height: 44px; min-width: 44px } }`) was inflating the bell button + avatar anchor + IrregularPearl logo into 44×44 boxes with their content top-left aligned, throwing both vertical and horizontal alignment off. Each is now `inline-flex items-center justify-center` and exempts itself from the min-width via `min-w-0!` (Tailwind v4 important suffix — beats the unlayered global rule that otherwise wins over layered utilities regardless of specificity). The 44px vertical hit area is preserved. [Navbar.astro](src/components/Navbar.astro), [NavbarBell.tsx](src/components/NavbarBell.tsx), [AuthButton.tsx](src/components/AuthButton.tsx).
+- **Dark mode text uses pure white.** `--color-ink` / `--ink` in `html[data-theme="dark"]` switched from `#F0EFEC` (a warm off-white) to `#FFFFFF` for maximum contrast against the `#1A1A1A` background. Contrast ratio against the page bg climbed from ~15.6:1 to ~17.4:1. [global.css](src/styles/global.css).
+- **`.pending-draft-btn` (Edit & accept / Decline) visible in dark mode.** Two compounding bugs: the rule had `background: #fff` hardcoded, and once the ink color went white in dark mode that rendered as white-on-white. Base background switched to `var(--color-surface)` and an explicit `html[data-theme="dark"] .pending-draft-btn { background: var(--bg); color: var(--ink); border-color: var(--border-strong); }` block was added so the buttons stand out against the dark purple draft card. The primary variant (`Accept as-is`) flips its label to `var(--bg)` in dark mode so the dark text reads cleanly on the lavender accent fill. [global.css](src/styles/global.css).
+- **Username slug + actions wrap as a unit.** On the profile header, `irregularpearl.org/@<username>` would line-break independently from `View · Change username` at narrow widths, leaving "View" stranded on its own line and "Change username" wrapped to two lines. The actions are now in an `inline-flex items-center gap-2 shrink-0 whitespace-nowrap` group so they always travel together; `min-w-0! min-h-0!` on the View / Change `<a>`+`<button>` opts them out of the global touch-target rule that was inflating them. The outer container is `flex flex-wrap items-center gap-x-2 gap-y-1`, so when there's not enough room for the slug and the action group on one line, the action group drops below the slug as a single block. [UsernameEditor.tsx](src/components/UsernameEditor.tsx).
+- **PWA manifest no longer 404s on icons.** `public/manifest.json` was pointing at `/icon-192.png` and `/icon-512.png` which never shipped, breaking the install banner and triggering a console error on every load. Manifest now references the existing `favicon.svg` with `sizes: "any"` so a single scalable asset covers every install slot. [manifest.json](public/manifest.json).
+- **Deprecated PWA meta tag complemented.** Added `<meta name="mobile-web-app-capable" content="yes">` alongside the legacy `apple-mobile-web-app-capable`, clearing the Chrome console deprecation warning. Apple's variant is kept for older iOS Safari. [Layout.astro](src/layouts/Layout.astro).
+
 ## [0.4.0] - 2026-04-22
 
 ### Added

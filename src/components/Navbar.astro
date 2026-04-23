@@ -3,71 +3,23 @@ import AuthButton from './AuthButton';
 import NavbarBell from './NavbarBell';
 import SearchTypeahead from './SearchTypeahead';
 ---
-<nav class="relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4 border-b border-border bg-surface sticky top-0 z-50">
-  <a href="/" class="no-underline shrink-0 text-ink font-medium tracking-tight text-base md:text-lg">
-    IrregularPearl
-  </a>
+<div class="sticky top-0 z-50 bg-surface border-b border-border">
+  <nav class="relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4">
+    <a href="/" class="no-underline shrink-0 text-ink font-medium tracking-tight text-base md:text-lg inline-flex items-center min-w-0!">
+      IrregularPearl
+    </a>
 
-  <div class="hidden sm:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 min-w-[260px] max-w-xl">
+    <div class="hidden sm:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 min-w-[260px] max-w-xl">
+      <SearchTypeahead client:load />
+    </div>
+
+    <div class="flex items-center gap-4 md:gap-5 text-sm text-ink ml-auto">
+      <NavbarBell client:load />
+      <AuthButton client:load />
+    </div>
+  </nav>
+
+  <div class="sm:hidden px-2 pb-2">
     <SearchTypeahead client:load />
   </div>
-
-  <div class="flex items-center gap-4 md:gap-5 text-sm text-ink ml-auto">
-    <button
-      type="button"
-      id="nav-search-open"
-      class="sm:hidden bg-transparent border-0 p-0 text-ink hover:text-accent transition-colors cursor-pointer inline-flex items-center"
-      aria-label="Search"
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="7"></circle>
-        <path d="m21 21-4.3-4.3"></path>
-      </svg>
-    </button>
-    <a href="/about" class="no-underline text-ink hover:text-accent transition-colors">About</a>
-    <NavbarBell client:load />
-    <AuthButton client:load />
-  </div>
-
-  <div
-    id="nav-search-overlay"
-    class="hidden absolute inset-0 bg-surface items-center gap-2 px-4 py-3 z-10"
-  >
-    <div class="flex-1">
-      <SearchTypeahead client:visible />
-    </div>
-    <button
-      type="button"
-      id="nav-search-close"
-      class="bg-transparent border-0 p-0 text-ink hover:text-accent transition-colors cursor-pointer inline-flex items-center shrink-0"
-      aria-label="Close search"
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M18 6 6 18"></path>
-        <path d="m6 6 12 12"></path>
-      </svg>
-    </button>
-  </div>
-</nav>
-
-<script>
-  const open = document.getElementById('nav-search-open');
-  const close = document.getElementById('nav-search-close');
-  const overlay = document.getElementById('nav-search-overlay');
-  if (open && close && overlay) {
-    const show = () => {
-      overlay.classList.remove('hidden');
-      overlay.classList.add('flex');
-      overlay.querySelector('input')?.focus();
-    };
-    const hide = () => {
-      overlay.classList.add('hidden');
-      overlay.classList.remove('flex');
-    };
-    open.addEventListener('click', show);
-    close.addEventListener('click', hide);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !overlay.classList.contains('hidden')) hide();
-    });
-  }
-</script>
+</div>

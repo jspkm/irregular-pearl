@@ -58,26 +58,28 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
 
   if (!editing) {
     return (
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
         {currentUsername ? (
           <>
-            <span className="font-mono text-xs text-[#A8A29E]">
+            <span className="font-mono text-xs text-[#A8A29E] leading-none">
               irregularpearl.org/@{currentUsername}
             </span>
-            <a
-              href={`/@${currentUsername}`}
-              className="text-[11px] text-accent hover:underline no-underline"
-            >
-              View
-            </a>
-            <span className="text-[11px] text-[#E5E3DE]">·</span>
-            <button
-              onClick={() => { setEditing(true); setUsername(currentUsername); }}
-              className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0"
-            >
-              Change username
-            </button>
-            {saved && <span className="text-[11px] text-green-600">Saved</span>}
+            <span className="inline-flex items-center gap-2 leading-none shrink-0 whitespace-nowrap">
+              <a
+                href={`/@${currentUsername}`}
+                className="text-[11px] text-accent hover:underline no-underline min-w-0! min-h-0!"
+              >
+                View
+              </a>
+              <span className="text-[11px] text-[#E5E3DE]">·</span>
+              <button
+                onClick={() => { setEditing(true); setUsername(currentUsername); }}
+                className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0 min-w-0! min-h-0!"
+              >
+                Change username
+              </button>
+              {saved && <span className="text-[11px] text-green-600">Saved</span>}
+            </span>
           </>
         ) : (
           <button
