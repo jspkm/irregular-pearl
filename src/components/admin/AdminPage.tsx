@@ -71,6 +71,8 @@ export default function AdminPage({ initialTab }: Props) {
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
   ].filter(t => t.show);
 
+  const isStaff = isAdmin || profile.role === 'moderator';
+
   if (!tabs.find(t => t.id === activeTab) && tabs.length > 0) {
     setActiveTab(tabs[0].id);
   }
@@ -113,6 +115,14 @@ export default function AdminPage({ initialTab }: Props) {
               {tab.label}
             </button>
           ))}
+          {isStaff && (
+            <a
+              href="/admin/unmatched-queries"
+              className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-[#6F6F6F] hover:text-[#1A1A1A] transition-colors no-underline"
+            >
+              Signals
+            </a>
+          )}
         </div>
       </div>
 
