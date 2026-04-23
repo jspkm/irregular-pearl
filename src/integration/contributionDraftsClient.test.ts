@@ -167,6 +167,103 @@ describe('fetchPendingDraftsOnPiece (recipient view)', () => {
   });
 });
 
+describe('fetchPendingDraftsForViewer (cross-piece, Drafts tab)', () => {
+  let staff: Awaited<ReturnType<typeof createAuthUser>>;
+  let recipient: Awaited<ReturnType<typeof createAuthUser>>;
+  const piece1 = 'pr3-fetch-piece-1';
+  const piece2 = 'pr3-fetch-piece-2';
+
+  beforeAll(async () => {
+    staff = await createAuthUser({ displayName: 'PR3 Staff', isStaff: true });
+    recipient = await createAuthUser({ displayName: 'PR3 Recipient' });
+    await createTestPiece(piece1, 'PR3 Piece One');
+    await createTestPiece(piece2, 'PR3 Piece Two');
+  });
+
+  afterAll(async () => {
+    await admin.from('contribution_requests').delete().eq('sender_id', staff.id);
+    await admin.from('sent_request_archive').delete().eq('sender_id', staff.id);
+    await deleteTestPiece(piece1);
+    await deleteTestPiece(piece2);
+    await deleteAuthUser(staff.id);
+    await deleteAuthUser(recipient.id);
+  });
+
+  test('cross-piece query joins piece + sender for each draft row', async () => {
+    // Send two requests on two different pieces.
+    const { data: req1 } = await staff.client.rpc('create_outbox_request', {
+      p_piece_id: piece1, p_recipient_id: recipient.id, p_note: null,
+    });
+    await staff.client.rpc('propose_draft', {
+      p_request_id: req1 as string,
+      p_kind: 'performers_note',
+      p_payload: { body: 'On piece one.' },
+    });
+    await staff.client.rpc('send_request', { p_request_id: req1 as string });
+
+    const { data: req2 } = await staff.client.rpc('create_outbox_request', {
+      p_piece_id: piece2, p_recipient_id: recipient.id, p_note: null,
+    });
+    await staff.client.rpc('propose_draft', {
+      p_request_id: req2 as string,
+      p_kind: 'piece_description',
+      p_payload: { body: 'On piece two.' },
+    });
+    await staff.client.rpc('send_request', { p_request_id: req2 as string });
+
+    // Recipient-side cross-piece read: 2 drafts, each with piece + sender info.
+    // Recipient queries both base tables directly (RLS scopes to live drafts).
+    const { data: rawDrafts } = await recipient.client
+      .from('contribution_request_drafts')
+      .select('id, request_id, kind');
+    expect(rawDrafts?.length ?? 0).toBe(2);
+
+    const requestIds = [...new Set((rawDrafts ?? []).map((d) => d.request_id))];
+    const { data: rawRequests } = await recipient.client
+      .from('contribution_requests')
+      .select('id, sender_id, piece_id')
+      .in('id', requestIds);
+    expect(rawRequests?.length ?? 0).toBe(2);
+
+    const pieceIds = [...new Set((rawRequests ?? []).map((r) => r.piece_id))].sort();
+    expect(pieceIds).toEqual([piece1, piece2]);
+  });
+
+  test('inline_dismissed_at drafts still appear (Drafts tab includes them)', async () => {
+    const { data: req3 } = await staff.client.rpc('create_outbox_request', {
+      p_piece_id: piece1, p_recipient_id: recipient.id, p_note: null,
+    });
+    const { data: draftId } = await staff.client.rpc('propose_draft', {
+      p_request_id: req3 as string,
+      p_kind: 'interpretive_school',
+      p_payload: { name: 'School', body: 'For todos.' },
+    });
+    await staff.client.rpc('send_request', { p_request_id: req3 as string });
+    await recipient.client.rpc('dismiss_draft_inline', { p_draft_id: draftId as string });
+
+    // Cross-piece query: dismissed-from-inline drafts STILL show on the
+    // Drafts tab (the lib's fetchPendingDraftsForViewer doesn't filter
+    // them out — that's the whole point of "Add to Todo").
+    const { data } = await recipient.client
+      .from('contribution_request_drafts')
+      .select('id, inline_dismissed_at')
+      .eq('id', draftId as string)
+      .single();
+    expect(data?.inline_dismissed_at).not.toBeNull();
+  });
+
+  test('pieces query exposes title + composer_name for each draft', async () => {
+    // Reuse the requests from prior tests; fetch the piece info.
+    const { data: pieces } = await recipient.client
+      .from('pieces')
+      .select('id, title, composer_name')
+      .in('id', [piece1, piece2]);
+    expect(pieces?.length ?? 0).toBe(2);
+    expect(pieces?.find((p) => p.id === piece1)?.title).toBe('PR3 Piece One');
+    expect(pieces?.find((p) => p.id === piece2)?.title).toBe('PR3 Piece Two');
+  });
+});
+
 describe('error-code mapping in lib wrappers', () => {
   // Pure-logic test: pick a pgrest-style error message and verify the lib
   // maps it to the right friendly code.

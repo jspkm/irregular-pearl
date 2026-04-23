@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../../lib/supabase';
+import { redirectFromPrivateRoute } from '../../lib/privateRoute';
 import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminPlaylist from './AdminPlaylist';
@@ -23,14 +24,20 @@ interface Props {
 export default function AdminPage({ initialTab }: Props) {
   const [profile, setProfile] = useState<StaffProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [denied, setDenied] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   useEffect(() => {
-    if (!hasSupabase) { setLoading(false); setDenied(true); return; }
+    // /admin + /maestro are private routes. Two unauthorized cases —
+    // both redirect via the shared helper, no leak about what the page
+    // contains.
+    if (!hasSupabase) { redirectFromPrivateRoute(false); return; }
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session?.user) { setDenied(true); setLoading(false); return; }
+      if (!session?.user) {
+        // Anon → home with sign-in modal trigger.
+        redirectFromPrivateRoute(false);
+        return;
+      }
 
       const { data } = await supabase
         .from('users')
@@ -38,26 +45,21 @@ export default function AdminPage({ initialTab }: Props) {
         .eq('id', session.user.id)
         .single();
 
-      if (!data) { setDenied(true); setLoading(false); return; }
-
-      const isStaff = data.role === 'admin' || data.role === 'moderator' || data.is_maestro;
-      if (!isStaff) { setDenied(true); setLoading(false); return; }
+      const isStaff = data && (data.role === 'admin' || data.role === 'moderator' || data.is_maestro);
+      if (!data || !isStaff) {
+        // Signed in but lacking permission → home, no modal.
+        redirectFromPrivateRoute(true);
+        return;
+      }
 
       setProfile(data as StaffProfile);
       setLoading(false);
     });
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center text-sm text-[#6F6F6F]">Loading...</div>;
-
-  if (denied || !profile) {
-    return (
-      <div className="min-h-screen bg-[#FFFFFF] flex flex-col items-center justify-center">
-        <p className="text-sm text-[#6F6F6F] mb-2">Access denied</p>
-        <a href="/" className="text-xs text-[#6B4E7C] no-underline hover:underline">← Back to site</a>
-      </div>
-    );
-  }
+  // Render nothing while resolving auth and during the redirect away —
+  // private route, no leak about what's behind the gate.
+  if (loading || !profile) return null;
 
   const isAdmin = profile.role === 'admin';
   const isMaestro = profile.is_maestro || isAdmin;

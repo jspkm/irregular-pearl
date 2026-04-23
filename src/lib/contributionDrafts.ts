@@ -27,9 +27,13 @@ export interface PendingDraft {
   payload: Record<string, unknown>;
   createdAt: string;
   /** Stamped by Add to Todo. Card is hidden from inline render but still
-   * lives on the recipient's Todos screen (PR 3). */
+   * lives on the recipient's Drafts tab (/notifications). */
   inlineDismissedAt: string | null;
   sender: { id: string; displayName: string | null };
+  /** Populated by fetchPendingDraftsForViewer() (Drafts tab needs piece
+   * context to render cross-piece). Null when fetched via
+   * fetchPendingDraftsOnPiece() — the piece is implicit there. */
+  piece: { id: string; title: string; composerName: string | null } | null;
 }
 
 export type ActOnDraftAction = 'accept_as_is' | 'edit_and_accept' | 'decline';
@@ -51,6 +55,10 @@ export interface ActOnDraftResult {
  * Fetch all live (non-dispositioned) drafts on a piece for the current viewer.
  * Recipient RLS already filters by recipient + sent. Empty array if anon or
  * no drafts.
+ *
+ * The returned drafts have `piece: null` — the piece is implicit (the section
+ * components rendering this know the pieceId). For cross-piece reads (the
+ * Drafts tab on /notifications), use fetchPendingDraftsForViewer() instead.
  */
 export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<PendingDraft[]> {
   const { data: drafts, error: draftsErr } = await supabase
@@ -88,6 +96,64 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
       createdAt: d.created_at,
       inlineDismissedAt: d.inline_dismissed_at,
       sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      piece: null,
+    });
+  }
+  return out;
+}
+
+/**
+ * Fetch all live (non-dispositioned) drafts addressed to the current viewer
+ * across every piece. Used by the Drafts tab on /notifications. Recipient
+ * RLS scopes the query to drafts the viewer can see; we then join piece
+ * + sender for cross-piece display.
+ *
+ * Returns drafts with `piece` populated. Sorted oldest-first so the
+ * Drafts tab renders in receipt order (matches the Messages tab pattern).
+ */
+export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
+  const { data: drafts, error: draftsErr } = await supabase
+    .from('contribution_request_drafts')
+    .select('id, request_id, kind, payload, created_at, inline_dismissed_at')
+    .order('created_at', { ascending: false });
+  if (draftsErr || !drafts || drafts.length === 0) return [];
+
+  const requestIds = [...new Set(drafts.map((d) => d.request_id))];
+  const { data: requests, error: reqErr } = await supabase
+    .from('contribution_requests')
+    .select('id, sender_id, piece_id')
+    .in('id', requestIds);
+  if (reqErr || !requests) return [];
+
+  const reqById = new Map(requests.map((r) => [r.id, r]));
+  const senderIds = [...new Set(requests.map((r) => r.sender_id))];
+  const pieceIds = [...new Set(requests.map((r) => r.piece_id))];
+
+  const [{ data: senders }, { data: pieces }] = await Promise.all([
+    supabase.from('users').select('id, display_name').in('id', senderIds),
+    supabase.from('pieces').select('id, title, composer_name').in('id', pieceIds),
+  ]);
+
+  const senderById = new Map((senders ?? []).map((s) => [s.id, s]));
+  const pieceById = new Map(
+    (pieces ?? []).map((p) => [p.id, { id: p.id, title: p.title, composerName: p.composer_name }]),
+  );
+
+  const out: PendingDraft[] = [];
+  for (const d of drafts) {
+    const req = reqById.get(d.request_id);
+    if (!req) continue;
+    const sender = senderById.get(req.sender_id);
+    const piece = pieceById.get(req.piece_id) ?? null;
+    out.push({
+      draftId: d.id,
+      requestId: d.request_id,
+      kind: d.kind as DraftKind,
+      payload: (d.payload as Record<string, unknown>) ?? {},
+      createdAt: d.created_at,
+      inlineDismissedAt: d.inline_dismissed_at,
+      sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      piece,
     });
   }
   return out;

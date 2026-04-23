@@ -36,9 +36,12 @@ interface Props {
    * resolves (acted, dismissed, or auto-removed due to a race). The parent
    * removes the draft from its local state and may show the toast. */
   onResolved: (draftId: string, toast: string | null) => void;
+  /** Set true on the Drafts tab — that surface IS the Todos screen, so
+   * "Add to Todo" doesn't make sense as an action there. */
+  hideAddToTodo?: boolean;
 }
 
-export default function PendingDraftCard({ draft, onResolved }: Props) {
+export default function PendingDraftCard({ draft, onResolved, hideAddToTodo = false }: Props) {
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -275,14 +278,16 @@ export default function PendingDraftCard({ draft, onResolved }: Props) {
             >
               Decline
             </button>
-            <button
-              type="button"
-              className="pending-draft-btn"
-              disabled={busy}
-              onClick={handleAddToTodo}
-            >
-              Add to Todo
-            </button>
+            {!hideAddToTodo && (
+              <button
+                type="button"
+                className="pending-draft-btn"
+                disabled={busy}
+                onClick={handleAddToTodo}
+              >
+                Add to Todo
+              </button>
+            )}
           </>
         )}
         {editing && (

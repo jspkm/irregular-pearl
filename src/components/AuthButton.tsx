@@ -31,6 +31,20 @@ export default function AuthButton() {
             setUserRole((data as any)?.role || 'user');
             setIsMaestro((data as any)?.is_maestro === true);
           });
+      } else if (typeof window !== 'undefined') {
+        // Auto-open sign-in modal when arriving with ?signin=1. Used by
+        // private pages (/notifications, etc.) that redirect anon visitors
+        // here without leaking what the source page was about.
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('signin') === '1') {
+          setSignInOpen(true);
+          // Strip the param so a refresh doesn't keep popping the modal.
+          params.delete('signin');
+          const newSearch = params.toString();
+          const newUrl =
+            window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+          window.history.replaceState({}, '', newUrl);
+        }
       }
     });
 
