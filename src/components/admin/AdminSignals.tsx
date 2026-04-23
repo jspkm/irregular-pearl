@@ -1,4 +1,6 @@
-// Editorial signals dashboard. Staff-only. Two sections:
+// Editorial signals tab inside /admin. Renders inside AdminPage which
+// already staff-gates the surface, so this component trusts the caller
+// and focuses on data loading + table rendering. Two sections:
 //
 // 1. Unmatched queries — what users typed into the navbar search that
 //    returned zero matches (logged on dismiss with query >= 6 chars).
@@ -10,12 +12,11 @@
 //    yet. Unique viewers dedup by user_id or visitor_token (same
 //    person counts once). Default top 50, adjustable 30–200.
 //
-// Staff gate is server-side on both RPCs. Non-staff viewers see a
-// blank "not authorized" state.
+// The RPCs behind both sections are server-side staff-gated as well
+// (defense in depth); errors from them surface inline.
 
 import { useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../../lib/supabase';
-import { useAuth } from '../../lib/useAuth';
 
 interface UnmatchedQuery {
   query: string;
@@ -35,8 +36,6 @@ interface ViewedNoContentPiece {
   last_viewed: string;
 }
 
-type GateStatus = 'loading' | 'unauthorized' | 'ready';
-
 function formatRelative(iso: string): string {
   const then = new Date(iso).getTime();
   const delta = Date.now() - then;
@@ -51,25 +50,18 @@ function formatRelative(iso: string): string {
 }
 
 export default function AdminSignals() {
-  const { user, loading: authLoading } = useAuth();
-  const [gate, setGate] = useState<GateStatus>('loading');
   const [unmatched, setUnmatched] = useState<UnmatchedQuery[]>([]);
   const [viewedNoContent, setViewedNoContent] = useState<ViewedNoContentPiece[]>([]);
   const [limit, setLimit] = useState(50);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user || !hasSupabase) {
-      // Non-staff (including signed-out) don't get to learn this URL
-      // exists. Bounce to the project-wide 404 page, replacing history
-      // so the back button doesn't land back on this URL.
-      window.location.replace('/404');
-      return;
-    }
+    if (!hasSupabase) return;
     let cancelled = false;
 
     async function load() {
+      setLoading(true);
       setError(null);
       const [queriesRes, piecesRes] = await Promise.all([
         supabase.rpc('admin_top_unmatched_queries', { p_limit: 50 }),
@@ -80,35 +72,28 @@ export default function AdminSignals() {
 
       if (queriesRes.error || piecesRes.error) {
         const msg = queriesRes.error?.message ?? piecesRes.error?.message ?? '';
-        if (msg.toLowerCase().includes('staff only')) {
-          window.location.replace('/404');
-          return;
-        }
         setError(msg || 'Could not load signals.');
-        setGate('ready');
+        setLoading(false);
         return;
       }
 
       setUnmatched((queriesRes.data ?? []) as UnmatchedQuery[]);
       setViewedNoContent((piecesRes.data ?? []) as ViewedNoContentPiece[]);
-      setGate('ready');
+      setLoading(false);
     }
 
     void load();
     return () => {
       cancelled = true;
     };
-  }, [authLoading, user, limit]);
+  }, [limit]);
 
-  // Render nothing while loading or bouncing — the dashboard body below
-  // mounts only after the RPC calls succeed as staff.
-  if (gate === 'loading' || gate === 'unauthorized') {
-    return null;
+  if (loading) {
+    return <div className="text-sm text-muted font-body">Loading signals…</div>;
   }
 
   return (
     <div className="font-body">
-      <h1 className="text-[28px] font-display text-ink mb-2 tracking-tight">Editorial signals</h1>
       <p className="text-sm text-muted mb-10 max-w-2xl">
         What musicians tried to find but the catalog didn&apos;t have, and which pieces in the catalog are drawing traffic without any signed contribution yet. Two editorial priority lists.
       </p>

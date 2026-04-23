@@ -4,8 +4,9 @@ import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminPlaylist from './AdminPlaylist';
 import ContributorContentAdmin from './ContributorContentAdmin';
+import AdminSignals from './AdminSignals';
 
-type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes' | 'interpretive-schools' | 'piece-descriptions';
+type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes' | 'interpretive-schools' | 'piece-descriptions' | 'signals';
 
 interface StaffProfile {
   id: string;
@@ -62,6 +63,8 @@ export default function AdminPage({ initialTab }: Props) {
   const isMaestro = profile.is_maestro || isAdmin;
   const headerLabel = isAdmin ? 'Admin' : profile.role === 'moderator' ? 'Moderator' : isMaestro ? 'Maestro' : 'Admin';
 
+  const isStaff = isAdmin || profile.role === 'moderator';
+
   const tabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
@@ -69,9 +72,8 @@ export default function AdminPage({ initialTab }: Props) {
     { id: 'interpretive-schools' as Tab, label: 'Schools', show: isAdmin },
     { id: 'piece-descriptions' as Tab, label: 'Descriptions', show: isAdmin },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
+    { id: 'signals' as Tab, label: 'Signals', show: isStaff },
   ].filter(t => t.show);
-
-  const isStaff = isAdmin || profile.role === 'moderator';
 
   if (!tabs.find(t => t.id === activeTab) && tabs.length > 0) {
     setActiveTab(tabs[0].id);
@@ -84,6 +86,7 @@ export default function AdminPage({ initialTab }: Props) {
     'interpretive-schools': 'Interpretive schools',
     'piece-descriptions': 'Piece descriptions',
     playlist: 'Maestro Playlist',
+    signals: 'Editorial signals',
   };
 
   return (
@@ -115,14 +118,6 @@ export default function AdminPage({ initialTab }: Props) {
               {tab.label}
             </button>
           ))}
-          {isStaff && (
-            <a
-              href="/admin/unmatched-queries"
-              className="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-[#6F6F6F] hover:text-[#1A1A1A] transition-colors no-underline"
-            >
-              Signals
-            </a>
-          )}
         </div>
       </div>
 
@@ -135,6 +130,7 @@ export default function AdminPage({ initialTab }: Props) {
         {activeTab === 'interpretive-schools' && isAdmin && <ContributorContentAdmin subjectTable="interpretive_schools" />}
         {activeTab === 'piece-descriptions' && isAdmin && <ContributorContentAdmin subjectTable="piece_descriptions" />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
+        {activeTab === 'signals' && isStaff && <AdminSignals />}
       </div>
     </div>
   );
