@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar.astro';
 import NotificationsQueue from '../components/NotificationsQueue';
 ---
 
-<Layout title="Your queue" noindex={true}>
+<Layout title="Messages" noindex={true}>
   <Navbar />
   <main class="max-w-[720px] mx-auto px-4 md:px-6 py-10">
     <NotificationsQueue client:load />

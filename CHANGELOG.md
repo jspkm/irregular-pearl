@@ -4,6 +4,28 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-22
+
+### Added
+
+- **Request a contribution.** Any signed-in musician with at least one published signed contribution can ask a specific user to curate a piece. Username autocomplete, optional personal note, LLM-drafted note affordance (staff-only). Works across the catalog and the new pre-piece surface. Rate-limited per-recipient-30d and per-sender-24h (tunable via `app_config`); staff bypass. Recipients see a contextual "asked you to contribute here" ribbon on the piece page and an entry on the unified Messages page. Recipients can dismiss non-staff requests; staff requests stay pending until the contribution publishes or the sender withdraws. Auto-clears on first published signed content. New tables: `contribution_requests`, `canonical_piece_index`, `piece_redirects`, `search_misses`, `piece_views`, `draft_note_requests`, `app_config`.
+- **Pre-piece surface.** Navbar search now returns grouped results: IN THE CATALOG (materialized pieces) and NOT YET CURATED (canonical index entries). Clicking a seed entry lands on a read-only pre-piece page; the first CTA click materializes it into a real piece with a canonical slug (race-safe, idempotent). Unified layout — one URL, one page, mode prop handles both states.
+- **Unified Messages page.** `/notifications` renamed to Messages; drafts + contribution requests appear in reverse-chronological order with bylines, piece links, and inline personal notes. Empty state shows a whimsical musical-glyph backdrop. Navbar bell links through with inline preview.
+- **Editorial signals dashboard.** New Signals tab in `/admin` (staff-only) surfaces two lists: unmatched search queries (grouped by lowercased query, sorted by frequency and distinct users) and most-viewed pieces without any published contribution. Powers the eventual automated canonical-index worker.
+- **Admin dashboard tiles.** Total Pieces and Pieces w/ User Curation stats, plus a Recent Curation section showing the latest published performer's notes / interpretive schools / landmarks / piece descriptions across all users, with contributor byline and piece link.
+- **LLM-drafted personal notes.** `/api/draft-contribution-note` drafts a short, warm, musician-to-musician note for the request dialog. Claude Haiku 4.5. Staff-only, Bearer-token authenticated, 20 drafts per staff per 24h (tunable). User-controlled prompt fields sanitized. Two framing patterns (90% recipient-centric, 10% sender-is-working-on-the-piece).
+
+### Changed
+
+- **One piece page, two modes.** `PiecePageLayout` now takes a `mode: 'pre-piece' | 'full'` prop; `StubPageLayout` retired. Slug renames route through `piece_redirects` (identity immutability via redirect, not update).
+- **Search-miss logging.** Logs on dismiss (sessionStorage-deduped) when query >= 6 chars with zero matches, replacing the per-keystroke approach.
+- **Moderator role rename.** First-chair → moderator throughout (`users.role`, RPC gates, staff checks). See prior refactor commits on main.
+
+### Fixed
+
+- **E2E content-drift.** Updated three production smoke tests that referenced retired slugs/copy (`/piece/chopin-ballade-1`, "Most Active This Week", case-sensitive Chopin search). Separate "prod search returns no results" bug flagged for follow-up.
+
+
 ### Added
 
 - **User-contributed metadata pills.** The pills row under the piece byline (instrument(s), era, form, duration, difficulty) is now a contributor surface. Any signed-in user can add a pill where a slot is open via the inline `+` chip; anyone signed in can delete a `user`-source pill (the delete-and-re-add pattern stands in for in-place edits — see [feedback memory on per-row affordances]). Mods/admins can also delete `seed` and `mod` pills, and see a subtle dot cue on pills they cannot remove via the user-source rule. Storage is a new `piece_pills` table (one row per pill, `source ∈ seed|user|mod`, `UNIQUE(piece_id, category, value)`); the legacy scalar/array columns on `pieces` (`instruments text[]`, `era text`, `form text`, `difficulty difficulty`, `duration_minutes int`) are kept as a denormalized read cache via a sync trigger so existing browse / search reads keep working without a wholesale refactor. A second trigger backfills seed pills from a piece's scalar fields when a new piece is inserted (so the seed script stays unchanged). Single-value categories (era / form / duration / difficulty) accept at most one pill per piece — the RPC enforces this, and the inline `+` hides when every category is filled. Controlled vocabularies live in [src/data/instruments.ts](src/data/instruments.ts) (full orchestra: strings, woodwinds, brass, percussion, keyboard, voice, ensembles) and [src/data/pill-vocabulary.ts](src/data/pill-vocabulary.ts) (era / form / difficulty); duration is the one free-format category and matches `^~\d{1,3} min$`. New RPCs `add_piece_pill(piece_id, category, value)` and `remove_piece_pill(pill_id)` carry the role gating and rate limiting. New island [PiecePills.tsx](src/components/PiecePills.tsx) renders the row, the `+` picker, and per-pill `×` confirm chip; styles in [piece-page.css](src/styles/piece-page.css) (per-memory: Astro scoped CSS misses React islands). Migration [20260521000000_piece_pills.sql](supabase/migrations/20260521000000_piece_pills.sql).

@@ -104,7 +104,55 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ---
 
+## Canonical piece index + request-a-contribution
+
+See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projects/jspkm-irregular-pearl/jspkm-main-design-request-contribution-20260421-183606.md) for the full design.
+
+### Initial multi-source import into `canonical_piece_index`
+
+**What:** One-time import populating `canonical_piece_index` with works scoped to instrumentation covering the repertoire H. and near-term contributors are likely to work in. Source set in priority order: MusicBrainz API (primary, works + recordings), Wikidata SPARQL (primary, cross-reference + multilingual titles + VIAF composer IDs), IMSLP XML dumps (secondary, edition/publisher metadata + obscure works MB misses), VIAF (disambiguation only, not primary metadata). Collected fields per entry: source IDs (`musicbrainz_work_id`, `wikidata_qid`, `viaf_id` for composer, `imslp_work_id`), canonical title, native title, composer, catalog number, era, instrumentation, movements when surfaces expose them cleanly. Everything else is deferred — no difficulty, no duration, no description, no signed content.
+
+**Decision rule:** an entry is written to the index when **two independent sources agree** on composer + title + catalog, OR MusicBrainz alone has high confidence (exact catalog match + at least one recording reference on file). Ambiguous entries are skipped and logged for manual review.
+
+**Why:** The canonical index is the site's piece identity source. The initial import is the difference between "catalog has 18 pieces" and "catalog covers real working repertoire." Without a broad initial import, new-user onboarding hits the `NOT YET CURATED` wall immediately on almost everything. Multi-source-with-agreement protects against single-source errors (MB has rough spots; Wikidata is cleaner on canonical naming; IMSLP fills niche gaps).
+
+**Context:** Bun script under `scripts/import-canonical-index.ts`. Runs locally with rate-limited clients per source (MB 1 req/sec per their policy, Wikidata SPARQL documented limits, IMSLP dump is local file parse — no live queries). Identifies the site as `IrregularPearl/0.x (https://irregularpearl.org; contact@irregularpearl.org)` in User-Agent headers. Writes to a local Supabase, commits a seed SQL file, applies to prod via normal migration path. Sample-quality pass on 50 works H. knows well before bulk import. License check: MB facts CC0; Wikidata CC0; Wikipedia CC-BY-SA (not imported — used only for disambiguation signals); IMSLP metadata generally free-to-use for catalog purposes (review their terms for the dumps specifically before shipping).
+
+**Explicitly excluded sources:** Grove Music Online, Oxford Music, AllMusic, Classical Archives, sheet-music-vendor catalogs, any site requiring scraping or TOS-violating bot access.
+
+**Effort:** M–L
+**Priority:** P1
+**Depends on:** `canonical_piece_index` table migration (part of the request-a-contribution PR1)
+
+### Automated canonical-index worker (GitHub Action or Claude routine)
+
+**What:** Scheduled worker that consumes the top entries from the `search_misses` admin view, queries MusicBrainz for each, and opens a pull request adding high-confidence matches to `canonical_piece_index` via a SQL migration. Each PR is a reviewable batch (10–50 candidates per run). Low-confidence or ambiguous matches are skipped with a one-line reason logged in the PR description. Human reviewer (staff) approves and merges; the migration applies on deploy. No direct writes to prod from the worker.
+
+**Shape:** Scheduled GitHub Action, weekly cadence initially. The action:
+1. Reads `search_misses` aggregate via a read-only Supabase service key.
+2. For each unique query at frequency ≥ threshold, queries the source set (MusicBrainz first; Wikidata and IMSLP dumps as cross-check and fill-in).
+3. Applies the decision rule: write the entry when two sources agree on composer + title + catalog, or when MB alone is high-confidence (exact catalog + recording reference). Skip and log otherwise.
+4. Invokes Claude (via API) or codex for ambiguous cases with a structured prompt: "Here is the user query, the MB match, the Wikidata match, and the IMSLP match. Do these refer to the same work? If yes, which is canonical? If no, which (if any) should be accepted?" Returns accept/reject with confidence and a one-line rationale. The AI is the tiebreaker for real ambiguity, not the primary decision layer.
+5. Writes a new migration file `YYYYMMDDHHMMSS_canonical_index_update_YYYY_MM_DD.sql` containing the accepted entries as INSERTs.
+6. Opens a PR with the migration + a markdown summary (accepted with source-agreement trail, rejected with reason, unique query counts, cost of the AI tiebreakers).
+
+**Why:** Every addition to the canonical index is a reviewable commit. Provenance is traceable (search query that triggered it, MB ID, AI confidence, reviewer who merged). No AI writes go to prod without a human pass. Matches the existing editorial discipline of the project — nothing ships without review.
+
+**Context:** Alternative to a GitHub Action is a `/loop`-scheduled Claude routine that does the same thing, but GitHub Action has better audit trail (everything is a commit) and doesn't require a running Claude instance. Can start as a one-file Bun script (`scripts/index-worker.ts`) run manually, then wrap in GitHub Action once the pattern proves out. Don't ship the Action until the script has produced 2-3 clean PRs manually. Staff (H. plus any moderator) reviews and merges.
+
+**Effort:** M
+**Priority:** P2
+**Depends on:** Initial MusicBrainz import (shipped first), `search_misses` logging (shipped first), `canonical_piece_index` schema stable
+
+---
+
 ## Completed
+
+### Request a contribution + pre-piece surface + editorial signals
+
+**What:** End-to-end request-a-contribution flow — navbar typeahead with grouped IN THE CATALOG / NOT YET CURATED results, seed-to-materialized piece on first CTA click via `materialize_piece_from_index` (race-safe, idempotent), recipient ribbon on piece page, unified Messages page with dismiss/auto-clear, username autocomplete, LLM-drafted personal notes (staff-only, rate-limited). Sender gate (>= 1 published signed contribution), per-recipient-30d + per-sender-24h rate limits (`app_config`-tunable), staff bypass. Email invites staff-only. New tables: `canonical_piece_index`, `contribution_requests`, `piece_redirects`, `search_misses`, `piece_views`, `draft_note_requests`, `app_config`. Admin Signals tab surfaces unmatched-query leaderboard + most-viewed-no-contribution pieces. Recent Curation section on admin dashboard (union across all four signed-content tables). `/piece/[slug]` uses one layout (`PiecePageLayout` with `mode` prop); `StubPageLayout` retired.
+
+**Completed:** v0.4.0 (2026-04-22)
 
 ### Seed-description voting + piece-page UI polish
 

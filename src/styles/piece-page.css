@@ -1558,3 +1558,368 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   text-decoration-thickness: 0.5px;
 }
 .piece-picker-clear:hover { text-decoration-thickness: 1px; }
+
+/* ---------- Request a contribution dialog (RequestContributionDialog.tsx) ---------- */
+.rcd-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.rcd-card {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(26, 26, 26, 0.16);
+  max-width: 480px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 28px 28px 24px;
+  font-family: var(--font-sans);
+}
+.rcd-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.rcd-subtitle {
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 4px;
+  line-height: 1.5;
+}
+.rcd-subtitle strong { font-weight: 500; }
+.rcd-subtitle-dim { color: var(--muted); font-weight: 400; }
+.rcd-helper {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.rcd-mode {
+  border: 0;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.rcd-mode legend {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 500;
+  margin-right: 6px;
+  padding: 0;
+  float: left;
+}
+.rcd-mode label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.rcd-mode input[type="radio"] { accent-color: var(--accent); cursor: pointer; }
+.rcd-field {
+  margin-bottom: 16px;
+  position: relative;
+}
+.rcd-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.rcd-field input,
+.rcd-field textarea {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.rcd-field input:focus,
+.rcd-field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+.rcd-counter {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  font-size: 11px;
+  color: var(--tertiary);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.rcd-error {
+  background: #f7e4e4;
+  color: #a32d2d;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.rcd-success {
+  background: #e6f1e9;
+  color: #2d6a3f;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin: 0 0 12px;
+}
+.rcd-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.rcd-actions-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.rcd-draft-link {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  padding: 7px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.rcd-draft-link:hover:not(:disabled) {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink);
+  text-underline-offset: 3px;
+}
+.rcd-draft-link:disabled { color: var(--tertiary); cursor: not-allowed; }
+.rcd-draft-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  line-height: 1;
+}
+.rcd-cancel {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--muted);
+  background: transparent;
+  border: 0.5px solid var(--border-strong);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.rcd-cancel:hover { color: var(--ink); border-color: var(--ink); }
+.rcd-submit {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--ink);
+  border: 0;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.rcd-submit:hover:not(:disabled) { opacity: 0.88; }
+.rcd-submit:disabled {
+  background: var(--border-strong);
+  color: var(--bg);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ---------- Pre-piece invitation block + CTAs (StubPageLayout) ---------- */
+/* React-island children don't inherit Astro scoped styles, so these live
+   global in piece-page.css alongside the other piece-page tokens. */
+.pp-invite { margin-bottom: 0; }
+.pp-invite-lede {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 16px 0 12px;
+  font-weight: 500;
+}
+.pp-invite-prose {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 640px;
+  margin: 0 0 40px;
+}
+.pp-cta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+.pp-cta-primary {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--bg);
+  background: var(--ink);
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.pp-cta-primary:hover { opacity: 0.88; }
+/* Ghost CTA: accent label + trailing chevron that nudges on hover. */
+.pp-cta-ghost {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--accent);
+  background: transparent;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.pp-cta-ghost::after {
+  content: '→';
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+.pp-cta-ghost:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink);
+  text-underline-offset: 3px;
+}
+.pp-cta-ghost:hover::after { transform: translateX(2px); }
+.pp-cta-ghost:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- Request dialog: username autocomplete ---------- */
+.rcd-field { position: relative; }
+.rcd-suggest-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  list-style: none;
+  padding: 4px 0;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(26, 26, 26, 0.08);
+  z-index: 10;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.rcd-suggest-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 120ms ease;
+}
+.rcd-suggest-item.is-active,
+.rcd-suggest-item:hover { background: var(--accent-soft); }
+.rcd-suggest-username {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+.rcd-suggest-display {
+  font-family: var(--font-sans);
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Piece header row: main column + recipient-ribbon aside ---------- */
+.piece-header-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.piece-header-main { min-width: 0; }
+.piece-header-aside { min-width: 0; }
+/* Hide the recipient-ribbon column on narrow viewports. The message
+   stays visible on the Messages page. */
+@media (max-width: 900px) {
+  .piece-header-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .piece-header-aside { display: none; }
+}
+
+/* ---------- Recipient ribbon (RecipientRibbon.tsx) ---------- */
+.recipient-ribbon {
+  display: block;
+  padding: 14px 16px;
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.recipient-ribbon-copy strong { font-weight: 500; }
+.recipient-ribbon-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.55;
+}
+.recipient-ribbon-privacy {
+  margin-top: 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--tertiary);
+  letter-spacing: 0.01em;
+}

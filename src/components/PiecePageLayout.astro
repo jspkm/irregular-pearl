@@ -39,13 +39,27 @@ import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '..
 import { fetchPedagogicalConnections, fetchAllPiecesForPicker } from '../lib/pedagogical';
 import PedagogicalArcList from './PedagogicalArcList';
 import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
+import RecipientRibbon from './RecipientRibbon';
 import PiecePills from './PiecePills';
+import StartContributionButton from './StartContributionButton';
+import RequestContributionDialog from './RequestContributionDialog';
+import PieceViewLogger from './PieceViewLogger';
 
 interface Props {
   piece: PieceFull;
+  /**
+   * 'pre-piece' hides every write surface below the ribbon and shows
+   * the invitation block + CTAs. 'full' renders the complete piece
+   * page: signed descriptions, difficulty, performer's notes, landmarks,
+   * schools, editions, recordings, pedagogical arc, references.
+   * There is only one piece page; `mode` is the one axis that
+   * decides whether write affordances are visible. Defaults to 'full'.
+   */
+  mode?: 'pre-piece' | 'full';
 }
 
-const { piece } = Astro.props;
+const { piece, mode = 'full' } = Astro.props;
+const isPrePiece = mode === 'pre-piece';
 const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId, dbPills] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
@@ -105,6 +119,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
 ---
 
 <main class="page">
+  <PieceViewLogger client:load pieceId={piece.id} />
 
   <div class="crumbs">
     <a href="/">Pieces</a><span class="sep">/</span>
@@ -112,17 +127,49 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     <span>{piece.title}</span>
   </div>
 
-  <h1 class="piece">
-    {piece.title}
-    {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
-  </h1>
-  <p class="byline">
-    by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
-  </p>
+  <div class="piece-header-row">
+    <div class="piece-header-main">
+      <h1 class="piece">
+        {piece.title}
+        {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
+      </h1>
+      <p class="byline">
+        by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
+      </p>
 
-  <PiecePills client:load pieceId={piece.id} initialPills={initialPills} />
+      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isPrePiece} />
+    </div>
 
+    <div class="piece-header-aside">
+      <RecipientRibbon client:load pieceId={piece.id} />
+    </div>
+  </div>
 
+  {isPrePiece && (
+    <section class="block pp-invite" id="invitation">
+      <p class="pp-invite-lede">
+        This piece has no signed contributions yet.
+      </p>
+      <p class="pp-invite-prose">
+        Write the first performer's note, a practice note on a specific passage,
+        or an interpretive school you'd defend in front of colleagues.
+      </p>
+      <div class="pp-cta-row">
+        <StartContributionButton client:load pieceId={piece.id} />
+        <RequestContributionDialog
+          client:load
+          pieceId={piece.id}
+          pieceTitle={piece.title}
+          composerName={piece.composer_name}
+          triggerLabel="Know someone who should? Request a contribution."
+          triggerClassName="pp-cta-ghost"
+        />
+      </div>
+    </section>
+  )}
+
+  {!isPrePiece && (
+    <>
   {/* Signed descriptions stack (includes the unsigned pieces.description as
       a synthetic "Seed data" card at the bottom of the stack; user-authored
       entries sort above by vote score). */}
@@ -200,6 +247,9 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
   <p class="change-log-link">
     <a href={`/piece/${piece.id}/change-log`}>Change log</a>
   </p>
+
+    </>
+  )}
 
 </main>
 

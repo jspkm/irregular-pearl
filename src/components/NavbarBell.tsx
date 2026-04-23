@@ -26,6 +26,8 @@ interface PieceRef {
 
 interface NotificationItem extends NotificationRow {
   piece: PieceRef | null;
+  /** Present on contribution_requested rows when the sender left a note. */
+  note: string | null;
 }
 
 /** Badge-text rule per plan: hidden at 0, exact 1–9, "9+" at 10+. */
@@ -35,9 +37,36 @@ export function bellBadgeText(count: number): string | null {
   return String(count);
 }
 
+// Bell acknowledgement: clicking any notification in the popover counts
+// as "I've seen the bell for now" across all current items. Stamped in
+// localStorage so subsequent loads hide anything created before the last
+// interaction. Device-local by design — clicking on the laptop doesn't
+// clear the phone's bell, which matches the bell's semantics (it's a
+// surface for the current session, not a persistent inbox). The real
+// inbox is the Messages page.
+const BELL_LAST_VIEWED_KEY = 'ip.bell.lastViewedAt';
+
+function readBellLastViewed(): string | null {
+  try {
+    return typeof window !== 'undefined' ? window.localStorage.getItem(BELL_LAST_VIEWED_KEY) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeBellLastViewed(iso: string) {
+  try {
+    if (typeof window !== 'undefined') window.localStorage.setItem(BELL_LAST_VIEWED_KEY, iso);
+  } catch {
+    // Storage may be disabled; bell still works, just won't auto-clear.
+  }
+}
+
 export default function NavbarBell() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const [hasQueueAccess, setHasQueueAccess] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const [lastViewedAt, setLastViewedAt] = useState<string | null>(() => readBellLastViewed());
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -45,8 +74,22 @@ export default function NavbarBell() {
     if (!hasSupabase) { setSignedIn(false); return; }
 
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) { setSignedIn(false); setItems([]); return; }
+    if (!session?.user) { setSignedIn(false); setItems([]); setHasQueueAccess(false); return; }
     setSignedIn(true);
+
+    // Queue access: active signed contributors only. Non-contributors get
+    // a reduced popover (no "Open queue" footer, since the queue page just
+    // tells them they don't belong there).
+    const { data: profile } = await supabase
+      .from('users')
+      .select('is_contributor, contributor_active')
+      .eq('id', session.user.id)
+      .single();
+    const canQueue = Boolean(
+      (profile as { is_contributor?: boolean; contributor_active?: boolean } | null)?.is_contributor &&
+        (profile as { is_contributor?: boolean; contributor_active?: boolean } | null)?.contributor_active,
+    );
+    setHasQueueAccess(canQueue);
 
     const { data: notifRows } = await supabase
       .from('notifications')
@@ -55,11 +98,16 @@ export default function NavbarBell() {
       .order('created_at', { ascending: false });
     if (!notifRows || notifRows.length === 0) { setItems([]); return; }
 
-    // Batch-fetch subjects per subject_table (O(tables) round trips). Every
-    // supported subject table has a `piece_id` column, so the projection is
-    // uniform.
+    // Batch-fetch subjects per subject_table (O(tables) round trips). Signed-
+    // content subjects have a `piece_id` column; contribution_requests has
+    // both piece_id and a `note` we want to render inline.
     const idsByTable = new Map<SubjectTable, string[]>();
+    const contribRequestIds: string[] = [];
     for (const n of notifRows) {
+      if (n.subject_table === 'contribution_requests') {
+        contribRequestIds.push(n.subject_id);
+        continue;
+      }
       if (!isSubjectTable(n.subject_table)) continue;
       const arr = idsByTable.get(n.subject_table) ?? [];
       arr.push(n.subject_id);
@@ -72,12 +120,29 @@ export default function NavbarBell() {
       ),
     );
     const pieceIdBySubjectKey = new Map<string, string>();
+    const noteByRequestId = new Map<string, string>();
     const pieceIdSet = new Set<string>();
     for (const [idx, [table]] of [...idsByTable.entries()].entries()) {
       const res = subjectResults[idx];
       for (const row of (res.data ?? []) as { id: string; piece_id: string }[]) {
         pieceIdBySubjectKey.set(`${table}:${row.id}`, row.piece_id);
         pieceIdSet.add(row.piece_id);
+      }
+    }
+
+    if (contribRequestIds.length > 0) {
+      const { data: crRows } = await supabase
+        .from('contribution_requests')
+        .select('id, piece_id, note')
+        .in('id', contribRequestIds);
+      for (const row of (crRows ?? []) as {
+        id: string;
+        piece_id: string;
+        note: string | null;
+      }[]) {
+        pieceIdBySubjectKey.set(`contribution_requests:${row.id}`, row.piece_id);
+        pieceIdSet.add(row.piece_id);
+        if (row.note) noteByRequestId.set(row.id, row.note);
       }
     }
 
@@ -89,7 +154,9 @@ export default function NavbarBell() {
     setItems(
       notifRows.map((n) => {
         const pieceId = pieceIdBySubjectKey.get(`${n.subject_table}:${n.subject_id}`);
-        return { ...n, piece: pieceId ? pieceById.get(pieceId) ?? null : null };
+        const note =
+          n.subject_table === 'contribution_requests' ? noteByRequestId.get(n.subject_id) ?? null : null;
+        return { ...n, piece: pieceId ? pieceById.get(pieceId) ?? null : null, note };
       }),
     );
   }, []);
@@ -124,8 +191,21 @@ export default function NavbarBell() {
   // Invisible when not signed in (loading or anon).
   if (signedIn !== true) return null;
 
-  const count = items.length;
+  // Filter items by the bell acknowledgement watermark: anything created
+  // before the last bell interaction is considered "seen" in the bell
+  // context and hidden from both count and list. The underlying
+  // notifications are still live on the Messages page.
+  const visibleItems = lastViewedAt
+    ? items.filter((n) => n.created_at > lastViewedAt)
+    : items;
+  const count = visibleItems.length;
   const badgeText = bellBadgeText(count);
+
+  function acknowledgeBell() {
+    const now = new Date().toISOString();
+    writeBellLastViewed(now);
+    setLastViewedAt(now);
+  }
 
   return (
     <div ref={containerRef} className="relative inline-flex">
@@ -157,22 +237,30 @@ export default function NavbarBell() {
           aria-label="Notifications"
         >
           <div className="px-4 py-3 border-b-[0.5px] border-border">
-            <div className="flex items-baseline justify-between">
-              <span className="text-[11px] uppercase tracking-wider font-medium" style={{ color: 'var(--color-accent)' }}>
-                Notifications
-              </span>
+            <div className="flex items-baseline justify-between gap-3">
+              <a
+                href="/notifications"
+                onClick={() => {
+                  acknowledgeBell();
+                  setOpen(false);
+                }}
+                className="inline-flex items-center gap-1 text-[11px] uppercase tracking-wider font-medium no-underline hover:underline"
+                style={{ color: 'var(--color-accent)' }}
+              >
+                Go to Messages <span aria-hidden="true">→</span>
+              </a>
               <span className="text-[11px] text-tertiary">
                 {count === 0 ? 'All clear' : `${count} waiting`}
               </span>
             </div>
           </div>
 
-          {items.length === 0 ? (
+          {visibleItems.length === 0 ? (
             <div className="px-4 py-6 text-center text-xs text-muted">Nothing waiting.</div>
           ) : (
             <>
               <ul className="max-h-[360px] overflow-y-auto">
-                {items.map((n) => {
+                {visibleItems.map((n) => {
                   const pieceLabel = n.piece
                     ? `${n.piece.title}${n.piece.catalog_number ? ` (${n.piece.catalog_number})` : ''}`
                     : null;
@@ -181,26 +269,39 @@ export default function NavbarBell() {
                       <a
                         href={n.link_path}
                         className="block px-4 py-3 text-sm text-ink no-underline hover:bg-bg-tint"
-                        onClick={() => setOpen(false)}
+                        onClick={() => {
+                          acknowledgeBell();
+                          setOpen(false);
+                        }}
                       >
                         {pieceLabel && (
                           <div className="font-display text-[15px] leading-tight mb-0.5">{pieceLabel}</div>
                         )}
                         <div className="text-xs text-muted leading-snug">{n.body}</div>
+                        {n.note && (
+                          <div
+                            className="mt-1.5 text-xs text-ink leading-snug italic border-l-2 border-accent pl-2"
+                            style={{ fontFamily: 'var(--font-serif)' }}
+                          >
+                            &ldquo;{n.note}&rdquo;
+                          </div>
+                        )}
                       </a>
                     </li>
                   );
                 })}
               </ul>
-              <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint">
-                <a
-                  href="/notifications"
-                  className="text-xs text-accent no-underline hover:underline"
-                  onClick={() => setOpen(false)}
-                >
-                  Open queue &rarr;
-                </a>
-              </div>
+              {hasQueueAccess && (
+                <div className="px-4 py-2 border-t-[0.5px] border-border bg-bg-tint">
+                  <a
+                    href="/notifications"
+                    className="text-xs text-accent no-underline hover:underline"
+                    onClick={() => setOpen(false)}
+                  >
+                    Open queue &rarr;
+                  </a>
+                </div>
+              )}
             </>
           )}
         </div>

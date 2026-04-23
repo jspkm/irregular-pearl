@@ -23,9 +23,10 @@ import {
   type SubjectTable,
 } from '../lib/contributorSubjects';
 
-type Status = 'loading' | 'unauthed' | 'not-contributor' | 'ready';
+type Status = 'loading' | 'unauthed' | 'ready';
 
 interface PendingDraft {
+  kind: 'draft';
   subjectTable: SubjectTable;
   subjectId: string;
   pieceId: string;
@@ -41,6 +42,21 @@ interface PendingDraft {
   schoolName: string | null;
 }
 
+interface ContributionRequestMessage {
+  kind: 'message';
+  notificationId: string;
+  requestId: string;
+  pieceId: string;
+  pieceTitle: string;
+  composerName: string;
+  catalogNumber: string | null;
+  senderName: string;
+  note: string | null;
+  createdAt: string;
+}
+
+type Item = PendingDraft | ContributionRequestMessage;
+
 interface ContributorProfile {
   displayName: string;
   bioShort: string | null;
@@ -55,7 +71,9 @@ function itemKey(d: Pick<PendingDraft, 'subjectTable' | 'subjectId'>): string {
 export default function NotificationsQueue() {
   const [status, setStatus] = useState<Status>('loading');
   const [profile, setProfile] = useState<ContributorProfile | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
   const [drafts, setDrafts] = useState<PendingDraft[]>([]);
+  const [messages, setMessages] = useState<ContributionRequestMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [actionByKey, setActionByKey] = useState<Record<string, ItemAction>>({});
   const [busyByKey, setBusyByKey] = useState<Record<string, boolean>>({});
@@ -63,23 +81,27 @@ export default function NotificationsQueue() {
   const loadQueue = useCallback(async (session: Session) => {
     setError(null);
 
-    // Profile: must be an active contributor.
+    // Profile: any signed-in user can reach Messages. Contributor fields
+    // decide whether we also load draft_awaiting_approval items below.
+    // Role decides whether the Dismiss action is available on message
+    // cards (staff can't dismiss; they publish or leave pending).
     const { data: profileRow, error: profileErr } = await supabase
       .from('users')
-      .select('is_contributor, contributor_active, display_name, contributor_bio_short')
+      .select('is_contributor, contributor_active, display_name, contributor_bio_short, role')
       .eq('id', session.user.id)
       .single();
     if (profileErr) {
       setError(profileErr.message);
       return;
     }
-    if (!profileRow?.is_contributor || !profileRow.contributor_active) {
-      setStatus('not-contributor');
-      return;
-    }
+    const isContributor = Boolean(
+      profileRow?.is_contributor && profileRow?.contributor_active,
+    );
+    const role = (profileRow as { role?: string } | null)?.role;
+    setIsStaff(role === 'moderator' || role === 'admin');
     setProfile({
-      displayName: profileRow.display_name,
-      bioShort: profileRow.contributor_bio_short ?? null,
+      displayName: profileRow?.display_name ?? '',
+      bioShort: profileRow?.contributor_bio_short ?? null,
     });
 
     // One query for un-cleared notifications. Subject-specific data is
@@ -95,13 +117,22 @@ export default function NotificationsQueue() {
     }
     if (!notifs || notifs.length === 0) {
       setDrafts([]);
+      setMessages([]);
       setStatus('ready');
       return;
     }
 
     // Group subject ids by table so we can issue one query per table.
+    // Drafts are loaded only for contributors; contribution_requests are
+    // loaded for everyone.
     const idsByTable = new Map<SubjectTable, string[]>();
+    const contribRequestIds: string[] = [];
     for (const n of notifs) {
+      if (n.subject_table === 'contribution_requests') {
+        contribRequestIds.push(n.subject_id);
+        continue;
+      }
+      if (!isContributor) continue; // non-contributors never see drafts
       if (!isSubjectTable(n.subject_table)) continue;
       const arr = idsByTable.get(n.subject_table) ?? [];
       arr.push(n.subject_id);
@@ -189,6 +220,7 @@ export default function NotificationsQueue() {
 
     const rows: PendingDraft[] = [];
     for (const n of notifs) {
+      if (n.subject_table === 'contribution_requests') continue;
       if (!isSubjectTable(n.subject_table)) continue;
       const key = `${n.subject_table}:${n.subject_id}`;
       const subject = subjectByKey.get(key);
@@ -197,6 +229,7 @@ export default function NotificationsQueue() {
       const piece = pieceById.get(subject.row.piece_id);
       if (!piece) continue;
       rows.push({
+        kind: 'draft',
         subjectTable: n.subject_table,
         subjectId: n.subject_id,
         pieceId: subject.row.piece_id,
@@ -212,7 +245,83 @@ export default function NotificationsQueue() {
       });
     }
 
+    // Load contribution_request messages (everyone — not gated to contributors).
+    let msgs: ContributionRequestMessage[] = [];
+    if (contribRequestIds.length > 0) {
+      const { data: crRows, error: crErr } = await supabase
+        .from('contribution_requests')
+        .select('id, piece_id, sender_id, note, created_at')
+        .in('id', contribRequestIds);
+      if (crErr) {
+        setError(crErr.message);
+        return;
+      }
+      const crList = (crRows ?? []) as {
+        id: string;
+        piece_id: string;
+        sender_id: string;
+        note: string | null;
+        created_at: string;
+      }[];
+
+      // Batch-fetch sender display names and pieces referenced by the requests.
+      const senderIds = [...new Set(crList.map((r) => r.sender_id))];
+      const pieceIdsForMsgs = [...new Set(crList.map((r) => r.piece_id))];
+      const [sendersRes, piecesForMsgsRes] = await Promise.all([
+        senderIds.length
+          ? supabase.from('users').select('id, display_name').in('id', senderIds)
+          : Promise.resolve({ data: [], error: null }),
+        pieceIdsForMsgs.length
+          ? supabase
+              .from('pieces')
+              .select('id, title, composer_name, catalog_number')
+              .in('id', pieceIdsForMsgs)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+      const senderById = new Map(
+        ((sendersRes.data ?? []) as { id: string; display_name: string }[]).map((u) => [
+          u.id,
+          u.display_name,
+        ]),
+      );
+      const pieceForMsgsById = new Map(
+        (
+          (piecesForMsgsRes.data ?? []) as {
+            id: string;
+            title: string;
+            composer_name: string;
+            catalog_number: string | null;
+          }[]
+        ).map((p) => [p.id, p]),
+      );
+      const crById = new Map(crList.map((r) => [r.id, r]));
+
+      msgs = notifs
+        .filter((n) => n.subject_table === 'contribution_requests')
+        .flatMap((n) => {
+          const cr = crById.get(n.subject_id);
+          if (!cr) return [];
+          const piece = pieceForMsgsById.get(cr.piece_id);
+          if (!piece) return [];
+          return [
+            {
+              kind: 'message' as const,
+              notificationId: n.id,
+              requestId: cr.id,
+              pieceId: cr.piece_id,
+              pieceTitle: piece.title,
+              composerName: piece.composer_name,
+              catalogNumber: piece.catalog_number ?? null,
+              senderName: senderById.get(cr.sender_id) ?? 'Someone',
+              note: cr.note,
+              createdAt: cr.created_at,
+            },
+          ];
+        });
+    }
+
     setDrafts(rows);
+    setMessages(msgs);
     setStatus('ready');
   }, []);
 
@@ -223,11 +332,6 @@ export default function NotificationsQueue() {
       void loadQueue(session);
     });
   }, [loadQueue]);
-
-  async function refresh() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) await loadQueue(session);
-  }
 
   function notifyChanged() {
     if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
@@ -284,34 +388,25 @@ export default function NotificationsQueue() {
   }
 
   if (status === 'loading') {
-    return <div className="text-sm text-muted font-body">Loading your queue…</div>;
+    return <div className="text-sm text-muted font-body">Loading…</div>;
   }
   if (status === 'unauthed') {
     return (
       <div className="font-body">
-        <h1 className="text-2xl font-display text-ink mb-3">Your queue</h1>
-        <p className="text-sm text-muted">You need to be signed in to see your approval queue.</p>
-      </div>
-    );
-  }
-  if (status === 'not-contributor') {
-    return (
-      <div className="font-body">
-        <h1 className="text-2xl font-display text-ink mb-3">Your queue</h1>
-        <p className="text-sm text-muted">
-          The queue is for signed contributors. If you think you should have access, reach out to the
-          Editorial Director.
-        </p>
+        <h1 className="text-2xl font-display text-ink mb-3">Messages</h1>
+        <p className="text-sm text-muted">You need to be signed in to see your messages.</p>
       </div>
     );
   }
 
+  // Merge drafts and messages into a single reverse-chron list.
+  const items: Item[] = [...drafts, ...messages].sort(
+    (a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0),
+  );
+
   return (
     <div className="font-body">
-      <h1 className="text-[28px] font-display text-ink mb-1 tracking-tight">Your queue</h1>
-      <p className="text-sm text-muted mb-8">
-        Drafts waiting for your review. Approve as-is, edit and then approve, or send back with a note.
-      </p>
+      <h1 className="text-[28px] font-display text-ink mb-8 tracking-tight">Messages</h1>
 
       {error && (
         <div className="mb-6 rounded-lg border-[0.5px] border-[#A32D2D] bg-[#F7E4E4] px-4 py-3 text-sm text-[#A32D2D]">
@@ -319,13 +414,24 @@ export default function NotificationsQueue() {
         </div>
       )}
 
-      {drafts.length === 0 ? (
-        <div className="rounded-xl border-[0.5px] border-border bg-surface px-5 py-8 text-center">
-          <p className="text-sm text-muted">Nothing waiting. When staff routes a draft to you, it'll appear here.</p>
-        </div>
+      {items.length === 0 ? (
+        <EmptyState />
       ) : (
         <ul className="space-y-4">
-          {drafts.map((d) => {
+          {items.map((item) => {
+            if (item.kind === 'message') {
+              return (
+                <MessageCard
+                  key={`msg:${item.notificationId}`}
+                  m={item}
+                  canDismiss={!isStaff}
+                  onDismissed={(requestId) =>
+                    setMessages((rows) => rows.filter((r) => r.requestId !== requestId))
+                  }
+                />
+              );
+            }
+            const d = item;
             const key = itemKey(d);
             const cfg = SUBJECT_CONFIG[d.subjectTable];
             const currentAction = actionByKey[key] ?? null;
@@ -435,16 +541,6 @@ export default function NotificationsQueue() {
           })}
         </ul>
       )}
-
-      <div className="mt-10">
-        <button
-          type="button"
-          onClick={refresh}
-          className="inline-flex items-center bg-transparent border-[0.5px] border-border-strong text-muted font-body text-[11px] px-2.5 py-1 rounded-md cursor-pointer transition-colors hover:text-ink hover:border-ink"
-        >
-          Refresh
-        </button>
-      </div>
     </div>
   );
 }
@@ -522,6 +618,158 @@ function RejectForm(props: {
           Cancel
         </button>
       </div>
+    </div>
+  );
+}
+
+// ---------- MessageCard ----------
+// Renders a contribution_requested notification as a message card. Unlike
+// draft approval cards, there's no inline approval action — the recipient
+// acts by visiting the piece and publishing signed content (which triggers
+// the auto-clear trigger and removes this message).
+
+function formatTimestamp(iso: string): string {
+  try {
+    const d = new Date(iso);
+    // "Apr 22, 2026, 3:42 PM" — precise for recipients who are deciding
+    // whether a request is recent or stale.
+    return d.toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function MessageCard({
+  m,
+  canDismiss,
+  onDismissed,
+}: {
+  m: ContributionRequestMessage;
+  /** False for staff recipients — they can't dismiss (must publish or
+   * leave pending). Matches the RPC's staff-rejection. */
+  canDismiss: boolean;
+  onDismissed: (requestId: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function handleDismiss() {
+    setBusy(true);
+    setErr(null);
+    const { error } = await supabase.rpc('dismiss_contribution_request', {
+      p_request_id: m.requestId,
+    });
+    setBusy(false);
+    if (error) {
+      setErr(error.message);
+      return;
+    }
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event('notifications:changed'));
+    onDismissed(m.requestId);
+  }
+
+  return (
+    <li className="rounded-xl border-[0.5px] border-border bg-surface p-5">
+      <div
+        className="text-[11px] font-medium tracking-[0.08em] uppercase mb-4"
+        style={{ color: 'var(--color-accent)' }}
+      >
+        Contribution request
+      </div>
+
+      <div className="pb-4 mb-5 border-b-[0.5px] border-border">
+        <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+          <a
+            href={`/piece/${m.pieceId}`}
+            className="font-display text-[22px] text-ink leading-tight tracking-tight no-underline hover:underline"
+          >
+            {m.pieceTitle}
+          </a>
+          {m.catalogNumber && (
+            <span className="text-[11px] font-mono text-tertiary tracking-wide">
+              {m.catalogNumber}
+            </span>
+          )}
+        </div>
+        <div className="mt-1 text-sm text-muted">
+          by <span className="text-ink">{m.composerName}</span>
+        </div>
+      </div>
+
+      <div className="text-sm text-ink font-body mb-2">
+        <span className="font-medium">{m.senderName}</span>
+        <span className="text-muted"> asked you to contribute.</span>
+      </div>
+      <div className="text-[11px] text-tertiary mb-4">{formatTimestamp(m.createdAt)}</div>
+
+      {m.note && (
+        <div
+          className="pl-[18px] border-l-2 font-display text-[15px] text-ink leading-[1.68] whitespace-pre-wrap italic mb-2"
+          style={{ borderLeftColor: 'var(--color-accent)' }}
+        >
+          &ldquo;{m.note}&rdquo;
+        </div>
+      )}
+
+      {err && (
+        <div className="mt-3 text-xs text-[#A32D2D]" role="alert">
+          {err}
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        <a
+          href={`/piece/${m.pieceId}`}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
+        >
+          Open piece <span aria-hidden="true">→</span>
+        </a>
+        {canDismiss && (
+          <button
+            type="button"
+            onClick={handleDismiss}
+            disabled={busy}
+            className="inline-flex items-center px-4 py-2 bg-transparent text-muted text-sm font-medium border-[0.5px] border-border-strong rounded-lg hover:text-ink hover:border-ink disabled:opacity-50 transition-colors"
+          >
+            {busy ? 'Dismissing…' : 'Dismiss'}
+          </button>
+        )}
+      </div>
+    </li>
+  );
+}
+
+// ---------- EmptyState ----------
+// Clear-inbox celebration. Borrows the 404 page's musical-glyph at-accent/15
+// pattern: one symbol rendered large and faded above a serif line.
+
+const EMPTY_STATE_SYMBOLS = [
+  // Whole rest — literally "silence"
+  '<svg viewBox="0 0 80 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="80" height="2"/><rect x="20" y="2" width="40" height="14"/></svg>',
+  // Fermata — a held moment
+  '<svg viewBox="0 0 120 80" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M60 0C30 0 4 22 4 50h6c0-24 22-44 50-44s50 20 50 44h6C116 22 90 0 60 0z"/><circle cx="60" cy="62" r="8"/></svg>',
+  // Quarter rest
+  '<svg viewBox="0 0 40 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M22 0L8 28l16 16-16 20c4 8 10 14 16 18l-4 10c-1 3-4 8-4 14 0 6 4 12 10 14 2-4 3-8 3-12 0-6-2-10-5-14l4-10 4-8-14-16L30 40z"/></svg>',
+];
+
+function EmptyState() {
+  const symbolIdx = Math.floor(Math.random() * EMPTY_STATE_SYMBOLS.length);
+  const symbol = EMPTY_STATE_SYMBOLS[symbolIdx];
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-16 px-4">
+      <div
+        className="w-24 h-24 md:w-36 md:h-36 mb-6 text-accent/15"
+        dangerouslySetInnerHTML={{ __html: symbol }}
+      />
+      <p className="font-display italic text-2xl md:text-3xl text-ink max-w-md leading-tight">
+        Hooray, all clear. More time for music-making.
+      </p>
     </div>
   );
 }

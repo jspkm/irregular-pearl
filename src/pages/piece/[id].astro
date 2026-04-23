@@ -2,17 +2,34 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import PiecePageLayout from '../../components/PiecePageLayout.astro';
-import StubPageLayout from '../../components/StubPageLayout.astro';
 import { getPieceFull, isStub } from '../../lib/pieces';
+import { resolvePieceRedirect } from '../../lib/pieceRedirects';
 
 const { id } = Astro.params;
-const piece = await getPieceFull(id || '');
+const slug = id || '';
+const piece = await getPieceFull(slug);
 
+// Identity-immutability fallback: if the slug isn't a current piece, check
+// piece_redirects. Old slugs 301 forever to their canonical target. This is
+// the only supported path for slug corrections — pieces.id is never updated
+// in place.
 if (!piece) {
+  const toSlug = await resolvePieceRedirect(slug);
+  if (toSlug) {
+    return Astro.redirect(`/piece/${toSlug}`, 301);
+  }
   return Astro.redirect('/');
 }
 
+// One piece page, one layout. Mode decides whether write surfaces are
+// visible. Pre-piece mode (the page has no signed content yet, and the
+// viewer hasn't clicked the primary CTA) hides every write affordance
+// and shows only the invitation block. ?expand=1 flips to the full
+// writeable mode — that's where "Start the first contribution" routes.
+// Pieces that already have signed content always render 'full' regardless.
+const expand = Astro.url.searchParams.get('expand') === '1';
 const stub = isStub(piece);
+const mode: 'pre-piece' | 'full' = !expand && stub ? 'pre-piece' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`
@@ -81,22 +98,6 @@ const breadcrumbLd = {
 >
   <Navbar />
 
-  <!-- Breadcrumb -->
-  <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
-    <a href="/" class="hover:text-ink">Home</a>
-    {breadcrumb.map((crumb) => (
-      <span>
-        <span class="mx-1">›</span>
-        <span class="text-muted">{crumb}</span>
-      </span>
-    ))}
-  </div>
-
-  {stub ? (
-    <!-- Stub page: illustration + inline contribution forms -->
-    <StubPageLayout piece={piece} />
-  ) : (
-    <!-- Full page: ported from the Claude design kit -->
-    <PiecePageLayout piece={piece} />
-  )}
+  {/* Breadcrumbs are rendered inside PiecePageLayout. One layout, one page. */}
+  <PiecePageLayout piece={piece} mode={mode} />
 </Layout>
