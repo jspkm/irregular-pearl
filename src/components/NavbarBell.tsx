@@ -222,7 +222,7 @@ export default function NavbarBell() {
         type="button"
         aria-label={badgeText ? `Notifications (${badgeText})` : 'Notifications'}
         onClick={() => setOpen((o) => !o)}
-        className="bg-transparent border-0 p-0 text-ink hover:text-accent transition-colors cursor-pointer inline-flex items-center relative"
+        className="bg-transparent border-0 p-0 text-ink hover:text-accent transition-colors cursor-pointer inline-flex items-center relative min-w-0!"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />

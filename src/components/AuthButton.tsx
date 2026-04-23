@@ -7,8 +7,6 @@ import SignInPanel from './SignInPanel';
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
   const [dbAvatarUrl, setDbAvatarUrl] = useState<string | null | undefined>(undefined);
-  const [userRole, setUserRole] = useState<string>('user');
-  const [isMaestro, setIsMaestro] = useState(false);
   const [loading, setLoading] = useState(true);
   const [signInOpen, setSignInOpen] = useState(false);
 
@@ -25,11 +23,9 @@ export default function AuthButton() {
         // Fetch avatar_url from public.users (respects user's choice).
         // Don't block the navbar on this — if the row is missing or the
         // query fails, we still render the avatar via GenerativeAvatar.
-        supabase.from('users').select('avatar_url, role, is_maestro').eq('id', session.user.id).single()
+        supabase.from('users').select('avatar_url').eq('id', session.user.id).single()
           .then(({ data }) => {
             setDbAvatarUrl(data?.avatar_url ?? null);
-            setUserRole((data as any)?.role || 'user');
-            setIsMaestro((data as any)?.is_maestro === true);
           });
       } else if (typeof window !== 'undefined') {
         // Auto-open sign-in modal when arriving with ?signin=1. Used by
@@ -64,22 +60,11 @@ export default function AuthButton() {
 
     return (
       <div className="flex items-center gap-3">
-        {isMaestro && (
-          <a href="/maestro" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
-            Maestro
-          </a>
-        )}
-        {userRole === 'admin' && (
-          <a href="/admin" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
-            Admin
-          </a>
-        )}
-        {userRole === 'moderator' && (
-          <a href="/moderator/reports" className="text-xs font-medium text-[#6B4E7C] hover:text-[#4C385C] no-underline transition-colors">
-            Moderator
-          </a>
-        )}
-        <a href={`/profile/${user.id}`} className="block no-underline" title={displayName}>
+        <a
+          href={`/profile/${user.id}`}
+          className="inline-flex items-center justify-center no-underline min-w-0!"
+          title={displayName}
+        >
           {dbAvatarUrl ? (
             <img src={dbAvatarUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover" />
           ) : (
