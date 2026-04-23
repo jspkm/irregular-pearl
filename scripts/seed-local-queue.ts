@@ -66,25 +66,23 @@ await ensureUser('staff@local.test', 'stafflocal', {
 });
 
 // Pick two existing pieces if available so we can stage pending drafts on
-// one and published signed content on the other. Fall back to a single
-// Bach fixture if the catalog is empty.
-const { data: pieces } = await admin.from('pieces').select('id, title').limit(2);
-const pendingPieceId = pieces?.[0]?.id ?? 'bach-cello-suite-1';
-const publishedPieceId = pieces?.[1]?.id ?? pendingPieceId;
+// one and published signed content on the other. If the catalog is empty,
+// run the main seed first so we don't have to fall back to ad-hoc fixtures.
+let { data: pieces } = await admin.from('pieces').select('id, title').limit(2);
 if (!pieces || pieces.length === 0) {
-  const fixtureId = 'bach-cello-suite-1';
-  await admin.from('pieces').upsert({
-    id: fixtureId,
-    title: 'Cello Suite No. 1 in G major',
-    composer_name: 'Bach, J.S.',
-    catalog_number: 'BWV 1007',
-    era: 'Baroque',
-    form: 'suite',
-    instruments: ['cello'],
-    difficulty: 'advanced',
-    description: 'The most-played of the Six, and the one every cellist must eventually confront on their own terms.',
-  });
+  console.log('  pieces table empty — running supabase/seed.ts first…');
+  const { spawnSync } = await import('node:child_process');
+  const seedRun = spawnSync('bun', ['run', 'supabase/seed.ts'], { stdio: 'inherit' });
+  if (seedRun.status !== 0) {
+    throw new Error('supabase/seed.ts failed; run it manually then retry seed-local-queue.ts');
+  }
+  ({ data: pieces } = await admin.from('pieces').select('id, title').limit(2));
 }
+if (!pieces || pieces.length === 0) {
+  throw new Error('pieces table still empty after running supabase/seed.ts');
+}
+const pendingPieceId = pieces[0].id;
+const publishedPieceId = pieces[1]?.id ?? pendingPieceId;
 
 // Reset any previous local test drafts for both pieces + contributor.
 for (const pid of [pendingPieceId, publishedPieceId]) {
@@ -448,7 +446,10 @@ if (pedagogicalSeeded) {
   console.log(`  7. Pedagogical arc on ${LANDMARK_PIECE_ID} already has the seed connection — skipped`);
 }
 if (pr2RequestId) {
-  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — three "Proposed by Staff Local" cards inline (PR 2)`);
-  console.log(`     in performer's notes / schools / signed descriptions sections, each with`);
-  console.log(`     [Accept as-is] [Edit & accept] [Decline] [Add to Todo] buttons`);
+  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — THREE "Proposed by Staff Local" cards inline (PR 2)`);
+  console.log(`     in performer's notes + schools + signed descriptions sections`);
+  console.log(`  9. Visit /notifications as haji — Open items tab has a 3-count badge (PR 3)`);
+  console.log(`     with all three proposals listed cross-piece`);
 }
+console.log(`  Private routes redirect anon users silently:`);
+console.log(`    /admin /maestro /notifications /settings → /?signin=1`);

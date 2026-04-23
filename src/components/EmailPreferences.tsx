@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { redirectFromPrivateRoute } from '../lib/privateRoute';
 
 interface Preferences {
   email_weekly_digest: boolean;
@@ -8,11 +9,18 @@ interface Preferences {
 }
 
 export default function EmailPreferences() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // /settings is a private route. Once auth resolves and there's no user,
+  // redirect via the shared helper — silent, no leak.
+  useEffect(() => {
+    if (authLoading) return;
+    if (!hasSupabase || !user) { redirectFromPrivateRoute(false); return; }
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (!hasSupabase || !user) { setLoading(false); return; }

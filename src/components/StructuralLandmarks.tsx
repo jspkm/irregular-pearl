@@ -125,10 +125,7 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
     const all = await fetchPendingDraftsOnPiece(pieceId);
     setPendingDrafts(
       all.filter(
-        (d) =>
-          d.kind === 'landmark' &&
-          !d.inlineDismissedAt &&
-          d.payload.movement_id === movementId,
+        (d) => d.kind === 'landmark' && d.payload.movement_id === movementId,
       ),
     );
   }, [pieceId, movementId, viewerId]);

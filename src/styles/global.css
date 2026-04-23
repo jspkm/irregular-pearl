@@ -424,3 +424,287 @@ body {
 }
 .ip-signin-create:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
 .ip-signin-create:disabled { opacity: 0.55; cursor: default; }
+
+/* ---------- /notifications tabs (MessagesPageShell + RecipientDraftsTab) ---------- */
+.messages-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 28px;
+}
+.messages-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 10px 18px;
+  margin-bottom: -1px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.messages-tab:hover { color: var(--ink); }
+.messages-tab.is-active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.messages-tab-count {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  min-width: 18px;
+  text-align: center;
+}
+.messages-tab-panel { min-height: 200px; }
+
+/* ---------- Drafts tab list rows ---------- */
+.drafts-tab { display: block; }
+.drafts-tab-empty {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-style: italic;
+  color: var(--muted);
+  padding: 60px 0;
+  text-align: center;
+  line-height: 1.55;
+}
+.drafts-tab-error {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.drafts-tab-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.drafts-tab-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.drafts-tab-row-head {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.drafts-tab-kind {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+  color: var(--accent);
+}
+.drafts-tab-sep { color: var(--muted); }
+.drafts-tab-piece {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 0.5px solid transparent;
+}
+.drafts-tab-piece:hover { border-bottom-color: var(--accent); }
+.drafts-tab-composer { font-style: italic; color: var(--muted); }
+
+
+/* ---------- PendingDraftCard (PR 2 + PR 3) ---------- */
+/* Globally scoped so both /piece/* (inline cards) and /notifications
+   Drafts tab share one source of truth. Astro scoped CSS misses React
+   islands, so styles for islands live in global stylesheets. */
+.pending-drafts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.pending-draft {
+  position: relative;
+  padding: 18px 20px;
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  font-family: var(--font-serif);
+  color: var(--ink);
+}
+.pending-draft-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.pending-draft-spark { font-size: 12px; }
+.pending-draft-body { margin-bottom: 16px; line-height: 1.55; }
+.pending-draft-prose { white-space: pre-wrap; }
+.pending-draft-school-name {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.pending-draft-landmark-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.pending-draft-landmark-label { font-weight: 500; }
+.pending-draft-landmark-range {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+}
+.pending-draft-landmark-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.pending-draft-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pending-draft-field { display: flex; flex-direction: column; gap: 4px; }
+.pending-draft-row { display: flex; gap: 12px; }
+.pending-draft-row .pending-draft-field { flex: 1; }
+.pending-draft-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.pending-draft-editor input[type='text'],
+.pending-draft-editor input[type='number'],
+.pending-draft-editor textarea {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--ink);
+  background: #fff;
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  resize: vertical;
+}
+.pending-draft-editor textarea {
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 90px;
+}
+.pending-draft-editor input:focus,
+.pending-draft-editor textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.pending-draft-error {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  padding: 8px 10px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+.pending-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.pending-draft-btn {
+  appearance: none;
+  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 0.5px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.pending-draft-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.pending-draft-btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.pending-draft-btn.primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.pending-draft-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pending-draft-toast {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+.pending-draft-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pending-draft-confirm-q {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--color-error);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-right: 2px;
+}
+.pending-draft-trailing {
+  margin-left: auto;
+  padding-left: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+.pending-draft-trailing-link {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--accent);
+  padding-bottom: 1px;
+  transition: color 0.12s, border-color 0.12s;
+}
+.pending-draft-trailing-link:hover {
+  color: var(--accent-hover, #4C385C);
+  border-bottom-width: 1px;
+}

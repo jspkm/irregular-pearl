@@ -1,9 +1,9 @@
 // Client-side helpers for the contribution-request drafts surface.
 //
-// PR 1 landed the schema + RPCs. PR 2 (recipient piece-page UX) consumes
-// them: fetch live drafts addressed to the current viewer on a piece, render
-// inline proposal cards in each section, dispatch act_on_draft and
-// dismiss_draft_inline.
+// PR 1 landed the schema + RPCs. PR 2 (recipient piece-page UX) +
+// PR 3 (/notifications Open items tab) consume them: fetch live drafts
+// addressed to the current viewer, render proposal cards with three
+// actions (Accept as-is / Edit & accept / Decline), dispatch act_on_draft.
 //
 // All reads + writes go through Supabase RLS / RPCs. The recipient SELECT
 // policy on contribution_request_drafts already filters
@@ -26,10 +26,11 @@ export interface PendingDraft {
   kind: DraftKind;
   payload: Record<string, unknown>;
   createdAt: string;
-  /** Stamped by Add to Todo. Card is hidden from inline render but still
-   * lives on the recipient's Todos screen (PR 3). */
-  inlineDismissedAt: string | null;
   sender: { id: string; displayName: string | null };
+  /** Populated by fetchPendingDraftsForViewer() (Open items tab needs
+   * piece context to render cross-piece). Null when fetched via
+   * fetchPendingDraftsOnPiece() — the piece is implicit there. */
+  piece: { id: string; title: string; composerName: string | null } | null;
 }
 
 export type ActOnDraftAction = 'accept_as_is' | 'edit_and_accept' | 'decline';
@@ -51,11 +52,15 @@ export interface ActOnDraftResult {
  * Fetch all live (non-dispositioned) drafts on a piece for the current viewer.
  * Recipient RLS already filters by recipient + sent. Empty array if anon or
  * no drafts.
+ *
+ * The returned drafts have `piece: null` — the piece is implicit (the section
+ * components rendering this know the pieceId). For cross-piece reads (the
+ * Open items tab on /notifications), use fetchPendingDraftsForViewer() instead.
  */
 export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<PendingDraft[]> {
   const { data: drafts, error: draftsErr } = await supabase
     .from('contribution_request_drafts')
-    .select('id, request_id, kind, payload, created_at, inline_dismissed_at')
+    .select('id, request_id, kind, payload, created_at')
     .order('created_at', { ascending: true });
   if (draftsErr || !drafts || drafts.length === 0) return [];
 
@@ -86,8 +91,64 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
       kind: d.kind as DraftKind,
       payload: (d.payload as Record<string, unknown>) ?? {},
       createdAt: d.created_at,
-      inlineDismissedAt: d.inline_dismissed_at,
       sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      piece: null,
+    });
+  }
+  return out;
+}
+
+/**
+ * Fetch all live (non-dispositioned) drafts addressed to the current viewer
+ * across every piece. Used by the Open items tab on /notifications.
+ * Recipient RLS scopes the query to drafts the viewer can see; we then
+ * join piece + sender for cross-piece display.
+ *
+ * Returns drafts with `piece` populated. Sorted newest-first so the
+ * Open items tab matches the Messages tab pattern.
+ */
+export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
+  const { data: drafts, error: draftsErr } = await supabase
+    .from('contribution_request_drafts')
+    .select('id, request_id, kind, payload, created_at')
+    .order('created_at', { ascending: false });
+  if (draftsErr || !drafts || drafts.length === 0) return [];
+
+  const requestIds = [...new Set(drafts.map((d) => d.request_id))];
+  const { data: requests, error: reqErr } = await supabase
+    .from('contribution_requests')
+    .select('id, sender_id, piece_id')
+    .in('id', requestIds);
+  if (reqErr || !requests) return [];
+
+  const reqById = new Map(requests.map((r) => [r.id, r]));
+  const senderIds = [...new Set(requests.map((r) => r.sender_id))];
+  const pieceIds = [...new Set(requests.map((r) => r.piece_id))];
+
+  const [{ data: senders }, { data: pieces }] = await Promise.all([
+    supabase.from('users').select('id, display_name').in('id', senderIds),
+    supabase.from('pieces').select('id, title, composer_name').in('id', pieceIds),
+  ]);
+
+  const senderById = new Map((senders ?? []).map((s) => [s.id, s]));
+  const pieceById = new Map(
+    (pieces ?? []).map((p) => [p.id, { id: p.id, title: p.title, composerName: p.composer_name }]),
+  );
+
+  const out: PendingDraft[] = [];
+  for (const d of drafts) {
+    const req = reqById.get(d.request_id);
+    if (!req) continue;
+    const sender = senderById.get(req.sender_id);
+    const piece = pieceById.get(req.piece_id) ?? null;
+    out.push({
+      draftId: d.id,
+      requestId: d.request_id,
+      kind: d.kind as DraftKind,
+      payload: (d.payload as Record<string, unknown>) ?? {},
+      createdAt: d.created_at,
+      sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      piece,
     });
   }
   return out;
@@ -118,17 +179,8 @@ export async function actOnDraft(
   return { contentId: (data as string | null) ?? null, errorCode: null, errorMessage: null };
 }
 
-/** Hide the inline draft card on the piece page; row persists for Todos screen. */
-export async function dismissDraftInline(
-  draftId: string,
-): Promise<{ errorCode: ActOnDraftResult['errorCode']; errorMessage: string | null }> {
-  const { error } = await supabase.rpc('dismiss_draft_inline', { p_draft_id: draftId });
-  if (error) {
-    const m = error.message.toLowerCase();
-    let errorCode: ActOnDraftResult['errorCode'] = 'unknown';
-    if (m.includes('not found') || m.includes('no longer')) errorCode = 'draft_no_longer_available';
-    else if (m.includes('already dispositioned')) errorCode = 'draft_already_dispositioned';
-    return { errorCode, errorMessage: error.message };
-  }
-  return { errorCode: null, errorMessage: null };
-}
+// Note: the dismiss_draft_inline RPC + contribution_request_drafts
+// .inline_dismissed_at column remain in the DB (shipped in PR 1).
+// They are unused after Option C — the client no longer stamps the
+// column and no UI surface filters on it. PR 5's destructive cleanup
+// migration will drop both.
