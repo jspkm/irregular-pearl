@@ -77,16 +77,16 @@ export default function ArtistProfile({ userId }: { userId: string }) {
     setEditing(false);
   };
 
-  if (loading) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Loading…</div>;
-  if (!profile) return <div className="max-w-[760px] mx-auto p-8 text-sm text-muted">Profile not found.</div>;
+  if (loading) return <div className="max-w-190 mx-auto p-8 text-sm text-muted">Loading…</div>;
+  if (!profile) return <div className="max-w-190 mx-auto p-8 text-sm text-muted">Profile not found.</div>;
 
   const rawName = profile.display_name || '';
   const displayName = rawName.includes('@') ? rawName.split('@')[0] : rawName;
 
   return (
-    <main className="max-w-[760px] mx-auto px-4 md:px-8 py-8 md:py-12">
+    <main className="max-w-190 mx-auto px-4 md:px-8 py-8 md:py-12">
       <div className="flex items-start gap-5 mb-6">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={displayName} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover" />
           ) : (
@@ -167,7 +167,7 @@ export default function ArtistProfile({ userId }: { userId: string }) {
           </label>
           {SOCIAL_PLATFORMS.map(platform => (
             <label key={platform} className="block">
-              <span className="text-xs text-muted uppercase tracking-wider capitalize">{platform}</span>
+              <span className="text-xs text-muted tracking-wider capitalize">{platform}</span>
               <input
                 value={editForm.social_links[platform] || ''}
                 onChange={e => setEditForm({ ...editForm, social_links: { ...editForm.social_links, [platform]: e.target.value } })}

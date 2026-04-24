@@ -14,6 +14,15 @@ All font choices, colors, spacing, and aesthetic direction are defined there.
 Do not deviate without explicit user approval.
 In QA mode, flag any code that doesn't match DESIGN.md.
 
+## Visual reference
+Always consult color-palette.htm before creating new components or making visual
+changes. It renders both themes side-by-side with tagged component samples
+(T typography, B buttons, C chips, D drafting banner, A alerts, R request dialog,
+P pending-draft proposal, F draft form, W wiki-edit dialog, I inline confirm,
+X toast, H admin header, E signed-content edit form). Reuse documented token
+combinations rather than introducing ad-hoc hex. Add a new sample when shipping
+a pattern the palette doesn't already cover.
+
 ## Skill routing
 
 When the user's request matches an available skill, ALWAYS invoke it using the Skill

@@ -6,20 +6,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Up next (immediate)
 
-### Dark-theme visibility sweep on contribution-draft surfaces
-
-**What:** Finish the dark-mode audit across the v0.5.0 contribution-drafts surfaces. `TempoCuesEditor`, `TempoCuesDisplay`, `ComposeDraftBlock` (during the DRY refactor) already grew `html[data-theme="dark"]` overrides. Still to audit: `DraftingModeBanner` (banner background and button contrast), `RequestsAdmin` tabs + expand-row treatment, `RequestContributionDialog` modal backdrop + fields, `PendingDraftCard` action buttons in dark mode.
-
-**Why:** v0.5.0 shipped the contribution-drafts pivot without a dark-mode audit on every new surface. Some components hardcode light-mode hex colors inline instead of leaning on token variables that flip under `html[data-theme="dark"]`. The initial screenshot that triggered this entry ("Cancel" button invisible on the composer form) was fixed during the inline-composer refactor; remaining surfaces have parallel issues.
-
-**Context:** Root-cause pattern — inline styles with literal hex (`background: #FAF8F4`, `color: #1A1A1A`) instead of tokens (`var(--surface)`, `var(--ink)`, `var(--bg)`, `var(--border-strong)`). Fix is to replace hardcoded hex with tokens, then add any missing `html[data-theme="dark"]` overrides for elements the tokens don't cover. DESIGN.md is the authoritative source for which token goes where. Apply the "fix the twin" rule — when one component has an issue, its siblings likely have the same one.
-
-**Effort:** S
-**Priority:** P1 (immediate — UX regression on every dark-mode user)
-**Depends on:** None
-
----
-
 ## Piece page (PRD Tier 1)
 
 ### Redesign piece page per PRD revision 2
@@ -65,6 +51,30 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Cleanup
+
+### Fix `AddPieceForm` for `canonical_index_id` requirement
+
+**What:** [AddPieceForm.tsx](src/components/AddPieceForm.tsx) inserts into `pieces` without `canonical_index_id`, but migration `20260522000000` made the column NOT NULL. The v0.5.1 type-cleanup pass cast the insert payload `as any` with a TODO comment so `tsc --noEmit` passes, but the form would still fail at runtime on the FK constraint.
+
+**Why:** Either (a) the form is obsolete now that the request-a-contribution flow + materialize-from-canonical-index is the canonical path for adding pieces, or (b) the form needs to upsert into `canonical_piece_index` first and then insert with the resulting id. Pick one and either delete the form or wire it up.
+
+**Context:** Find callers (`grep -r "AddPieceForm"` in src/). If only one entry point and it's behind a stub page, deletion is the cheapest fix. If still wired into a user-facing flow, the upsert-then-insert path is straightforward — `canonical_piece_index` already has a unique constraint on `(composer_name, title, catalog_number)` so the upsert is idempotent.
+
+**Effort:** S
+**Priority:** P2
+**Depends on:** None
+
+### Sweep Tailwind arbitrary `[XXXpx]` classes for canonical equivalents
+
+**What:** Tailwind v4's lint flags arbitrary-value classes like `max-w-[760px]` in favor of canonical scale classes (`max-w-190` since v4's spacing scale is 4px × n). The v0.5.1 sweep did the obvious one (`max-w-[760px]` → `max-w-190` in [ArtistProfile.tsx](src/components/ArtistProfile.tsx) and [@[slug].astro](src/pages/@[slug].astro)). About 30 sites remain across NavbarBell, ProfileShell, EmailPreferences, AppearanceSettings, Navbar.astro, StubContributionForms, PasswordSettings, etc.
+
+**Why:** Canonical classes survive theme/scale changes; arbitrary values don't. Cleaner codebase, fewer IDE warnings.
+
+**Context:** `grep -rE "(max-w|w|h|max-h|min-w|min-h)-\[[0-9]+px\]" src/ --include="*.tsx" --include="*.astro"`. Tailwind v4 spacing scale: `n` = `n × 4px`, so `760px` → `190`, `420px` → `105`, `360px` → `90`, etc. Some values like `[16px]`, `[10px]` align to `4`, `2.5` already; others like `[110px]` don't have a clean integer (use `27.5` or keep arbitrary). When the value is genuinely off-scale, leave it.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
 
 ### Remove `discussions` table and code references
 
@@ -163,6 +173,12 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 ---
 
 ## Completed
+
+### Dark-theme visibility sweep + color-palette.htm + tsc cleanup
+
+**What:** Swept every surface that paired literal `#fff` text with a token-driven background, fixing the dark-mode invisible-button family of bugs (Save/Publish/Send/Delete in modals, difficulty-axis level chips, wiki-edit dialog, signed-content edit forms, NavbarBell badge, Toast). Adopted `color-palette.htm` at repo root as the visual source of truth — both themes side-by-side with tagged component samples (T/B/C/D/A/R/P/F/W/I/X/H/E). Defined missing `--accent-hover` and `--accent-border` in `:root` + dark block. Pinned Toast and admin header always-dark with literal hex (interrupt-surface UX). Replaced 60+ Tailwind arbitrary `text-[#XXX]`/`bg-[#XXX]` with semantic utilities that flip with the theme. Cleaned up 66 pre-existing TypeScript errors that had been silently passing because `bun run build` doesn't run `tsc --noEmit` (added `@types/bun`, set `"types": ["bun"]`, excluded `supabase/functions` from the Node-side typecheck, fixed lib mappers + component RPC sites).
+
+**Completed:** v0.5.1 (2026-04-24)
 
 ### Request a contribution + pre-piece surface + editorial signals
 
