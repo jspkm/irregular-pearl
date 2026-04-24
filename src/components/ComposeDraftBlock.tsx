@@ -77,6 +77,27 @@ export default function ComposeDraftBlock({ pieceId, kind, onEnabledChange }: Pr
             ✎ Your proposed {kindLabel} · will send when you click Send drafts
           </div>
           <div className="compose-block-body">{previewBody(kind, myDraft.payload)}</div>
+          {kind === 'interpretive_school' && (() => {
+            const cues = myDraft.payload.tempo_cues;
+            if (!cues || typeof cues !== 'object' || Array.isArray(cues)) return null;
+            const entries = Object.entries(cues as Record<string, unknown>).filter(
+              ([, v]) => typeof v === 'string' && v.trim().length > 0,
+            );
+            if (entries.length === 0) return null;
+            return (
+              <div className="compose-block-tempo">
+                <span className="compose-block-tempo-label">Tempo cues</span>
+                <ul className="compose-block-tempo-list">
+                  {entries.map(([section, value]) => (
+                    <li key={section}>
+                      <span className="compose-block-tempo-section">{section}</span>
+                      <span className="compose-block-tempo-value">{value as string}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })()}
           <div className="compose-block-actions">
             {!confirmRemove ? (
               <>
@@ -213,6 +234,47 @@ export default function ComposeDraftBlock({ pieceId, kind, onEnabledChange }: Pr
           color: var(--ink, #1A1A1A);
           white-space: pre-wrap;
           margin-bottom: 10px;
+        }
+        .compose-block-tempo {
+          margin: 0 0 10px;
+          padding: 8px 10px;
+          border-radius: 6px;
+          background: var(--surface, #FAF8F4);
+          border: 0.5px solid var(--border-strong, #CFCCC5);
+        }
+        html[data-theme="dark"] .compose-block-tempo {
+          background: rgba(255, 255, 255, 0.03);
+        }
+        .compose-block-tempo-label {
+          display: block;
+          font-size: 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: var(--muted, #6F6F6F);
+          margin-bottom: 4px;
+        }
+        .compose-block-tempo-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px 16px;
+        }
+        .compose-block-tempo-list li {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 8px;
+          font-size: 13px;
+        }
+        .compose-block-tempo-section {
+          font-family: var(--font-sans);
+          color: var(--muted, #6F6F6F);
+          font-style: italic;
+        }
+        .compose-block-tempo-value {
+          font-family: var(--font-serif);
+          color: var(--ink, #1A1A1A);
         }
         .compose-block-actions {
           display: flex;
