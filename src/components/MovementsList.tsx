@@ -16,6 +16,7 @@ import MovementEdit from './MovementEdit';
 import { CHANGELOG_REFRESH_EVENT } from './ChangeLog';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import { fetchMovementsForPiece, type Movement } from '../lib/movements';
 import SignInPanel from './SignInPanel';
 import StructuralLandmarks from './StructuralLandmarks';
@@ -43,10 +44,15 @@ export default function MovementsList({
   landmarksByMovement = {},
 }: Props) {
   const { user } = useAuth();
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [movements, setMovements] = useState<Movement[]>(initialMovements);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [signInOpen, setSignInOpen] = useState(false);
   const [busy, setBusy] = useState<Busy>({ kind: 'idle' });
 
   const broadcastChangelog = useCallback(() => {
@@ -61,56 +67,50 @@ export default function MovementsList({
     broadcastChangelog();
   }, [pieceId, broadcastChangelog]);
 
-  const requireAuth = useCallback(() => {
-    if (!user) {
-      setSignInOpen(true);
-      return false;
-    }
-    return true;
-  }, [user]);
-
   const handleSwap = useCallback(
-    async (i: number, direction: 'up' | 'down') => {
-      if (!requireAuth()) return;
-      const target = direction === 'up' ? i - 1 : i + 1;
-      if (target < 0 || target >= movements.length) return;
-      const a = movements[i];
-      const b = movements[target];
-      setBusy({ kind: 'working', movementId: a.id });
-      const { error } = await supabase.rpc('swap_movement_ordinals', {
-        p_movement_id_a: a.id,
-        p_movement_id_b: b.id,
-      });
-      if (error) {
-        const pretty = error.message.includes('rate limit')
-          ? 'You’ve changed movements too often. Try again later.'
-          : `Reorder failed: ${error.message}`;
-        setBusy({ kind: 'error', message: pretty });
-        return;
-      }
-      await refetch();
-      setBusy({ kind: 'idle' });
+    (i: number, direction: 'up' | 'down') => {
+      gate(() => void (async () => {
+        const target = direction === 'up' ? i - 1 : i + 1;
+        if (target < 0 || target >= movements.length) return;
+        const a = movements[i];
+        const b = movements[target];
+        setBusy({ kind: 'working', movementId: a.id });
+        const { error } = await supabase.rpc('swap_movement_ordinals', {
+          p_movement_id_a: a.id,
+          p_movement_id_b: b.id,
+        });
+        if (error) {
+          const pretty = error.message.includes('rate limit')
+            ? 'You’ve changed movements too often. Try again later.'
+            : `Reorder failed: ${error.message}`;
+          setBusy({ kind: 'error', message: pretty });
+          return;
+        }
+        await refetch();
+        setBusy({ kind: 'idle' });
+      })());
     },
-    [movements, refetch, requireAuth],
+    [movements, refetch, gate],
   );
 
   const handleDelete = useCallback(
-    async (id: string) => {
-      if (!requireAuth()) return;
-      setBusy({ kind: 'working', movementId: id });
-      const { error } = await supabase.rpc('delete_movement', { p_movement_id: id });
-      if (error) {
-        const pretty = error.message.includes('rate limit')
-          ? 'You’ve changed movements too often. Try again later.'
-          : `Delete failed: ${error.message}`;
-        setBusy({ kind: 'error', message: pretty });
-        return;
-      }
-      setConfirmDeleteId(null);
-      await refetch();
-      setBusy({ kind: 'idle' });
+    (id: string) => {
+      gate(() => void (async () => {
+        setBusy({ kind: 'working', movementId: id });
+        const { error } = await supabase.rpc('delete_movement', { p_movement_id: id });
+        if (error) {
+          const pretty = error.message.includes('rate limit')
+            ? 'You’ve changed movements too often. Try again later.'
+            : `Delete failed: ${error.message}`;
+          setBusy({ kind: 'error', message: pretty });
+          return;
+        }
+        setConfirmDeleteId(null);
+        await refetch();
+        setBusy({ kind: 'idle' });
+      })());
     },
-    [refetch, requireAuth],
+    [refetch, gate],
   );
 
   return (
@@ -183,10 +183,7 @@ export default function MovementsList({
                         type="button"
                         className="mvmt-ctrl mvmt-ctrl-delete"
                         aria-label={user ? `Delete ${m.name}` : `Sign in to delete ${m.name}`}
-                        onClick={() => {
-                          if (!requireAuth()) return;
-                          setConfirmDeleteId(m.id);
-                        }}
+                        onClick={() => gate(() => setConfirmDeleteId(m.id))}
                         disabled={rowWorking}
                       >
                         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -227,10 +224,7 @@ export default function MovementsList({
       <button
         type="button"
         className="mvmt-add"
-        onClick={() => {
-          if (!requireAuth()) return;
-          setAddOpen(true);
-        }}
+        onClick={() => gate(() => setAddOpen(true))}
       >
         + Add movement
       </button>
@@ -246,7 +240,8 @@ export default function MovementsList({
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to edit"
           body={
             <>

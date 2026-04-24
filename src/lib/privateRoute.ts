@@ -13,8 +13,15 @@
 //
 // Called from inside a useEffect on each private-page island after the
 // auth check resolves. SSR-safe (no-op if window is undefined).
+
+/** Query param that makes the home-page AuthButton auto-open the SignInPanel.
+ *  Single source of truth — any producer sending anon users to the modal must
+ *  use this constant (and AuthButton reads it) so the two sides can't drift. */
+export const SIGN_IN_PARAM = 'signin';
+export const SIGN_IN_TRIGGER_URL = `/?${SIGN_IN_PARAM}=1`;
+
 export function redirectFromPrivateRoute(isSignedIn: boolean): void {
   if (typeof window === 'undefined') return;
-  const target = isSignedIn ? '/' : '/?signin=1';
+  const target = isSignedIn ? '/' : SIGN_IN_TRIGGER_URL;
   window.location.replace(target);
 }

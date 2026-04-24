@@ -11,7 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import {
   fetchPedagogicalConnections,
   type PedagogicalConnection,
@@ -36,12 +36,16 @@ const KIND_LABELS: Record<PedagogicalKind, string> = {
 };
 
 export default function PedagogicalArcList({ pieceId, initialConnections, pieceOptions }: Props) {
-  const { user } = useAuth();
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [connections, setConnections] = useState<PedagogicalConnection[]>(initialConnections);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [addOpenKind, setAddOpenKind] = useState<PedagogicalKind | null>(null);
-  const [signInOpen, setSignInOpen] = useState(false);
   const [busy, setBusy] = useState<Busy>({ kind: 'idle' });
 
   const broadcastChangelog = useCallback(() => {
@@ -52,11 +56,6 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
     setConnections(await fetchPedagogicalConnections(pieceId));
     broadcastChangelog();
   }, [pieceId, broadcastChangelog]);
-
-  const requireAuth = useCallback(() => {
-    if (!user) { setSignInOpen(true); return false; }
-    return true;
-  }, [user]);
 
   const grouped = useMemo(() => {
     const prepare: PedagogicalConnection[] = [];
@@ -73,34 +72,36 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
     return s;
   }, [connections, pieceId]);
 
-  const handleSwap = useCallback(async (kind: PedagogicalKind, i: number, dir: 'up' | 'down') => {
-    if (!requireAuth()) return;
-    const list = grouped[kind];
-    const j = dir === 'up' ? i - 1 : i + 1;
-    if (j < 0 || j >= list.length) return;
-    const a = list[i], b = list[j];
-    setBusy({ kind: 'working', id: a.id });
-    const { error } = await supabase.rpc('swap_pedagogical_ordinals', { p_id_a: a.id, p_id_b: b.id });
-    if (error) {
-      setBusy({ kind: 'error', message: pretty(error.message, 'Reorder failed') });
-      return;
-    }
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [grouped, refetch, requireAuth]);
+  const handleSwap = useCallback((kind: PedagogicalKind, i: number, dir: 'up' | 'down') => {
+    gate(() => void (async () => {
+      const list = grouped[kind];
+      const j = dir === 'up' ? i - 1 : i + 1;
+      if (j < 0 || j >= list.length) return;
+      const a = list[i], b = list[j];
+      setBusy({ kind: 'working', id: a.id });
+      const { error } = await supabase.rpc('swap_pedagogical_ordinals', { p_id_a: a.id, p_id_b: b.id });
+      if (error) {
+        setBusy({ kind: 'error', message: pretty(error.message, 'Reorder failed') });
+        return;
+      }
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [grouped, refetch, gate]);
 
-  const handleDelete = useCallback(async (id: string) => {
-    if (!requireAuth()) return;
-    setBusy({ kind: 'working', id });
-    const { error } = await supabase.rpc('delete_pedagogical_connection', { p_id: id });
-    if (error) {
-      setBusy({ kind: 'error', message: pretty(error.message, 'Delete failed') });
-      return;
-    }
-    setConfirmDeleteId(null);
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [refetch, requireAuth]);
+  const handleDelete = useCallback((id: string) => {
+    gate(() => void (async () => {
+      setBusy({ kind: 'working', id });
+      const { error } = await supabase.rpc('delete_pedagogical_connection', { p_id: id });
+      if (error) {
+        setBusy({ kind: 'error', message: pretty(error.message, 'Delete failed') });
+        return;
+      }
+      setConfirmDeleteId(null);
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [refetch, gate]);
 
   return (
     <>
@@ -172,7 +173,7 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                           </svg>
                         </button>
                         <button type="button" className="ed-ctrl" aria-label={`Edit ${c.relatedTitle}`}
-                          disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setEditingId(c.id); }}>
+                          disabled={rowWorking} onClick={() => gate(() => setEditingId(c.id))}>
                           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                             <path d="M11.5 2.5l2 2L5 13H3v-2l8.5-8.5z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
                           </svg>
@@ -185,7 +186,7 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                           </span>
                         ) : (
                           <button type="button" className="ed-ctrl ed-ctrl-delete" aria-label={`Delete ${c.relatedTitle}`}
-                            disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setConfirmDeleteId(c.id); }}>
+                            disabled={rowWorking} onClick={() => gate(() => setConfirmDeleteId(c.id))}>
                             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                             </svg>
@@ -198,7 +199,7 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                 })}
               </ul>
             )}
-            <button type="button" className="mvmt-add ped-add" onClick={() => { if (!requireAuth()) return; setAddOpenKind(kind); }}>
+            <button type="button" className="mvmt-add ped-add" onClick={() => gate(() => setAddOpenKind(kind))}>
               + Add {KIND_LABELS[kind].toLowerCase()}
             </button>
           </div>
@@ -214,7 +215,8 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to edit"
           body={
             <>

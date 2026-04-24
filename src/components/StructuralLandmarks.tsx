@@ -22,6 +22,7 @@ import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
 import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
+import { useRequireAuth } from '../lib/useRequireAuth';
 
 interface Props {
   pieceId: string;
@@ -101,7 +102,12 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
-  const [signInOpen, setSignInOpen] = useState(false);
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
 
   useEffect(() => {
     if (!hasSupabase) { setAuthed(false); setViewerId(null); return; }
@@ -147,8 +153,7 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
   }, [toast]);
 
   const onAddClick = () => {
-    if (authed === false) { setSignInOpen(true); return; }
-    setFormOpen(true);
+    gate(() => setFormOpen(true));
   };
 
   async function handleRemove(landmarkId: string) {
@@ -269,7 +274,8 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to add"
           body={<>Landmarks are signed — any registered user can add one. Sign in or create an account to post yours.</>}
         />

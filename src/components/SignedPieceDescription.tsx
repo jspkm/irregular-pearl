@@ -16,6 +16,7 @@ import OwnerEditDelete from './OwnerEditDelete';
 import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 import ComposeDraftBlock from './ComposeDraftBlock';
+import { useRequireAuth } from '../lib/useRequireAuth';
 
 interface Props {
   pieceId: string;
@@ -52,7 +53,12 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
   const [toast, setToast] = useState<string | null>(null);
   const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [stackIdx, setStackIdx] = useState(0);
-  const [signInOpen, setSignInOpen] = useState(false);
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
 
   const stackItems: StackItem[] = [
     ...descriptions.map((desc) => ({ kind: 'user' as const, desc })),
@@ -306,8 +312,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           type="button"
           onClick={() => {
             setError(null);
-            if (!user) { setSignInOpen(true); return; }
-            setMode('write');
+            gate(() => setMode('write'));
           }}
           className="write-entry"
         >
@@ -331,7 +336,8 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to write"
           body={
             <>Signed descriptions are authored — any registered user can publish their take on a piece. Sign in or create an account to post yours.</>

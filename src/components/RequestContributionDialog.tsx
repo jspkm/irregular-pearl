@@ -13,8 +13,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import { createOutboxRequest } from '../lib/contributionDrafts';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
@@ -41,7 +42,13 @@ export default function RequestContributionDialog({
   triggerLabel,
   triggerClassName,
 }: Props) {
-  const { user } = useAuth();
+  const {
+    user,
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [open, setOpen] = useState(false);
   const [isStaff, setIsStaff] = useState(false);
   const [mode, setMode] = useState<Mode>('username');
@@ -182,13 +189,11 @@ export default function RequestContributionDialog({
   }, [suggestOpen]);
 
   function handleOpen() {
-    if (!user) {
-      window.location.href = '/?sign_in=1';
-      return;
-    }
-    setOpen(true);
-    setError(null);
-    setSuccess(null);
+    gate(() => {
+      setOpen(true);
+      setError(null);
+      setSuccess(null);
+    });
   }
 
   function handleClose() {
@@ -373,6 +378,17 @@ export default function RequestContributionDialog({
       >
         {triggerLabel}
       </button>
+
+      {signInOpen && (
+        <SignInPanel
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
+          title="Sign in to request a contribution"
+          body={
+            <>Sending a contribution request is a signed action. Sign in or create an account to continue.</>
+          }
+        />
+      )}
 
       {open && (
         <div

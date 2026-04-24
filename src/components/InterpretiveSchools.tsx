@@ -19,6 +19,7 @@ import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
 import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import ComposeDraftBlock from './ComposeDraftBlock';
 
 interface Props {
@@ -43,7 +44,12 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
   const [toast, setToast] = useState<string | null>(null);
   const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
   const [pageIdx, setPageIdx] = useState(0);
-  const [signInOpen, setSignInOpen] = useState(false);
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
 
   const PAGE_SIZE = 3;
   const totalPages = Math.max(1, Math.ceil(schools.length / PAGE_SIZE));
@@ -285,8 +291,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
           type="button"
           onClick={() => {
             setError(null);
-            if (!viewer?.userId) { setSignInOpen(true); return; }
-            setMode('write');
+            gate(() => setMode('write'));
           }}
           className="mvmt-add"
         >
@@ -312,7 +317,8 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to write"
           body={
             <>Interpretive schools are signed — any registered user can propose one. Sign in or create an account to post yours.</>
