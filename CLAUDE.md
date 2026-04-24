@@ -41,3 +41,12 @@ Key routing rules:
 - Visual audit, design polish → invoke design-review
 - Architecture review → invoke plan-eng-review
 - For design work on specific components or surfaces, invoke the designer subagent via @agent-designer
+
+## GBrain Configuration (configured by /setup-gbrain)
+- Engine: pglite
+- Config file: ~/.gbrain/config.json (mode 0600)
+- Setup date: 2026-04-24
+- MCP registered: yes (user scope — `gbrain serve`)
+- Memory sync: off (local-only; run `/setup-gbrain` again to switch modes)
+- Current repo policy: read-write
+- Note: vector search requires OPENAI_API_KEY; text search works without it. Set the env var and re-run `gbrain embed --stale` to enable semantic search across imported pages.
