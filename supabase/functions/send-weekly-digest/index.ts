@@ -148,7 +148,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
       }
 
       const firstName = (recipient.display_name || "").split(" ")[0] || "there";
-      const unsubscribeUrl = `https://irregularpearl.org/settings#email`;
+      const unsubscribeUrl = `https://irregularpearl.org/profile/${recipient.id}?section=setting#email`;
 
       const html = renderWeeklyDigest({
         recipientName: firstName,

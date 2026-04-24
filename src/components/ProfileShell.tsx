@@ -1,18 +1,54 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/useAuth';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { SIGN_IN_TRIGGER_URL } from '../lib/privateRoute';
 import ArtistProfile from './ArtistProfile';
 import AppearanceSettings from './AppearanceSettings';
+import EmailPreferences from './EmailPreferences';
+import PasswordSettings from './PasswordSettings';
 
 type Section = 'profile' | 'setting';
 
+function readSectionFromUrl(): Section {
+  if (typeof window === 'undefined') return 'profile';
+  const param = new URLSearchParams(window.location.search).get('section');
+  return param === 'setting' ? 'setting' : 'profile';
+}
+
 export default function ProfileShell({ userId }: { userId: string }) {
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const isOwnProfile = user?.id === userId;
-  const [section, setSection] = useState<Section>('profile');
+  const [section, setSection] = useState<Section>(() => readSectionFromUrl());
   const [confirmLogout, setConfirmLogout] = useState(false);
   const [userRole, setUserRole] = useState<string>('user');
   const [isMaestro, setIsMaestro] = useState(false);
+
+  // When ?section=setting is on the URL but this isn't the viewer's own
+  // profile, the link was meant for the account that owns this profile —
+  // typically an email footer clicked from a different session. Redirect:
+  // anon → sign-in, signed-in-as-different-user → their own setting tab.
+  useEffect(() => {
+    if (authLoading) return;
+    if (section !== 'setting') return;
+    if (isOwnProfile) return;
+    if (typeof window === 'undefined') return;
+    if (!user) {
+      window.location.replace(SIGN_IN_TRIGGER_URL);
+      return;
+    }
+    const hash = window.location.hash || '';
+    window.location.replace(`/profile/${user.id}?section=setting${hash}`);
+  }, [authLoading, section, isOwnProfile, user]);
+
+  // Scroll to the hash after mount so #email lands at the email section.
+  useEffect(() => {
+    if (section !== 'setting' || !isOwnProfile) return;
+    if (typeof window === 'undefined' || !window.location.hash) return;
+    const id = window.location.hash.slice(1);
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ block: 'start' });
+    });
+  }, [section, isOwnProfile]);
 
   useEffect(() => {
     if (!confirmLogout) return;
@@ -32,6 +68,19 @@ export default function ProfileShell({ userId }: { userId: string }) {
         setIsMaestro((data as any)?.is_maestro === true);
       });
   }, [isOwnProfile, user]);
+
+  const switchSection = (next: Section) => {
+    setSection(next);
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (next === 'profile') {
+      url.searchParams.delete('section');
+      url.hash = '';
+    } else {
+      url.searchParams.set('section', next);
+    }
+    window.history.replaceState(null, '', url.toString());
+  };
 
   if (!isOwnProfile) {
     return <ArtistProfile userId={userId} />;
@@ -53,12 +102,12 @@ export default function ProfileShell({ userId }: { userId: string }) {
         <SidebarItem
           label="Profile"
           active={section === 'profile'}
-          onClick={() => setSection('profile')}
+          onClick={() => switchSection('profile')}
         />
         <SidebarItem
           label="Setting"
           active={section === 'setting'}
-          onClick={() => setSection('setting')}
+          onClick={() => switchSection('setting')}
         />
 
         {roleLinks.map((link) => (
@@ -147,9 +196,17 @@ function SidebarItem({
 
 function SettingsPanel() {
   return (
-    <section>
+    <div className="max-w-[600px]">
       <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Setting</h1>
-      <AppearanceSettings />
-    </section>
+      <section id="appearance" className="mb-10">
+        <AppearanceSettings />
+      </section>
+      <section id="email" className="mb-10 pt-8 border-t border-border">
+        <EmailPreferences />
+      </section>
+      <section id="password" className="pt-8 border-t border-border">
+        <PasswordSettings />
+      </section>
+    </div>
   );
 }

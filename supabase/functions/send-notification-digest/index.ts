@@ -122,6 +122,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
       const firstName = (profile?.display_name ?? "").split(" ")[0] || "there";
 
       const html = renderNotificationDigest({
+        recipientId,
         recipientName: firstName,
         count: notifications.length,
         items: notifications.map((n) => {
@@ -180,6 +181,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
 }
 
 function renderNotificationDigest(opts: {
+  recipientId: string;
   recipientName: string;
   count: number;
   items: Array<{ body: string; linkPath: string; piece: PieceRef | null }>;
@@ -222,7 +224,7 @@ function renderNotificationDigest(opts: {
         : `Irregular Pearl — ${opts.count} drafts await your review`,
     preheader: lede,
     bodyHtml,
-    footerLink: { text: "Manage email preferences", href: "https://irregularpearl.org/settings#email" },
+    footerLink: { text: "Manage email preferences", href: `https://irregularpearl.org/profile/${opts.recipientId}?section=setting#email` },
   });
 }
 

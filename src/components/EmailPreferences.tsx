@@ -15,8 +15,10 @@ export default function EmailPreferences() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // /settings is a private route. Once auth resolves and there's no user,
-  // redirect via the shared helper — silent, no leak.
+  // Defense-in-depth. ProfileShell only renders SettingsPanel for the profile
+  // owner, so in normal flow `user` is never null here. This guard covers the
+  // sign-out-while-on-settings edge, and any future caller that renders the
+  // component outside the shell.
   useEffect(() => {
     if (authLoading) return;
     if (!hasSupabase || !user) { redirectFromPrivateRoute(false); return; }
