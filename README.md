@@ -153,6 +153,7 @@ public/
 
 - [PRD.md](./PRD.md) — product requirements, principles, data model, Tier 1/2/3 surfaces.
 - [DESIGN.md](./DESIGN.md) — design system: tokens, typography, components, voice.
+- [color-palette.htm](./color-palette.htm) — live visual reference. Renders both themes side-by-side with tagged component samples (T/B/C/D/A/R/P/F/W/I/X/H/E). Open in a browser. Consult before any visual change; add a sample when introducing a new pattern.
 - [TODOS.md](./TODOS.md) — tracked work, sorted by priority.
 - [CHANGELOG.md](./CHANGELOG.md) — what shipped, when.
 - [VERSION.md](./VERSION.md) — current version, history, and how to cut a release.

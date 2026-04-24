@@ -68,6 +68,8 @@
   /* Accent */
   --accent: #6B4E7C;
   --accent-soft: #F4F3F5;
+  --accent-hover: #4C385C;
+  --accent-border: #D9CCE1;
 
   /* Semantic */
   --warning: #8B6914;
@@ -176,6 +178,8 @@ html[data-theme="dark"] {
   --border-strong: #524E47;
   --accent: #B299C4;
   --accent-soft: #2A2230;
+  --accent-hover: #D6C2E3;
+  --accent-border: #4A3B56;
   --warning: #D9B878;
   --warning-soft: #332A18;
   --info: #8FB0E0;
@@ -343,7 +347,7 @@ body {
 .ip-signin-btn-ghost:hover:not(:disabled) { color: var(--ink); }
 .ip-signin-btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
 }
 .ip-signin-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
 .ip-signin-error {
@@ -418,7 +422,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   border: 0.5px solid var(--accent);
   transition: background-color 120ms ease;
 }
@@ -461,7 +465,7 @@ body {
   padding: 1px 7px;
   border-radius: 999px;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   min-width: 18px;
   text-align: center;
 }
@@ -607,7 +611,7 @@ body {
   font-family: var(--font-serif);
   font-size: 15px;
   color: var(--ink);
-  background: #fff;
+  background: var(--bg);
   border: 0.5px solid var(--border);
   border-radius: 4px;
   padding: 8px 10px;
@@ -659,7 +663,7 @@ body {
 }
 .pending-draft-btn.primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   border-color: var(--accent);
 }
 .pending-draft-btn.primary:hover:not(:disabled) {
@@ -670,11 +674,6 @@ html[data-theme="dark"] .pending-draft-btn {
   background: var(--bg);
   color: var(--ink);
   border-color: var(--border-strong);
-}
-html[data-theme="dark"] .pending-draft-btn.primary {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
 }
 .pending-draft-toast {
   font-family: var(--font-sans);

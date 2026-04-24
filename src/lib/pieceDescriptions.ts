@@ -58,6 +58,9 @@ export async function getPublishedPieceDescriptions(
     const version = versionById.get(d.current_version_id);
     const contributor = contribById.get(d.contributor_id);
     if (!version || !contributor) continue;
+    if (version.id === null || version.body === null || version.version_number === null) {
+      continue;
+    }
     rows.push({
       descriptionId: d.id,
       versionId: version.id,

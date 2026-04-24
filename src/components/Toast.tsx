@@ -21,8 +21,11 @@ export default function Toast({ message, onUndo, duration = 5000, onDismiss }: T
   if (!visible) return null;
 
   return (
-    <div className="inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-lg text-sm shadow-lg">
-      <span className="text-emerald-400 font-semibold">✓</span>
+    <div
+      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm shadow-lg"
+      style={{ background: '#1A1A1A', color: '#FFFFFF' }}
+    >
+      <span style={{ color: '#7FC592' }} className="font-semibold">✓</span>
       <span>{message}</span>
       <button
         onClick={() => {
@@ -30,7 +33,8 @@ export default function Toast({ message, onUndo, duration = 5000, onDismiss }: T
           setVisible(false);
           onDismiss();
         }}
-        className="text-[#FCD34D] font-semibold underline underline-offset-2 bg-transparent border-none cursor-pointer ml-1 p-0 text-sm"
+        style={{ color: '#FCD34D' }}
+        className="font-semibold underline underline-offset-2 bg-transparent border-none cursor-pointer ml-1 p-0 text-sm"
       >
         Undo
       </button>

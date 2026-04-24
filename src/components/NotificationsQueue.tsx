@@ -163,7 +163,7 @@ export default function NotificationsQueue() {
       <h1 className="text-[28px] font-display text-ink mb-8 tracking-tight">Messages</h1>
 
       {error && (
-        <div className="mb-6 rounded-lg border-[0.5px] border-[#A32D2D] bg-[#F7E4E4] px-4 py-3 text-sm text-[#A32D2D]">
+        <div className="mb-6 rounded-lg border-[0.5px] border-error bg-error-bg px-4 py-3 text-sm text-error">
           {error}
         </div>
       )}
@@ -274,7 +274,7 @@ function MessageCard({
       )}
 
       {err && (
-        <div className="mt-3 text-xs text-[#A32D2D]" role="alert">
+        <div className="mt-3 text-xs text-error" role="alert">
           {err}
         </div>
       )}
@@ -282,7 +282,7 @@ function MessageCard({
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <a
           href={`/piece/${m.pieceId}`}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-[#292524] transition-colors no-underline"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-bg text-sm font-medium rounded-lg hover:opacity-90 transition-opacity no-underline"
         >
           Open piece <span aria-hidden="true">→</span>
         </a>

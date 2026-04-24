@@ -14,8 +14,8 @@ export interface PieceBasic {
   composer_name: string;
   catalog_number: string | null;
   instruments: string[];
-  era: string;
-  form: string;
+  era: string | null;
+  form: string | null;
   difficulty: Difficulty | null;
   duration_minutes: number | null;
   description: string;

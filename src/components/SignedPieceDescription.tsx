@@ -135,6 +135,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
       const v = vById.get(d.current_version_id);
       const c = cById.get(d.contributor_id);
       if (!v || !c) continue;
+      if (v.id === null || v.body === null || v.version_number === null) continue;
       rows.push({
         descriptionId: d.id,
         versionId: v.id,
@@ -453,7 +454,7 @@ function EssayEditForm(props: {
           disabled={disabled}
           style={{
             background: 'var(--ink)',
-            color: '#FFFFFF',
+            color: 'var(--bg)',
             border: 0,
             fontFamily: 'var(--font-sans)',
             fontSize: '13px',

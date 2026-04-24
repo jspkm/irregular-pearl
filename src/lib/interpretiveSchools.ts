@@ -64,6 +64,9 @@ export async function getPublishedInterpretiveSchools(
     const version = versionById.get(s.current_version_id);
     const contributor = contribById.get(s.contributor_id);
     if (!version || !contributor) continue;
+    if (version.id === null || version.body === null || version.version_number === null) {
+      continue;
+    }
     rows.push({
       schoolId: s.id,
       versionId: version.id,

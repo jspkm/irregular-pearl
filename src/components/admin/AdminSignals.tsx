@@ -99,7 +99,7 @@ export default function AdminSignals() {
       </p>
 
       {error && (
-        <div className="mb-6 rounded-lg border-[0.5px] border-[#A32D2D] bg-[#F7E4E4] px-4 py-3 text-sm text-[#A32D2D]">
+        <div className="mb-6 rounded-lg border-[0.5px] border-error bg-error-bg px-4 py-3 text-sm text-error">
           {error}
         </div>
       )}

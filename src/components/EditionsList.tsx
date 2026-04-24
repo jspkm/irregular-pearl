@@ -98,10 +98,10 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
                       p_id: e.id,
                       p_publisher: fields.publisher,
                       p_editor: fields.editor,
-                      p_year: fields.year,
+                      p_year: fields.year ?? undefined,
                       p_description: fields.description,
-                      p_type: fields.type,
-                      p_url: fields.url,
+                      p_type: fields.type ?? undefined,
+                      p_url: fields.url ?? undefined,
                     });
                     if (error) {
                       setBusy({ kind: 'error', message: prettyError(error.message, 'Save failed') });
@@ -297,10 +297,10 @@ function EditionAddModal({ pieceId, onCancel, onCreated }: {
       p_piece_id: pieceId,
       p_publisher: f.publisher.trim(),
       p_editor: f.editor.trim() || '',
-      p_year: f.year,
+      p_year: f.year ?? undefined,
       p_description: f.description.trim() || '',
-      p_type: f.type || null,
-      p_url: f.url?.trim() || null,
+      p_type: f.type ?? undefined,
+      p_url: f.url?.trim() ?? undefined,
     });
     if (error) {
       setState({ kind: 'error', message: prettyError(error.message, 'Save failed') });

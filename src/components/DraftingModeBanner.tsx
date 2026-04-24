@@ -300,11 +300,11 @@ export default function DraftingModeBanner({ pieceId }: Props) {
         }
         .dm-warning {
           font-size: 12px;
-          color: #8A5A00;
-          background: #FFF5E0;
+          color: var(--warning);
+          background: var(--warning-soft);
           padding: 4px 8px;
           border-radius: 4px;
-          border: 0.5px solid #E0C48A;
+          border: 0.5px solid var(--warning);
         }
         .dm-btn {
           font-family: inherit;
@@ -326,23 +326,23 @@ export default function DraftingModeBanner({ pieceId }: Props) {
         }
         .dm-btn-primary {
           background: var(--accent, #6B4E7C);
-          color: #fff;
+          color: var(--bg, #fff);
           border-color: var(--accent, #6B4E7C);
         }
-        .dm-btn-primary:hover:not(:disabled) { background: #563c66; }
+        .dm-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #563c66); }
         .dm-btn-ghost {
           background: transparent;
           color: var(--ink, #1A1A1A);
           border-color: var(--border-strong, #CFCCC5);
         }
-        .dm-btn-ghost:hover:not(:disabled) { background: rgba(0,0,0,0.04); }
+        .dm-btn-ghost:hover:not(:disabled) { background: var(--bg-tint); }
         .dm-btn-danger {
           background: transparent;
-          color: #A32D2D;
-          border-color: #E4B5B5;
+          color: var(--danger);
+          border-color: var(--danger-soft);
         }
         .dm-btn-danger:hover:not(:disabled) {
-          background: #FAE5E5;
+          background: var(--danger-soft);
         }
         .dm-confirm {
           display: inline-flex;
@@ -355,7 +355,7 @@ export default function DraftingModeBanner({ pieceId }: Props) {
           max-width: 960px;
           margin: 8px auto 0;
           font-size: 13px;
-          color: #A32D2D;
+          color: var(--danger);
         }
       `}</style>
     </div>

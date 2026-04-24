@@ -1,6 +1,6 @@
 # Version
 
-Current: **0.5.0** (2026-04-23)
+Current: **0.5.1** (2026-04-24)
 
 The version number lives in three places that must stay in sync:
 
@@ -36,6 +36,7 @@ Pre-1.0, this project follows a relaxed semver:
 
 | Version | Date | Tag | GitHub release | Anchor commit | One-line summary |
 |---------|------|-----|----------------|---------------|------------------|
+| 0.5.1 | 2026-04-24 | `v0.5.1` | [v0.5.1](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.1) | release commit | Dark-mode contrast pass: every white-on-token-bg surface readable in both themes (Save/Publish/Send/Delete buttons, Toast, badges, wiki-edit dialog, signed-content forms). Tailwind arbitrary `text-[#XXX]` swept to semantic utilities. New `color-palette.htm` reference doc with tagged component samples. TypeScript type-drift cleanup across lib/ + components (66 errors → 0; tsconfig now excludes Deno files and pulls `@types/bun`). |
 | 0.5.0 | 2026-04-23 | `v0.5.0` | [v0.5.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.0) | release commit | Contribution-request drafts completed: staff drafting mode on the piece page (banner + composer panel), new Requests admin tab (outbox + immutable sent archive), three legacy admin pages retired, 21 staff-draft RPCs dropped, `draft_status` + `notification_type` enums rebuilt, `fulfilled_at` + vestigial columns removed. Self-author path unchanged. No-feedback principle enforced end-to-end. |
 | 0.4.1 | 2026-04-23 | `v0.4.1` | [v0.4.1](https://github.com/jspkm/irregular-pearl/releases/tag/v0.4.1) | release commit | UX polish: profile horizontal nav + slim navbar (About → footer, role links → profile), mobile search second row, navbar icon alignment under 1025px, dark-mode contrast (white ink + visible draft buttons), username slug + actions wrap as unit, PWA manifest icon + mobile-web-app-capable meta |
 | 0.4.0 | 2026-04-22 | `v0.4.0` | [v0.4.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.4.0) | release commit | Request a contribution end-to-end: canonical piece index, pre-piece surface with NOT YET CURATED search, materialize-on-CTA, recipient ribbon, unified Messages page, LLM-drafted notes (staff-only), editorial signals dashboard (unmatched queries + most-viewed-no-contribution), Recent Curation admin tile |

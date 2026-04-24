@@ -4,6 +4,41 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-04-24
+
+### Dark-mode contrast pass + visual reference doc
+
+A sweep across every surface that paired literal `#fff` text with a token-driven background. In dark mode, `--ink` flips to white and `--accent` flips to a light purple, so white text on those backgrounds went invisible (Save/Publish/Send/Delete buttons in modals, the difficulty axis level chips, Toast, NavbarBell badge, the Movement edit dialog, etc.). Same pattern surfaced in inline-style props, Tailwind arbitrary-value classes (`text-[#XXX]`, `bg-[#XXX]`), and scoped CSS blocks — all swept in one pass.
+
+Alongside, a new visual reference doc (`color-palette.htm`) renders both themes side-by-side with tagged component samples: typography (T), buttons (B), chips (C), drafting banner (D), alerts (A), request dialog (R), pending-draft proposal (P), draft form (F), wiki-edit dialog (W), inline confirm (I), toast (X), admin header (H), signed-content edit form (E). Future visual changes consult this doc first and add an entry when introducing a new pattern.
+
+### Fixed
+
+- **Save / Publish buttons readable in dark mode.** Replaced `color: #fff` with `color: var(--bg)` on every primary CTA paired with `var(--ink)` or `var(--accent)`: [DraftingModeBanner](src/components/DraftingModeBanner.tsx) (Send), [ComposeDraftBlock](src/components/ComposeDraftBlock.tsx) (compose-form-submit), [SignedPieceDifficulty](src/components/SignedPieceDifficulty.tsx) (level chips + Publish), [PerformersNotes](src/components/PerformersNotes.tsx) / [SignedPieceDescription](src/components/SignedPieceDescription.tsx) / [InterpretiveSchools](src/components/InterpretiveSchools.tsx) (signed-content Publish), [PiecePageLayout](src/components/PiecePageLayout.astro) (edition type-chip hover), [piece-page.css](src/styles/piece-page.css) (`.movement-edit-button-primary` Save, `.changelog-retry` hover, `.mvmt-toast` text + dismiss), [global.css](src/styles/global.css) (`.ip-signin-btn-primary`, `.ip-signin-create`, `.messages-tab-count`, `.pending-draft-btn.primary`).
+- **`--accent-hover` defined in `:root` + dark block.** Was only declared in the Tailwind `@theme` block as `--color-accent-hover`. CSS rules using `var(--accent-hover, #4C385C)` always fell through to the light-mode hex in dark mode. Now properly defined in both themes ([global.css](src/styles/global.css)).
+- **Toast and admin header pinned always-dark.** Both surfaces should keep their dark "interrupt" treatment regardless of theme. Switched from `bg-ink` (which inverted in dark mode) to literal `#1A1A1A` with explicit white text. Toast checkmark uses `#7FC592` (success-green) and Undo uses `#FCD34D` (warning-yellow) — bright variants that read on the dark surface ([Toast.tsx](src/components/Toast.tsx), [AdminPage.tsx](src/components/admin/AdminPage.tsx)).
+- **Drafting banner warning chip border visible.** `.dm-warning` was using `var(--warning-soft)` for both background and border, leaving the chip edge invisible. Border now uses `var(--warning)` ([DraftingModeBanner.tsx](src/components/DraftingModeBanner.tsx)).
+- **Hover state restored on dark CTAs.** `bg-ink hover:bg-ink` in NotificationsQueue and UsernameEditor was a no-op. Switched to `hover:opacity-90` ([NotificationsQueue.tsx](src/components/NotificationsQueue.tsx), [UsernameEditor.tsx](src/components/UsernameEditor.tsx)).
+- **Pending-draft editor textarea readable in dark mode.** `.pending-draft-editor input` had `background: #fff` — recipient's edit form was a white block with white text in dark mode. Now uses `var(--bg)` ([global.css](src/styles/global.css)).
+- **NavbarBell badge text readable in dark mode.** Inline `style={{ color: '#FFFFFF' }}` swapped to `'var(--color-bg)'` ([NavbarBell.tsx](src/components/NavbarBell.tsx)).
+- **Wiki-edit dialog Save button readable in dark mode.** `.movement-edit-button-primary` (used by movements, editions, recordings, pedagogical arc, external refs) had `color: #fff` against `var(--accent)` — Save went near-invisible on light purple. Fixed to `var(--bg)` ([piece-page.css](src/styles/piece-page.css)).
+- **InlineConfirm danger/success/default buttons aligned to design tokens.** Saturated `bg-[#DC2626]` / `bg-[#15803D]` swapped for `bg-error text-bg` / `bg-success text-bg`. InlineMessage alert variants likewise use `bg-error-bg border-error text-error` and the success twin ([InlineConfirm.tsx](src/components/admin/InlineConfirm.tsx)).
+- **Twin sweep across remaining `bg-accent text-white` sites.** [404.astro](src/pages/404.astro), [AddPieceForm.tsx](src/components/AddPieceForm.tsx), [StubContributionForms.tsx](src/components/StubContributionForms.tsx) — all flipped to `text-bg` so accent CTAs read in dark mode.
+
+### Refactored
+
+- **Tailwind arbitrary `[#XXX]` → semantic utilities.** Replaced 60+ literal hex Tailwind classes (`text-[#1A1A1A]`, `bg-[#F2EEF5]`, `border-[#E5E3DE]`, etc.) with the semantic utilities Tailwind v4 generates from `@theme` (`text-ink`, `bg-accent-soft`, `border-border`). These flip with the theme automatically. Touched files: [about.astro](src/pages/about.astro), [@[slug].astro](src/pages/@[slug].astro), [UsernameEditor.tsx](src/components/UsernameEditor.tsx), [Autocomplete.tsx](src/components/Autocomplete.tsx), [NotificationsQueue.tsx](src/components/NotificationsQueue.tsx), [AuthButton.tsx](src/components/AuthButton.tsx), [ArtistProfile.tsx](src/components/ArtistProfile.tsx), [admin/AdminUserList.tsx](src/components/admin/AdminUserList.tsx), [admin/AdminSignals.tsx](src/components/admin/AdminSignals.tsx), [admin/AdminPlaylist.tsx](src/components/admin/AdminPlaylist.tsx), [admin/AdminPage.tsx](src/components/admin/AdminPage.tsx), [admin/RequestsAdmin.tsx](src/components/admin/RequestsAdmin.tsx), [ProfileOwnerBar.tsx](src/components/ProfileOwnerBar.tsx).
+- **Type-drift cleanup across lib/ + components/.** TypeScript was silently passing 66 type errors because `bun run build` doesn't run `tsc --noEmit`. Added `@types/bun`, set `"types": ["bun"]` and `"exclude": ["supabase/functions"]` in [tsconfig.json](tsconfig.json) (Deno-runtime files are out-of-scope for the Node-side typecheck). Then fixed every remaining error: lib mappers in [landmarks.ts](src/lib/landmarks.ts), [interpretiveSchools.ts](src/lib/interpretiveSchools.ts), [performersNotes.ts](src/lib/performersNotes.ts), [pieceDescriptions.ts](src/lib/pieceDescriptions.ts), [movements.ts](src/lib/movements.ts), [pieces.ts](src/lib/pieces.ts) now `continue` early when nullable view fields are null (instead of asserting non-null). User-facing types `PieceBasic.era`/`.form` and `MovementVersion.authoredBy` widened to `string | null` to match reality. Added `Difficulty` / `UserLevel` / `LinkType` re-exports to [database.types.ts](src/lib/database.types.ts). Component RPC call sites use `?? undefined` for optional params.
+- **`UsernameEditor.onUsernameChange` now optional.** ArtistProfile didn't pass it; making it optional avoids the false "missing required prop" error and keeps ProfileShell's real handler working ([UsernameEditor.tsx](src/components/UsernameEditor.tsx)).
+
+### Added
+
+- **`color-palette.htm` reference doc.** Live light + dark token swatches plus tagged component samples (T/B/C/D/A/R/P/F/W/I/X/H/E). Companion to DESIGN.md — palette is the visual source of truth, DESIGN.md is the principles. Lives at repo root, not in `/public`, so it doesn't deploy.
+
+### Known gaps
+
+- **AddPieceForm needs a real fix for `canonical_index_id`.** Migration `20260522000000` made `pieces.canonical_index_id` NOT NULL, but [AddPieceForm.tsx](src/components/AddPieceForm.tsx) predates that and inserts without it. Type-checked with an `as any` cast + TODO comment for now; runtime would still fail on the FK. Either wire it up to upsert into `canonical_piece_index` first or delete the form if obsolete.
+
 ## [0.5.0] - 2026-04-23
 
 ### Contribution-request drafts — staff bootstrap pivot (PRs 4 + 5 + 6 of the contribution-request-drafts plan)

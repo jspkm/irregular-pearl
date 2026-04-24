@@ -295,7 +295,7 @@ function PedagogicalAddModal({ pieceId, kind, pieceOptions, excludeIds, onCancel
       p_piece_id: pieceId,
       p_related_piece_id: f.relatedPieceId,
       p_kind: kind,
-      p_note: f.note.trim() ? f.note.trim() : null,
+      p_note: f.note.trim() ? f.note.trim() : undefined,
     });
     if (error) {
       setState({ kind: 'error', message: pretty(error.message, 'Save failed') });

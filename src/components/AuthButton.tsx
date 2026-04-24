@@ -79,7 +79,7 @@ export default function AuthButton() {
     <>
       <button
         onClick={() => setSignInOpen(true)}
-        className="text-sm font-medium text-[#6B4E7C] hover:text-[#4C385C] transition-colors bg-transparent border-none cursor-pointer p-0"
+        className="text-sm font-medium text-accent hover:text-accent-hover transition-colors bg-transparent border-none cursor-pointer p-0"
       >
         Sign in
       </button>

@@ -106,6 +106,14 @@ export async function getPublishedLandmarksForPiece(
     const v = versionById.get(l.current_version_id);
     const c = contribById.get(l.contributor_id);
     if (!v || !c) continue;
+    if (
+      v.id === null ||
+      v.measure_start === null ||
+      v.label === null ||
+      v.version_number === null
+    ) {
+      continue;
+    }
     rows.push({
       landmarkId: l.id,
       versionId: v.id,

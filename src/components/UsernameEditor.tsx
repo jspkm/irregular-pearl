@@ -5,7 +5,7 @@ import { validateSlug } from '../lib/helpers';
 interface UsernameEditorProps {
   userId: string;
   currentUsername: string | null;
-  onUsernameChange: (username: string) => void;
+  onUsernameChange?: (username: string) => void;
 }
 
 export default function UsernameEditor({ userId, currentUsername, onUsernameChange }: UsernameEditorProps) {
@@ -52,7 +52,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
     setSaving(false);
     setSaved(true);
     setEditing(false);
-    onUsernameChange(trimmed);
+    onUsernameChange?.(trimmed);
     setTimeout(() => setSaved(false), 3000);
   };
 
@@ -61,7 +61,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-4">
         {currentUsername ? (
           <>
-            <span className="font-mono text-xs text-[#A8A29E] leading-none">
+            <span className="font-mono text-xs text-tertiary leading-none">
               irregularpearl.org/@{currentUsername}
             </span>
             <span className="inline-flex items-center gap-2 leading-none shrink-0 whitespace-nowrap">
@@ -71,7 +71,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
               >
                 View
               </a>
-              <span className="text-[11px] text-[#E5E3DE]">·</span>
+              <span className="text-[11px] text-border">·</span>
               <button
                 onClick={() => { setEditing(true); setUsername(currentUsername); }}
                 className="text-[11px] text-accent hover:underline bg-transparent border-none cursor-pointer p-0 min-w-0! min-h-0!"
@@ -84,7 +84,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1A1A] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer"
           >
             Claim your URL
           </button>
@@ -119,7 +119,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         <button
           onClick={handleSave}
           disabled={saving || !username.trim()}
-          className="px-3 py-1.5 bg-[#1A1A1A] text-white text-xs font-medium rounded-lg hover:bg-[#292524] transition-colors border-none cursor-pointer disabled:opacity-50"
+          className="px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>

@@ -3447,3 +3447,8 @@ export const Constants = {
   },
 } as const
 
+// Convenience aliases for the most-used DB enums.
+export type Difficulty = Database["public"]["Enums"]["difficulty"]
+export type UserLevel = Database["public"]["Enums"]["user_level"]
+export type LinkType = Database["public"]["Enums"]["link_type"]
+

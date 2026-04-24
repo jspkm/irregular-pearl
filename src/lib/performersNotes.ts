@@ -66,6 +66,9 @@ export async function getPublishedPerformersNotes(pieceId: string): Promise<Publ
     const version = versionById.get(n.current_version_id);
     const contributor = contribById.get(n.contributor_id);
     if (!version || !contributor) continue;
+    if (version.id === null || version.body === null || version.version_number === null) {
+      continue;
+    }
     rows.push({
       noteId: n.id,
       versionId: version.id,

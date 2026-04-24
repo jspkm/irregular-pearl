@@ -1,0 +1,1241 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Irregular Pearl — palette + components</title>
+<style>
+  :root {
+    --font-serif: 'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+    --font-sans: 'Inter', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  body {
+    margin: 0;
+    padding: 32px;
+    font: 14px var(--font-sans);
+    background: #EEEAE3;
+    color: #1A1A1A;
+  }
+  h1 { font-size: 22px; font-weight: 500; margin: 0 0 8px; }
+  .lede { font-size: 13px; color: #555; margin: 0 0 24px; max-width: 780px; }
+  .themes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1600px;
+  }
+  .theme {
+    border-radius: 12px;
+    padding: 24px;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+  }
+  .theme.light {
+    /* Light tokens */
+    --bg: #FFFFFF;
+    --bg-tint: #F8F7F4;
+    --surface: #FFFFFF;
+    --ink: #1A1A1A;
+    --muted: #6F6F6F;
+    --tertiary: #9A9A9A;
+    --border: #E5E3DE;
+    --border-strong: #CCC9C2;
+    --accent: #6B4E7C;
+    --accent-soft: #F4F3F5;
+    --accent-hover: #4C385C;
+    --accent-border: #D9CCE1;
+    --success: #2D6A3F;
+    --success-soft: #E6F1E9;
+    --danger: #A32D2D;
+    --danger-soft: #F7E4E4;
+    --warning: #8B6914;
+    --warning-soft: #FAF2DB;
+    --info: #2B5797;
+    --info-soft: #E8EEF7;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .theme.dark {
+    /* Dark tokens */
+    --bg: #1A1A1A;
+    --bg-tint: #242320;
+    --surface: #1F1F1F;
+    --ink: #FFFFFF;
+    --muted: #A8A6A0;
+    --tertiary: #77756F;
+    --border: #3A3732;
+    --border-strong: #524E47;
+    --accent: #B299C4;
+    --accent-soft: #2A2230;
+    --accent-hover: #D6C2E3;
+    --accent-border: #4A3B56;
+    --success: #7FC592;
+    --success-soft: #1E2E22;
+    --danger: #E38A8A;
+    --danger-soft: #3A1F1F;
+    --warning: #D9B878;
+    --warning-soft: #332A18;
+    --info: #8FB0E0;
+    --info-soft: #1B2536;
+    background: var(--bg);
+    color: var(--ink);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .theme h2 {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 20px;
+    opacity: 0.7;
+  }
+  .group { margin-bottom: 28px; }
+  .gl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: 12px;
+  }
+  .sw {
+    width: 40px;
+    height: 28px;
+    border-radius: 4px;
+    border: 0.5px solid rgba(128, 128, 128, 0.3);
+  }
+  .tk, .hx {
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .hx { opacity: 0.6; }
+
+  /* ---- Component samples (theme-scoped via inherited vars) ---- */
+  .samples {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .sample {
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    background: var(--surface);
+  }
+  .sample-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .sample-label .ref {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--tertiary);
+    margin-left: 4px;
+  }
+  .cap {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--tertiary);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 1px 5px;
+    margin-right: 6px;
+    border-radius: 3px;
+    background: var(--bg-tint);
+    color: var(--muted);
+    border: 0.5px solid var(--border);
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+  }
+  /* In dark mode the tag chip should still read against the dark surface */
+  .theme.dark .tag {
+    background: var(--surface);
+    color: var(--muted);
+    border-color: var(--border-strong);
+  }
+  .row-flex {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Buttons — mirror src/components patterns */
+  .btn {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 0.5px solid transparent;
+    transition: background 120ms, border-color 120ms, color 120ms;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .theme.dark .btn-primary { color: var(--bg); }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--border-strong);
+  }
+  .btn-ghost:hover { background: var(--bg-tint); }
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border-color: var(--danger-soft);
+  }
+  .btn-danger:hover { background: var(--danger-soft); }
+  .btn-cta {
+    background: var(--ink);
+    color: var(--bg);
+    border: 0;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .btn-link {
+    background: transparent;
+    color: var(--accent);
+    border: 0;
+    padding: 4px 0;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-link::after {
+    content: ' →';
+  }
+
+  /* Form fields */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .field input, .field textarea {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-soft);
+  }
+
+  /* Banner / drafting mode */
+  .banner {
+    background: var(--accent-soft);
+    border-top: 0.5px solid var(--accent);
+    border-bottom: 0.5px solid var(--accent);
+    padding: 10px 16px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .theme.dark .banner { background: rgba(178, 153, 196, 0.15); }
+  .banner .pencil { color: var(--accent); }
+
+  /* Status chips */
+  .chip {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 0.5px solid;
+    display: inline-block;
+  }
+  .chip-warning { color: var(--warning); background: var(--warning-soft); border-color: var(--warning-soft); }
+  .chip-danger  { color: var(--danger);  background: var(--danger-soft);  border-color: var(--danger-soft); }
+  .chip-success { color: var(--success); background: var(--success-soft); border-color: var(--success-soft); }
+  .chip-info    { color: var(--info);    background: var(--info-soft);    border-color: var(--info-soft); }
+
+  /* Alert blocks (rcd-error / rcd-success style) */
+  .alert {
+    font-size: 13px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    line-height: 1.5;
+  }
+  .alert-error   { background: var(--danger-soft);  color: var(--danger); }
+  .alert-success { background: var(--success-soft); color: var(--success); }
+
+  /* Dialog */
+  .dialog-shell {
+    position: relative;
+    background: rgba(26, 26, 26, 0.18);
+    padding: 24px;
+    border-radius: 10px;
+  }
+  .theme.dark .dialog-shell { background: rgba(0, 0, 0, 0.45); }
+  .dialog {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    padding: 22px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .dialog h3 {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .dialog p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 14px;
+    line-height: 1.5;
+  }
+
+  /* Pending-draft proposal card */
+  .proposal {
+    border: 1px dashed var(--accent);
+    border-radius: 8px;
+    background: var(--accent-soft);
+    padding: 16px;
+    font-family: var(--font-serif);
+    color: var(--ink);
+  }
+  .proposal-kicker {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .proposal-body {
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 12px;
+  }
+
+  /* Wiki-edit dialog (mirrors .movement-edit-* in piece-page.css) */
+  .wiki-shell {
+    background: rgba(26, 26, 26, 0.4);
+    padding: 24px;
+    border-radius: 10px;
+  }
+  .theme.dark .wiki-shell { background: rgba(0, 0, 0, 0.5); }
+  .wiki-modal {
+    background: var(--bg);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 12px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .wiki-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .wiki-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .wiki-field > span { color: var(--muted); font-weight: 500; letter-spacing: 0.02em; }
+  .wiki-field input {
+    font: inherit;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    color: var(--ink);
+    padding: 8px 10px;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 4px;
+    background: var(--bg);
+  }
+  .wiki-row { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 12px; }
+  .wiki-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+  .wiki-btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 0.5px solid var(--border-strong);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+  .wiki-btn-ghost:hover { color: var(--ink); }
+  .wiki-btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: 0.5px solid transparent;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+  .theme.dark .wiki-btn-primary { color: var(--bg); }
+
+  /* Draft / publish form (mirrors .diff-edit-* in SignedPieceDifficulty) */
+  .draft-form { font-family: var(--font-sans); }
+  .draft-axis .lab {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .level-picker {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .level-btn {
+    appearance: none;
+    background: transparent;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 4px 0;
+    flex: 1;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .level-btn:hover { color: var(--ink); border-color: var(--ink); }
+  .level-btn.is-active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .theme.dark .level-btn.is-active { color: var(--bg); }
+  .level-label {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .axis-note {
+    width: 100%;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--ink);
+    background: transparent;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 6px 8px;
+    line-height: 1.4;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+  .draft-by {
+    margin-top: 18px;
+    font-size: 13px;
+    text-align: right;
+    color: var(--ink);
+  }
+  .draft-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-cta-ink {
+    background: var(--ink);
+    color: var(--bg);
+    border: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .btn-ghost-ink {
+    background: transparent;
+    color: var(--ink);
+    border: 0.5px solid var(--border-strong);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* Signed-content edit form (mirrors EditForm in PerformersNotes etc.) */
+  .signed-edit {
+    display: grid;
+    grid-template-columns: 4px 1fr;
+    gap: 16px;
+  }
+  .signed-rule {
+    grid-column: 1;
+    grid-row: 2;
+    background: var(--accent);
+    border-radius: 2px;
+    align-self: stretch;
+  }
+  .signed-kicker {
+    grid-column: 1 / -1;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .signed-edit-body {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .signed-edit-textarea {
+    width: 100%;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: transparent;
+    border: 0.5px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 10px 12px;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .signed-edit-textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+    border-color: var(--accent);
+  }
+  .signed-edit-by {
+    margin-top: 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .signed-edit-dot { margin: 0 8px; color: var(--muted); }
+  .signed-edit-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+  .signed-edit-publish {
+    background: var(--ink);
+    color: var(--bg);
+    border: 0;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .signed-edit-cancel {
+    background: transparent;
+    color: var(--ink);
+    border: 0.5px solid var(--border-strong);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* Inline confirm + alert (mirrors InlineConfirm.tsx) */
+  .inline-confirm {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .inline-confirm-msg {
+    font-size: 12px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+  .ic-btn-danger,
+  .ic-btn-success,
+  .ic-btn-default,
+  .ic-btn-ghost {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 0;
+    cursor: pointer;
+  }
+  .ic-btn-danger  { background: var(--danger);  color: var(--bg); }
+  .ic-btn-success { background: var(--success); color: var(--bg); }
+  .ic-btn-default { background: var(--ink);     color: var(--bg); }
+  .ic-btn-ghost   { background: transparent; color: var(--muted); }
+  .ic-btn-ghost:hover { color: var(--ink); }
+
+  /* Toast (mirrors Toast.tsx) */
+  .toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  }
+  .toast-tick { color: var(--success); font-weight: 600; }
+  .toast-undo {
+    background: transparent;
+    border: 0;
+    color: var(--warning);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: 4px;
+    padding: 0;
+  }
+
+  /* Admin header (mirrors AdminPage.tsx top bar) */
+  .admin-header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 16px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+  }
+
+  /* Typeset preview */
+  .type-display {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .type-body {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.68;
+    color: var(--ink);
+  }
+  .type-meta {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .type-mono {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--tertiary);
+  }
+</style>
+</head>
+
+<body>
+  <h1>Irregular Pearl — palette + components</h1>
+  <p class="lede">
+    All tokens shown live; component samples render against the theme they sit
+    inside, mirroring the actual <code>--ink</code>, <code>--bg</code>,
+    <code>--accent</code>, etc. mappings used in production. Any contrast bug
+    visible here is the same bug shipping in the app.
+  </p>
+
+  <div class="themes">
+    <!-- ============================ LIGHT ============================ -->
+    <section class="theme light">
+      <h2>Light theme</h2>
+
+      <div class="group">
+        <div class="gl">Neutrals</div>
+        <div class="row"><div class="sw" style="background:#FFFFFF"></div><span class="tk">--bg / --surface</span><span class="hx">#FFFFFF</span></div>
+        <div class="row"><div class="sw" style="background:#F8F7F4"></div><span class="tk">--bg-tint</span><span class="hx">#F8F7F4</span></div>
+        <div class="row"><div class="sw" style="background:#1A1A1A"></div><span class="tk">--ink</span><span class="hx">#1A1A1A</span></div>
+        <div class="row"><div class="sw" style="background:#6F6F6F"></div><span class="tk">--muted</span><span class="hx">#6F6F6F</span></div>
+        <div class="row"><div class="sw" style="background:#9A9A9A"></div><span class="tk">--tertiary</span><span class="hx">#9A9A9A</span></div>
+        <div class="row"><div class="sw" style="background:#E5E3DE"></div><span class="tk">--border</span><span class="hx">#E5E3DE</span></div>
+        <div class="row"><div class="sw" style="background:#CCC9C2"></div><span class="tk">--border-strong</span><span class="hx">#CCC9C2</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Accent (purple)</div>
+        <div class="row"><div class="sw" style="background:#6B4E7C"></div><span class="tk">--accent</span><span class="hx">#6B4E7C</span></div>
+        <div class="row"><div class="sw" style="background:#4C385C"></div><span class="tk">--accent-hover</span><span class="hx">#4C385C</span></div>
+        <div class="row"><div class="sw" style="background:#F4F3F5"></div><span class="tk">--accent-soft</span><span class="hx">#F4F3F5</span></div>
+        <div class="row"><div class="sw" style="background:#D9CCE1"></div><span class="tk">--accent-border</span><span class="hx">#D9CCE1</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Semantic</div>
+        <div class="row"><div class="sw" style="background:#2D6A3F"></div><span class="tk">--success</span><span class="hx">#2D6A3F</span></div>
+        <div class="row"><div class="sw" style="background:#E6F1E9"></div><span class="tk">--success-soft</span><span class="hx">#E6F1E9</span></div>
+        <div class="row"><div class="sw" style="background:#A32D2D"></div><span class="tk">--danger</span><span class="hx">#A32D2D</span></div>
+        <div class="row"><div class="sw" style="background:#F7E4E4"></div><span class="tk">--danger-soft</span><span class="hx">#F7E4E4</span></div>
+        <div class="row"><div class="sw" style="background:#8B6914"></div><span class="tk">--warning</span><span class="hx">#8B6914</span></div>
+        <div class="row"><div class="sw" style="background:#FAF2DB"></div><span class="tk">--warning-soft</span><span class="hx">#FAF2DB</span></div>
+        <div class="row"><div class="sw" style="background:#2B5797"></div><span class="tk">--info</span><span class="hx">#2B5797</span></div>
+        <div class="row"><div class="sw" style="background:#E8EEF7"></div><span class="tk">--info-soft</span><span class="hx">#E8EEF7</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Components</div>
+        <div class="samples">
+          <div class="sample">
+            <div class="sample-label">[T] Typography scale · <span class="ref">--font-serif / --font-sans / --font-mono</span></div>
+            <div class="type-display">[T1] Display · Schubert · Sonata in B♭, D 960</div>
+            <div class="type-body">[T2] Body prose · An interpretive school is a way of reading the piece — not a verdict on the piece.</div>
+            <div class="type-meta">[T3] Meta caption · Hannah K. · pianist · Berlin</div>
+            <div class="type-mono">[T4] Mono · D 960 · I. Molto moderato</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[B] Buttons · <span class="ref">.dm-btn-* / .pp-cta-* / .rcd-*</span></div>
+            <div class="row-flex">
+              <button class="btn btn-primary"><span class="tag">B1</span>Send (3 drafts)</button>
+              <button class="btn btn-ghost"><span class="tag">B2</span>Save &amp; exit</button>
+              <button class="btn btn-danger"><span class="tag">B3</span>Delete request</button>
+            </div>
+            <div class="cap">B1 primary (.dm-btn-primary / .pending-draft-btn.primary) · B2 ghost (.dm-btn-ghost / .rcd-cancel) · B3 danger (.dm-btn-danger)</div>
+            <div class="row-flex" style="margin-top:12px">
+              <button class="btn-cta"><span class="tag">B4</span>Request a contribution</button>
+              <button class="btn-link"><span class="tag">B5</span>Resume</button>
+            </div>
+            <div class="cap">B4 ink CTA (.pp-cta-primary / .rcd-submit) · B5 accent link (.pp-cta-ghost / .rcd-draft-link)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[C] Status chips · <span class="ref">.flag / .pill-* / .chip</span></div>
+            <div class="row-flex">
+              <span class="chip chip-warning"><span class="tag">C1</span>significant</span>
+              <span class="chip chip-info"><span class="tag">C2</span>notable</span>
+              <span class="chip chip-success"><span class="tag">C3</span>published</span>
+              <span class="chip chip-danger"><span class="tag">C4</span>recipient deleted</span>
+            </div>
+            <div class="cap">C1 warning · C2 info · C3 success · C4 danger</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[D] DraftingModeBanner · <span class="ref">src/components/DraftingModeBanner.tsx</span></div>
+            <div class="banner">
+              <span class="pencil" aria-hidden="true">✎</span>
+              Drafting for <strong style="font-weight:600">Hannah K.</strong>
+              <span style="color:var(--muted)">· 3 drafts</span>
+              <span style="margin-left:auto" class="row-flex">
+                <button class="btn btn-primary">Send (3)</button>
+                <button class="btn btn-ghost">Save &amp; exit</button>
+                <button class="btn btn-danger">Delete request</button>
+              </span>
+            </div>
+            <div class="cap">D · sticky banner that appears in compose mode on a piece page</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[A] Alerts · <span class="ref">.rcd-error / .rcd-success / .pending-draft-error</span></div>
+            <div class="alert alert-error"><span class="tag">A1</span>You've already asked this musician recently. Try someone else, or wait.</div>
+            <div class="alert alert-success" style="margin-top:8px"><span class="tag">A2</span>Request sent to hannahk.</div>
+            <div class="cap">A1 error / A2 success — used inside dialogs &amp; inline forms</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[R] RequestContributionDialog · <span class="ref">src/components/RequestContributionDialog.tsx</span></div>
+            <div class="dialog-shell">
+              <div class="dialog">
+                <h3>Request a contribution</h3>
+                <p>Ask a musician to write a signed contribution on Schubert D 960.</p>
+                <div class="field">
+                  <label>Recipient</label>
+                  <input type="text" value="hannahk" />
+                </div>
+                <div class="field">
+                  <label>Personal note (optional)</label>
+                  <textarea rows="2">One sentence. The recipient will see this with the request.</textarea>
+                </div>
+                <div class="row-flex" style="justify-content:flex-end">
+                  <button class="btn btn-ghost">Cancel</button>
+                  <button class="btn btn-primary">Send request</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">R · modal opened from the "Request a contribution" CTA on a piece page</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[P] PendingDraftCard · <span class="ref">src/components/PendingDraftCard.tsx</span></div>
+            <div class="proposal">
+              <div class="proposal-kicker">✦ Proposed by Hannah K.</div>
+              <div class="proposal-body">The pianissimo at m. 8 is the question the rest of the movement answers — start it from the ribcage, not the fingers.</div>
+              <div class="row-flex">
+                <button class="btn btn-primary">Accept as-is</button>
+                <button class="btn btn-ghost">Edit &amp; accept</button>
+                <button class="btn btn-ghost">Decline</button>
+              </div>
+            </div>
+            <div class="cap">P · recipient-side proposal card; appears inline on piece page &amp; in /notifications</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[W] Wiki-edit dialog · <span class="ref">.movement-edit-* in MovementsList / EditionsList / RecordingsList / PedagogicalArcList / ExternalRefsList</span></div>
+            <div class="wiki-shell">
+              <div class="wiki-modal">
+                <h3 class="wiki-title">Edit movement</h3>
+                <label class="wiki-field">
+                  <span>Name</span>
+                  <input type="text" value="II. Tema pastorale con variazioni" />
+                </label>
+                <div class="wiki-row">
+                  <label class="wiki-field">
+                    <span>Ordinal</span>
+                    <input type="text" value="2" />
+                  </label>
+                  <label class="wiki-field">
+                    <span>Key signature</span>
+                    <input type="text" placeholder="e.g. G major" />
+                  </label>
+                  <label class="wiki-field">
+                    <span>Meter</span>
+                    <input type="text" value="3/4" />
+                  </label>
+                </div>
+                <label class="wiki-field">
+                  <span>Tempo indication</span>
+                  <input type="text" placeholder="e.g. Adagio sostenuto" />
+                </label>
+                <label class="wiki-field">
+                  <span>Edit summary (optional)</span>
+                  <input type="text" placeholder="Short note about what changed" />
+                </label>
+                <div class="wiki-actions">
+                  <button class="wiki-btn-ghost"><span class="tag">W2</span>Cancel</button>
+                  <button class="wiki-btn-primary"><span class="tag">W1</span>Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">W1 accent CTA (.movement-edit-button-primary) — dark mode flips text to var(--bg) so Save reads against light purple · W2 ghost cancel (.movement-edit-button-ghost) · used by every wiki-edit list (movements, editions, recordings, pedagogical arc, external refs)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[F] Draft / publish form · <span class="ref">.diff-edit-* in SignedPieceDifficulty.tsx</span></div>
+            <div class="draft-form">
+              <div class="draft-axis">
+                <div class="lab">Technical</div>
+                <div class="level-picker">
+                  <button class="level-btn is-active">n/a</button>
+                  <button class="level-btn">1</button>
+                  <button class="level-btn">2</button>
+                  <button class="level-btn">3</button>
+                  <button class="level-btn">4</button>
+                  <button class="level-btn">5</button>
+                </div>
+                <div class="level-label">n/a</div>
+                <textarea class="axis-note" rows="2" placeholder="Optional — what makes this axis score what it scores?"></textarea>
+              </div>
+              <div class="draft-by"><strong>You</strong> <span style="color:var(--muted)">· pianist · Berlin</span></div>
+              <div class="draft-actions">
+                <button class="btn-cta-ink"><span class="tag">F1</span>Publish</button>
+                <button class="btn-ghost-ink"><span class="tag">F2</span>Cancel</button>
+              </div>
+            </div>
+            <div class="cap">F1 ink CTA on surface (.diff-edit-primary) — must use color: var(--bg), never #fff · F2 outlined cancel (.diff-edit-secondary)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[E] Signed-content edit form · <span class="ref">EditForm in PerformersNotes / SignedPieceDescription / InterpretiveSchools</span></div>
+            <div class="signed-edit">
+              <div class="signed-kicker">PERFORMER'S NOTES</div>
+              <div class="signed-rule"></div>
+              <div class="signed-edit-body">
+                <textarea class="signed-edit-textarea" rows="5" placeholder="Write the note the way you'd want to read it on another musician's piece page."></textarea>
+                <div class="signed-edit-by">
+                  <strong>Haji Kim</strong>
+                  <span class="signed-edit-dot" aria-hidden="true">·</span>
+                  <span style="color:var(--muted)">cellist, NYC</span>
+                </div>
+                <div class="signed-edit-actions">
+                  <button class="signed-edit-publish"><span class="tag">E1</span>Publish</button>
+                  <button class="signed-edit-cancel"><span class="tag">E2</span>Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">E1 ink Publish (color: var(--bg), never #FFFFFF — applies to disabled state at opacity 0.5 too) · E2 outlined Cancel · same EditForm shape across performer's notes / piece description / interpretive schools, all wrapped in the accent-rule signed block</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[I] Inline confirm · <span class="ref">src/components/admin/InlineConfirm.tsx</span></div>
+            <div class="inline-confirm">
+              <p class="inline-confirm-msg">Delete this post? This cannot be undone.</p>
+              <div class="row-flex">
+                <button class="ic-btn-danger"><span class="tag">I1</span>Delete</button>
+                <button class="ic-btn-ghost"><span class="tag">I2</span>Cancel</button>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <div class="inline-confirm">
+                <p class="inline-confirm-msg">Approve this draft?</p>
+                <div class="row-flex">
+                  <button class="ic-btn-success"><span class="tag">I3</span>Approve</button>
+                  <button class="ic-btn-default"><span class="tag">I4</span>Confirm</button>
+                  <button class="ic-btn-ghost">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-error" style="margin-top:8px"><span class="tag">I5</span>Save failed. Try again.</div>
+            <div class="alert alert-success" style="margin-top:8px"><span class="tag">I6</span>Saved.</div>
+            <div class="cap">I1 danger / I3 success / I4 default — all use color: var(--bg) on the saturated semantic bg · I5/I6 InlineMessage variants · replaces native confirm() / alert() / prompt()</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[X] Toast · <span class="ref">src/components/Toast.tsx</span></div>
+            <div class="row-flex">
+              <div class="toast">
+                <span class="toast-tick">✓</span>
+                <span>Movement reordered.</span>
+                <button class="toast-undo"><span class="tag">X1</span>Undo</button>
+              </div>
+            </div>
+            <div class="cap">X · inverted bg (bg-ink + text-bg) so it reads against either theme · checkmark uses --success, undo accent uses --warning</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[H] Admin header · <span class="ref">src/components/admin/AdminPage.tsx</span></div>
+            <div class="admin-header">
+              <div class="row-flex" style="gap:16px">
+                <span style="font-weight:500">IrregularPearl</span>
+                <span style="opacity:0.4">|</span>
+                <span style="font-size:13px">User management</span>
+              </div>
+              <div class="row-flex" style="gap:12px">
+                <span style="font-size:11px;opacity:0.6">josephjkim</span>
+                <span style="font-size:11px;opacity:0.4">← Back to site</span>
+              </div>
+            </div>
+            <div class="cap">H · inverted bar at top of /admin · bg-ink + text-bg (never text-white)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ DARK ============================ -->
+    <section class="theme dark">
+      <h2>Dark theme</h2>
+
+      <div class="group">
+        <div class="gl">Neutrals</div>
+        <div class="row"><div class="sw" style="background:#1A1A1A"></div><span class="tk">--bg</span><span class="hx">#1A1A1A</span></div>
+        <div class="row"><div class="sw" style="background:#1F1F1F"></div><span class="tk">--surface</span><span class="hx">#1F1F1F</span></div>
+        <div class="row"><div class="sw" style="background:#242320"></div><span class="tk">--bg-tint</span><span class="hx">#242320</span></div>
+        <div class="row"><div class="sw" style="background:#FFFFFF"></div><span class="tk">--ink</span><span class="hx">#FFFFFF</span></div>
+        <div class="row"><div class="sw" style="background:#A8A6A0"></div><span class="tk">--muted</span><span class="hx">#A8A6A0</span></div>
+        <div class="row"><div class="sw" style="background:#77756F"></div><span class="tk">--tertiary</span><span class="hx">#77756F</span></div>
+        <div class="row"><div class="sw" style="background:#3A3732"></div><span class="tk">--border</span><span class="hx">#3A3732</span></div>
+        <div class="row"><div class="sw" style="background:#524E47"></div><span class="tk">--border-strong</span><span class="hx">#524E47</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Accent (purple)</div>
+        <div class="row"><div class="sw" style="background:#B299C4"></div><span class="tk">--accent</span><span class="hx">#B299C4</span></div>
+        <div class="row"><div class="sw" style="background:#D6C2E3"></div><span class="tk">--accent-hover</span><span class="hx">#D6C2E3</span></div>
+        <div class="row"><div class="sw" style="background:#2A2230"></div><span class="tk">--accent-soft</span><span class="hx">#2A2230</span></div>
+        <div class="row"><div class="sw" style="background:#4A3B56"></div><span class="tk">--accent-border</span><span class="hx">#4A3B56</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Semantic</div>
+        <div class="row"><div class="sw" style="background:#7FC592"></div><span class="tk">--success</span><span class="hx">#7FC592</span></div>
+        <div class="row"><div class="sw" style="background:#1E2E22"></div><span class="tk">--success-soft</span><span class="hx">#1E2E22</span></div>
+        <div class="row"><div class="sw" style="background:#E38A8A"></div><span class="tk">--danger</span><span class="hx">#E38A8A</span></div>
+        <div class="row"><div class="sw" style="background:#3A1F1F"></div><span class="tk">--danger-soft</span><span class="hx">#3A1F1F</span></div>
+        <div class="row"><div class="sw" style="background:#D9B878"></div><span class="tk">--warning</span><span class="hx">#D9B878</span></div>
+        <div class="row"><div class="sw" style="background:#332A18"></div><span class="tk">--warning-soft</span><span class="hx">#332A18</span></div>
+        <div class="row"><div class="sw" style="background:#8FB0E0"></div><span class="tk">--info</span><span class="hx">#8FB0E0</span></div>
+        <div class="row"><div class="sw" style="background:#1B2536"></div><span class="tk">--info-soft</span><span class="hx">#1B2536</span></div>
+      </div>
+
+      <div class="group">
+        <div class="gl">Components</div>
+        <div class="samples">
+          <div class="sample">
+            <div class="sample-label">[T] Typography scale · <span class="ref">--font-serif / --font-sans / --font-mono</span></div>
+            <div class="type-display">[T1] Display · Schubert · Sonata in B♭, D 960</div>
+            <div class="type-body">[T2] Body prose · An interpretive school is a way of reading the piece — not a verdict on the piece.</div>
+            <div class="type-meta">[T3] Meta caption · Hannah K. · pianist · Berlin</div>
+            <div class="type-mono">[T4] Mono · D 960 · I. Molto moderato</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[B] Buttons · <span class="ref">.dm-btn-* / .pp-cta-* / .rcd-*</span></div>
+            <div class="row-flex">
+              <button class="btn btn-primary"><span class="tag">B1</span>Send (3 drafts)</button>
+              <button class="btn btn-ghost"><span class="tag">B2</span>Save &amp; exit</button>
+              <button class="btn btn-danger"><span class="tag">B3</span>Delete request</button>
+            </div>
+            <div class="cap">B1 primary (.dm-btn-primary / .pending-draft-btn.primary) · B2 ghost (.dm-btn-ghost / .rcd-cancel) · B3 danger (.dm-btn-danger)</div>
+            <div class="row-flex" style="margin-top:12px">
+              <button class="btn-cta"><span class="tag">B4</span>Request a contribution</button>
+              <button class="btn-link"><span class="tag">B5</span>Resume</button>
+            </div>
+            <div class="cap">B4 ink CTA (.pp-cta-primary / .rcd-submit) · B5 accent link (.pp-cta-ghost / .rcd-draft-link)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[C] Status chips · <span class="ref">.flag / .pill-* / .chip</span></div>
+            <div class="row-flex">
+              <span class="chip chip-warning"><span class="tag">C1</span>significant</span>
+              <span class="chip chip-info"><span class="tag">C2</span>notable</span>
+              <span class="chip chip-success"><span class="tag">C3</span>published</span>
+              <span class="chip chip-danger"><span class="tag">C4</span>recipient deleted</span>
+            </div>
+            <div class="cap">C1 warning · C2 info · C3 success · C4 danger</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[D] DraftingModeBanner · <span class="ref">src/components/DraftingModeBanner.tsx</span></div>
+            <div class="banner">
+              <span class="pencil" aria-hidden="true">✎</span>
+              Drafting for <strong style="font-weight:600">Hannah K.</strong>
+              <span style="color:var(--muted)">· 3 drafts</span>
+              <span style="margin-left:auto" class="row-flex">
+                <button class="btn btn-primary">Send (3)</button>
+                <button class="btn btn-ghost">Save &amp; exit</button>
+                <button class="btn btn-danger">Delete request</button>
+              </span>
+            </div>
+            <div class="cap">D · sticky banner that appears in compose mode on a piece page</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[A] Alerts · <span class="ref">.rcd-error / .rcd-success / .pending-draft-error</span></div>
+            <div class="alert alert-error"><span class="tag">A1</span>You've already asked this musician recently. Try someone else, or wait.</div>
+            <div class="alert alert-success" style="margin-top:8px"><span class="tag">A2</span>Request sent to hannahk.</div>
+            <div class="cap">A1 error / A2 success — used inside dialogs &amp; inline forms</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[R] RequestContributionDialog · <span class="ref">src/components/RequestContributionDialog.tsx</span></div>
+            <div class="dialog-shell">
+              <div class="dialog">
+                <h3>Request a contribution</h3>
+                <p>Ask a musician to write a signed contribution on Schubert D 960.</p>
+                <div class="field">
+                  <label>Recipient</label>
+                  <input type="text" value="hannahk" />
+                </div>
+                <div class="field">
+                  <label>Personal note (optional)</label>
+                  <textarea rows="2">One sentence. The recipient will see this with the request.</textarea>
+                </div>
+                <div class="row-flex" style="justify-content:flex-end">
+                  <button class="btn btn-ghost">Cancel</button>
+                  <button class="btn btn-primary">Send request</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">R · modal opened from the "Request a contribution" CTA on a piece page</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[P] PendingDraftCard · <span class="ref">src/components/PendingDraftCard.tsx</span></div>
+            <div class="proposal">
+              <div class="proposal-kicker">✦ Proposed by Hannah K.</div>
+              <div class="proposal-body">The pianissimo at m. 8 is the question the rest of the movement answers — start it from the ribcage, not the fingers.</div>
+              <div class="row-flex">
+                <button class="btn btn-primary">Accept as-is</button>
+                <button class="btn btn-ghost">Edit &amp; accept</button>
+                <button class="btn btn-ghost">Decline</button>
+              </div>
+            </div>
+            <div class="cap">P · recipient-side proposal card; appears inline on piece page &amp; in /notifications</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[W] Wiki-edit dialog · <span class="ref">.movement-edit-* in MovementsList / EditionsList / RecordingsList / PedagogicalArcList / ExternalRefsList</span></div>
+            <div class="wiki-shell">
+              <div class="wiki-modal">
+                <h3 class="wiki-title">Edit movement</h3>
+                <label class="wiki-field">
+                  <span>Name</span>
+                  <input type="text" value="II. Tema pastorale con variazioni" />
+                </label>
+                <div class="wiki-row">
+                  <label class="wiki-field">
+                    <span>Ordinal</span>
+                    <input type="text" value="2" />
+                  </label>
+                  <label class="wiki-field">
+                    <span>Key signature</span>
+                    <input type="text" placeholder="e.g. G major" />
+                  </label>
+                  <label class="wiki-field">
+                    <span>Meter</span>
+                    <input type="text" value="3/4" />
+                  </label>
+                </div>
+                <label class="wiki-field">
+                  <span>Tempo indication</span>
+                  <input type="text" placeholder="e.g. Adagio sostenuto" />
+                </label>
+                <label class="wiki-field">
+                  <span>Edit summary (optional)</span>
+                  <input type="text" placeholder="Short note about what changed" />
+                </label>
+                <div class="wiki-actions">
+                  <button class="wiki-btn-ghost"><span class="tag">W2</span>Cancel</button>
+                  <button class="wiki-btn-primary"><span class="tag">W1</span>Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">W1 accent CTA (.movement-edit-button-primary) — dark mode flips text to var(--bg) so Save reads against light purple · W2 ghost cancel (.movement-edit-button-ghost) · used by every wiki-edit list (movements, editions, recordings, pedagogical arc, external refs)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[F] Draft / publish form · <span class="ref">.diff-edit-* in SignedPieceDifficulty.tsx</span></div>
+            <div class="draft-form">
+              <div class="draft-axis">
+                <div class="lab">Technical</div>
+                <div class="level-picker">
+                  <button class="level-btn is-active">n/a</button>
+                  <button class="level-btn">1</button>
+                  <button class="level-btn">2</button>
+                  <button class="level-btn">3</button>
+                  <button class="level-btn">4</button>
+                  <button class="level-btn">5</button>
+                </div>
+                <div class="level-label">n/a</div>
+                <textarea class="axis-note" rows="2" placeholder="Optional — what makes this axis score what it scores?"></textarea>
+              </div>
+              <div class="draft-by"><strong>You</strong> <span style="color:var(--muted)">· pianist · Berlin</span></div>
+              <div class="draft-actions">
+                <button class="btn-cta-ink"><span class="tag">F1</span>Publish</button>
+                <button class="btn-ghost-ink"><span class="tag">F2</span>Cancel</button>
+              </div>
+            </div>
+            <div class="cap">F1 ink CTA on surface (.diff-edit-primary) — must use color: var(--bg), never #fff · F2 outlined cancel (.diff-edit-secondary)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[E] Signed-content edit form · <span class="ref">EditForm in PerformersNotes / SignedPieceDescription / InterpretiveSchools</span></div>
+            <div class="signed-edit">
+              <div class="signed-kicker">PERFORMER'S NOTES</div>
+              <div class="signed-rule"></div>
+              <div class="signed-edit-body">
+                <textarea class="signed-edit-textarea" rows="5" placeholder="Write the note the way you'd want to read it on another musician's piece page."></textarea>
+                <div class="signed-edit-by">
+                  <strong>Haji Kim</strong>
+                  <span class="signed-edit-dot" aria-hidden="true">·</span>
+                  <span style="color:var(--muted)">cellist, NYC</span>
+                </div>
+                <div class="signed-edit-actions">
+                  <button class="signed-edit-publish"><span class="tag">E1</span>Publish</button>
+                  <button class="signed-edit-cancel"><span class="tag">E2</span>Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div class="cap">E1 ink Publish (color: var(--bg), never #FFFFFF — applies to disabled state at opacity 0.5 too) · E2 outlined Cancel · same EditForm shape across performer's notes / piece description / interpretive schools, all wrapped in the accent-rule signed block</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[I] Inline confirm · <span class="ref">src/components/admin/InlineConfirm.tsx</span></div>
+            <div class="inline-confirm">
+              <p class="inline-confirm-msg">Delete this post? This cannot be undone.</p>
+              <div class="row-flex">
+                <button class="ic-btn-danger"><span class="tag">I1</span>Delete</button>
+                <button class="ic-btn-ghost"><span class="tag">I2</span>Cancel</button>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <div class="inline-confirm">
+                <p class="inline-confirm-msg">Approve this draft?</p>
+                <div class="row-flex">
+                  <button class="ic-btn-success"><span class="tag">I3</span>Approve</button>
+                  <button class="ic-btn-default"><span class="tag">I4</span>Confirm</button>
+                  <button class="ic-btn-ghost">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-error" style="margin-top:8px"><span class="tag">I5</span>Save failed. Try again.</div>
+            <div class="alert alert-success" style="margin-top:8px"><span class="tag">I6</span>Saved.</div>
+            <div class="cap">I1 danger / I3 success / I4 default — all use color: var(--bg) on the saturated semantic bg · I5/I6 InlineMessage variants · replaces native confirm() / alert() / prompt()</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[X] Toast · <span class="ref">src/components/Toast.tsx</span></div>
+            <div class="row-flex">
+              <div class="toast">
+                <span class="toast-tick">✓</span>
+                <span>Movement reordered.</span>
+                <button class="toast-undo"><span class="tag">X1</span>Undo</button>
+              </div>
+            </div>
+            <div class="cap">X · inverted bg (bg-ink + text-bg) so it reads against either theme · checkmark uses --success, undo accent uses --warning</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[H] Admin header · <span class="ref">src/components/admin/AdminPage.tsx</span></div>
+            <div class="admin-header">
+              <div class="row-flex" style="gap:16px">
+                <span style="font-weight:500">IrregularPearl</span>
+                <span style="opacity:0.4">|</span>
+                <span style="font-size:13px">User management</span>
+              </div>
+              <div class="row-flex" style="gap:12px">
+                <span style="font-size:11px;opacity:0.6">josephjkim</span>
+                <span style="font-size:11px;opacity:0.4">← Back to site</span>
+              </div>
+            </div>
+            <div class="cap">H · inverted bar at top of /admin · bg-ink + text-bg (never text-white)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

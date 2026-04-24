@@ -130,6 +130,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
       const v = vById.get(n.current_version_id);
       const c = cById.get(n.contributor_id);
       if (!v || !c) continue;
+      if (v.id === null || v.body === null || v.version_number === null) continue;
       rows.push({
         noteId: n.id,
         versionId: v.id,
@@ -432,7 +433,7 @@ function EditForm(props: {
           disabled={props.submitting || value.trim() === ''}
           style={{
             background: 'var(--ink)',
-            color: '#FFFFFF',
+            color: 'var(--bg)',
             border: 0,
             fontFamily: 'var(--font-sans)',
             fontSize: '13px',

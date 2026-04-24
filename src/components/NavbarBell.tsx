@@ -232,7 +232,7 @@ export default function NavbarBell() {
           <span
             aria-hidden="true"
             className="absolute -top-1 -right-1.5 min-w-[16px] h-[16px] px-1 text-[10px] leading-[16px] text-center rounded-full font-medium"
-            style={{ background: 'var(--color-accent)', color: '#FFFFFF' }}
+            style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
           >
             {badgeText}
           </span>

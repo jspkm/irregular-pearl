@@ -181,13 +181,13 @@ export default function SignedPieceDifficulty({
     const { error: err } = await supabase.rpc('publish_contributor_piece_difficulty', {
       p_piece_id: pieceId,
       p_technical_level: draft.technical.level,
-      p_technical_note: draft.technical.note.trim() || null,
+      p_technical_note: draft.technical.note.trim(),
       p_stamina_level: draft.stamina.level,
-      p_stamina_note: draft.stamina.note.trim() || null,
+      p_stamina_note: draft.stamina.note.trim(),
       p_interpretive_level: draft.interpretive.level,
-      p_interpretive_note: draft.interpretive.note.trim() || null,
+      p_interpretive_note: draft.interpretive.note.trim(),
       p_ensemble_level: draft.ensemble.level,
-      p_ensemble_note: draft.ensemble.note.trim() || null,
+      p_ensemble_note: draft.ensemble.note.trim(),
     });
     setBusy(false);
     if (err) {
@@ -204,13 +204,13 @@ export default function SignedPieceDifficulty({
     const { error: err } = await supabase.rpc('publish_contributor_piece_difficulty_edit', {
       p_rating_id: ratingId,
       p_technical_level: draft.technical.level,
-      p_technical_note: draft.technical.note.trim() || null,
+      p_technical_note: draft.technical.note.trim(),
       p_stamina_level: draft.stamina.level,
-      p_stamina_note: draft.stamina.note.trim() || null,
+      p_stamina_note: draft.stamina.note.trim(),
       p_interpretive_level: draft.interpretive.level,
-      p_interpretive_note: draft.interpretive.note.trim() || null,
+      p_interpretive_note: draft.interpretive.note.trim(),
       p_ensemble_level: draft.ensemble.level,
-      p_ensemble_note: draft.ensemble.note.trim() || null,
+      p_ensemble_note: draft.ensemble.note.trim(),
     });
     setBusy(false);
     if (err) {
@@ -604,7 +604,7 @@ function DifficultyEditForm(props: {
         .level-btn:hover { color: var(--ink); border-color: var(--ink); }
         .level-btn.is-active {
           background: var(--accent);
-          color: #fff;
+          color: var(--bg);
           border-color: var(--accent);
         }
         .level-label {
@@ -638,7 +638,7 @@ function DifficultyEditForm(props: {
         }
         .diff-edit-primary {
           background: var(--ink);
-          color: #fff;
+          color: var(--bg);
           border: 0;
           font-family: var(--font-sans);
           font-size: 13px;
