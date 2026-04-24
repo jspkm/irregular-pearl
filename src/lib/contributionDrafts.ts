@@ -49,18 +49,28 @@ export interface ActOnDraftResult {
 }
 
 /**
- * Fetch all live (non-dispositioned) drafts on a piece for the current viewer.
- * Recipient RLS already filters by recipient + sent. Empty array if anon or
- * no drafts.
+ * Fetch all live (non-dispositioned) drafts on a piece addressed to the
+ * current viewer as recipient. Empty array if anon, if nobody has asked this
+ * viewer on this piece, or if all drafts are dispositioned.
+ *
+ * Why the explicit recipient filter here — RLS is not sufficient on its own
+ * because `crd_staff_read` lets staff see all drafts for moderation. Without
+ * this filter, a staff user drafting their own outbox on a piece would see
+ * their own proposal render back as a pending "act on this" card.
  *
  * The returned drafts have `piece: null` — the piece is implicit (the section
  * components rendering this know the pieceId). For cross-piece reads (the
  * Open items tab on /notifications), use fetchPendingDraftsForViewer() instead.
  */
 export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<PendingDraft[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const viewerId = session?.user?.id ?? null;
+  if (!viewerId) return [];
+
   const { data: drafts, error: draftsErr } = await supabase
     .from('contribution_request_drafts')
     .select('id, request_id, kind, payload, created_at')
+    .is('dispositioned_at', null)
     .order('created_at', { ascending: true });
   if (draftsErr || !drafts || drafts.length === 0) return [];
 
@@ -69,7 +79,9 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
     .from('contribution_requests')
     .select('id, sender_id, piece_id')
     .in('id', requestIds)
-    .eq('piece_id', pieceId);
+    .eq('piece_id', pieceId)
+    .eq('recipient_id', viewerId)
+    .not('sent_at', 'is', null);
   if (reqErr || !requests) return [];
 
   const reqById = new Map(requests.map((r) => [r.id, r]));
@@ -100,17 +112,23 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
 
 /**
  * Fetch all live (non-dispositioned) drafts addressed to the current viewer
- * across every piece. Used by the Open items tab on /notifications.
- * Recipient RLS scopes the query to drafts the viewer can see; we then
- * join piece + sender for cross-piece display.
+ * across every piece. Used by the Open items tab on /notifications. Same
+ * explicit recipient filter as fetchPendingDraftsOnPiece — required because
+ * the staff RLS policy would otherwise leak drafts the staff viewer sent or
+ * drafts addressed to other users.
  *
  * Returns drafts with `piece` populated. Sorted newest-first so the
  * Open items tab matches the Messages tab pattern.
  */
 export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const viewerId = session?.user?.id ?? null;
+  if (!viewerId) return [];
+
   const { data: drafts, error: draftsErr } = await supabase
     .from('contribution_request_drafts')
     .select('id, request_id, kind, payload, created_at')
+    .is('dispositioned_at', null)
     .order('created_at', { ascending: false });
   if (draftsErr || !drafts || drafts.length === 0) return [];
 
@@ -118,7 +136,9 @@ export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
   const { data: requests, error: reqErr } = await supabase
     .from('contribution_requests')
     .select('id, sender_id, piece_id')
-    .in('id', requestIds);
+    .in('id', requestIds)
+    .eq('recipient_id', viewerId)
+    .not('sent_at', 'is', null);
   if (reqErr || !requests) return [];
 
   const reqById = new Map(requests.map((r) => [r.id, r]));
