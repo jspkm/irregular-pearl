@@ -57,14 +57,40 @@ function renderWelcomeEmail(recipientName: string): string {
 Deno.serve(async (req) => {
   const body = await req.json();
 
-  const record = body.record;
-  if (!record || !record.id) {
-    return new Response(JSON.stringify({ error: "No user record" }), { status: 400 });
-  }
-
   if (!RESEND_API_KEY) {
     console.error("RESEND_API_KEY not set");
     return new Response(JSON.stringify({ error: "No API key" }), { status: 500 });
+  }
+
+  // Preview mode: skip DB lookup entirely and send one copy to preview_to.
+  // Used for reviewing the template against real prod rendering without
+  // tripping the per-INSERT webhook path.
+  if (body.preview_to) {
+    const firstName = (body.preview_name || "").split(" ")[0] || "there";
+    const html = renderWelcomeEmail(firstName);
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Irregular Pearl <hello@irregularpearl.org>",
+        to: [body.preview_to],
+        subject: "Welcome to Irregular Pearl (preview)",
+        html,
+      }),
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: result }), { status: 500 });
+    }
+    return new Response(JSON.stringify({ success: true, preview: true, id: result.id }), { status: 200 });
+  }
+
+  const record = body.record;
+  if (!record || !record.id) {
+    return new Response(JSON.stringify({ error: "No user record" }), { status: 400 });
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
