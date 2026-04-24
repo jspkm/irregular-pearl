@@ -11,7 +11,6 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
-  TOKENS,
   card,
   heading,
   kicker,
@@ -117,12 +116,38 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
 
       const { data: profile } = await supabase
         .from("users")
-        .select("display_name")
+        .select("display_name, email_notification_digest")
         .eq("id", recipientId)
         .single();
+
+      // Missing profile row — auth.users exists but public.users doesn't
+      // (orphaned notifications, deleted account, RLS mismatch). Treat as
+      // hard-skip: do not send with a default "there" greeting.
+      if (!profile) {
+        skipped++;
+        continue;
+      }
+
+      // Respect the recipient's Notification Email pref. Still stamp
+      // last_digest_sent_at so the in-product bell remains the nag; if they
+      // later opt in we don't flood them with backlog.
+      if ((profile as { email_notification_digest?: boolean }).email_notification_digest === false) {
+        const ids = notifications.map((n) => n.id);
+        const { error: updateErr } = await supabase
+          .from("notifications")
+          .update({ last_digest_sent_at: new Date().toISOString() })
+          .in("id", ids);
+        if (updateErr) {
+          errors.push(`Opted-out ${recipientId} but failed to stamp last_digest_sent_at: ${updateErr.message}`);
+        }
+        skipped++;
+        continue;
+      }
+
       const firstName = (profile?.display_name ?? "").split(" ")[0] || "there";
 
       const html = renderNotificationDigest({
+        recipientId,
         recipientName: firstName,
         count: notifications.length,
         items: notifications.map((n) => {
@@ -181,6 +206,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
 }
 
 function renderNotificationDigest(opts: {
+  recipientId: string;
   recipientName: string;
   count: number;
   items: Array<{ body: string; linkPath: string; piece: PieceRef | null }>;
@@ -212,12 +238,7 @@ function renderNotificationDigest(opts: {
     <div style="padding-bottom:12px;">${kicker("Awaiting your review")}</div>
     ${itemsHtml}
     <div align="center" style="padding:24px 0 8px;">
-      ${primaryButton({ text: "Open your queue", href: queueUrl })}
-    </div>
-    <div style="padding-top:16px;text-align:center;">
-      <span style="font-family:${TOKENS.sans};font-size:11px;color:${TOKENS.hint};">
-        Approve, edit, or send back from the queue. This email won't repeat for the same draft.
-      </span>
+      ${primaryButton({ text: "View message", href: queueUrl })}
     </div>
   `;
 
@@ -227,10 +248,9 @@ function renderNotificationDigest(opts: {
         ? "Irregular Pearl — 1 draft awaits your review"
         : `Irregular Pearl — ${opts.count} drafts await your review`,
     preheader: lede,
-    subtitle: "Awaiting review",
     bodyHtml,
     footerNote: "You're receiving this because a draft was routed to your byline.",
-    footerLink: { text: "Open your queue", href: queueUrl },
+    footerLink: { text: "Manage email preferences", href: `https://irregularpearl.org/profile/${opts.recipientId}?section=setting#email` },
   });
 }
 

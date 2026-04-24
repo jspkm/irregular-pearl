@@ -2148,6 +2148,7 @@ export type Database = {
           contributor_bio_short: string | null
           created_at: string
           display_name: string
+          email_notification_digest: boolean
           email_weekly_digest: boolean
           email_welcome: boolean
           ensembles: string[] | null
@@ -2174,6 +2175,7 @@ export type Database = {
           contributor_bio_short?: string | null
           created_at?: string
           display_name: string
+          email_notification_digest?: boolean
           email_weekly_digest?: boolean
           email_welcome?: boolean
           ensembles?: string[] | null
@@ -2200,6 +2202,7 @@ export type Database = {
           contributor_bio_short?: string | null
           created_at?: string
           display_name?: string
+          email_notification_digest?: boolean
           email_weekly_digest?: boolean
           email_welcome?: boolean
           ensembles?: string[] | null

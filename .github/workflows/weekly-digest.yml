@@ -2,7 +2,9 @@ name: Weekly Digest Email
 
 on:
   schedule:
-    - cron: '0 3 * * 1' # Every Monday at 03:00 UTC
+    # Offset from the daily notification-digest (0 13 * * *) so users opted
+    # in to both prefs on a Sunday don't get two concurrent emails.
+    - cron: '30 13 * * 0' # Every Sunday at 13:30 UTC = 09:30 ET (EDT; 08:30 during EST)
   workflow_dispatch: # Manual trigger
 
 jobs:

@@ -4,6 +4,43 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-04-24
+
+### Email templates + settings consolidation
+
+Welcome transactional email ported off its legacy amber inline template onto the shared Claude-kit layout (`supabase/functions/_lib/email-template.ts`), with copy rewritten to the PRD r2 stance: opens on "The hardest passage in any piece has been played a thousand times before you got to it," lists what musicians write about (signed performer's notes, structural landmarks, interpretive schools held in disagreement, edition observations at the measure), and closes with "Glad you're here." — CTA "Add your experience."
+
+Weekly-digest cron moved from Mondays 03:00 UTC to Sundays 13:30 UTC (09:30 ET), offset from the daily notification-digest at 13:00 UTC so users opted in to both don't get two emails at the same moment. Notification-digest CTA "Open your queue" → "View message"; both digests now link to "Manage email preferences" on the user's own profile settings page (per-recipient URL).
+
+The standalone `/settings` Astro page is gone. Its panels — Appearance, Email Preferences, Password — live inside the profile shell at `/profile/:id` under two new URL-routed tabs: **Settings** (Appearance + Email) and **Security** (Password). Anon visitors to `?section=setting` get an inline SignInPanel on the profile page so the destination URL survives auth; signed-in viewers of someone else's `?section=setting` are redirected to their own.
+
+New per-user pref `email_notification_digest` (default on) surfaced as a second toggle in Email Preferences. The notification-digest edge function now checks the pref per recipient; opted-out users get their notifications stamped `last_digest_sent_at` so re-enabling doesn't flood them with backlog — the bell + `/notifications` remain the ongoing nag.
+
+### Added
+
+- **Second email pref toggle.** "Notification Email — A heads-up when a draft is routed to your byline for review." Toggles `users.email_notification_digest` (new boolean column, default true; see [`supabase/migrations/20260608000000_email_notification_digest_pref.sql`](supabase/migrations/20260608000000_email_notification_digest_pref.sql)). Consumed by [`send-notification-digest/index.ts`](supabase/functions/send-notification-digest/index.ts) — opted-out recipients are skipped and their pending notifications stamped so re-enabling stays clean.
+- **Security tab** in profile shell. Houses the password-change panel at `#password`, separate from Settings. Same owner-only guarding as Settings ([`ProfileShell.tsx`](src/components/ProfileShell.tsx)).
+- **URL-driven section state.** `?section=setting` / `?section=security` open the corresponding tab on mount and scroll to `#hash` (e.g. `#email`). Tab clicks `history.replaceState` to keep URL in sync ([`ProfileShell.tsx`](src/components/ProfileShell.tsx)).
+
+### Changed
+
+- **Welcome email rewritten.** Dropped ~230 lines of MSO/VML boilerplate + the amber `#B45309` / `#FAF8F5` palette. Now renders through the shared `renderEmailLayout` with musician-to-musician copy ([`send-welcome-email/index.ts`](supabase/functions/send-welcome-email/index.ts)). Subject "Welcome to Irregular Pearl" (no emoji).
+- **Weekly digest schedule.** `0 3 * * 1` → `30 13 * * 0` (Monday 03:00 UTC → Sunday 13:30 UTC = 09:30 ET) ([`.github/workflows/weekly-digest.yml`](.github/workflows/weekly-digest.yml)). `EmailPreferences` description updated: "every Sunday."
+- **Email footer links.** Both digests now use per-recipient `/profile/<id>?section=setting#email` instead of the removed `/settings#email`. Welcome email's footerLink dropped (transactional; no toggle applies). Both digests retain a "why you're receiving this" footerNote for compliance clarity.
+- **Notification digest subtitle + hint removed.** Dropped "Awaiting review" subtitle and the "Approve, edit, or send back from the queue. This email won't repeat for the same draft." hint block. CTA "Open your queue" → "View message" ([`send-notification-digest/index.ts`](supabase/functions/send-notification-digest/index.ts)).
+
+### Fixed
+
+- **Destination preserved across sign-in.** Anon click on a "Manage email preferences" email link used to redirect to `/?signin=1`, losing the URL. Now the profile shell renders an inline `SignInPanel` on the settings URL itself; post-signin, `useAuth` ticks and the Settings tab mounts with `#email` scrolled ([`ProfileShell.tsx`](src/components/ProfileShell.tsx)).
+- **Non-owner + `?section=setting` redirects correctly.** Signed-in viewers land on their own profile settings (preserving the hash) instead of someone else's. Anon viewers get the inline SignInPanel.
+- **Tab label.** Renamed `Setting` → `Settings` in nav + heading. URL param stays `?section=setting` so email links issued before this release still resolve.
+- **Notification-digest opt-out handles missing profile row.** Hard-skip when `public.users` has no row for a notification recipient (orphaned notifications, deleted accounts) instead of falling through to a generic "there" greeting.
+
+### Removed
+
+- **`src/pages/settings.astro`** — consolidated into the profile shell.
+- **`src/emails/*`** (orphaned parallel templates). `welcome.ts`, `welcome.html`, `weekly-digest.ts`, `weekly-digest.html` — stale duplicates on the old amber palette with out-of-date URLs and schedule comments; never imported by production.
+
 ## [0.5.1] - 2026-04-24
 
 ### Dark-mode contrast pass + visual reference doc

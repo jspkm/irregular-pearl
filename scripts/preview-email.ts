@@ -87,7 +87,7 @@ function renderWeeklyDigestSample(): string {
     subtitle: 'Weekly Digest',
     bodyHtml,
     footerNote: "You're receiving this because you opted in to weekly digests.",
-    footerLink: { text: 'Unsubscribe', href: 'https://irregularpearl.org/settings#email' },
+    footerLink: { text: 'Manage email preferences', href: 'https://irregularpearl.org/profile/preview-user-id?section=setting#email' },
   });
 }
 
@@ -173,7 +173,7 @@ function renderNotificationDigestSample(): string {
     subtitle: 'Daily digest',
     bodyHtml,
     footerNote: 'You\'re receiving this because drafts are waiting for your approval.',
-    footerLink: { text: 'Email preferences', href: 'https://irregularpearl.org/settings#email' },
+    footerLink: { text: 'Manage email preferences', href: 'https://irregularpearl.org/profile/preview-user-id?section=setting#email' },
   });
 }
 

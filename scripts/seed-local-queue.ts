@@ -504,4 +504,4 @@ console.log(`     · Sent:   one "→ Haji Kim" archive row on ${LANDMARK_PIECE_
 console.log('  5. Click Resume on staff outbox → lands on /piece/bach-cello-suite-2?compose=<id>');
 console.log('     · drafting banner visible, composer panel with 2 drafts, Add draft of remaining kind works');
 console.log('  Private routes redirect anon users silently:');
-console.log('    /admin /maestro /notifications /settings → /?signin=1');
+console.log('    /admin /maestro /notifications → /?signin=1');

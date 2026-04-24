@@ -5,6 +5,7 @@ import { redirectFromPrivateRoute } from '../lib/privateRoute';
 
 interface Preferences {
   email_weekly_digest: boolean;
+  email_notification_digest: boolean;
   email_welcome: boolean;
 }
 
@@ -15,8 +16,10 @@ export default function EmailPreferences() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // /settings is a private route. Once auth resolves and there's no user,
-  // redirect via the shared helper — silent, no leak.
+  // Defense-in-depth. ProfileShell only renders SettingsPanel for the profile
+  // owner, so in normal flow `user` is never null here. This guard covers the
+  // sign-out-while-on-settings edge, and any future caller that renders the
+  // component outside the shell.
   useEffect(() => {
     if (authLoading) return;
     if (!hasSupabase || !user) { redirectFromPrivateRoute(false); return; }
@@ -28,7 +31,7 @@ export default function EmailPreferences() {
     const fetch = async () => {
       const { data } = await supabase
         .from('users')
-        .select('email_weekly_digest, email_welcome')
+        .select('email_weekly_digest, email_notification_digest, email_welcome')
         .eq('id', user.id)
         .single();
 
@@ -54,7 +57,7 @@ export default function EmailPreferences() {
   const unsubscribeAll = async () => {
     if (!user) return;
     setSaving(true);
-    const updated = { email_weekly_digest: false, email_welcome: false };
+    const updated = { email_weekly_digest: false, email_notification_digest: false, email_welcome: false };
     setPrefs(updated);
     await supabase.from('users').update(updated).eq('id', user.id);
     setSaving(false);
@@ -86,7 +89,12 @@ export default function EmailPreferences() {
     {
       key: 'email_weekly_digest',
       title: 'Weekly Digest',
-      description: 'A summary of new pieces added to the catalog every Monday.',
+      description: 'A summary of new pieces added to the catalog every Sunday.',
+    },
+    {
+      key: 'email_notification_digest',
+      title: 'Notification Email',
+      description: 'A heads-up when a draft is routed to your byline for review.',
     },
   ];
 
@@ -130,7 +138,7 @@ export default function EmailPreferences() {
       <div className="mt-8 pt-6 border-t border-border">
         <button
           onClick={unsubscribeAll}
-          disabled={saving || !prefs.email_weekly_digest}
+          disabled={saving || (!prefs.email_weekly_digest && !prefs.email_notification_digest)}
           className="text-sm text-muted hover:text-error bg-transparent border-none cursor-pointer p-0 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Unsubscribe from all emails

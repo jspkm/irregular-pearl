@@ -1,5 +1,5 @@
 // Supabase Edge Function: send-weekly-digest
-// Triggered weekly via GitHub Actions cron (Mondays 03:00 UTC).
+// Triggered weekly via GitHub Actions cron (Sundays 13:00 UTC = 09:00 ET).
 // Fetches users with email_weekly_digest=true, renders a digest for each,
 // and sends via Resend.
 //
@@ -93,8 +93,8 @@ function renderWeeklyDigest(opts: {
     preheader: opts.summary,
     subtitle: "Weekly Digest",
     bodyHtml,
-    footerNote: "You're receiving this because you opted in to weekly digests.",
-    footerLink: { text: "Unsubscribe", href: opts.unsubscribeUrl },
+    footerNote: "You're receiving this because you opted in to the weekly digest.",
+    footerLink: { text: "Manage email preferences", href: opts.unsubscribeUrl },
   });
 }
 
@@ -149,7 +149,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
       }
 
       const firstName = (recipient.display_name || "").split(" ")[0] || "there";
-      const unsubscribeUrl = `https://irregularpearl.org/settings#email`;
+      const unsubscribeUrl = `https://irregularpearl.org/profile/${recipient.id}?section=setting#email`;
 
       const html = renderWeeklyDigest({
         recipientName: firstName,
