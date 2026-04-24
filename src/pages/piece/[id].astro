@@ -26,10 +26,13 @@ if (!piece) {
 // viewer hasn't clicked the primary CTA) hides every write affordance
 // and shows only the invitation block. ?expand=1 flips to the full
 // writeable mode — that's where "Start the first contribution" routes.
+// ?compose=<request_id> also forces 'full' so the sender can draft into
+// each section of a piece that's still a stub.
 // Pieces that already have signed content always render 'full' regardless.
 const expand = Astro.url.searchParams.get('expand') === '1';
+const composing = Astro.url.searchParams.has('compose');
 const stub = isStub(piece);
-const mode: 'pre-piece' | 'full' = !expand && stub ? 'pre-piece' : 'full';
+const mode: 'pre-piece' | 'full' = !expand && !composing && stub ? 'pre-piece' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`

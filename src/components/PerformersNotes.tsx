@@ -19,6 +19,7 @@ import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
 import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
+import ComposeDraftBlock from './ComposeDraftBlock';
 
 interface Props {
   pieceId: string;
@@ -195,6 +196,8 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
       {toast && (
         <div role="status" className="pending-draft-toast">{toast}</div>
       )}
+
+      <ComposeDraftBlock pieceId={pieceId} kind="performers_note" />
 
       {pendingDrafts.length > 0 && (
         <div className="pending-drafts-list">

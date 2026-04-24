@@ -234,12 +234,25 @@ export default function DraftingModeBanner({ pieceId }: Props) {
       <style>{`
         .dm-banner {
           position: sticky;
-          top: 0;
+          /* Sits directly beneath the sticky navbar. The navbar is
+             padding+content ~60px on desktop; its mobile variant adds a
+             search row so the offset grows. --navbar-h can be overridden
+             at document level if the navbar chrome changes. */
+          top: var(--navbar-h, 60px);
           z-index: 40;
           background: var(--accent-soft, #F0E9F4);
+          border-top: 0.5px solid var(--accent, #6B4E7C);
           border-bottom: 0.5px solid var(--accent, #6B4E7C);
           padding: 10px 20px;
           font-family: var(--font-sans);
+        }
+        html[data-theme="dark"] .dm-banner {
+          background: rgba(107, 78, 124, 0.2);
+        }
+        @media (max-width: 640px) {
+          .dm-banner {
+            top: var(--navbar-h-mobile, 104px);
+          }
         }
         .dm-banner-inner {
           max-width: 960px;

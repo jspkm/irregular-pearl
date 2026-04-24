@@ -4,6 +4,22 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ---
 
+## Up next (immediate)
+
+### Dark-theme visibility sweep on contribution-draft surfaces
+
+**What:** Contribution-draft compose panel and related v0.5.0 surfaces don't switch properly in dark mode. Specific issues observed in the draft form: "Cancel" button (white text on near-white background, invisible), the panel's "light island" background (hardcoded `var(--surface)` / `#FAF8F4`-style) reads as pale against the dark-mode `#1A1A1A` page. Drafting-mode banner, ComposeDraftsPanel card borders/backgrounds, RequestsAdmin tabs, and the RequestContributionDialog modal all need a dark-mode audit.
+
+**Why:** v0.5.0 shipped the contribution-drafts pivot without auditing dark mode across the new surfaces. v0.4.1 did a dark-mode pass for then-existing components but the new `DraftingModeBanner`, `ComposeDraftsPanel`, and `RequestsAdmin` hardcode light-mode colors inline instead of leaning on the token variables that flip under `html[data-theme="dark"]`.
+
+**Context:** Root cause pattern — the new components use inline styles with literal hex colors (e.g. `background: #FAF8F4`, `color: #1A1A1A`) rather than `var(--surface)`, `var(--ink)`, `var(--bg)`, `var(--border-strong)`, etc. Fix is to replace hardcoded hex with tokens, then add any missing `html[data-theme="dark"]` overrides for elements that the tokens don't fully cover. DESIGN.md is the authoritative source for which token goes where.
+
+**Effort:** S
+**Priority:** P1 (immediate — UX regression on every dark-mode user)
+**Depends on:** None
+
+---
+
 ## Piece page (PRD Tier 1)
 
 ### Redesign piece page per PRD revision 2
