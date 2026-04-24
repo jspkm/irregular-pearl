@@ -44,6 +44,8 @@ import PiecePills from './PiecePills';
 import StartContributionButton from './StartContributionButton';
 import RequestContributionDialog from './RequestContributionDialog';
 import PieceViewLogger from './PieceViewLogger';
+import DraftingModeBanner from './DraftingModeBanner';
+import ComposeDraftsPanel from './ComposeDraftsPanel';
 
 interface Props {
   piece: PieceFull;
@@ -60,6 +62,12 @@ interface Props {
 
 const { piece, mode = 'full' } = Astro.props;
 const isPrePiece = mode === 'pre-piece';
+// Drafting mode: a staff member opens a piece with ?compose=<request_id> to
+// compose drafts on an outbox request before sending. The banner + composer
+// are client-mounted (they make their own auth + ownership checks); we only
+// use Astro.url here to know whether to reserve space on the page.
+const composeRequestId = Astro.url.searchParams.get('compose') ?? null;
+const composing = composeRequestId !== null;
 const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId, dbPills] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
@@ -118,7 +126,14 @@ const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` :
 const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly string[]).includes(l.type));
 ---
 
-<main class="page">
+{composing && (
+  <>
+    <DraftingModeBanner client:load pieceId={piece.id} />
+    <ComposeDraftsPanel client:load pieceId={piece.id} />
+  </>
+)}
+
+<main class="page" data-compose-mode={composing ? '1' : undefined}>
   <PieceViewLogger client:load pieceId={piece.id} />
 
   <div class="crumbs">

@@ -1760,6 +1760,37 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   cursor: not-allowed;
   opacity: 0.7;
 }
+.rcd-compose {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: 0.5px solid var(--accent);
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.rcd-compose:hover:not(:disabled) {
+  background: var(--accent-soft);
+}
+.rcd-compose:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---------- Drafting mode: hide self-author affordances ---------- */
+/* When the piece page is in compose mode (staff drafting on behalf of a
+   recipient), the "write under my own name" entries hide so the sender
+   doesn't accidentally publish instead of proposing a draft. Existing
+   published content still renders normally for context. */
+.page[data-compose-mode] .write-entry,
+.page[data-compose-mode] .write-entry-diff,
+.page[data-compose-mode] .mvmt-add,
+.page[data-compose-mode] .landmark-add,
+.page[data-compose-mode] .landmark-form-inline-add {
+  display: none !important;
+}
 
 /* ---------- Pre-piece invitation block + CTAs (StubPageLayout) ---------- */
 /* React-island children don't inherit Astro scoped styles, so these live

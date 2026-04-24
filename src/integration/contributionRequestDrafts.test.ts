@@ -22,42 +22,37 @@ import {
 
 async function publishOnePiece(pieceId: string, contributorId: string): Promise<void> {
   // Satisfies the sender-gate (≥1 published signed contribution) for non-staff.
-  // Reuses the publish_contributor_performers_note RPC.
-  const { data: noteId, error } = await admin.rpc('publish_contributor_performers_note', {
-    p_piece_id: pieceId,
-    p_body: 'Sender-gate seed.',
-  });
-  // Note: publish_contributor_performers_note uses auth.uid(); since we're
-  // calling via admin, auth.uid() is null and this would fail. Use the
-  // direct-insert pattern instead, mirroring requestContribution.test.ts.
-  if (error) {
-    // Fallback: insert published row directly via service role.
-    const { data: note, error: noteErr } = await admin
-      .from('performers_notes')
-      .insert({ piece_id: pieceId, contributor_id: contributorId, status: 'draft' })
-      .select('id')
-      .single();
-    if (noteErr || !note) throw new Error(`insert note: ${noteErr?.message}`);
-    const { data: ver, error: verErr } = await admin
-      .from('performers_note_versions')
-      .insert({
-        note_id: note.id,
-        piece_id: pieceId,
-        contributor_id: contributorId,
-        body: 'Sender-gate seed.',
-        version_number: 1,
-        authored_by: contributorId,
-        approved_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
-    if (verErr || !ver) throw new Error(`insert version: ${verErr?.message}`);
-    const { error: pubErr } = await admin
-      .from('performers_notes')
-      .update({ status: 'published', current_version_id: ver.id })
-      .eq('id', note.id);
-    if (pubErr) throw new Error(`publish: ${pubErr.message}`);
-  }
+  // publish_contributor_performers_note uses auth.uid(); calling via admin
+  // leaves auth.uid() null, so we seed directly via service role. Two-step
+  // insert: the performers_notes check constraint
+  // ((status <> 'published') or (current_version_id is not null)) forces us
+  // to insert with a non-published status first, then update after the
+  // version row exists.
+  const { data: note, error: noteErr } = await admin
+    .from('performers_notes')
+    .insert({ piece_id: pieceId, contributor_id: contributorId, status: 'draft' })
+    .select('id')
+    .single();
+  if (noteErr || !note) throw new Error(`insert note: ${noteErr?.message}`);
+  const { data: ver, error: verErr } = await admin
+    .from('performers_note_versions')
+    .insert({
+      note_id: note.id,
+      piece_id: pieceId,
+      contributor_id: contributorId,
+      body: 'Sender-gate seed.',
+      version_number: 1,
+      authored_by: contributorId,
+      approved_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single();
+  if (verErr || !ver) throw new Error(`insert version: ${verErr?.message}`);
+  const { error: pubErr } = await admin
+    .from('performers_notes')
+    .update({ status: 'published', current_version_id: ver.id })
+    .eq('id', note.id);
+  if (pubErr) throw new Error(`publish: ${pubErr.message}`);
 }
 
 async function createMovement(pieceId: string): Promise<string> {
@@ -635,10 +630,13 @@ describe('act_on_draft', () => {
 });
 
 // -----------------------------
-// dismiss_draft_inline + lifecycle (auto-close trigger)
+// Lifecycle (auto-close trigger)
 // -----------------------------
+// dismiss_draft_inline + inline_dismissed_at were retired by the PR 5b
+// destructive cleanup (Option C from Draft 3 of the plan). The RPC and
+// column are gone from the schema; their tests are removed alongside.
 
-describe('dismiss_draft_inline + lifecycle', () => {
+describe('lifecycle', () => {
   let staff: Awaited<ReturnType<typeof createAuthUser>>;
   let recipient: Awaited<ReturnType<typeof createAuthUser>>;
   const pieceId = 'pr1-dismiss-piece';
@@ -656,53 +654,6 @@ describe('dismiss_draft_inline + lifecycle', () => {
     await deleteTestPiece(pieceId);
     await deleteAuthUser(staff.id);
     await deleteAuthUser(recipient.id);
-  });
-
-  test('dismiss_draft_inline stamps inline_dismissed_at, draft persists', async () => {
-    const { data: requestId } = await staff.client.rpc('create_outbox_request', {
-      p_piece_id: pieceId,
-      p_recipient_id: recipient.id,
-      p_note: null,
-    });
-    const { data: draftId } = await staff.client.rpc('propose_draft', {
-      p_request_id: requestId as string,
-      p_kind: 'performers_note',
-      p_payload: { body: 'Add to todo.' },
-    });
-    await staff.client.rpc('send_request', { p_request_id: requestId as string });
-
-    const { error } = await recipient.client.rpc('dismiss_draft_inline', {
-      p_draft_id: draftId as string,
-    });
-    expect(error).toBeNull();
-
-    const { data: row } = await admin
-      .from('contribution_request_drafts')
-      .select('inline_dismissed_at, dispositioned_at')
-      .eq('id', draftId as string)
-      .single();
-    expect(row?.inline_dismissed_at).toBeTruthy();
-    expect(row?.dispositioned_at).toBeNull(); // still pending
-  });
-
-  test('dismiss_draft_inline is idempotent', async () => {
-    const { data: requestId } = await staff.client.rpc('create_outbox_request', {
-      p_piece_id: pieceId,
-      p_recipient_id: recipient.id,
-      p_note: null,
-    });
-    const { data: draftId } = await staff.client.rpc('propose_draft', {
-      p_request_id: requestId as string,
-      p_kind: 'performers_note',
-      p_payload: { body: 'Twice.' },
-    });
-    await staff.client.rpc('send_request', { p_request_id: requestId as string });
-
-    await recipient.client.rpc('dismiss_draft_inline', { p_draft_id: draftId as string });
-    const { error } = await recipient.client.rpc('dismiss_draft_inline', {
-      p_draft_id: draftId as string,
-    });
-    expect(error).toBeNull();
   });
 
   test('auto-close: when all drafts dispositioned, request row deleted and notification cleared', async () => {

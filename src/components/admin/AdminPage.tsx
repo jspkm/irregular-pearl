@@ -4,10 +4,10 @@ import { redirectFromPrivateRoute } from '../../lib/privateRoute';
 import AdminDashboard from './AdminDashboard';
 import AdminUserList from './AdminUserList';
 import AdminPlaylist from './AdminPlaylist';
-import ContributorContentAdmin from './ContributorContentAdmin';
 import AdminSignals from './AdminSignals';
+import RequestsAdmin from './RequestsAdmin';
 
-type Tab = 'dashboard' | 'users' | 'playlist' | 'performers-notes' | 'interpretive-schools' | 'piece-descriptions' | 'signals';
+type Tab = 'dashboard' | 'users' | 'playlist' | 'requests' | 'signals';
 
 interface StaffProfile {
   id: string;
@@ -27,14 +27,10 @@ export default function AdminPage({ initialTab }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   useEffect(() => {
-    // /admin + /maestro are private routes. Two unauthorized cases —
-    // both redirect via the shared helper, no leak about what the page
-    // contains.
     if (!hasSupabase) { redirectFromPrivateRoute(false); return; }
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session?.user) {
-        // Anon → home with sign-in modal trigger.
         redirectFromPrivateRoute(false);
         return;
       }
@@ -47,7 +43,6 @@ export default function AdminPage({ initialTab }: Props) {
 
       const isStaff = data && (data.role === 'admin' || data.role === 'moderator' || data.is_maestro);
       if (!data || !isStaff) {
-        // Signed in but lacking permission → home, no modal.
         redirectFromPrivateRoute(true);
         return;
       }
@@ -57,8 +52,6 @@ export default function AdminPage({ initialTab }: Props) {
     });
   }, []);
 
-  // Render nothing while resolving auth and during the redirect away —
-  // private route, no leak about what's behind the gate.
   if (loading || !profile) return null;
 
   const isAdmin = profile.role === 'admin';
@@ -70,9 +63,7 @@ export default function AdminPage({ initialTab }: Props) {
   const tabs = [
     { id: 'dashboard' as Tab, label: 'Dashboard', show: isAdmin },
     { id: 'users' as Tab, label: 'Users', show: isAdmin },
-    { id: 'performers-notes' as Tab, label: "Performer's notes", show: isAdmin },
-    { id: 'interpretive-schools' as Tab, label: 'Schools', show: isAdmin },
-    { id: 'piece-descriptions' as Tab, label: 'Descriptions', show: isAdmin },
+    { id: 'requests' as Tab, label: 'Requests', show: isStaff },
     { id: 'playlist' as Tab, label: 'Playlist', show: isMaestro },
     { id: 'signals' as Tab, label: 'Signals', show: isStaff },
   ].filter(t => t.show);
@@ -84,9 +75,7 @@ export default function AdminPage({ initialTab }: Props) {
   const titles: Record<Tab, string> = {
     dashboard: 'Dashboard',
     users: 'User Management',
-    'performers-notes': "Performer's notes",
-    'interpretive-schools': 'Interpretive schools',
-    'piece-descriptions': 'Piece descriptions',
+    requests: 'Contribution requests',
     playlist: 'Maestro Playlist',
     signals: 'Editorial signals',
   };
@@ -128,9 +117,7 @@ export default function AdminPage({ initialTab }: Props) {
 
         {activeTab === 'dashboard' && isAdmin && <AdminDashboard isAdmin={true} />}
         {activeTab === 'users' && isAdmin && <AdminUserList />}
-        {activeTab === 'performers-notes' && isAdmin && <ContributorContentAdmin subjectTable="performers_notes" />}
-        {activeTab === 'interpretive-schools' && isAdmin && <ContributorContentAdmin subjectTable="interpretive_schools" />}
-        {activeTab === 'piece-descriptions' && isAdmin && <ContributorContentAdmin subjectTable="piece_descriptions" />}
+        {activeTab === 'requests' && isStaff && <RequestsAdmin />}
         {activeTab === 'playlist' && isMaestro && <AdminPlaylist />}
         {activeTab === 'signals' && isStaff && <AdminSignals />}
       </div>

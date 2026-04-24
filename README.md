@@ -55,7 +55,7 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 **Against a local stack (dev + tests):**
 1. `supabase start` — spins up Postgres + Auth + Functions on `127.0.0.1:54321`
 2. `bun run dev:local` — runs Astro dev server against the local stack
-3. `bun --env-file=.env.test run scripts/seed-local-queue.ts` — seeds a test contributor + a pending draft so the approval queue has something to render
+3. `bun --env-file=.env.test run scripts/seed-local-queue.ts` — seeds a test contributor so there's a realistic user to draft for
 4. `bun --env-file=.env.test run scripts/magic-link.ts <email> [path] --open` — generates a magic-link URL for any local user and opens it in the browser (bypasses the Google-OAuth-only UI for dev)
 
 Migration files are in `supabase/migrations/`.
@@ -86,8 +86,10 @@ Output directory: `dist`
 src/
   components/     React components (islands) + Astro components
     admin/
-      ContributorContentAdmin.tsx  Generic subject-parameterized admin (performer's notes, schools, descriptions)
+      RequestsAdmin.tsx            Staff Requests tab — outbox (resume drafting) + sent archive
       AdminPage.tsx, users, etc.
+    DraftingModeBanner.tsx         Sticky banner on piece/[slug]?compose=<req_id>
+    ComposeDraftsPanel.tsx         Per-request composer (body-only kinds in v1)
     NavbarBell.tsx              Notifications bell + popover (subject-agnostic)
     NotificationsQueue.tsx      Unified Messages page (drafts + contribution requests, reverse-chron)
     SearchTypeahead.tsx         Navbar search with grouped IN THE CATALOG / NOT YET CURATED results
@@ -111,11 +113,9 @@ src/
     piece/[id]                     Piece detail pages
     composer/[name]                Composer index pages
     instrument/[name]              Instrument category pages
-    notifications                  Unified Messages page (drafts + contribution requests)
-    admin                          Staff surface — tabs: Dashboard, Users, Performer's notes, Schools, Descriptions, Playlist, Signals
-    admin/performers-notes         Staff authoring view (performer's notes)
-    admin/interpretive-schools     Staff authoring view (schools)
-    admin/piece-descriptions       Staff authoring view (signed descriptions)
+    notifications                  Messages list (contribution requests) + Open items tab (recipient drafts cross-piece)
+    admin                          Staff surface — tabs: Dashboard, Users, Requests, Playlist, Signals
+    piece/[id]?compose=<req_id>    Staff drafting mode (banner + composer panel on the piece page)
     api/draft-contribution-note    LLM-drafted personal note for request dialog (staff-only, rate-limited)
     about, privacy, terms
     sitemap.xml, llms.txt, llms-full.txt, openapi.json

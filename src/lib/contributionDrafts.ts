@@ -166,7 +166,7 @@ export async function actOnDraft(
   const { data, error } = await supabase.rpc('act_on_draft', {
     p_draft_id: draftId,
     p_action: action,
-    p_payload_override: payloadOverride ?? null,
+    p_payload_override: (payloadOverride ?? null) as never,
   });
   if (error) {
     const m = error.message.toLowerCase();
@@ -179,8 +179,254 @@ export async function actOnDraft(
   return { contentId: (data as string | null) ?? null, errorCode: null, errorMessage: null };
 }
 
-// Note: the dismiss_draft_inline RPC + contribution_request_drafts
-// .inline_dismissed_at column remain in the DB (shipped in PR 1).
-// They are unused after Option C — the client no longer stamps the
-// column and no UI surface filters on it. PR 5's destructive cleanup
-// migration will drop both.
+// ============================================================
+// Sender-side helpers (PR 4 — drafting mode)
+// ============================================================
+
+export interface OutboxRequest {
+  id: string;
+  pieceId: string;
+  senderId: string;
+  recipientId: string | null;
+  recipientDisplayName: string | null;
+  note: string | null;
+  sentAt: string | null;
+}
+
+export interface OutboxDraft {
+  id: string;
+  requestId: string;
+  kind: DraftKind;
+  payload: Record<string, unknown>;
+  ordinal: number;
+  createdAt: string;
+}
+
+/** Create a new outbox request. Staff-only. Returns the new request id. */
+export async function createOutboxRequest(
+  pieceId: string,
+  recipientId: string,
+  note: string | null,
+): Promise<{ requestId: string | null; errorMessage: string | null }> {
+  const { data, error } = await supabase.rpc('create_outbox_request', {
+    p_piece_id: pieceId,
+    p_recipient_id: recipientId,
+    p_note: note as never,
+  });
+  if (error) return { requestId: null, errorMessage: error.message };
+  return { requestId: (data as string | null) ?? null, errorMessage: null };
+}
+
+/** Propose a new draft on an outbox request. Returns the new draft id. */
+export async function proposeDraft(
+  requestId: string,
+  kind: DraftKind,
+  payload: Record<string, unknown>,
+): Promise<{ draftId: string | null; errorMessage: string | null }> {
+  const { data, error } = await supabase.rpc('propose_draft', {
+    p_request_id: requestId,
+    p_kind: kind,
+    p_payload: payload as never,
+  });
+  if (error) return { draftId: null, errorMessage: error.message };
+  return { draftId: (data as string | null) ?? null, errorMessage: null };
+}
+
+export async function updateOutboxDraft(
+  draftId: string,
+  payload: Record<string, unknown>,
+): Promise<{ errorMessage: string | null }> {
+  const { error } = await supabase.rpc('update_outbox_draft', {
+    p_draft_id: draftId,
+    p_payload: payload as never,
+  });
+  return { errorMessage: error ? error.message : null };
+}
+
+export async function deleteOutboxDraft(
+  draftId: string,
+): Promise<{ errorMessage: string | null }> {
+  const { error } = await supabase.rpc('delete_outbox_draft', {
+    p_draft_id: draftId,
+  });
+  return { errorMessage: error ? error.message : null };
+}
+
+export async function deleteOutboxRequest(
+  requestId: string,
+): Promise<{ errorMessage: string | null }> {
+  const { error } = await supabase.rpc('delete_outbox_request', {
+    p_request_id: requestId,
+  });
+  return { errorMessage: error ? error.message : null };
+}
+
+export async function sendRequest(
+  requestId: string,
+): Promise<{ errorMessage: string | null }> {
+  const { error } = await supabase.rpc('send_request', {
+    p_request_id: requestId,
+  });
+  return { errorMessage: error ? error.message : null };
+}
+
+/**
+ * Fetch the outbox request by id for the drafting banner. Returns null if
+ * the request no longer exists or isn't readable (sender RLS only returns
+ * rows they own).
+ */
+export async function fetchOutboxRequest(
+  requestId: string,
+): Promise<OutboxRequest | null> {
+  const { data, error } = await supabase
+    .from('contribution_requests')
+    .select('id, piece_id, sender_id, recipient_id, note, sent_at')
+    .eq('id', requestId)
+    .maybeSingle();
+  if (error || !data) return null;
+
+  let recipientDisplayName: string | null = null;
+  if (data.recipient_id) {
+    const { data: user } = await supabase
+      .from('users')
+      .select('display_name')
+      .eq('id', data.recipient_id)
+      .maybeSingle();
+    recipientDisplayName = (user as { display_name?: string } | null)?.display_name ?? null;
+  }
+
+  return {
+    id: data.id as string,
+    pieceId: data.piece_id as string,
+    senderId: data.sender_id as string,
+    recipientId: (data.recipient_id as string | null) ?? null,
+    recipientDisplayName,
+    note: (data.note as string | null) ?? null,
+    sentAt: (data.sent_at as string | null) ?? null,
+  };
+}
+
+/**
+ * Fetch the sender's own drafts on a specific outbox request via the
+ * no-feedback security-definer function. Returns only safe columns; the
+ * caller cannot see disposition state.
+ */
+export async function fetchSenderDraftsForRequest(
+  requestId: string,
+): Promise<OutboxDraft[]> {
+  const { data, error } = await supabase.rpc('fetch_sender_drafts_archive', {
+    p_request_id: requestId,
+  });
+  if (error || !data) return [];
+  const rows = data as Array<{
+    id: string;
+    request_id: string;
+    kind: string;
+    payload: Record<string, unknown>;
+    ordinal: number;
+    created_at: string;
+  }>;
+  return rows.map((r) => ({
+    id: r.id,
+    requestId: r.request_id,
+    kind: r.kind as DraftKind,
+    payload: r.payload ?? {},
+    ordinal: r.ordinal,
+    createdAt: r.created_at,
+  }));
+}
+
+// ============================================================
+// Sent archive (Requests admin tab)
+// ============================================================
+
+export interface SentRequestArchiveRow {
+  id: string;
+  originalRequestId: string;
+  pieceId: string;
+  pieceTitle: string | null;
+  recipientId: string | null;
+  recipientDisplayName: string | null;
+  sentAt: string;
+  note: string | null;
+  drafts: Array<{ kind: DraftKind; payload: Record<string, unknown> }>;
+}
+
+export interface OutboxListRow {
+  requestId: string;
+  pieceId: string;
+  pieceTitle: string | null;
+  recipientId: string | null;
+  recipientDisplayName: string | null;
+  note: string | null;
+  createdAt: string;
+  draftCount: number;
+}
+
+/** List the viewer's own outbox (unsent) requests for the Requests admin tab. */
+export async function fetchOutboxList(): Promise<OutboxListRow[]> {
+  const { data: reqs, error } = await supabase
+    .from('contribution_requests')
+    .select('id, piece_id, recipient_id, note, created_at')
+    .is('sent_at', null)
+    .order('created_at', { ascending: false });
+  if (error || !reqs || reqs.length === 0) return [];
+
+  const pieceIds = [...new Set(reqs.map((r) => r.piece_id as string))];
+  const recipientIds = [...new Set(reqs.map((r) => r.recipient_id).filter((x): x is string => Boolean(x)))];
+  const requestIds = reqs.map((r) => r.id as string);
+
+  const [piecesRes, usersRes, draftsRes] = await Promise.all([
+    supabase.from('pieces').select('id, title').in('id', pieceIds),
+    recipientIds.length > 0
+      ? supabase.from('users').select('id, display_name').in('id', recipientIds)
+      : Promise.resolve({ data: [] as { id: string; display_name: string | null }[] }),
+    supabase.rpc('fetch_sender_drafts_archive', { p_request_id: null as never }),
+  ]);
+
+  const pieceById = new Map((piecesRes.data ?? []).map((p) => [p.id as string, p.title as string | null]));
+  const userById = new Map((usersRes.data ?? []).map((u) => [u.id as string, u.display_name as string | null]));
+  const countByRequest = new Map<string, number>();
+  if (Array.isArray(draftsRes.data)) {
+    for (const row of draftsRes.data as Array<{ request_id: string }>) {
+      countByRequest.set(row.request_id, (countByRequest.get(row.request_id) ?? 0) + 1);
+    }
+  }
+
+  return reqs.map((r) => ({
+    requestId: r.id as string,
+    pieceId: r.piece_id as string,
+    pieceTitle: pieceById.get(r.piece_id as string) ?? null,
+    recipientId: (r.recipient_id as string | null) ?? null,
+    recipientDisplayName: r.recipient_id ? userById.get(r.recipient_id as string) ?? null : null,
+    note: (r.note as string | null) ?? null,
+    createdAt: r.created_at as string,
+    draftCount: countByRequest.get(r.id as string) ?? 0,
+  }));
+}
+
+/** List the viewer's sent-request archive for the Requests admin tab. */
+export async function fetchSentArchiveList(limit = 20): Promise<SentRequestArchiveRow[]> {
+  const { data, error } = await supabase
+    .from('sent_request_archive')
+    .select('id, original_request_id, piece_id, recipient_id, recipient_display_name, sent_at, note, drafts')
+    .order('sent_at', { ascending: false })
+    .limit(limit);
+  if (error || !data) return [];
+
+  const pieceIds = [...new Set(data.map((r) => r.piece_id as string))];
+  const piecesRes = await supabase.from('pieces').select('id, title').in('id', pieceIds);
+  const pieceById = new Map((piecesRes.data ?? []).map((p) => [p.id as string, p.title as string | null]));
+
+  return data.map((r) => ({
+    id: r.id as string,
+    originalRequestId: r.original_request_id as string,
+    pieceId: r.piece_id as string,
+    pieceTitle: pieceById.get(r.piece_id as string) ?? null,
+    recipientId: (r.recipient_id as string | null) ?? null,
+    recipientDisplayName: (r.recipient_display_name as string | null) ?? null,
+    sentAt: r.sent_at as string,
+    note: (r.note as string | null) ?? null,
+    drafts: (r.drafts as Array<{ kind: DraftKind; payload: Record<string, unknown> }>) ?? [],
+  }));
+}

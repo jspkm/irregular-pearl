@@ -4,6 +4,35 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-23
+
+### Contribution-request drafts — staff bootstrap pivot (PRs 4 + 5 + 6 of the contribution-request-drafts plan)
+
+Staff no longer drafts signed content in a separate admin surface. The "drafted on behalf of a contributor" path now rides inline on the piece page in a *drafting mode* that's only visible to the sender, attached to a single contribution request, and sent as one atomic bundle. Three admin pages retired; one new Requests tab replaces them. The editorial invariant is preserved: content only publishes under a contributor's byline when that contributor flips disposition — sender can propose, only the recipient can accept.
+
+### Added
+
+- **Drafting mode.** A staff member opens the "Request a contribution" dialog on any piece and clicks the new **Compose drafts inline →** button to create an outbox request (`sent_at = NULL`) and land on `/piece/[slug]?compose=<request_id>`. A sticky purple banner at the top reads "Drafting for [recipient] · N drafts" with Send / Save & exit / Delete request actions. Below the banner, a composer panel lists the staged drafts and offers "+ Add draft" in each of the body-only kinds (performer's note, interpretive school, piece description). Save & exit preserves the outbox for later resume from the Requests admin tab; Send is final and fires one recipient notification carrying the request + drafts. [DraftingModeBanner.tsx](src/components/DraftingModeBanner.tsx), [ComposeDraftsPanel.tsx](src/components/ComposeDraftsPanel.tsx), [RequestContributionDialog.tsx](src/components/RequestContributionDialog.tsx).
+- **Requests admin tab.** New `/admin` tab visible to admins and moderators: an Outbox list (unsent requests with Resume → links back into drafting mode) and a Sent list (immutable archive copy of what was sent). No recipient disposition info appears anywhere — the sender cannot see whether a draft was accepted, edited-and-accepted, or declined. This is enforced at the storage layer (archive table excludes disposition columns; sender read path is a security-definer function that omits them) as well as in the UI. [RequestsAdmin.tsx](src/components/admin/RequestsAdmin.tsx).
+
+### Changed
+
+- **Self-author affordances suppressed in drafting mode.** When the page renders with `?compose=<id>` and the viewer is the request sender, the "Write a performer's note →", "+ Add a school", "Add landmark at this passage →" entries hide via a `data-compose-mode` attribute on the main element. Keeps the sender focused on proposing-for-recipient instead of accidentally publishing under their own name. [piece-page.css](src/styles/piece-page.css).
+- **`/notifications` Messages tab slimmed.** The legacy draft-approval queue (pending `draft_awaiting_approval` rows with Approve / Edit-and-approve / Reject action rows) is gone. The Messages list now shows only contribution-request messages; draft triage lives on the Open items tab (shipped in PR 3). [NotificationsQueue.tsx](src/components/NotificationsQueue.tsx).
+- **PRD §478 rewritten.** The contributor submission + approval pipeline section now describes the self-author path, the staff bootstrap drafting path, and the no-feedback principle as first-class design invariants. Status enum language updated across PerformersNote / InterpretiveSchool / PracticeNote fields to `(published / removed)` — the retired interim statuses are gone. [PRD.md](PRD.md).
+
+### Removed
+
+- **Three admin surfaces retired.** `/admin/performers-notes`, `/admin/interpretive-schools`, `/admin/piece-descriptions` deleted along with the generic `ContributorContentAdmin.tsx` that backed them. The drafted-on-behalf flow they implemented is now the drafting mode described above — one surface, one flow, bundled drafts per request rather than per-content-type drafts in isolation.
+- **21 staff-draft RPCs dropped.** For each of `performers_note`, `interpretive_school`, `piece_description`: `create_*_draft`, `update_*_draft`, `submit_*`, `retract_*`, `approve_*`, `approve_and_edit_*`, `reject_*` — 7 × 3 = 21 functions. Landmarks kept their staff-draft RPCs (not called by any surface, not in scope for this cleanup). New flow: `propose_draft` on the outbox, `act_on_draft` on the recipient side.
+- **Retired enum values + columns.** `draft_status` enum rebuilt to `('published', 'removed')` across the four content tables (drops `awaiting_contributor_approval` and `draft`). `notification_type` enum rebuilt to `('contribution_requested')` (drops `draft_awaiting_approval` and `contribution_fulfilled`). `submitted_by`, `retracted_by`, `retracted_at` columns dropped from all four content tables. `contribution_requests.fulfilled_at` dropped; the publish-triggered clear helper stamps only `cleared_at` now. `contribution_request_drafts.inline_dismissed_at` dropped along with the unused `dismiss_draft_inline` RPC (retired by PR 3's Option C). All done in a single migration ([20260527000000_contribution_drafts_destructive_cleanup.sql](supabase/migrations/20260527000000_contribution_drafts_destructive_cleanup.sql)) protected by a drain assertion that refuses to run if any content row is still in a retired state.
+- **Retired-feature integration tests deleted.** `contributorPipeline.test.ts`, `contributorPipeline.rls.test.ts`, `interpretiveSchools.test.ts`, `pieceDescriptions.test.ts`, `sliceBCleanup.test.ts`, `queueMixedSubjects.test.ts` — all covered the staff-draft pipeline that no longer exists. `contributionRequestDrafts.test.ts` and `requestContribution.test.ts` remain as the regression checkpoint for the live flow.
+
+### Known gaps
+
+- **Landmark drafts not composable in the UI yet.** The backend supports landmark-kind drafts via `propose_draft`, and the recipient can accept/edit/decline them normally, but the composer panel in v1 only lets staff add body-only kinds (performer's note, interpretive school, piece description). Follow-up: surface a landmark composer form in `ComposeDraftsPanel`, or retarget the plan's "inline-in-each-section" vision so landmark drafting lives on the `StructuralLandmarks` card itself.
+- **Composer is a dedicated panel, not per-section inline.** The plan called for adding a `compose-draft` mode to each of the four section components so drafts render in-place. For v1 we shipped a single panel below the banner listing all proposed drafts, which gets staff the full end-to-end flow without the invasive refactor of four ~500-line components. The per-section treatment is a follow-up.
+
 ## [0.4.1] - 2026-04-23
 
 ### Changed

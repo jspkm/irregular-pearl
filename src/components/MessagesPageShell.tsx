@@ -1,7 +1,6 @@
-// Shell for /notifications: tab nav between the existing Messages list
-// (draft-approval queue + contribution-request messages) and the new
-// Open items tab (recipient's cross-piece view of contribution_request_drafts,
-// including Add-to-Todo rows).
+// Shell for /notifications: tab nav between the Messages list
+// (contribution-request messages) and the Open items tab (recipient's
+// cross-piece view of contribution_request_drafts).
 //
 // Tab state is a single useState — no router hash, no URL coupling. Keeps
 // the bell badge + page title stable. If we ever need deep-linking per tab,
@@ -13,10 +12,10 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { fetchPendingOpen itemsForViewer } from '../lib/contributionOpen items';
+import { fetchPendingDraftsForViewer } from '../lib/contributionDrafts';
 import { redirectFromPrivateRoute } from '../lib/privateRoute';
 import NotificationsQueue from './NotificationsQueue';
-import RecipientOpen itemsTab from './RecipientOpen itemsTab';
+import RecipientDraftsTab from './RecipientDraftsTab';
 
 type Tab = 'messages' | 'drafts';
 type AuthStatus = 'loading' | 'unauthed' | 'authed';
@@ -59,7 +58,7 @@ export default function MessagesPageShell() {
     if (authStatus !== 'authed') { setDraftCount(null); return; }
     let cancelled = false;
     async function loadCount() {
-      const all = await fetchPendingOpen itemsForViewer();
+      const all = await fetchPendingDraftsForViewer();
       if (!cancelled) setDraftCount(all.length);
     }
     void loadCount();
@@ -110,7 +109,7 @@ export default function MessagesPageShell() {
         </button>
       </div>
       <div className="messages-tab-panel">
-        {tab === 'messages' ? <NotificationsQueue /> : <RecipientOpen itemsTab />}
+        {tab === 'messages' ? <NotificationsQueue /> : <RecipientDraftsTab />}
       </div>
     </div>
   );
