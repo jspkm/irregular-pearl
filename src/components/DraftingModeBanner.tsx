@@ -106,12 +106,14 @@ export default function DraftingModeBanner({ pieceId }: Props) {
 
     void load();
 
-    // Other surfaces on the page fire notifications:changed when they mutate
+    // Other surfaces on the page fire drafts:changed when they mutate
     // drafts; refresh the count in sync so the banner reflects what's ready
-    // to send.
+    // to send. Read the compose ID from URL each time to avoid the stale
+    // closure (the `request` captured here is null during the effect's
+    // initial sync run — we'd see an empty listener otherwise).
     function onChange() {
-      if (!request) return;
-      void refetchDrafts(request.id);
+      const cid = readComposeRequestIdFromUrl();
+      if (cid) void refetchDrafts(cid);
     }
     if (typeof window !== 'undefined') {
       window.addEventListener('drafts:changed', onChange);
