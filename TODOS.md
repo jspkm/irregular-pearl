@@ -4,6 +4,22 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ---
 
+## Up next (immediate)
+
+### Dark-theme visibility sweep on contribution-draft surfaces
+
+**What:** Finish the dark-mode audit across the v0.5.0 contribution-drafts surfaces. `TempoCuesEditor`, `TempoCuesDisplay`, `ComposeDraftBlock` (during the DRY refactor) already grew `html[data-theme="dark"]` overrides. Still to audit: `DraftingModeBanner` (banner background and button contrast), `RequestsAdmin` tabs + expand-row treatment, `RequestContributionDialog` modal backdrop + fields, `PendingDraftCard` action buttons in dark mode.
+
+**Why:** v0.5.0 shipped the contribution-drafts pivot without a dark-mode audit on every new surface. Some components hardcode light-mode hex colors inline instead of leaning on token variables that flip under `html[data-theme="dark"]`. The initial screenshot that triggered this entry ("Cancel" button invisible on the composer form) was fixed during the inline-composer refactor; remaining surfaces have parallel issues.
+
+**Context:** Root-cause pattern — inline styles with literal hex (`background: #FAF8F4`, `color: #1A1A1A`) instead of tokens (`var(--surface)`, `var(--ink)`, `var(--bg)`, `var(--border-strong)`). Fix is to replace hardcoded hex with tokens, then add any missing `html[data-theme="dark"]` overrides for elements the tokens don't cover. DESIGN.md is the authoritative source for which token goes where. Apply the "fix the twin" rule — when one component has an issue, its siblings likely have the same one.
+
+**Effort:** S
+**Priority:** P1 (immediate — UX regression on every dark-mode user)
+**Depends on:** None
+
+---
+
 ## Piece page (PRD Tier 1)
 
 ### Redesign piece page per PRD revision 2

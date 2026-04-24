@@ -1,26 +1,33 @@
 #!/usr/bin/env bun
-// Seeds the local Supabase stack with fixtures so the /notifications queue
+// Seeds the local Supabase stack with fixtures so the /notifications tabs
 // AND the piece-page signed surfaces have something to show when you visit
 // the dev server.
 //
 // Creates:
 //   - a contributor (haji@local.test / password: hajilocal)
 //   - a second contributor (ben@local.test / password: benlocal) — for stacking
-//   - a staff user   (staff@local.test / password: stafflocal)
-//   - one submitted pending performer's note (Slice A)
-//   - one submitted pending interpretive school (Slice B)
-//   - one submitted pending piece description (Slice B)
+//   - a staff admin   (staff@local.test / password: stafflocal)
+//   - a staff moderator (mod@local.test / password: modlocal)
 //   - one published interpretive school on a SECOND piece (Slice B, renders
-//     in the schools grid on that piece page for visual QA without needing
-//     to click approve)
+//     in the schools grid on that piece page for visual QA)
 //   - one published piece description on the same second piece (Slice B)
 //   - two published landmarks on the Bach Suite No. 1 Prélude at the same
 //     measure range, authored by haji and ben respectively, with cross-votes
 //     so the stack has a clear top (Slice C)
 //   - one movement edit on the Prélude so the change-log + version history
 //     have something to show
+//   - contribution-request drafts (v0.5.0):
+//       · one SENT request from staff → haji on Bach Suite No. 1 with three
+//         drafts (performer's note + interpretive school + piece description)
+//         — demonstrates recipient triage UX + Open items tab
+//       · one SENT request from mod → haji on Bach Suite No. 1 with one
+//         performer's note draft — shows multi-sender bell + archive under mod
+//       · one OUTBOX (in-progress) request from staff → ben on Bach Suite
+//         No. 2 with two drafts — shows Resume → flow in Requests admin tab
 //
 // Idempotent — re-running refreshes the drafts + republishes the visuals.
+// The retired draft-approval pipeline (create_*_draft / submit_*) is gone
+// as of PR 5b; this script no longer seeds those.
 //
 // Usage:
 //   bun --env-file=.env.development.local run scripts/seed-local-queue.ts
@@ -60,9 +67,17 @@ const benId = await ensureUser('ben@local.test', 'benlocal', {
   display_name: 'Ben Cellist',
   contributor_bio_short: 'cellist + chamber player, Boston',
 });
-await ensureUser('staff@local.test', 'stafflocal', {
+const staffId = await ensureUser('staff@local.test', 'stafflocal', {
   display_name: 'Staff Local',
   role: 'admin',
+});
+const modId = await ensureUser('mod@local.test', 'modlocal', {
+  display_name: 'Mod Local',
+  role: 'moderator',
+  is_contributor: true,
+  contributor_active: true,
+  contributor_agreement_signed_at: new Date().toISOString(),
+  contributor_bio_short: 'moderator, local test',
 });
 
 // Pick two existing pieces if available so we can stage pending drafts on
@@ -107,6 +122,7 @@ await admin.from('notifications').delete().eq('recipient_id', hajiId);
 // Sign in as staff + haji respectively so auth.uid() populates correctly.
 const anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY!;
 const staffClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+const modClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const hajiClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const benClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
@@ -115,52 +131,16 @@ const benClient = createClient(url, anonKey, { auth: { autoRefreshToken: false, 
   if (error) throw new Error(`sign-in staff: ${error.message}`);
 }
 {
+  const { error } = await modClient.auth.signInWithPassword({ email: 'mod@local.test', password: 'modlocal' });
+  if (error) throw new Error(`sign-in mod: ${error.message}`);
+}
+{
   const { error } = await hajiClient.auth.signInWithPassword({ email: 'haji@local.test', password: 'hajilocal' });
   if (error) throw new Error(`sign-in haji: ${error.message}`);
 }
 {
   const { error } = await benClient.auth.signInWithPassword({ email: 'ben@local.test', password: 'benlocal' });
   if (error) throw new Error(`sign-in ben: ${error.message}`);
-}
-
-// --- Pending drafts on pendingPieceId (bell/queue fixtures) ---
-
-const { data: noteId, error: noteErr } = await staffClient.rpc('create_performers_note_draft', {
-  p_piece_id: pendingPieceId,
-  p_contributor_id: hajiId,
-  p_body:
-    "Staff-authored draft: the opening arpeggios call for bow speed more than articulation — try broadening the second bar under a single down-bow to hear the architecture Bach wrote, then restore the printed bowing if it serves the room.",
-});
-if (noteErr) throw new Error(`create performer's note draft: ${noteErr.message}`);
-{
-  const { error } = await staffClient.rpc('submit_performers_note', { p_note_id: noteId });
-  if (error) throw new Error(`submit performer's note: ${error.message}`);
-}
-
-const { data: schoolDraftId, error: schoolErr } = await staffClient.rpc('create_interpretive_school_draft', {
-  p_piece_id: pendingPieceId,
-  p_contributor_id: hajiId,
-  p_name: 'Historically informed',
-  p_body:
-    "Staff-drafted school: the HIP reading treats the prelude's sixteenths as inégales rather than metrically even — every second note slightly weighted, the phrase shaped around the long arc of the dominant pedal.",
-  p_tempo_cues: { opening: 'quarter=72' },
-});
-if (schoolErr) throw new Error(`create school draft: ${schoolErr.message}`);
-{
-  const { error } = await staffClient.rpc('submit_interpretive_school', { p_school_id: schoolDraftId });
-  if (error) throw new Error(`submit school: ${error.message}`);
-}
-
-const { data: descDraftId, error: descErr } = await staffClient.rpc('create_piece_description_draft', {
-  p_piece_id: pendingPieceId,
-  p_contributor_id: hajiId,
-  p_body:
-    'Staff-drafted description: the G major Suite is the entry point to the cycle and the thing every cellist eventually confronts on their own terms — not because it is the easiest of the six, but because its rhetoric is the least forgiving. Every shape has to be found, not imposed.',
-});
-if (descErr) throw new Error(`create description draft: ${descErr.message}`);
-{
-  const { error } = await staffClient.rpc('submit_piece_description', { p_description_id: descDraftId });
-  if (error) throw new Error(`submit description: ${error.message}`);
 }
 
 // --- Published signed content on publishedPieceId (piece-page fixtures) ---
@@ -345,69 +325,137 @@ if (preludeId && pedagogicalNextPiece) {
   }
 }
 
-// --- PR 2: bundled-drafts contribution_request addressed to Haji on the Bach Suite ---
-// Demonstrates the new recipient piece-page UX: visit /piece/bach-cello-suite-1
-// signed in as haji and the section components render proposal cards.
+// --- v0.5.0 contribution-request drafts demo ---
+// Three requests total, all idempotent:
+//   1. SENT from staff → haji on Bach Suite No. 1 with 3 drafts. Recipient
+//      triage: visit /piece/bach-cello-suite-1 as haji → inline cards.
+//   2. SENT from mod → haji on Bach Suite No. 1 with 1 performer's note
+//      draft. Multi-sender bell; archive visible under mod on /admin Requests.
+//   3. OUTBOX from staff → ben on Bach Suite No. 2 with 2 drafts (unsent).
+//      Resume → link visible under staff on /admin Requests.
+//
+// Cleanup wipes everything the previous run of this script or the retired
+// draft-approval pipeline might have left around: any contribution request
+// marked with the DEMO tag, plus every sent_request_archive row for the
+// three demo senders.
 
-let pr2RequestId: string | null = null;
-if (preludeId) {
-  // Reset any prior PR 2 sample so re-runs are clean. Cascades the drafts.
-  await admin
+const DEMO_TAG = 'V5-DEMO';
+
+// Delete any prior DEMO requests (outbox OR sent) and their archive copies.
+{
+  const { data: prev } = await admin
     .from('contribution_requests')
-    .delete()
-    .eq('sender_id', (await admin.auth.admin.listUsers({ perPage: 1000 })).data.users.find((u) => u.email === 'staff@local.test')?.id ?? '00000000-0000-0000-0000-000000000000')
-    .eq('recipient_id', hajiId)
-    .is('sent_at', null);
-  // Also clean any leftover sent test-request
-  const { data: prevSent } = await admin
-    .from('contribution_requests')
-    .select('id, note')
-    .eq('recipient_id', hajiId)
-    .eq('piece_id', LANDMARK_PIECE_ID)
-    .like('note', 'PR2-DEMO%');
-  if (prevSent && prevSent.length > 0) {
-    await admin.from('contribution_requests').delete().in('id', prevSent.map((r) => r.id));
+    .select('id')
+    .like('note', `${DEMO_TAG}%`);
+  if (prev && prev.length > 0) {
+    await admin.from('contribution_requests').delete().in('id', prev.map((r) => r.id));
   }
+  const { data: prevArchive } = await admin
+    .from('sent_request_archive')
+    .select('id')
+    .like('note', `${DEMO_TAG}%`);
+  if (prevArchive && prevArchive.length > 0) {
+    await admin.from('sent_request_archive').delete().in('id', prevArchive.map((r) => r.id));
+  }
+}
+// Also purge any un-cleared contribution_requested notifications to haji
+// from prior runs so the bell doesn't re-render stale ones.
+await admin.from('notifications').delete().eq('recipient_id', hajiId);
 
-  const { data: outboxId, error: outboxErr } = await staffClient.rpc('create_outbox_request', {
+let demoSentStaffId: string | null = null;
+let demoSentModId: string | null = null;
+let demoOutboxStaffId: string | null = null;
+
+// 1. SENT from staff → haji with 3 drafts on Bach Suite No. 1
+{
+  const { data: reqId, error } = await staffClient.rpc('create_outbox_request', {
     p_piece_id: LANDMARK_PIECE_ID,
     p_recipient_id: hajiId,
-    p_note: 'PR2-DEMO: drafted these for you on the G major Suite — your landmarks would round it out.',
+    p_note: `${DEMO_TAG}: drafted these three on the G major Suite — your voice would round them out.`,
   });
-  if (outboxErr) throw new Error(`create_outbox_request: ${outboxErr.message}`);
-  pr2RequestId = outboxId as string;
+  if (error) throw new Error(`staff outbox → haji: ${error.message}`);
+  demoSentStaffId = reqId as string;
 
   await staffClient.rpc('propose_draft', {
-    p_request_id: pr2RequestId,
+    p_request_id: demoSentStaffId,
     p_kind: 'performers_note',
     p_payload: {
-      body: "Sender's draft (PR 2 demo): the opening prelude rewards a single mental down-bow across the first four bars before the printed bowing kicks in — try practicing it that way once before restoring the marked slurs.",
+      body: "Sender's draft: the opening prelude rewards a single mental down-bow across the first four bars before the printed bowing kicks in — try practicing it that way once before restoring the marked slurs.",
     },
   });
   await staffClient.rpc('propose_draft', {
-    p_request_id: pr2RequestId,
+    p_request_id: demoSentStaffId,
     p_kind: 'interpretive_school',
     p_payload: {
       name: 'Modernist clarity',
-      body: "Sender's school draft (PR 2 demo): a metronomic, evenly weighted reading that treats every sixteenth as equal architecture — minimal rubato, maximal counterpoint visibility. Suits a hall, suits a recording, doesn't pretend to be HIP.",
+      body: "Sender's school draft: a metronomic, evenly weighted reading that treats every sixteenth as equal architecture — minimal rubato, maximal counterpoint visibility. Suits a hall, suits a recording, doesn't pretend to be HIP.",
     },
   });
   await staffClient.rpc('propose_draft', {
-    p_request_id: pr2RequestId,
+    p_request_id: demoSentStaffId,
     p_kind: 'piece_description',
     p_payload: {
-      body: "Sender's description draft (PR 2 demo): the G major Suite is the cellist's first long-form solo conversation with their instrument. Every register, every gesture, the entire bow plan tested across a single key center.",
+      body: "Sender's description draft: the G major Suite is the cellist's first long-form solo conversation with their instrument. Every register, every gesture, the entire bow plan tested across a single key center.",
     },
   });
 
-  await staffClient.rpc('send_request', { p_request_id: pr2RequestId });
+  await staffClient.rpc('send_request', { p_request_id: demoSentStaffId });
 }
 
-console.log('Local queue + piece-page fixtures seeded.');
-console.log(`  pending piece:      ${pendingPieceId}`);
-console.log(`    performer's note: ${noteId}   (awaiting approval)`);
-console.log(`    school draft:     ${schoolDraftId}   (awaiting approval)`);
-console.log(`    desc draft:       ${descDraftId}   (awaiting approval)`);
+// 2. SENT from mod → haji with 1 performer's note draft on Bach Suite No. 1
+{
+  const { data: reqId, error } = await modClient.rpc('create_outbox_request', {
+    p_piece_id: LANDMARK_PIECE_ID,
+    p_recipient_id: hajiId,
+    p_note: `${DEMO_TAG}: one thought on your phrasing of the opening — open to your read.`,
+  });
+  if (error) throw new Error(`mod outbox → haji: ${error.message}`);
+  demoSentModId = reqId as string;
+
+  await modClient.rpc('propose_draft', {
+    p_request_id: demoSentModId,
+    p_kind: 'performers_note',
+    p_payload: {
+      body: "Moderator's draft: consider treating the last beat of m. 2 as an upbeat into m. 3 rather than closing on it — the phrase wants one long line through the dominant.",
+    },
+  });
+
+  await modClient.rpc('send_request', { p_request_id: demoSentModId });
+}
+
+// 3. OUTBOX from staff → ben on Bach Suite No. 2 (unsent; Resume flow)
+{
+  const SECOND_PIECE = 'bach-cello-suite-2';
+  const { data: p } = await admin.from('pieces').select('id').eq('id', SECOND_PIECE).maybeSingle();
+  if (p) {
+    const { data: reqId, error } = await staffClient.rpc('create_outbox_request', {
+      p_piece_id: SECOND_PIECE,
+      p_recipient_id: benId,
+      p_note: `${DEMO_TAG}: drafting for the D minor — will add a landmark before I send.`,
+    });
+    if (error) throw new Error(`staff outbox → ben: ${error.message}`);
+    demoOutboxStaffId = reqId as string;
+
+    await staffClient.rpc('propose_draft', {
+      p_request_id: demoOutboxStaffId,
+      p_kind: 'performers_note',
+      p_payload: {
+        body: "Sender's draft (in progress): the D minor Prelude's opening figure is about weight and the G string — treat it like a Sarabande before the bow plan kicks in.",
+      },
+    });
+    await staffClient.rpc('propose_draft', {
+      p_request_id: demoOutboxStaffId,
+      p_kind: 'piece_description',
+      p_payload: {
+        body: "Sender's description draft (in progress): the D minor is the Suite where Bach's rhetoric turns inward. Less about architecture than about weight — the cellist's first test of how much silence a phrase can hold.",
+      },
+    });
+    // Intentionally NOT calling send_request — this stays in outbox state
+    // so you can hit /admin/requests → Resume → land in drafting mode.
+  }
+}
+
+console.log('Local fixtures seeded.');
 if (publishedPieceId !== pendingPieceId) {
   console.log(`  published piece:    ${publishedPieceId}`);
   console.log(`    schools:          ${publishedSchoolIds.join(', ')}`);
@@ -427,29 +475,33 @@ if (preludeId) {
 } else {
   console.log(`  landmarks: skipped — ${LANDMARK_PIECE_ID} Prélude not found in movements`);
 }
-console.log('  contributors: haji@local.test / hajilocal, ben@local.test / benlocal');
-console.log('  staff:        staff@local.test / stafflocal');
+if (demoSentStaffId) {
+  console.log(`  contribution-request drafts (v0.5.0):`);
+  console.log(`    sent from staff → haji on ${LANDMARK_PIECE_ID}:  ${demoSentStaffId}  (3 drafts)`);
+  if (demoSentModId) {
+    console.log(`    sent from mod → haji on ${LANDMARK_PIECE_ID}:    ${demoSentModId}  (1 draft)`);
+  }
+  if (demoOutboxStaffId) {
+    console.log(`    outbox staff → ben on bach-cello-suite-2:        ${demoOutboxStaffId}  (2 drafts, unsent)`);
+  }
+}
+console.log('  users:');
+console.log('    contributors: haji@local.test / hajilocal,  ben@local.test / benlocal');
+console.log('    staff admin:  staff@local.test / stafflocal');
+console.log('    moderator:    mod@local.test / modlocal');
 console.log('\nNext:');
 console.log('  1. bun run dev:local');
-console.log('  2. Sign in as haji@local.test / hajilocal (use scripts/magic-link.ts if needed)');
-console.log(`  3. Bell should show 3; queue at /notifications has three distinct kickers`);
-if (publishedPieceId !== pendingPieceId) {
-  console.log(`  4. Visit /piece/${publishedPieceId} — schools grid (2-col) + signed essay render live`);
-}
-if (preludeId) {
-  console.log(`  5. Visit /piece/${LANDMARK_PIECE_ID} — Prélude shows two stacked landmarks (Haji on top, cycle to Ben)`);
-  console.log(`  6. Visit /piece/${LANDMARK_PIECE_ID}/change-log — Prélude rename + landmark publishes appear in the feed`);
-}
-if (pedagogicalSeeded) {
-  console.log(`  7. Visit /piece/${LANDMARK_PIECE_ID} — Pedagogical arc shows "Natural next → Bach Cello Suite No. 2"`);
-} else if (preludeId && pedagogicalNextPiece) {
-  console.log(`  7. Pedagogical arc on ${LANDMARK_PIECE_ID} already has the seed connection — skipped`);
-}
-if (pr2RequestId) {
-  console.log(`  8. Visit /piece/${LANDMARK_PIECE_ID} as haji — THREE "Proposed by Staff Local" cards inline (PR 2)`);
-  console.log(`     in performer's notes + schools + signed descriptions sections`);
-  console.log(`  9. Visit /notifications as haji — Open items tab has a 3-count badge (PR 3)`);
-  console.log(`     with all three proposals listed cross-piece`);
-}
-console.log(`  Private routes redirect anon users silently:`);
-console.log(`    /admin /maestro /notifications /settings → /?signin=1`);
+console.log(`  2. Sign in as haji → /piece/${LANDMARK_PIECE_ID}`);
+console.log(`     · four "Proposed by ..." cards inline (3 from Staff + 1 from Mod)`);
+console.log(`     · /notifications Messages tab shows two request rows`);
+console.log(`     · /notifications Open items tab has a 4-count badge`);
+console.log('  3. Sign in as staff → /admin → Requests tab');
+console.log('     · Outbox: one "→ Ben Cellist" in-progress entry (Resume → drafting mode)');
+console.log(`     · Sent:   one "→ Haji Kim" archive row on ${LANDMARK_PIECE_ID}`);
+console.log('  4. Sign in as mod → /admin → Requests tab');
+console.log('     · Outbox: empty');
+console.log(`     · Sent:   one "→ Haji Kim" archive row on ${LANDMARK_PIECE_ID}`);
+console.log('  5. Click Resume on staff outbox → lands on /piece/bach-cello-suite-2?compose=<id>');
+console.log('     · drafting banner visible, composer panel with 2 drafts, Add draft of remaining kind works');
+console.log('  Private routes redirect anon users silently:');
+console.log('    /admin /maestro /notifications /settings → /?signin=1');

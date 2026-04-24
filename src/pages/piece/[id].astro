@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar.astro';
 import PiecePageLayout from '../../components/PiecePageLayout.astro';
 import { getPieceFull, isStub } from '../../lib/pieces';
 import { resolvePieceRedirect } from '../../lib/pieceRedirects';
+import { supabase, hasSupabase } from '../../lib/supabase';
 
 const { id } = Astro.params;
 const slug = id || '';
@@ -26,10 +27,31 @@ if (!piece) {
 // viewer hasn't clicked the primary CTA) hides every write affordance
 // and shows only the invitation block. ?expand=1 flips to the full
 // writeable mode — that's where "Start the first contribution" routes.
+// ?compose=<request_id> also forces 'full' so the sender can draft into
+// each section of a piece that's still a stub.
+// A piece with un-cleared sent contribution_requests also renders 'full',
+// because it's under active editorial conversation — the recipient needs
+// the section components to render so proposed drafts display inline, and
+// the "no signed contributions yet" pre-piece framing is wrong for a page
+// someone is actively being asked to contribute to.
 // Pieces that already have signed content always render 'full' regardless.
 const expand = Astro.url.searchParams.get('expand') === '1';
+const composing = Astro.url.searchParams.has('compose');
 const stub = isStub(piece);
-const mode: 'pre-piece' | 'full' = !expand && stub ? 'pre-piece' : 'full';
+
+let hasActiveRequests = false;
+if (stub && !expand && !composing && hasSupabase) {
+  // Call the security-definer RPC: SSR's anon-session client can't SELECT
+  // contribution_requests directly (RLS scopes reads to sender/recipient/staff),
+  // so we go through a function that exposes only a boolean.
+  const { data } = await supabase.rpc('piece_has_active_contribution_requests', {
+    p_piece_id: piece.id,
+  });
+  hasActiveRequests = data === true;
+}
+
+const mode: 'pre-piece' | 'full' =
+  !expand && !composing && !hasActiveRequests && stub ? 'pre-piece' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`

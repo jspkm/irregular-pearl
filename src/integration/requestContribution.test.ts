@@ -369,14 +369,13 @@ describe('dismiss_contribution_request', () => {
     });
     expect(error).toBeNull();
 
-    // contribution_requests.cleared_at is set, fulfilled_at is NOT
+    // contribution_requests.cleared_at is set
     const { data: cr } = await admin
       .from('contribution_requests')
-      .select('cleared_at, fulfilled_at')
+      .select('cleared_at')
       .eq('id', reqId)
       .single();
     expect(cr!.cleared_at).not.toBeNull();
-    expect(cr!.fulfilled_at).toBeNull();
 
     // notification.cleared_at is set
     const { data: notif } = await admin

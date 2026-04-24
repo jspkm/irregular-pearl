@@ -14,6 +14,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { createOutboxRequest } from '../lib/contributionDrafts';
 
 interface Props {
   pieceId: string;
@@ -304,6 +305,55 @@ export default function RequestContributionDialog({
     }, 1800);
   }
 
+  // Staff-only: open the outbox on this piece for this recipient and redirect
+  // to the piece page in drafting mode (?compose=<id>). The dialog's other
+  // "Send request" path stays available for plain (no-drafts) asks; this
+  // alternate path lets staff stage drafts inline before committing.
+  async function handleComposeDrafts() {
+    if (!hasSupabase || mode !== 'username') return;
+    setSubmitting(true);
+    setError(null);
+
+    // Resolve username → user id. Email-mode drafting is not supported
+    // because outbox requests require a known users.id.
+    const { data: userRow, error: lookupErr } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', username.trim())
+      .maybeSingle();
+    if (lookupErr || !userRow) {
+      setSubmitting(false);
+      setError(
+        lookupErr
+          ? mapError(lookupErr.message)
+          : 'No musician found with that username. Check the spelling, or ask editorial to invite by email.',
+      );
+      return;
+    }
+
+    const { requestId, errorMessage } = await createOutboxRequest(
+      pieceId,
+      (userRow as { id: string }).id,
+      note.trim() || null,
+    );
+    setSubmitting(false);
+
+    if (errorMessage) {
+      setError(mapError(errorMessage));
+      return;
+    }
+    if (!requestId) {
+      setError('Could not open drafting mode. Try again.');
+      return;
+    }
+
+    // Preserve the current location as the "return" so Send / Save & exit /
+    // Delete on the drafting banner lands the user back where they entered
+    // drafting mode from (the same piece page, in this case).
+    const returnTo = `${window.location.pathname}${window.location.search}`;
+    window.location.href = `/piece/${pieceId}?compose=${requestId}&return=${encodeURIComponent(returnTo)}`;
+  }
+
   const canSubmit =
     !submitting &&
     ((mode === 'username' && username.trim().length > 0) ||
@@ -531,6 +581,17 @@ export default function RequestContributionDialog({
                   <button type="button" onClick={handleClose} className="rcd-cancel">
                     Cancel
                   </button>
+                  {isStaff && mode === 'username' && (
+                    <button
+                      type="button"
+                      onClick={handleComposeDrafts}
+                      disabled={!canSubmit}
+                      className="rcd-compose"
+                      title="Open drafting mode on the piece page to compose drafts before sending"
+                    >
+                      Compose drafts inline →
+                    </button>
+                  )}
                   <button type="submit" disabled={!canSubmit} className="rcd-submit">
                     {submitting ? 'Sending…' : 'Send request'}
                   </button>

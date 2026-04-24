@@ -219,7 +219,7 @@ The entities below are the atomic units of the product. Relationships between th
 
 • can publish in own name (boolean; true once the agreement is on file and the contributor has activated their account)
 
-• pending drafts count (computed; populates their in-app approval queue)
+• pending drafts count (computed; populates their Open items tab on /notifications)
 
 **RELATIONSHIPS**
 
@@ -299,7 +299,7 @@ The entities below are the atomic units of the product. Relationships between th
 
 • signed by (reference to Contributor)
 
-• status (draft / awaiting-contributor-approval / published / removed)
+• status (published / removed)
 
 • drafted by (reference to the staff member or AI role that produced the draft, distinct from the contributor whose byline it will carry)
 
@@ -333,7 +333,7 @@ The entities below are the atomic units of the product. Relationships between th
 
 • date published
 
-• status (draft / awaiting-contributor-approval / published / removed)
+• status (published / removed)
 
 • drafted by (reference to the staff member or AI role that produced the draft, when applicable)
 
@@ -363,7 +363,7 @@ The entities below are the atomic units of the product. Relationships between th
 
 • signed by (reference to Contributor)
 
-• status (draft / awaiting-contributor-approval / published / removed)
+• status (published / removed)
 
 • drafted by (reference to the staff member or AI role that produced the draft, when applicable)
 
@@ -415,11 +415,11 @@ The entities below are the atomic units of the product. Relationships between th
 
 • recipient (reference to the user the notification is addressed to)
 
-• type (enumerated: draft-awaiting-approval is the first type; the list extends only by editorial decision)
+• type (enumerated: contribution-requested is the single type in v1; the list extends only by editorial decision)
 
 • subject (reference to the entity the notification is about — a draft PerformersNote, InterpretiveSchool, PracticeNote, edition observation, or substantive description)
 
-• body (short system-generated line; e.g. "A draft performer's note on the Dvořák Cello Concerto is ready for your review")
+• body (short system-generated line; e.g. "H. asked you to contribute to the Dvořák Cello Concerto, with a draft performer's note to start from.")
 
 • created at (timestamp)
 
@@ -475,7 +475,19 @@ Job: give the first real user, and the musicians like her who follow, a lightwei
 
 ### **Contributor submission and approval pipeline**
 
-Job: the surface by which drafts become published content under a contributor's byline, and the surface by which new contributors onboard. Audience: contributors (first, the one real contributor; later, every signed voice). Primary surface: an in-app approval queue showing drafts attributed to the logged-in contributor, each with current text, diff from any prior version, and action buttons (approve, edit-and-approve, reject). For staff producing drafts on a contributor's behalf, the draft status is visible in a staff dashboard (not in Tier 1 UI, but in the data model and an admin view). Every signed surface on the site routes through this flow: performer's notes, interpretive schools, practice notes, substantive piece descriptions, edition observations. Published content is editable and deletable by the bylined contributor at any time from within the app; deletion removes from public view in the next request.
+Job: the surface by which drafts become published content under a contributor's byline, and the surface by which new contributors onboard. Audience: contributors (first, the one real contributor; later, every signed voice). The pipeline has two paths and a shared invariant.
+
+**Self-author path (the common case):** any signed-in user publishes under their own byline directly from the piece page — write a performer's note, an interpretive school, a signed piece description, or a structural landmark, hit publish, it appears immediately. The act of authoring is the approval; there is no secondary gate.
+
+**Drafted-on-behalf path (staff bootstrap):** a staff member (admin or moderator) can open a contribution request to a specific user from the piece's "Request a contribution" dialog. The dialog offers two secondary paths: send a plain request (bare ask, no proposed text) or *compose drafts inline*. Compose drafts inline puts the piece page into *drafting mode* — a sticky banner at the top reads "Drafting for [recipient]", and a composer panel below it lists the drafts staged on the request. Staff propose 0+ drafts (one per kind per request across performer's note, interpretive school, piece description, landmark) by writing the body the recipient will see. Save & exit preserves the outbox for later resume; Send stamps the request and fires one recipient notification carrying the request + drafts. Sent is final: no edit, no recall, no sender visibility into recipient disposition. An immutable archive copy is preserved in the sender's Requests admin tab.
+
+**Recipient disposition (email-semantic):** the recipient lands on the piece page and sees each proposed draft rendered inline in its matching section, as a "Proposed by H." card with three actions — Accept as-is (publishes the body verbatim under recipient's byline, drafted_by set to sender), Edit & accept (opens editor pre-loaded with sender's body; recipient's edits before publish), Decline (opens inline confirm chip). All undecided drafts for the recipient also list cross-piece on the Open items tab at `/notifications`. When every draft on a request is dispositioned, the request auto-clears from the recipient's messages; the sender's archive survives.
+
+**No-feedback principle:** the sender never sees recipient disposition at any surface. Enforced at the storage layer (archive table excludes disposition columns; the sender read path is a security-definer function that omits them) and at every UI that reads sender-side data. The sender finds out the draft was accepted only by seeing the published content appear under the recipient's byline on the piece page, at the same time everyone else sees it.
+
+**Shared invariant (§441-style):** no content publishes under a contributor's byline without that contributor's explicit act — either writing it themselves (self-author) or accepting a proposed draft (Accept as-is / Edit & accept). Staff cannot publish under someone else's name; the recipient is always the one who flips disposition to 'accepted'.
+
+Every signed surface routes through this flow: performer's notes, interpretive schools, signed piece descriptions, structural landmarks (with their practice notes and flags). Published content is editable and deletable by the bylined contributor at any time from within the app; deletion removes from public view in the next request.
 
 ### **Notifications**
 

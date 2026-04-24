@@ -37,10 +37,15 @@ export default function ProfileShell({ userId }: { userId: string }) {
     return <ArtistProfile userId={userId} />;
   }
 
+  // One URL (/admin) for every role. The AdminPage component filters its
+  // tab list by role, so admins see Dashboard/Users/Requests/Playlist/Signals,
+  // moderators see Requests/Signals, maestro-only users see Playlist. The
+  // initial-tab auto-snap in AdminPage lands each role on the first tab
+  // they're allowed to see.
   const roleLinks: { href: string; label: string }[] = [];
-  if (isMaestro) roleLinks.push({ href: '/maestro', label: 'Maestro' });
+  if (isMaestro) roleLinks.push({ href: '/admin', label: 'Maestro' });
   if (userRole === 'admin') roleLinks.push({ href: '/admin', label: 'Admin' });
-  if (userRole === 'moderator') roleLinks.push({ href: '/moderator/reports', label: 'Moderator' });
+  if (userRole === 'moderator') roleLinks.push({ href: '/admin', label: 'Moderator' });
 
   return (
     <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-6 md:py-10">
