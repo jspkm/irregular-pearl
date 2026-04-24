@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import type { Movement } from '../lib/movements';
 import SignInPanel from './SignInPanel';
 
@@ -32,8 +33,13 @@ type SaveState =
 
 export default function MovementEdit({ movement, onUpdated }: Props) {
   const { user } = useAuth();
+  const {
+    signInOpen: signInPrompt,
+    onClose: signInPromptOnClose,
+    onSignedIn: signInPromptOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [open, setOpen] = useState(false);
-  const [signInPrompt, setSignInPrompt] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>({ kind: 'idle' });
   const [fields, setFields] = useState({
     name: movement.name,
@@ -51,21 +57,19 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
   // Reset form state when opening so subsequent edits start from the current
   // movement (in case another user updated it between modal opens).
   const openModal = useCallback(() => {
-    if (!user) {
-      setSignInPrompt(true);
-      return;
-    }
-    setFields({
-      name: movement.name,
-      tempoIndication: movement.tempoIndication ?? '',
-      keySignature: movement.keySignature ?? '',
-      meter: movement.meter ?? '',
-      ordinal: movement.ordinal,
-      editSummary: '',
+    gate(() => {
+      setFields({
+        name: movement.name,
+        tempoIndication: movement.tempoIndication ?? '',
+        keySignature: movement.keySignature ?? '',
+        meter: movement.meter ?? '',
+        ordinal: movement.ordinal,
+        editSummary: '',
+      });
+      setSaveState({ kind: 'idle' });
+      setOpen(true);
     });
-    setSaveState({ kind: 'idle' });
-    setOpen(true);
-  }, [movement, user]);
+  }, [movement, gate]);
 
   const closeModal = useCallback(() => {
     setOpen(false);
@@ -74,9 +78,9 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
   }, []);
 
   const closeSignInPrompt = useCallback(() => {
-    setSignInPrompt(false);
+    signInPromptOnClose();
     requestAnimationFrame(() => pencilRef.current?.focus());
-  }, []);
+  }, [signInPromptOnClose]);
 
   // Focus trap + Esc handler while modal is open.
   useEffect(() => {
@@ -284,6 +288,7 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
       {signInPrompt && (
         <SignInPanel
           onClose={closeSignInPrompt}
+          onSignedIn={signInPromptOnSignedIn}
           title="Sign in to edit"
           body={
             <>

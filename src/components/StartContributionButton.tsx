@@ -4,36 +4,48 @@
 //   performer's notes, schools, landmarks, etc.). The pre-piece page
 //   stays deliberately read-only until this click so no one nudges
 //   into writing accidentally.
-// - Signed-out: routes to /?sign_in=1 first; after auth they return
-//   to the piece page and can click the CTA again.
+// - Signed-out: opens the SignInPanel inline on the current piece page
+//   (no home-page detour). After successful sign-in the pending action
+//   auto-resumes via useRequireAuth, so the user doesn't click twice.
 
-import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
+import SignInPanel from './SignInPanel';
 
 interface Props {
   pieceId: string;
 }
 
 export default function StartContributionButton({ pieceId }: Props) {
-  const { user, loading } = useAuth();
+  const { signInOpen, onClose, onSignedIn, redirectTo, gate } = useRequireAuth();
+
+  // Same URL + ?expand=1 — forces [id].astro down the PiecePageLayout
+  // branch even when has_signed_content is still false.
+  const expandUrl = `/piece/${pieceId}?expand=1`;
 
   function handleClick() {
-    if (loading) return;
-    if (!user) {
-      window.location.href = '/?sign_in=1';
-      return;
-    }
-    // Same URL + ?expand=1 — forces [id].astro down the PiecePageLayout
-    // branch even when has_signed_content is still false.
-    window.location.href = `/piece/${pieceId}?expand=1`;
+    gate(() => { window.location.href = expandUrl; }, { resumeUrl: expandUrl });
   }
 
   return (
-    <button
-      type="button"
-      className="pp-cta-primary"
-      onClick={handleClick}
-    >
-      Start the first contribution
-    </button>
+    <>
+      <button
+        type="button"
+        className="pp-cta-primary"
+        onClick={handleClick}
+      >
+        Start the first contribution
+      </button>
+      {signInOpen && (
+        <SignInPanel
+          onClose={onClose}
+          onSignedIn={onSignedIn}
+          redirectTo={redirectTo}
+          title="Sign in to contribute"
+          body={
+            <>Any registered user can start a contribution. Sign in or create an account to open this piece for writing.</>
+          }
+        />
+      )}
+    </>
   );
 }

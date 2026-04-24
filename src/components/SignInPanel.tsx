@@ -20,12 +20,26 @@ type Status =
   | { kind: 'info'; message: string };
 
 interface Props {
+  /** Fired when the user dismisses the modal without signing in
+   *  (backdrop / X / Escape). */
   onClose: () => void;
+  /** Fired after a successful password sign-in or same-session signup.
+   *  Defaults to onClose for legacy callers. Callers that resume a pending
+   *  action after sign-in (see useRequireAuth) pass a distinct handler here
+   *  so cancellation can't fire the resumed action. */
+  onSignedIn?: () => void;
+  /** URL Google OAuth redirects to after successful auth. Defaults to the
+   *  current page. Callers with a navigation-style intent (e.g. "go to
+   *  ?expand=1 after sign-in") pass that URL here so OAuth round-trip
+   *  completes the action; in-memory pending closures don't survive the
+   *  redirect. */
+  redirectTo?: string;
   title?: string;
   body?: ReactNode;
 }
 
-export default function SignInPanel({ onClose, title = 'Sign in', body }: Props) {
+export default function SignInPanel({ onClose, onSignedIn, redirectTo, title = 'Sign in', body }: Props) {
+  const onSuccess = onSignedIn ?? onClose;
   const [mode, setMode] = useState<Mode>('choose');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,12 +60,13 @@ export default function SignInPanel({ onClose, title = 'Sign in', body }: Props)
   const signInWithGoogle = useCallback(async () => {
     if (!hasSupabase) return;
     setStatus({ kind: 'busy' });
+    const target = redirectTo ?? window.location.href;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.href },
+      options: { redirectTo: target },
     });
     if (error) setStatus({ kind: 'error', message: prettyAuthError(error.message) });
-  }, []);
+  }, [redirectTo]);
 
   const submitSignIn = useCallback(async (e: FormEvent) => {
     e.preventDefault();
@@ -70,8 +85,8 @@ export default function SignInPanel({ onClose, title = 'Sign in', body }: Props)
       setStatus({ kind: 'error', message: prettyAuthError(error.message) });
       return;
     }
-    onClose();
-  }, [email, password, onClose]);
+    onSuccess();
+  }, [email, password, onSuccess]);
 
   const resendConfirmation = useCallback(async (addr: string) => {
     if (!hasSupabase) return;
@@ -106,11 +121,11 @@ export default function SignInPanel({ onClose, title = 'Sign in', body }: Props)
       return;
     }
     if (data.session) {
-      onClose();
+      onSuccess();
       return;
     }
     window.location.href = `/auth/check-inbox?email=${encodeURIComponent(trimmed)}`;
-  }, [email, password, onClose]);
+  }, [email, password, onSuccess]);
 
   const submitForgot = useCallback(async (e: FormEvent) => {
     e.preventDefault();

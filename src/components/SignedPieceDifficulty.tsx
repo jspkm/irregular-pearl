@@ -13,6 +13,7 @@ import type { PieceDifficultyAxes, DifficultyAxis } from '../data/difficulty-axe
 import VoteThumbs from './VoteThumbs';
 import OwnerEditDelete from './OwnerEditDelete';
 import SignInPanel from './SignInPanel';
+import { useRequireAuth } from '../lib/useRequireAuth';
 
 type AxisKey = 'technical' | 'stamina' | 'interpretive' | 'ensemble';
 
@@ -99,7 +100,12 @@ export default function SignedPieceDifficulty({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stackIdx, setStackIdx] = useState(0);
-  const [signInOpen, setSignInOpen] = useState(false);
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
 
   const stackItems: StackItem[] = [
     ...ratings.map((rating) => ({ kind: 'user' as const, rating })),
@@ -246,7 +252,8 @@ export default function SignedPieceDifficulty({
         {renderWriteEntry()}
         {signInOpen && (
           <SignInPanel
-            onClose={() => setSignInOpen(false)}
+            onClose={signInOnClose}
+            onSignedIn={signInOnSignedIn}
             title="Sign in to rate"
             body={<>Signed ratings are authored — any registered user can publish their own four-axis difficulty. Sign in or create an account to post yours.</>}
           />
@@ -446,11 +453,7 @@ export default function SignedPieceDifficulty({
         type="button"
         onClick={() => {
           setError(null);
-          if (!user) {
-            setSignInOpen(true);
-            return;
-          }
-          setMode('write');
+          gate(() => setMode('write'));
         }}
         className="write-entry-diff"
       >

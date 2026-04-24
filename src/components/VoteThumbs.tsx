@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import SignInPanel from './SignInPanel';
 
 export type VoteSubjectTable =
@@ -37,9 +38,14 @@ type Vote = -1 | 0 | 1;
 
 export default function VoteThumbs({ subjectTable, subjectId }: Props) {
   const { user, loading: authLoading } = useAuth();
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [vote, setVote] = useState<Vote>(0);
   const [error, setError] = useState<string | null>(null);
-  const [signInOpen, setSignInOpen] = useState(false);
   const [pending, setPending] = useState(false);
   // Bumps every time the user transitions INTO an upvote (not clear, not down).
   // The upvote button reads this to trigger a one-shot celebration animation
@@ -67,12 +73,8 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
     };
   }, [user, authLoading, subjectTable, subjectId]);
 
-  const cast = useCallback(
+  const doCast = useCallback(
     async (desired: 1 | -1) => {
-      if (!user) {
-        setSignInOpen(true);
-        return;
-      }
       if (pending) return;
       const prev = vote;
       // Clicking the already-filled thumb clears the vote; otherwise sets.
@@ -104,7 +106,12 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
         setError(pretty);
       }
     },
-    [user, vote, pending, subjectTable, subjectId],
+    [vote, pending, subjectTable, subjectId],
+  );
+
+  const cast = useCallback(
+    (desired: 1 | -1) => gate(() => { void doCast(desired); }),
+    [gate, doCast],
   );
 
   const ariaUp = user
@@ -173,7 +180,8 @@ export default function VoteThumbs({ subjectTable, subjectId }: Props) {
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to vote"
           body={
             <>

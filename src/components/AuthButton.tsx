@@ -3,6 +3,7 @@ import { supabase, hasSupabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 import GenerativeAvatar from './GenerativeAvatar';
 import SignInPanel from './SignInPanel';
+import { SIGN_IN_PARAM } from '../lib/privateRoute';
 
 export default function AuthButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -32,10 +33,10 @@ export default function AuthButton() {
         // private pages (/notifications, etc.) that redirect anon visitors
         // here without leaking what the source page was about.
         const params = new URLSearchParams(window.location.search);
-        if (params.get('signin') === '1') {
+        if (params.get(SIGN_IN_PARAM) === '1') {
           setSignInOpen(true);
           // Strip the param so a refresh doesn't keep popping the modal.
-          params.delete('signin');
+          params.delete(SIGN_IN_PARAM);
           const newSearch = params.toString();
           const newUrl =
             window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;

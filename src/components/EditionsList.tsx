@@ -8,10 +8,10 @@
 
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../lib/useAuth';
 import { fetchEditionsForPiece, type Edition } from '../lib/editions';
 import { CHANGELOG_REFRESH_EVENT } from './ChangeLog';
 import SignInPanel from './SignInPanel';
+import { useRequireAuth } from '../lib/useRequireAuth';
 
 interface Props {
   pieceId: string;
@@ -23,12 +23,16 @@ const TYPE_OPTIONS = ['urtext', 'scholarly', 'performer', 'facsimile', 'critical
 type Busy = { kind: 'idle' } | { kind: 'working'; id?: string } | { kind: 'error'; message: string };
 
 export default function EditionsList({ pieceId, initialEditions }: Props) {
-  const { user } = useAuth();
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [editions, setEditions] = useState<Edition[]>(initialEditions);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [signInOpen, setSignInOpen] = useState(false);
   const [busy, setBusy] = useState<Busy>({ kind: 'idle' });
 
   const broadcastChangelog = useCallback(() => {
@@ -41,38 +45,35 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
     broadcastChangelog();
   }, [pieceId, broadcastChangelog]);
 
-  const requireAuth = useCallback(() => {
-    if (!user) { setSignInOpen(true); return false; }
-    return true;
-  }, [user]);
+  const handleSwap = useCallback((i: number, dir: 'up' | 'down') => {
+    gate(() => void (async () => {
+      const j = dir === 'up' ? i - 1 : i + 1;
+      if (j < 0 || j >= editions.length) return;
+      const a = editions[i], b = editions[j];
+      setBusy({ kind: 'working', id: a.id });
+      const { error } = await supabase.rpc('swap_edition_ordinals', { p_id_a: a.id, p_id_b: b.id });
+      if (error) {
+        setBusy({ kind: 'error', message: prettyError(error.message, 'Reorder failed') });
+        return;
+      }
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [editions, refetch, gate]);
 
-  const handleSwap = useCallback(async (i: number, dir: 'up' | 'down') => {
-    if (!requireAuth()) return;
-    const j = dir === 'up' ? i - 1 : i + 1;
-    if (j < 0 || j >= editions.length) return;
-    const a = editions[i], b = editions[j];
-    setBusy({ kind: 'working', id: a.id });
-    const { error } = await supabase.rpc('swap_edition_ordinals', { p_id_a: a.id, p_id_b: b.id });
-    if (error) {
-      setBusy({ kind: 'error', message: prettyError(error.message, 'Reorder failed') });
-      return;
-    }
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [editions, refetch, requireAuth]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    if (!requireAuth()) return;
-    setBusy({ kind: 'working', id });
-    const { error } = await supabase.rpc('delete_edition', { p_id: id });
-    if (error) {
-      setBusy({ kind: 'error', message: prettyError(error.message, 'Delete failed') });
-      return;
-    }
-    setConfirmDeleteId(null);
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [refetch, requireAuth]);
+  const handleDelete = useCallback((id: string) => {
+    gate(() => void (async () => {
+      setBusy({ kind: 'working', id });
+      const { error } = await supabase.rpc('delete_edition', { p_id: id });
+      if (error) {
+        setBusy({ kind: 'error', message: prettyError(error.message, 'Delete failed') });
+        return;
+      }
+      setConfirmDeleteId(null);
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [refetch, gate]);
 
   return (
     <>
@@ -158,7 +159,7 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
                     </svg>
                   </button>
                   <button type="button" className="ed-ctrl" aria-label={`Edit ${e.publisher}`}
-                    disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setEditingId(e.id); }}>
+                    disabled={rowWorking} onClick={() => gate(() => setEditingId(e.id))}>
                     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                       <path d="M11.5 2.5l2 2L5 13H3v-2l8.5-8.5z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
                     </svg>
@@ -171,7 +172,7 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
                     </span>
                   ) : (
                     <button type="button" className="ed-ctrl ed-ctrl-delete" aria-label={`Delete ${e.publisher}`}
-                      disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setConfirmDeleteId(e.id); }}>
+                      disabled={rowWorking} onClick={() => gate(() => setConfirmDeleteId(e.id))}>
                       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                       </svg>
@@ -191,7 +192,7 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
         </div>
       )}
 
-      <button type="button" className="mvmt-add" onClick={() => { if (!requireAuth()) return; setAddOpen(true); }}>
+      <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
         + Add edition
       </button>
 
@@ -204,7 +205,8 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to edit"
           body={
             <>

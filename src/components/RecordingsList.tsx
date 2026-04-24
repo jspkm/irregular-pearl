@@ -14,7 +14,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../lib/useAuth';
+import { useRequireAuth } from '../lib/useRequireAuth';
 import {
   fetchExternalLinksForPiece,
   recordingEmbedUrl,
@@ -32,13 +32,17 @@ interface Props {
 type Busy = { kind: 'idle' } | { kind: 'working'; id?: string } | { kind: 'error'; message: string };
 
 export default function RecordingsList({ pieceId, initialLinks }: Props) {
-  const { user } = useAuth();
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
   const [links, setLinks] = useState<ExternalLink[]>(initialLinks);
   const [openId, setOpenId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
-  const [signInOpen, setSignInOpen] = useState(false);
   const [busy, setBusy] = useState<Busy>({ kind: 'idle' });
 
   const broadcastChangelog = useCallback(() => {
@@ -51,39 +55,36 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
     broadcastChangelog();
   }, [pieceId, broadcastChangelog]);
 
-  const requireAuth = useCallback(() => {
-    if (!user) { setSignInOpen(true); return false; }
-    return true;
-  }, [user]);
+  const handleSwap = useCallback((i: number, dir: 'up' | 'down') => {
+    gate(() => void (async () => {
+      const j = dir === 'up' ? i - 1 : i + 1;
+      if (j < 0 || j >= links.length) return;
+      const a = links[i], b = links[j];
+      setBusy({ kind: 'working', id: a.id });
+      const { error } = await supabase.rpc('swap_external_link_ordinals', { p_id_a: a.id, p_id_b: b.id });
+      if (error) {
+        setBusy({ kind: 'error', message: pretty(error.message, 'Reorder failed') });
+        return;
+      }
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [links, refetch, gate]);
 
-  const handleSwap = useCallback(async (i: number, dir: 'up' | 'down') => {
-    if (!requireAuth()) return;
-    const j = dir === 'up' ? i - 1 : i + 1;
-    if (j < 0 || j >= links.length) return;
-    const a = links[i], b = links[j];
-    setBusy({ kind: 'working', id: a.id });
-    const { error } = await supabase.rpc('swap_external_link_ordinals', { p_id_a: a.id, p_id_b: b.id });
-    if (error) {
-      setBusy({ kind: 'error', message: pretty(error.message, 'Reorder failed') });
-      return;
-    }
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [links, refetch, requireAuth]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    if (!requireAuth()) return;
-    setBusy({ kind: 'working', id });
-    const { error } = await supabase.rpc('delete_external_link', { p_id: id });
-    if (error) {
-      setBusy({ kind: 'error', message: pretty(error.message, 'Delete failed') });
-      return;
-    }
-    setConfirmDeleteId(null);
-    if (openId === id) setOpenId(null);
-    await refetch();
-    setBusy({ kind: 'idle' });
-  }, [openId, refetch, requireAuth]);
+  const handleDelete = useCallback((id: string) => {
+    gate(() => void (async () => {
+      setBusy({ kind: 'working', id });
+      const { error } = await supabase.rpc('delete_external_link', { p_id: id });
+      if (error) {
+        setBusy({ kind: 'error', message: pretty(error.message, 'Delete failed') });
+        return;
+      }
+      setConfirmDeleteId(null);
+      if (openId === id) setOpenId(null);
+      await refetch();
+      setBusy({ kind: 'idle' });
+    })());
+  }, [openId, refetch, gate]);
 
   return (
     <>
@@ -154,7 +155,7 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
                       </svg>
                     </button>
                     <button type="button" className="ed-ctrl" aria-label={`Edit ${r.label}`}
-                      disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setEditingId(r.id); if (isOpen) setOpenId(null); }}>
+                      disabled={rowWorking} onClick={() => gate(() => { setEditingId(r.id); if (isOpen) setOpenId(null); })}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M11.5 2.5l2 2L5 13H3v-2l8.5-8.5z" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
                       </svg>
@@ -167,7 +168,7 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
                       </span>
                     ) : (
                       <button type="button" className="ed-ctrl ed-ctrl-delete" aria-label={`Delete ${r.label}`}
-                        disabled={rowWorking} onClick={() => { if (!requireAuth()) return; setConfirmDeleteId(r.id); }}>
+                        disabled={rowWorking} onClick={() => gate(() => setConfirmDeleteId(r.id))}>
                         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                           <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                         </svg>
@@ -204,7 +205,7 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
         </ul>
       )}
 
-      <button type="button" className="mvmt-add" onClick={() => { if (!requireAuth()) return; setAddOpen(true); }}>
+      <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
         + Add recording
       </button>
 
@@ -217,7 +218,8 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
 
       {signInOpen && (
         <SignInPanel
-          onClose={() => setSignInOpen(false)}
+          onClose={signInOnClose}
+          onSignedIn={signInOnSignedIn}
           title="Sign in to edit"
           body={
             <>

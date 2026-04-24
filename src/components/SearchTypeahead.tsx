@@ -12,6 +12,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
+import { useRequireAuth } from '../lib/useRequireAuth';
+import SignInPanel from './SignInPanel';
 
 interface Result {
   result_type: 'materialized' | 'seed';
@@ -73,7 +75,13 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
   const [materializing, setMaterializing] = useState(false);
-  const [needsSignIn, setNeedsSignIn] = useState<Result | null>(null);
+  const [pendingSeed, setPendingSeed] = useState<Result | null>(null);
+  const {
+    signInOpen,
+    onClose: signInOnClose,
+    onSignedIn: signInOnSignedIn,
+    gate,
+  } = useRequireAuth();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -139,14 +147,11 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  // Escape dismiss
+  // Escape dismiss. The SignInPanel owns its own Escape handling when open,
+  // so we only care about dismissing the typeahead dropdown here.
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        if (needsSignIn) {
-          setNeedsSignIn(null);
-          return;
-        }
         if (open) {
           maybeLogDismissedMiss();
           setOpen(false);
@@ -157,7 +162,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     }
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [open, needsSignIn, onDismiss]);
+  }, [open, onDismiss]);
 
   // Page unload (nav away with dropdown still open)
   useEffect(() => {
@@ -168,18 +173,8 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     return () => window.removeEventListener('pagehide', handler);
   }, [open]);
 
-  async function handleSelect(r: Result) {
-    if (r.result_type === 'materialized') {
-      window.location.href = piecePath(r.id);
-      return;
-    }
-    // Seed: materialize (signed-in only)
+  async function materializeAndGo(r: Result) {
     if (!hasSupabase) return;
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      setNeedsSignIn(r);
-      return;
-    }
     setMaterializing(true);
     const { data: pieceId, error } = await supabase.rpc('materialize_piece_from_index', {
       p_index_id: r.id,
@@ -192,6 +187,20 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
       return;
     }
     window.location.href = piecePath(pieceId as string);
+  }
+
+  function handleSelect(r: Result) {
+    if (r.result_type === 'materialized') {
+      window.location.href = piecePath(r.id);
+      return;
+    }
+    // Seed: anon gets SignInPanel with the seed stashed as the pending
+    // action; on successful sign-in the materialize + navigate resumes.
+    setPendingSeed(r);
+    gate(() => {
+      setPendingSeed(null);
+      void materializeAndGo(r);
+    });
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -362,35 +371,21 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
         </div>
       )}
 
-      {needsSignIn && (
-        <div
-          className="absolute left-0 right-0 top-full mt-2 bg-surface border border-border rounded-xl shadow-md z-50 p-4"
-          role="dialog"
-          aria-label="Sign in required"
-        >
-          <p className="text-sm text-ink mb-2">
-            <span className="text-muted">{needsSignIn.composer_name} · </span>
-            <span className="text-ink">{needsSignIn.title}</span>
-          </p>
-          <p className="text-xs text-muted mb-3">
-            Sign in to open this piece so you can contribute or request a contribution.
-          </p>
-          <div className="flex gap-2">
-            <a
-              href={`/?sign_in=1`}
-              className="inline-flex items-center px-3 py-1.5 bg-ink text-surface rounded-md text-xs font-medium no-underline"
-            >
-              Sign in
-            </a>
-            <button
-              type="button"
-              onClick={() => setNeedsSignIn(null)}
-              className="inline-flex items-center px-3 py-1.5 text-muted hover:text-ink border border-border-strong rounded-md text-xs bg-transparent cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+      {signInOpen && (
+        <SignInPanel
+          onClose={() => { setPendingSeed(null); signInOnClose(); }}
+          onSignedIn={signInOnSignedIn}
+          title="Sign in to open this piece"
+          body={
+            pendingSeed ? (
+              <>
+                Opening <span style={{ fontWeight: 500 }}>{pendingSeed.composer_name} · {pendingSeed.title}</span> for contribution is a signed action. Sign in or create an account to continue.
+              </>
+            ) : (
+              <>Opening a seed piece for contribution is a signed action. Sign in or create an account to continue.</>
+            )
+          }
+        />
       )}
     </div>
   );
