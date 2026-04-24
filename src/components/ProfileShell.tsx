@@ -85,7 +85,12 @@ export default function ProfileShell({ userId }: { userId: string }) {
   if (needsSignIn) {
     return (
       <SignInPanel
+        // Cancel (backdrop / X / Escape) — settings requires auth, so leave.
         onClose={() => { window.location.replace('/'); }}
+        // Success — URL is already the right destination; let useAuth tick
+        // user to non-null so this component re-renders into the Settings
+        // tab. A navigation here (the default onClose) would drop the URL.
+        onSignedIn={() => { /* no-op: URL is already correct */ }}
         title="Sign in to manage settings"
       />
     );
