@@ -89,7 +89,9 @@ src/
       RequestsAdmin.tsx            Staff Requests tab — outbox (resume drafting) + sent archive
       AdminPage.tsx, users, etc.
     DraftingModeBanner.tsx         Sticky banner on piece/[slug]?compose=<req_id>
-    ComposeDraftsPanel.tsx         Per-request composer (body-only kinds in v1)
+    ComposeDraftBlock.tsx          Inline compose block rendered at the top of each signed section in drafting mode
+    TempoCuesEditor.tsx            Row editor + note-symbol palette; used by both sender and recipient
+    TempoCuesDisplay.tsx           Read-only tempo-cues list; used on every card that shows an interpretive school
     NavbarBell.tsx              Notifications bell + popover (subject-agnostic)
     NotificationsQueue.tsx      Unified Messages page (drafts + contribution requests, reverse-chron)
     SearchTypeahead.tsx         Navbar search with grouped IN THE CATALOG / NOT YET CURATED results
@@ -114,8 +116,9 @@ src/
     composer/[name]                Composer index pages
     instrument/[name]              Instrument category pages
     notifications                  Messages list (contribution requests) + Open items tab (recipient drafts cross-piece)
-    admin                          Staff surface — tabs: Dashboard, Users, Requests, Playlist, Signals
-    piece/[id]?compose=<req_id>    Staff drafting mode (banner + composer panel on the piece page)
+    admin                          Role-gated surface — tabs filtered by role (Dashboard/Users admin; Requests/Signals staff; Playlist maestro)
+    maestro                        301 → /admin (legacy URL)
+    piece/[id]?compose=<req_id>    Staff drafting mode — sticky banner + inline compose blocks in each signed section
     api/draft-contribution-note    LLM-drafted personal note for request dialog (staff-only, rate-limited)
     about, privacy, terms
     sitemap.xml, llms.txt, llms-full.txt, openapi.json
