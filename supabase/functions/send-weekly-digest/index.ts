@@ -98,7 +98,7 @@ function renderWeeklyDigest(opts: {
   });
 }
 
-async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; errors: string[] }> {
+async function fetchAndSendDigests(previewTo?: string, previewName?: string): Promise<{ sent: number; skipped: number; errors: string[] }> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const errors: string[] = [];
   let sent = 0;
@@ -130,6 +130,39 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
   }
   summaryParts.push(`The catalog now holds ${totalPieces ?? 0} pieces.`);
   const summary = summaryParts.join(" ");
+
+  // Preview mode: render one digest with real prod data and send only to
+  // previewTo. Skips the recipient DB loop and all per-user personalization
+  // beyond the greeting, since a single template render is sufficient for
+  // visual review.
+  if (previewTo) {
+    const firstName = (previewName || "").split(" ")[0] || "there";
+    const html = renderWeeklyDigest({
+      recipientName: firstName,
+      weekRange,
+      summary,
+      piecesHtml,
+      piecesCount: (newPieces || []).length,
+      totalPieces: totalPieces ?? 0,
+      unsubscribeUrl: "https://irregularpearl.org/profile/preview?section=setting#email",
+    });
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Irregular Pearl <noreply@irregularpearl.org>",
+        to: [previewTo],
+        subject: `[PREVIEW] Your Weekly Digest — ${weekRange}`,
+        html,
+      }),
+    });
+    if (res.ok) return { sent: 1, skipped: 0, errors: [] };
+    const errText = await res.text();
+    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${errText}`] };
+  }
 
   const { data: recipients } = await supabase
     .from("users")
@@ -168,7 +201,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Irregular Pearl <hello@irregularpearl.org>",
+          from: "Irregular Pearl <noreply@irregularpearl.org>",
           to: [authUser.email],
           subject: `Your Weekly Digest — ${weekRange}`,
           html,
@@ -190,13 +223,23 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
   return { sent, skipped, errors };
 }
 
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
   if (!RESEND_API_KEY) {
     return new Response(JSON.stringify({ error: "RESEND_API_KEY not set" }), { status: 500 });
   }
 
+  let previewTo: string | undefined;
+  let previewName: string | undefined;
   try {
-    const result = await fetchAndSendDigests();
+    const body = await req.json();
+    previewTo = body?.preview_to;
+    previewName = body?.preview_name;
+  } catch {
+    // Cron invocation has no body; that's fine.
+  }
+
+  try {
+    const result = await fetchAndSendDigests(previewTo, previewName);
     console.log(`Weekly digest complete: ${result.sent} sent, ${result.skipped} skipped, ${result.errors.length} errors`);
 
     return new Response(JSON.stringify(result), {

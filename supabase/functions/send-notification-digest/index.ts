@@ -49,11 +49,116 @@ const SUBJECT_TABLES = [
   'piece_descriptions',
 ] as const;
 
-async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; errors: string[] }> {
+async function fetchAndSendDigests(previewTo?: string, previewName?: string): Promise<{ sent: number; skipped: number; errors: string[] }> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const errors: string[] = [];
   let sent = 0;
   let skipped = 0;
+
+  // Preview mode: pull the most recent notifications (regardless of cleared /
+  // digest-sent state) so the preview always has content, render ONE digest
+  // grouping them, send only to previewTo, and skip the last_digest_sent_at
+  // stamp so prod state is untouched.
+  if (previewTo) {
+    const { data: sampleRows } = await supabase
+      .from("notifications")
+      .select("id, recipient_id, subject_table, subject_id, body, link_path, created_at")
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    // If prod has no notifications (early-stage catalog), synthesize preview
+    // items against real pieces so the review still shows the shipping layout.
+    let effectiveRows: NotificationRow[];
+    let syntheticPieceById = new Map<string, PieceRef>();
+    if (!sampleRows || sampleRows.length === 0) {
+      const { data: somePieces } = await supabase
+        .from("pieces")
+        .select("id, title, catalog_number, composer_name")
+        .order("created_at", { ascending: false })
+        .limit(2);
+      if (!somePieces || somePieces.length === 0) {
+        return { sent: 0, skipped: 0, errors: ["No notifications and no pieces in prod — nothing to preview against"] };
+      }
+      const synthetic: NotificationRow[] = [];
+      for (const p of somePieces as PieceRef[]) {
+        syntheticPieceById.set(p.id, p);
+        synthetic.push({
+          id: `preview-${p.id}`,
+          recipient_id: "preview",
+          subject_table: "__preview__",
+          subject_id: p.id,
+          body: "Sample draft body: a contributor submitted a performer's note for this piece. Approve, request a revision, or let it sit for another reviewer.",
+          link_path: `/piece/${p.id}#performers-notes`,
+          created_at: new Date().toISOString(),
+        });
+      }
+      effectiveRows = synthetic;
+    } else {
+      effectiveRows = sampleRows as NotificationRow[];
+    }
+
+    // Enrich subject → piece for pretty rendering.
+    const sampleSubjectToPiece = new Map<string, string>();
+    const samplePieceIds = new Set<string>();
+    const sampleIdsByTable = new Map<string, Set<string>>();
+    for (const n of effectiveRows) {
+      if (!(SUBJECT_TABLES as readonly string[]).includes(n.subject_table)) continue;
+      const set = sampleIdsByTable.get(n.subject_table) ?? new Set<string>();
+      set.add(n.subject_id);
+      sampleIdsByTable.set(n.subject_table, set);
+    }
+    for (const [table, ids] of sampleIdsByTable) {
+      const { data: subjects } = await supabase.from(table).select("id, piece_id").in("id", [...ids]);
+      for (const row of (subjects ?? []) as Array<{ id: string; piece_id: string }>) {
+        sampleSubjectToPiece.set(`${table}:${row.id}`, row.piece_id);
+        samplePieceIds.add(row.piece_id);
+      }
+    }
+    const { data: samplePieces } = samplePieceIds.size
+      ? await supabase.from("pieces").select("id, title, catalog_number, composer_name").in("id", [...samplePieceIds])
+      : { data: [] };
+    const samplePieceById = new Map<string, PieceRef>();
+    for (const p of (samplePieces ?? []) as PieceRef[]) samplePieceById.set(p.id, p);
+    for (const [id, p] of syntheticPieceById) samplePieceById.set(id, p);
+
+    const firstName = (previewName || "").split(" ")[0] || "there";
+    const html = renderNotificationDigest({
+      recipientId: "preview",
+      recipientName: firstName,
+      count: effectiveRows.length,
+      items: effectiveRows.map((n) => {
+        const pieceId = sampleSubjectToPiece.get(`${n.subject_table}:${n.subject_id}`)
+          ?? (syntheticPieceById.has(n.subject_id) ? n.subject_id : undefined);
+        return {
+          body: n.body,
+          linkPath: n.link_path,
+          piece: pieceId ? samplePieceById.get(pieceId) ?? null : null,
+        };
+      }),
+    });
+
+    const subject = effectiveRows.length === 1
+      ? "[PREVIEW] 1 draft awaits your review"
+      : `[PREVIEW] ${effectiveRows.length} drafts await your review`;
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Irregular Pearl <noreply@irregularpearl.org>",
+        to: [previewTo],
+        subject,
+        html,
+      }),
+    });
+
+    if (res.ok) return { sent: 1, skipped: 0, errors: [] };
+    const errText = await res.text();
+    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${errText}`] };
+  }
 
   // Unsent, un-cleared notifications. One email per notification, ever —
   // the bell + /notifications provide the ongoing nag.
@@ -171,7 +276,7 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Irregular Pearl <hello@irregularpearl.org>",
+          from: "Irregular Pearl <noreply@irregularpearl.org>",
           to: [authUser.email],
           subject,
           html,
@@ -254,13 +359,23 @@ function renderNotificationDigest(opts: {
   });
 }
 
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
   if (!RESEND_API_KEY) {
     return new Response(JSON.stringify({ error: "RESEND_API_KEY not set" }), { status: 500 });
   }
 
+  let previewTo: string | undefined;
+  let previewName: string | undefined;
   try {
-    const result = await fetchAndSendDigests();
+    const body = await req.json();
+    previewTo = body?.preview_to;
+    previewName = body?.preview_name;
+  } catch {
+    // Cron invocation has no body; that's fine.
+  }
+
+  try {
+    const result = await fetchAndSendDigests(previewTo, previewName);
     console.log(
       `Notification digest complete: ${result.sent} sent, ${result.skipped} skipped, ${result.errors.length} errors`,
     );
