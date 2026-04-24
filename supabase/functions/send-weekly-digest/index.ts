@@ -93,6 +93,7 @@ function renderWeeklyDigest(opts: {
     preheader: opts.summary,
     subtitle: "Weekly Digest",
     bodyHtml,
+    footerNote: "You're receiving this because you opted in to the weekly digest.",
     footerLink: { text: "Manage email preferences", href: opts.unsubscribeUrl },
   });
 }

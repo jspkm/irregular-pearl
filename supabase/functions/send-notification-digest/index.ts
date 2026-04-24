@@ -120,10 +120,18 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
         .eq("id", recipientId)
         .single();
 
+      // Missing profile row — auth.users exists but public.users doesn't
+      // (orphaned notifications, deleted account, RLS mismatch). Treat as
+      // hard-skip: do not send with a default "there" greeting.
+      if (!profile) {
+        skipped++;
+        continue;
+      }
+
       // Respect the recipient's Notification Email pref. Still stamp
       // last_digest_sent_at so the in-product bell remains the nag; if they
       // later opt in we don't flood them with backlog.
-      if (profile && (profile as { email_notification_digest?: boolean }).email_notification_digest === false) {
+      if ((profile as { email_notification_digest?: boolean }).email_notification_digest === false) {
         const ids = notifications.map((n) => n.id);
         const { error: updateErr } = await supabase
           .from("notifications")
@@ -241,6 +249,7 @@ function renderNotificationDigest(opts: {
         : `Irregular Pearl — ${opts.count} drafts await your review`,
     preheader: lede,
     bodyHtml,
+    footerNote: "You're receiving this because a draft was routed to your byline.",
     footerLink: { text: "Manage email preferences", href: `https://irregularpearl.org/profile/${opts.recipientId}?section=setting#email` },
   });
 }
