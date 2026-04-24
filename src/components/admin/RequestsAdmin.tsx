@@ -17,16 +17,10 @@ import {
   type OutboxListRow,
   type SentRequestArchiveRow,
 } from '../../lib/contributionDrafts';
+import { KIND_LABEL_TITLE } from '../../lib/draftKinds';
 
 type Tab = 'outbox' | 'sent';
 type Status = 'loading' | 'ready' | 'error';
-
-const KIND_LABEL: Record<DraftKind, string> = {
-  performers_note: "Performer's note",
-  interpretive_school: 'Interpretive school',
-  piece_description: 'Piece description',
-  landmark: 'Landmark',
-};
 
 function draftBodyPreview(kind: DraftKind, payload: Record<string, unknown>): string {
   if (kind === 'interpretive_school') {
@@ -212,7 +206,7 @@ export default function RequestsAdmin() {
                               {row.drafts.map((d, i) => (
                                 <li key={i} className="border-l-2 border-[#6B4E7C] pl-3">
                                   <div className="text-[11px] text-[#6B4E7C] uppercase tracking-wider">
-                                    {KIND_LABEL[d.kind] ?? d.kind}
+                                    {KIND_LABEL_TITLE[d.kind] ?? d.kind}
                                   </div>
                                   <div className="text-sm text-[#1A1A1A] mt-1 whitespace-pre-wrap">
                                     {draftBodyPreview(d.kind, d.payload)}

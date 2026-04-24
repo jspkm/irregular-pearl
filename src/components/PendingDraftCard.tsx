@@ -25,6 +25,9 @@ import {
   type DraftKind,
   type PendingDraft,
 } from '../lib/contributionDrafts';
+import { rowsToTempoCues, tempoCuesToRows, type TempoRow } from '../lib/draftKinds';
+import TempoCuesEditor from './TempoCuesEditor';
+import TempoCuesDisplay from './TempoCuesDisplay';
 
 interface Props {
   draft: PendingDraft;
@@ -46,6 +49,7 @@ export default function PendingDraftCard({ draft, onResolved, trailingAction }: 
   // Edit-form local state (initialized from payload when the editor opens).
   const [editBody, setEditBody] = useState('');
   const [editName, setEditName] = useState('');
+  const [editTempoRows, setEditTempoRows] = useState<TempoRow[]>([]);
   const [editLabel, setEditLabel] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editMeasureStart, setEditMeasureStart] = useState('');
@@ -58,6 +62,7 @@ export default function PendingDraftCard({ draft, onResolved, trailingAction }: 
     const p = draft.payload;
     setEditBody(typeof p.body === 'string' ? p.body : '');
     setEditName(typeof p.name === 'string' ? p.name : '');
+    setEditTempoRows(tempoCuesToRows(p.tempo_cues));
     setEditLabel(typeof p.label === 'string' ? p.label : '');
     setEditDescription(typeof p.description === 'string' ? p.description : '');
     setEditMeasureStart(typeof p.measure_start === 'number' ? String(p.measure_start) : '');
@@ -80,7 +85,16 @@ export default function PendingDraftCard({ draft, onResolved, trailingAction }: 
     if (draft.kind === 'interpretive_school') {
       if (editName.trim().length === 0) { setError('Name required.'); return null; }
       if (editBody.trim().length === 0) { setError('Body required.'); return null; }
-      return { ...p, name: editName, body: editBody };
+      const cues = rowsToTempoCues(editTempoRows);
+      const next: Record<string, unknown> = { ...p, name: editName, body: editBody };
+      if (cues) {
+        next.tempo_cues = cues;
+      } else {
+        // All rows empty → drop the field entirely so the published record
+        // doesn't persist a stale cues object the recipient just cleared.
+        delete next.tempo_cues;
+      }
+      return next;
     }
     if (draft.kind === 'landmark') {
       if (editLabel.trim().length === 0) { setError('Label required.'); return null; }
@@ -152,16 +166,22 @@ export default function PendingDraftCard({ draft, onResolved, trailingAction }: 
       {editing && (
         <div className="pending-draft-editor">
           {(draft.kind === 'interpretive_school') && (
-            <label className="pending-draft-field">
-              <span className="pending-draft-label">Name</span>
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                disabled={busy}
-                maxLength={200}
-              />
-            </label>
+            <>
+              <label className="pending-draft-field">
+                <span className="pending-draft-label">Name</span>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  disabled={busy}
+                  maxLength={200}
+                />
+              </label>
+              <div className="pending-draft-field">
+                <span className="pending-draft-label">Tempo cues (optional)</span>
+                <TempoCuesEditor rows={editTempoRows} onChange={setEditTempoRows} />
+              </div>
+            </>
           )}
           {draft.kind === 'landmark' && (
             <>
@@ -332,29 +352,11 @@ function renderBodyPreview(draft: PendingDraft) {
   if (draft.kind === 'interpretive_school') {
     const name = typeof p.name === 'string' ? p.name : '(unnamed)';
     const body = typeof p.body === 'string' ? p.body : '';
-    const cueEntries =
-      p.tempo_cues && typeof p.tempo_cues === 'object' && !Array.isArray(p.tempo_cues)
-        ? Object.entries(p.tempo_cues as Record<string, unknown>).filter(
-            ([, v]) => typeof v === 'string' && v.trim().length > 0,
-          )
-        : [];
     return (
       <>
         <div className="pending-draft-school-name">{name}</div>
         <div className="pending-draft-prose">{body}</div>
-        {cueEntries.length > 0 && (
-          <div className="pending-draft-tempo">
-            <span className="pending-draft-tempo-label">Tempo cues</span>
-            <ul className="pending-draft-tempo-list">
-              {cueEntries.map(([section, value]) => (
-                <li key={section}>
-                  <span className="pending-draft-tempo-section">{section}</span>
-                  <span className="pending-draft-tempo-value">{value as string}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <TempoCuesDisplay raw={p.tempo_cues} />
       </>
     );
   }
