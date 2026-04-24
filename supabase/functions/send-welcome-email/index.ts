@@ -49,7 +49,6 @@ function renderWelcomeEmail(recipientName: string): string {
     subtitle: "Welcome",
     bodyHtml,
     footerNote: "You're receiving this because you just registered on Irregular Pearl.",
-    footerLink: { text: "Manage email preferences", href: "https://irregularpearl.org/settings#email" },
   });
 }
 
