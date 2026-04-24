@@ -81,20 +81,20 @@ export default function AdminPage({ initialTab }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF]">
-      <div className="bg-[#1A1A1A] text-white px-4 md:px-6 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-bg">
+      <div className="bg-ink text-bg px-4 md:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <a href="/" className="text-lg font-medium tracking-tight text-white no-underline opacity-70 hover:opacity-100">IrregularPearl</a>
-          <span className="text-xs text-white/40">|</span>
+          <a href="/" className="text-lg font-medium tracking-tight text-bg no-underline opacity-70 hover:opacity-100">IrregularPearl</a>
+          <span className="text-xs text-bg/40">|</span>
           <span className="text-sm font-medium">{headerLabel}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-white/60">{profile.display_name}</span>
-          <a href="/" className="text-xs text-white/40 hover:text-white no-underline">← Back to site</a>
+          <span className="text-xs text-bg/60">{profile.display_name}</span>
+          <a href="/" className="text-xs text-bg/40 hover:text-bg no-underline">← Back to site</a>
         </div>
       </div>
 
-      <div className="border-b border-[#E5E3DE] bg-white px-4 md:px-6">
+      <div className="border-b border-border bg-bg px-4 md:px-6">
         <div className="max-w-6xl mx-auto flex gap-0">
           {tabs.map(tab => (
             <button
@@ -102,8 +102,8 @@ export default function AdminPage({ initialTab }: Props) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 text-sm font-medium border-b-2 bg-transparent cursor-pointer transition-colors ${
                 activeTab === tab.id
-                  ? 'border-[#6B4E7C] text-[#6B4E7C]'
-                  : 'border-transparent text-[#6F6F6F] hover:text-[#1A1A1A]'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-muted hover:text-ink'
               }`}
             >
               {tab.label}

@@ -432,7 +432,7 @@ function EditForm(props: {
           disabled={props.submitting || value.trim() === ''}
           style={{
             background: 'var(--ink)',
-            color: '#FFFFFF',
+            color: 'var(--bg)',
             border: 0,
             fontFamily: 'var(--font-sans)',
             fontSize: '13px',

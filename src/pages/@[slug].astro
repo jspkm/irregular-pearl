@@ -56,10 +56,10 @@ const breadcrumbLd = {
       </div>
       <div>
         <h1 class="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{user.display_name}</h1>
-        <p class="font-mono text-xs text-[#A8A29E] mb-2">irregularpearl.org/@{slug}</p>
+        <p class="font-mono text-xs text-tertiary mb-2">irregularpearl.org/@{slug}</p>
         <div class="flex flex-wrap gap-2 items-center">
           {user.instrument && user.instrument.split(',').map((i: string) => i.trim()).filter(Boolean).map((inst: string) => (
-            <span class="text-[11px] px-2.5 py-1 bg-[#F2EEF5] text-[#6B4E7C] rounded-full font-medium">{inst}</span>
+            <span class="text-[11px] px-2.5 py-1 bg-accent-soft text-accent rounded-full font-medium">{inst}</span>
           ))}
           {user.level && (
             <span class="text-[11px] px-2.5 py-1 bg-green-50 text-green-700 rounded-full capitalize font-medium">{user.level}</span>
@@ -72,7 +72,7 @@ const breadcrumbLd = {
     </div>
 
     {user.bio && (
-      <p class="text-sm md:text-base text-[#57534E] leading-relaxed mb-4 whitespace-pre-line">{user.bio}</p>
+      <p class="text-sm md:text-base text-muted leading-relaxed mb-4 whitespace-pre-line">{user.bio}</p>
     )}
 
     {(user.website || (user.social_links && Object.values(user.social_links).some(Boolean))) && (

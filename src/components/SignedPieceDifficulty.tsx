@@ -604,7 +604,7 @@ function DifficultyEditForm(props: {
         .level-btn:hover { color: var(--ink); border-color: var(--ink); }
         .level-btn.is-active {
           background: var(--accent);
-          color: #fff;
+          color: var(--bg);
           border-color: var(--accent);
         }
         .level-label {
@@ -638,7 +638,7 @@ function DifficultyEditForm(props: {
         }
         .diff-edit-primary {
           background: var(--ink);
-          color: #fff;
+          color: var(--bg);
           border: 0;
           font-family: var(--font-sans);
           font-size: 13px;

@@ -229,7 +229,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .movement-edit-button-ghost:hover:not(:disabled) { color: var(--ink); }
 .movement-edit-button-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
 }
 .movement-edit-button-primary:hover:not(:disabled) {
   background: var(--accent-hover, #4C385C);
@@ -355,7 +355,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   left: 50%;
   transform: translateX(-50%);
   background: var(--ink);
-  color: #fff;
+  color: var(--bg);
   padding: 12px 16px;
   border-radius: 6px;
   font-family: var(--font-sans);
@@ -369,15 +369,16 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
 .mvmt-toast-dismiss {
   appearance: none;
   background: transparent;
-  border: 0.5px solid rgba(255, 255, 255, 0.4);
-  color: #fff;
+  border: 0.5px solid currentColor;
+  color: var(--bg);
+  opacity: 0.7;
   padding: 4px 10px;
   border-radius: 3px;
   font: inherit;
   font-size: 12px;
   cursor: pointer;
 }
-.mvmt-toast-dismiss:hover { border-color: #fff; }
+.mvmt-toast-dismiss:hover { opacity: 1; }
 
 /* Page-level Change log. Rendered as its own section at the bottom of the
    piece page. One row per versioned change across every subject (today
@@ -447,7 +448,7 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   cursor: pointer;
   margin-left: 4px;
 }
-.changelog-retry:hover { background: var(--danger); color: #fff; }
+.changelog-retry:hover { background: var(--danger); color: var(--bg); }
 @media (max-width: 520px) {
   .movement-edit-row { grid-template-columns: 1fr; }
 }
@@ -1670,8 +1671,8 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   font-variant-numeric: tabular-nums;
 }
 .rcd-error {
-  background: #f7e4e4;
-  color: #a32d2d;
+  background: var(--danger-soft);
+  color: var(--danger);
   font-size: 13px;
   padding: 10px 12px;
   border-radius: 6px;
@@ -1679,8 +1680,8 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   line-height: 1.5;
 }
 .rcd-success {
-  background: #e6f1e9;
-  color: #2d6a3f;
+  background: var(--success-soft);
+  color: var(--success);
   font-size: 13px;
   padding: 10px 12px;
   border-radius: 6px;

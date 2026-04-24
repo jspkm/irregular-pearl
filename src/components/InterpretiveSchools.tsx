@@ -463,7 +463,7 @@ function EditForm(props: {
           disabled={disabled}
           style={{
             background: 'var(--ink)',
-            color: '#FFFFFF',
+            color: 'var(--bg)',
             border: 0,
             fontFamily: 'var(--font-sans)',
             fontSize: '13px',

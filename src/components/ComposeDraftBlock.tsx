@@ -407,7 +407,7 @@ function DraftForm(props: FormProps) {
           border-radius: 6px;
           border: 0;
           background: var(--accent, #6B4E7C);
-          color: #FFFFFF;
+          color: var(--bg, #FFFFFF);
           cursor: pointer;
         }
         .compose-form-submit:disabled { opacity: 0.5; cursor: not-allowed; }

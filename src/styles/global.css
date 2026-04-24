@@ -343,7 +343,7 @@ body {
 .ip-signin-btn-ghost:hover:not(:disabled) { color: var(--ink); }
 .ip-signin-btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
 }
 .ip-signin-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
 .ip-signin-error {
@@ -418,7 +418,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   border: 0.5px solid var(--accent);
   transition: background-color 120ms ease;
 }
@@ -461,7 +461,7 @@ body {
   padding: 1px 7px;
   border-radius: 999px;
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   min-width: 18px;
   text-align: center;
 }
@@ -607,7 +607,7 @@ body {
   font-family: var(--font-serif);
   font-size: 15px;
   color: var(--ink);
-  background: #fff;
+  background: var(--bg);
   border: 0.5px solid var(--border);
   border-radius: 4px;
   padding: 8px 10px;
@@ -659,7 +659,7 @@ body {
 }
 .pending-draft-btn.primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--bg);
   border-color: var(--accent);
 }
 .pending-draft-btn.primary:hover:not(:disabled) {
@@ -670,11 +670,6 @@ html[data-theme="dark"] .pending-draft-btn {
   background: var(--bg);
   color: var(--ink);
   border-color: var(--border-strong);
-}
-html[data-theme="dark"] .pending-draft-btn.primary {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
 }
 .pending-draft-toast {
   font-family: var(--font-sans);

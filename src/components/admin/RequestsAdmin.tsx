@@ -73,11 +73,11 @@ export default function RequestsAdmin() {
   }, []);
 
   if (status === 'loading') {
-    return <div className="text-sm text-[#6F6F6F]">Loading…</div>;
+    return <div className="text-sm text-muted">Loading…</div>;
   }
   if (status === 'error') {
     return (
-      <div className="rounded-lg border-[0.5px] border-[#A32D2D] bg-[#F7E4E4] px-4 py-3 text-sm text-[#A32D2D]">
+      <div className="rounded-lg border-[0.5px] border-error bg-error-bg px-4 py-3 text-sm text-error">
         {error ?? 'Failed to load.'}
       </div>
     );
@@ -85,35 +85,35 @@ export default function RequestsAdmin() {
 
   return (
     <div>
-      <div className="border-b-[0.5px] border-[#E5E3DE] mb-6 flex gap-0">
+      <div className="border-b-[0.5px] border-border mb-6 flex gap-0">
         <button
           type="button"
           onClick={() => setTab('outbox')}
           className={`px-3 py-2 text-sm font-medium border-b-2 bg-transparent cursor-pointer transition-colors ${
             tab === 'outbox'
-              ? 'border-[#6B4E7C] text-[#6B4E7C]'
-              : 'border-transparent text-[#6F6F6F] hover:text-[#1A1A1A]'
+              ? 'border-accent text-accent'
+              : 'border-transparent text-muted hover:text-ink'
           }`}
         >
-          Outbox <span className="text-[11px] text-[#9A9A9A] ml-1">({outbox.length})</span>
+          Outbox <span className="text-[11px] text-tertiary ml-1">({outbox.length})</span>
         </button>
         <button
           type="button"
           onClick={() => setTab('sent')}
           className={`px-3 py-2 text-sm font-medium border-b-2 bg-transparent cursor-pointer transition-colors ${
             tab === 'sent'
-              ? 'border-[#6B4E7C] text-[#6B4E7C]'
-              : 'border-transparent text-[#6F6F6F] hover:text-[#1A1A1A]'
+              ? 'border-accent text-accent'
+              : 'border-transparent text-muted hover:text-ink'
           }`}
         >
-          Sent <span className="text-[11px] text-[#9A9A9A] ml-1">({sent.length})</span>
+          Sent <span className="text-[11px] text-tertiary ml-1">({sent.length})</span>
         </button>
       </div>
 
       {tab === 'outbox' && (
         <div>
           {outbox.length === 0 ? (
-            <p className="text-sm text-[#6F6F6F]">
+            <p className="text-sm text-muted">
               No outbox drafts. Start one from any piece page's &ldquo;Request a
               contribution&rdquo; dialog.
             </p>
@@ -122,22 +122,22 @@ export default function RequestsAdmin() {
               {outbox.map((row) => (
                 <li
                   key={row.requestId}
-                  className="border-[0.5px] border-[#E5E3DE] rounded-lg px-4 py-3 flex items-center justify-between gap-4"
+                  className="border-[0.5px] border-border rounded-lg px-4 py-3 flex items-center justify-between gap-4"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm text-[#1A1A1A]">
+                    <div className="text-sm text-ink">
                       <span className="font-medium">{row.pieceTitle ?? row.pieceId}</span>
-                      <span className="text-[#9A9A9A] mx-2">→</span>
+                      <span className="text-tertiary mx-2">→</span>
                       <span>{row.recipientDisplayName ?? (row.recipientId ? '(unknown)' : '(recipient deleted)')}</span>
                     </div>
-                    <div className="text-[11px] text-[#9A9A9A] mt-1">
+                    <div className="text-[11px] text-tertiary mt-1">
                       {row.draftCount} draft{row.draftCount === 1 ? '' : 's'}
                       {row.note ? ` · "${row.note.slice(0, 80)}${row.note.length > 80 ? '…' : ''}"` : ''}
                     </div>
                   </div>
                   <a
                     href={`/piece/${row.pieceId}?compose=${row.requestId}&return=${encodeURIComponent('/admin')}`}
-                    className="text-sm text-[#6B4E7C] no-underline hover:underline whitespace-nowrap"
+                    className="text-sm text-accent no-underline hover:underline whitespace-nowrap"
                   >
                     Resume →
                   </a>
@@ -151,7 +151,7 @@ export default function RequestsAdmin() {
       {tab === 'sent' && (
         <div>
           {sent.length === 0 ? (
-            <p className="text-sm text-[#6F6F6F]">No sent requests.</p>
+            <p className="text-sm text-muted">No sent requests.</p>
           ) : (
             <ul className="space-y-2">
               {sent.map((row) => {
@@ -159,7 +159,7 @@ export default function RequestsAdmin() {
                 return (
                   <li
                     key={row.id}
-                    className="border-[0.5px] border-[#E5E3DE] rounded-lg px-4 py-3"
+                    className="border-[0.5px] border-border rounded-lg px-4 py-3"
                   >
                     <button
                       type="button"
@@ -167,48 +167,48 @@ export default function RequestsAdmin() {
                       className="w-full flex items-center justify-between gap-4 bg-transparent border-0 p-0 cursor-pointer text-left"
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm text-[#1A1A1A]">
-                          <span className="text-[#9A9A9A] mr-3 font-mono text-xs">
+                        <div className="text-sm text-ink">
+                          <span className="text-tertiary mr-3 font-mono text-xs">
                             {new Date(row.sentAt).toLocaleDateString(undefined, {
                               month: 'short',
                               day: 'numeric',
                             })}
                           </span>
                           <span className="font-medium">{row.pieceTitle ?? row.pieceId}</span>
-                          <span className="text-[#9A9A9A] mx-2">→</span>
+                          <span className="text-tertiary mx-2">→</span>
                           <span>{row.recipientDisplayName ?? '(recipient deleted)'}</span>
                         </div>
-                        <div className="text-[11px] text-[#9A9A9A] mt-1">
+                        <div className="text-[11px] text-tertiary mt-1">
                           {row.drafts.length === 0
                             ? 'note only'
                             : `${row.drafts.length} draft${row.drafts.length === 1 ? '' : 's'}`}
                         </div>
                       </div>
-                      <span className="text-[#6B4E7C] text-xs">{expanded ? '−' : '+'}</span>
+                      <span className="text-accent text-xs">{expanded ? '−' : '+'}</span>
                     </button>
 
                     {expanded && (
-                      <div className="mt-4 pt-4 border-t-[0.5px] border-[#E5E3DE] space-y-3">
+                      <div className="mt-4 pt-4 border-t-[0.5px] border-border space-y-3">
                         {row.note && (
                           <div>
-                            <div className="text-[11px] uppercase tracking-wider text-[#9A9A9A] mb-1">
+                            <div className="text-[11px] uppercase tracking-wider text-tertiary mb-1">
                               Personal note
                             </div>
-                            <div className="text-sm text-[#1A1A1A] italic">&ldquo;{row.note}&rdquo;</div>
+                            <div className="text-sm text-ink italic">&ldquo;{row.note}&rdquo;</div>
                           </div>
                         )}
                         {row.drafts.length > 0 && (
                           <div>
-                            <div className="text-[11px] uppercase tracking-wider text-[#9A9A9A] mb-2">
+                            <div className="text-[11px] uppercase tracking-wider text-tertiary mb-2">
                               Drafts sent
                             </div>
                             <ul className="space-y-2">
                               {row.drafts.map((d, i) => (
-                                <li key={i} className="border-l-2 border-[#6B4E7C] pl-3">
-                                  <div className="text-[11px] text-[#6B4E7C] uppercase tracking-wider">
+                                <li key={i} className="border-l-2 border-accent pl-3">
+                                  <div className="text-[11px] text-accent uppercase tracking-wider">
                                     {KIND_LABEL_TITLE[d.kind] ?? d.kind}
                                   </div>
-                                  <div className="text-sm text-[#1A1A1A] mt-1 whitespace-pre-wrap">
+                                  <div className="text-sm text-ink mt-1 whitespace-pre-wrap">
                                     {draftBodyPreview(d.kind, d.payload)}
                                   </div>
                                 </li>
