@@ -116,9 +116,26 @@ async function fetchAndSendDigests(): Promise<{ sent: number; skipped: number; e
 
       const { data: profile } = await supabase
         .from("users")
-        .select("display_name")
+        .select("display_name, email_notification_digest")
         .eq("id", recipientId)
         .single();
+
+      // Respect the recipient's Notification Email pref. Still stamp
+      // last_digest_sent_at so the in-product bell remains the nag; if they
+      // later opt in we don't flood them with backlog.
+      if (profile && (profile as { email_notification_digest?: boolean }).email_notification_digest === false) {
+        const ids = notifications.map((n) => n.id);
+        const { error: updateErr } = await supabase
+          .from("notifications")
+          .update({ last_digest_sent_at: new Date().toISOString() })
+          .in("id", ids);
+        if (updateErr) {
+          errors.push(`Opted-out ${recipientId} but failed to stamp last_digest_sent_at: ${updateErr.message}`);
+        }
+        skipped++;
+        continue;
+      }
+
       const firstName = (profile?.display_name ?? "").split(" ")[0] || "there";
 
       const html = renderNotificationDigest({
