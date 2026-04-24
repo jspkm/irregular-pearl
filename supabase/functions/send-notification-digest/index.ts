@@ -11,7 +11,6 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
-  TOKENS,
   card,
   heading,
   kicker,
@@ -212,12 +211,7 @@ function renderNotificationDigest(opts: {
     <div style="padding-bottom:12px;">${kicker("Awaiting your review")}</div>
     ${itemsHtml}
     <div align="center" style="padding:24px 0 8px;">
-      ${primaryButton({ text: "Open your queue", href: queueUrl })}
-    </div>
-    <div style="padding-top:16px;text-align:center;">
-      <span style="font-family:${TOKENS.sans};font-size:11px;color:${TOKENS.hint};">
-        Approve, edit, or send back from the queue. This email won't repeat for the same draft.
-      </span>
+      ${primaryButton({ text: "View message", href: queueUrl })}
     </div>
   `;
 
@@ -227,10 +221,8 @@ function renderNotificationDigest(opts: {
         ? "Irregular Pearl — 1 draft awaits your review"
         : `Irregular Pearl — ${opts.count} drafts await your review`,
     preheader: lede,
-    subtitle: "Awaiting review",
     bodyHtml,
-    footerNote: "You're receiving this because a draft was routed to your byline.",
-    footerLink: { text: "Open your queue", href: queueUrl },
+    footerLink: { text: "Manage email preferences", href: "https://irregularpearl.org/settings#email" },
   });
 }
 

@@ -86,7 +86,7 @@ export default function EmailPreferences() {
     {
       key: 'email_weekly_digest',
       title: 'Weekly Digest',
-      description: 'A summary of new pieces added to the catalog every Monday.',
+      description: 'A summary of new pieces added to the catalog every Sunday.',
     },
   ];
 

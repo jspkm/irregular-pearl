@@ -2,7 +2,7 @@ name: Weekly Digest Email
 
 on:
   schedule:
-    - cron: '0 3 * * 1' # Every Monday at 03:00 UTC
+    - cron: '0 13 * * 0' # Every Sunday at 13:00 UTC = 09:00 ET (EDT; 08:00 during EST)
   workflow_dispatch: # Manual trigger
 
 jobs:
