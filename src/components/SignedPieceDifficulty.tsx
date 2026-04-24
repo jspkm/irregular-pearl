@@ -501,6 +501,8 @@ function DifficultyEditForm(props: {
   const setAxis = (key: AxisKey, patch: Partial<AxisDraft>) =>
     setDraft((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
 
+  const canSubmit = AXIS_ORDER.some(({ key }) => draft[key].level > 0);
+
   return (
     <div>
       <div className="diff-edit-grid">
@@ -551,7 +553,7 @@ function DifficultyEditForm(props: {
         <button
           type="button"
           onClick={() => props.onSubmit(draft)}
-          disabled={props.submitting}
+          disabled={props.submitting || !canSubmit}
           className="diff-edit-primary"
         >
           {props.submitting ? submittingLabel : submitLabel}
