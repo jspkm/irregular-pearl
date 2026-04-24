@@ -347,7 +347,11 @@ export default function RequestContributionDialog({
       return;
     }
 
-    window.location.href = `/piece/${pieceId}?compose=${requestId}`;
+    // Preserve the current location as the "return" so Send / Save & exit /
+    // Delete on the drafting banner lands the user back where they entered
+    // drafting mode from (the same piece page, in this case).
+    const returnTo = `${window.location.pathname}${window.location.search}`;
+    window.location.href = `/piece/${pieceId}?compose=${requestId}&return=${encodeURIComponent(returnTo)}`;
   }
 
   const canSubmit =

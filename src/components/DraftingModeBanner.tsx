@@ -40,6 +40,21 @@ function readComposeRequestIdFromUrl(): string | null {
   return /^[0-9a-f-]{8,}$/i.test(raw) ? raw : null;
 }
 
+// Where to go when the sender finishes (Send / Save & exit / Delete). Entry
+// points (RequestContributionDialog, RequestsAdmin "Resume") encode the
+// origin in `return`; the banner respects that so the sender lands back
+// where they started. Same-origin paths only — defensive against anyone
+// hand-crafting a URL that points off-site.
+function readReturnUrl(fallback: string): string {
+  if (typeof window === 'undefined') return fallback;
+  const raw = new URLSearchParams(window.location.search).get('return');
+  if (!raw) return fallback;
+  const decoded = (() => { try { return decodeURIComponent(raw); } catch { return null; } })();
+  if (!decoded) return fallback;
+  if (!decoded.startsWith('/') || decoded.startsWith('//')) return fallback;
+  return decoded;
+}
+
 export default function DraftingModeBanner({ pieceId }: Props) {
   const [status, setStatus] = useState<Status>('loading');
   const [request, setRequest] = useState<OutboxRequest | null>(null);
@@ -117,14 +132,13 @@ export default function DraftingModeBanner({ pieceId }: Props) {
     const { errorMessage } = await sendRequest(request.id);
     setBusy(null);
     if (errorMessage) { setError(errorMessage); return; }
-    // Redirect back to the piece without ?compose so the banner unmounts.
-    window.location.href = `/piece/${pieceId}`;
+    window.location.href = readReturnUrl(`/piece/${pieceId}`);
   }
 
   function handleSaveAndExit() {
     if (busy) return;
     setBusy('save');
-    window.location.href = `/piece/${pieceId}`;
+    window.location.href = readReturnUrl(`/piece/${pieceId}`);
   }
 
   async function handleDelete() {
@@ -134,7 +148,7 @@ export default function DraftingModeBanner({ pieceId }: Props) {
     const { errorMessage } = await deleteOutboxRequest(request.id);
     setBusy(null);
     if (errorMessage) { setError(errorMessage); setConfirmDelete(false); return; }
-    window.location.href = `/`;
+    window.location.href = readReturnUrl(`/`);
   }
 
   if (status !== 'ready' || !request) return null;

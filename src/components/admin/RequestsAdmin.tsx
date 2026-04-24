@@ -142,7 +142,7 @@ export default function RequestsAdmin() {
                     </div>
                   </div>
                   <a
-                    href={`/piece/${row.pieceId}?compose=${row.requestId}`}
+                    href={`/piece/${row.pieceId}?compose=${row.requestId}&return=${encodeURIComponent('/admin')}`}
                     className="text-sm text-[#6B4E7C] no-underline hover:underline whitespace-nowrap"
                   >
                     Resume →
