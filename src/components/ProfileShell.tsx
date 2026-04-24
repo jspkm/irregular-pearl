@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/useAuth';
 import { supabase, hasSupabase } from '../lib/supabase';
-import { SIGN_IN_TRIGGER_URL } from '../lib/privateRoute';
 import ArtistProfile from './ArtistProfile';
 import AppearanceSettings from './AppearanceSettings';
 import EmailPreferences from './EmailPreferences';
 import PasswordSettings from './PasswordSettings';
+import SignInPanel from './SignInPanel';
 
 type Section = 'profile' | 'setting';
 
@@ -23,22 +23,22 @@ export default function ProfileShell({ userId }: { userId: string }) {
   const [userRole, setUserRole] = useState<string>('user');
   const [isMaestro, setIsMaestro] = useState(false);
 
-  // When ?section=setting is on the URL but this isn't the viewer's own
-  // profile, the link was meant for the account that owns this profile —
-  // typically an email footer clicked from a different session. Redirect:
-  // anon → sign-in, signed-in-as-different-user → their own setting tab.
+  // ?section=setting is an owner-only view. When the viewer is signed in as
+  // a different user (e.g. clicked someone else's email footer), send them
+  // to their own settings tab instead. Anon is handled inline below with a
+  // SignInPanel so the URL is preserved across auth — otherwise the intent
+  // is lost to the sign-in redirect.
   useEffect(() => {
     if (authLoading) return;
     if (section !== 'setting') return;
+    if (!user) return;
     if (isOwnProfile) return;
     if (typeof window === 'undefined') return;
-    if (!user) {
-      window.location.replace(SIGN_IN_TRIGGER_URL);
-      return;
-    }
     const hash = window.location.hash || '';
-    window.location.replace(`/profile/${user.id}?section=setting${hash}`);
+    window.location.replace(`/profile/${user.id}?section=settings${hash}`);
   }, [authLoading, section, isOwnProfile, user]);
+
+  const needsSignIn = !authLoading && section === 'setting' && !user;
 
   // Scroll to the hash after mount so #email lands at the email section.
   useEffect(() => {
@@ -82,6 +82,15 @@ export default function ProfileShell({ userId }: { userId: string }) {
     window.history.replaceState(null, '', url.toString());
   };
 
+  if (needsSignIn) {
+    return (
+      <SignInPanel
+        onClose={() => { window.location.replace('/'); }}
+        title="Sign in to manage settings"
+      />
+    );
+  }
+
   if (!isOwnProfile) {
     return <ArtistProfile userId={userId} />;
   }
@@ -105,7 +114,7 @@ export default function ProfileShell({ userId }: { userId: string }) {
           onClick={() => switchSection('profile')}
         />
         <SidebarItem
-          label="Setting"
+          label="Settings"
           active={section === 'setting'}
           onClick={() => switchSection('setting')}
         />
@@ -197,7 +206,7 @@ function SidebarItem({
 function SettingsPanel() {
   return (
     <div className="max-w-[600px]">
-      <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Setting</h1>
+      <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Settings</h1>
       <section id="appearance" className="mb-10">
         <AppearanceSettings />
       </section>
