@@ -67,7 +67,7 @@ interface AxisDraft {
   note: string;
 }
 
-type Draft = Record<AxisKey, AxisDraft>;
+export type Draft = Record<AxisKey, AxisDraft>;
 
 function emptyDraft(): Draft {
   return {
@@ -76,6 +76,10 @@ function emptyDraft(): Draft {
     interpretive: { level: 0, note: '' },
     ensemble: { level: 0, note: '' },
   };
+}
+
+export function hasRatedAxis(draft: Draft): boolean {
+  return AXIS_ORDER.some(({ key }) => draft[key].level > 0);
 }
 
 function draftFromRating(r: PublishedPieceDifficulty): Draft {
@@ -501,7 +505,7 @@ function DifficultyEditForm(props: {
   const setAxis = (key: AxisKey, patch: Partial<AxisDraft>) =>
     setDraft((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
 
-  const canSubmit = AXIS_ORDER.some(({ key }) => draft[key].level > 0);
+  const canSubmit = hasRatedAxis(draft);
 
   return (
     <div>
