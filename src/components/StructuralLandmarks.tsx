@@ -329,9 +329,10 @@ function LandmarkForm({ pieceId, movementId, mode, onCancel, onPublished }: Form
       ? await supabase.rpc('publish_contributor_landmark_edit', {
           p_landmark_id: editing.landmarkId,
           p_measure_start: mStart,
-          p_measure_end: mEnd,
+          // SQL accepts NULL; generated type marks it required `number`.
+          p_measure_end: mEnd as number,
           p_label: label.trim(),
-          p_description: description.trim() === '' ? null : description,
+          p_description: description.trim() === '' ? '' : description,
           p_flags: flags,
           p_practice_notes: cleanedPNs,
         })
@@ -339,9 +340,10 @@ function LandmarkForm({ pieceId, movementId, mode, onCancel, onPublished }: Form
           p_piece_id: pieceId,
           p_movement_id: movementId,
           p_measure_start: mStart,
-          p_measure_end: mEnd,
+          // SQL accepts NULL; generated type marks it required `number`.
+          p_measure_end: mEnd as number,
           p_label: label.trim(),
-          p_description: description.trim() === '' ? null : description,
+          p_description: description.trim() === '' ? '' : description,
           p_flags: flags,
           p_practice_notes: cleanedPNs,
         });

@@ -68,6 +68,8 @@
   /* Accent */
   --accent: #6B4E7C;
   --accent-soft: #F4F3F5;
+  --accent-hover: #4C385C;
+  --accent-border: #D9CCE1;
 
   /* Semantic */
   --warning: #8B6914;
@@ -176,6 +178,8 @@ html[data-theme="dark"] {
   --border-strong: #524E47;
   --accent: #B299C4;
   --accent-soft: #2A2230;
+  --accent-hover: #D6C2E3;
+  --accent-border: #4A3B56;
   --warning: #D9B878;
   --warning-soft: #332A18;
   --info: #8FB0E0;

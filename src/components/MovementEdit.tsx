@@ -124,10 +124,10 @@ export default function MovementEdit({ movement, onUpdated }: Props) {
       p_movement_id: movement.id,
       p_ordinal: fields.ordinal,
       p_name: name,
-      p_tempo_indication: fields.tempoIndication.trim() || null,
-      p_key_signature: fields.keySignature.trim() || null,
-      p_meter: fields.meter.trim() || null,
-      p_edit_summary: fields.editSummary.trim() || null,
+      p_tempo_indication: fields.tempoIndication.trim(),
+      p_key_signature: fields.keySignature.trim(),
+      p_meter: fields.meter.trim(),
+      p_edit_summary: fields.editSummary.trim() || undefined,
     });
 
     if (error) {

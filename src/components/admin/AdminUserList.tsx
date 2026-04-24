@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../../lib/supabase';
+import type { UserLevel } from '../../lib/database.types';
 
 const SECTIONS = [
   'baroque', 'classical', 'romantic', 'late-romantic', 'impressionist', '20th-century', 'post-romantic',
@@ -10,7 +11,7 @@ interface User {
   id: string;
   display_name: string;
   instrument: string | null;
-  level: string | null;
+  level: UserLevel | null;
   role: string;
   is_maestro: boolean;
   managed_sections: string[];

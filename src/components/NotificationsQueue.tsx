@@ -282,7 +282,7 @@ function MessageCard({
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <a
           href={`/piece/${m.pieceId}`}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-bg text-sm font-medium rounded-lg hover:bg-ink transition-colors no-underline"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-ink text-bg text-sm font-medium rounded-lg hover:opacity-90 transition-opacity no-underline"
         >
           Open piece <span aria-hidden="true">→</span>
         </a>

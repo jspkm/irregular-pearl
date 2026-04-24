@@ -335,10 +335,10 @@ function AddMovementModal({
     const { error } = await supabase.rpc('create_movement', {
       p_piece_id: pieceId,
       p_name: name,
-      p_tempo_indication: fields.tempoIndication.trim() || null,
-      p_key_signature: fields.keySignature.trim() || null,
-      p_meter: fields.meter.trim() || null,
-      p_edit_summary: fields.editSummary.trim() || null,
+      p_tempo_indication: fields.tempoIndication.trim() || undefined,
+      p_key_signature: fields.keySignature.trim() || undefined,
+      p_meter: fields.meter.trim() || undefined,
+      p_edit_summary: fields.editSummary.trim() || undefined,
     });
     if (error) {
       const pretty = error.message.includes('rate limit')

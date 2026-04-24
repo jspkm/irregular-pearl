@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
+import type { UserLevel } from '../lib/database.types';
 import { useAuth } from '../lib/useAuth';
 import { normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import UsernameEditor from './UsernameEditor';
@@ -9,7 +10,7 @@ interface ProfileData {
   id: string;
   display_name: string;
   instrument: string | null;
-  level: string | null;
+  level: UserLevel | null;
   avatar_url: string | null;
   username: string | null;
   bio: string;
@@ -48,7 +49,12 @@ export default function ArtistProfile({ userId }: { userId: string }) {
           level: data.level || '',
           website: data.website || '',
           location: data.location || '',
-          social_links: data.social_links || {},
+          social_links:
+            typeof data.social_links === 'object' &&
+            data.social_links !== null &&
+            !Array.isArray(data.social_links)
+              ? (data.social_links as Record<string, string>)
+              : {},
         });
       }
       setLoading(false);
@@ -58,15 +64,16 @@ export default function ArtistProfile({ userId }: { userId: string }) {
   const handleSave = async () => {
     if (!isOwnProfile || !profile) return;
     const cleanLinks = Object.fromEntries(Object.entries(editForm.social_links).filter(([, v]) => v));
+    const nextLevel = (editForm.level || null) as UserLevel | null;
     await supabase.from('users').update({
       bio: editForm.bio,
       instrument: editForm.instrument || null,
-      level: editForm.level || null,
+      level: nextLevel,
       website: editForm.website || null,
       location: editForm.location || null,
       social_links: cleanLinks,
     }).eq('id', profile.id);
-    setProfile(prev => prev ? { ...prev, ...editForm } : null);
+    setProfile(prev => prev ? { ...prev, ...editForm, level: nextLevel } : null);
     setEditing(false);
   };
 

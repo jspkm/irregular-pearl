@@ -124,6 +124,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
       const v = vById.get(s.current_version_id);
       const c = cById.get(s.contributor_id);
       if (!v || !c) continue;
+      if (v.id === null || v.body === null || v.version_number === null) continue;
       rows.push({
         schoolId: s.id,
         versionId: v.id,

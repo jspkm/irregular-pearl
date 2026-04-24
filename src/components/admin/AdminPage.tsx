@@ -82,15 +82,18 @@ export default function AdminPage({ initialTab }: Props) {
 
   return (
     <div className="min-h-screen bg-bg">
-      <div className="bg-ink text-bg px-4 md:px-6 py-3 flex items-center justify-between">
+      <div
+        className="px-4 md:px-6 py-3 flex items-center justify-between"
+        style={{ background: '#1A1A1A', color: '#FFFFFF' }}
+      >
         <div className="flex items-center gap-4">
-          <a href="/" className="text-lg font-medium tracking-tight text-bg no-underline opacity-70 hover:opacity-100">IrregularPearl</a>
-          <span className="text-xs text-bg/40">|</span>
+          <a href="/" className="text-lg font-medium tracking-tight no-underline opacity-70 hover:opacity-100" style={{ color: '#FFFFFF' }}>IrregularPearl</a>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>|</span>
           <span className="text-sm font-medium">{headerLabel}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-bg/60">{profile.display_name}</span>
-          <a href="/" className="text-xs text-bg/40 hover:text-bg no-underline">← Back to site</a>
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{profile.display_name}</span>
+          <a href="/" className="text-xs no-underline hover:opacity-100" style={{ color: 'rgba(255,255,255,0.4)' }}>← Back to site</a>
         </div>
       </div>
 

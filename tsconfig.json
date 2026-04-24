@@ -6,6 +6,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
-  }
+    },
+    "types": ["bun"]
+  },
+  "exclude": [
+    "dist",
+    "dist-preview",
+    "node_modules",
+    "supabase/functions"
+  ]
 }

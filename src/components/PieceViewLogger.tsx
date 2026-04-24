@@ -42,7 +42,7 @@ export default function PieceViewLogger({ pieceId }: Props) {
     const visitorToken = readOrMintVisitorToken();
     void supabase.rpc('log_piece_view', {
       p_piece_id: pieceId,
-      p_visitor_token: visitorToken,
+      p_visitor_token: visitorToken ?? undefined,
     });
   }, [pieceId]);
 

@@ -304,7 +304,7 @@ export default function DraftingModeBanner({ pieceId }: Props) {
           background: var(--warning-soft);
           padding: 4px 8px;
           border-radius: 4px;
-          border: 0.5px solid var(--warning-soft);
+          border: 0.5px solid var(--warning);
         }
         .dm-btn {
           font-family: inherit;

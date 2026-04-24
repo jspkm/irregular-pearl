@@ -5,7 +5,7 @@ import { validateSlug } from '../lib/helpers';
 interface UsernameEditorProps {
   userId: string;
   currentUsername: string | null;
-  onUsernameChange: (username: string) => void;
+  onUsernameChange?: (username: string) => void;
 }
 
 export default function UsernameEditor({ userId, currentUsername, onUsernameChange }: UsernameEditorProps) {
@@ -52,7 +52,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
     setSaving(false);
     setSaved(true);
     setEditing(false);
-    onUsernameChange(trimmed);
+    onUsernameChange?.(trimmed);
     setTimeout(() => setSaved(false), 3000);
   };
 
@@ -84,7 +84,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:bg-ink transition-colors border-none cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer"
           >
             Claim your URL
           </button>
@@ -119,7 +119,7 @@ export default function UsernameEditor({ userId, currentUsername, onUsernameChan
         <button
           onClick={handleSave}
           disabled={saving || !username.trim()}
-          className="px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:bg-ink transition-colors border-none cursor-pointer disabled:opacity-50"
+          className="px-3 py-1.5 bg-ink text-bg text-xs font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>

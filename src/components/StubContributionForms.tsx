@@ -87,7 +87,7 @@ export default function StubContributionForms({ pieceId, existingDescription, ex
                   </button>
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="px-3 py-1 rounded-md font-sans font-medium text-[12px] text-white bg-accent border-none cursor-pointer hover:bg-accent-hover transition-colors"
+                    className="px-3 py-1 rounded-md font-sans font-medium text-[12px] text-bg bg-accent border-none cursor-pointer hover:bg-accent-hover transition-colors"
                   >
                     Save
                   </button>
@@ -151,7 +151,7 @@ export default function StubContributionForms({ pieceId, existingDescription, ex
           />
           <button
             onClick={addMovement}
-            className="py-1.5 px-3.5 bg-accent text-white border-none rounded-md font-sans font-medium text-[12px] cursor-pointer hover:bg-accent-hover transition-colors whitespace-nowrap"
+            className="py-1.5 px-3.5 bg-accent text-bg border-none rounded-md font-sans font-medium text-[12px] cursor-pointer hover:bg-accent-hover transition-colors whitespace-nowrap"
           >
             Add
           </button>

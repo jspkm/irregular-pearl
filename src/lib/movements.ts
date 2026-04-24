@@ -33,7 +33,7 @@ export interface MovementVersion {
   keySignature: string | null;
   meter: string | null;
   versionNumber: number;
-  authoredBy: string;
+  authoredBy: string | null;
   createdAt: string;
   editSummary: string | null;
   revertedFromVersionId: string | null;
@@ -205,7 +205,7 @@ type MovementVersionRow = {
   key_signature: string | null;
   meter: string | null;
   version_number: number;
-  authored_by: string;
+  authored_by: string | null;
   created_at: string;
   edit_summary: string | null;
   reverted_from_version_id: string | null;
