@@ -7,12 +7,18 @@ import EmailPreferences from './EmailPreferences';
 import PasswordSettings from './PasswordSettings';
 import SignInPanel from './SignInPanel';
 
-type Section = 'profile' | 'setting';
+type Section = 'profile' | 'setting' | 'security';
 
 function readSectionFromUrl(): Section {
   if (typeof window === 'undefined') return 'profile';
   const param = new URLSearchParams(window.location.search).get('section');
-  return param === 'setting' ? 'setting' : 'profile';
+  if (param === 'setting') return 'setting';
+  if (param === 'security') return 'security';
+  return 'profile';
+}
+
+function isOwnerOnly(s: Section): boolean {
+  return s === 'setting' || s === 'security';
 }
 
 export default function ProfileShell({ userId }: { userId: string }) {
@@ -23,26 +29,26 @@ export default function ProfileShell({ userId }: { userId: string }) {
   const [userRole, setUserRole] = useState<string>('user');
   const [isMaestro, setIsMaestro] = useState(false);
 
-  // ?section=setting is an owner-only view. When the viewer is signed in as
-  // a different user (e.g. clicked someone else's email footer), send them
-  // to their own settings tab instead. Anon is handled inline below with a
-  // SignInPanel so the URL is preserved across auth — otherwise the intent
-  // is lost to the sign-in redirect.
+  // Settings and Security are owner-only views. When the viewer is signed in
+  // as a different user (e.g. clicked someone else's email footer), send
+  // them to the same section on their own profile instead. Anon is handled
+  // inline below with a SignInPanel so the URL is preserved across auth —
+  // otherwise the intent is lost to the sign-in redirect.
   useEffect(() => {
     if (authLoading) return;
-    if (section !== 'setting') return;
+    if (!isOwnerOnly(section)) return;
     if (!user) return;
     if (isOwnProfile) return;
     if (typeof window === 'undefined') return;
     const hash = window.location.hash || '';
-    window.location.replace(`/profile/${user.id}?section=settings${hash}`);
+    window.location.replace(`/profile/${user.id}?section=${section}${hash}`);
   }, [authLoading, section, isOwnProfile, user]);
 
-  const needsSignIn = !authLoading && section === 'setting' && !user;
+  const needsSignIn = !authLoading && isOwnerOnly(section) && !user;
 
   // Scroll to the hash after mount so #email lands at the email section.
   useEffect(() => {
-    if (section !== 'setting' || !isOwnProfile) return;
+    if (!isOwnerOnly(section) || !isOwnProfile) return;
     if (typeof window === 'undefined' || !window.location.hash) return;
     const id = window.location.hash.slice(1);
     requestAnimationFrame(() => {
@@ -91,7 +97,7 @@ export default function ProfileShell({ userId }: { userId: string }) {
         // user to non-null so this component re-renders into the Settings
         // tab. A navigation here (the default onClose) would drop the URL.
         onSignedIn={() => { /* no-op: URL is already correct */ }}
-        title="Sign in to manage settings"
+        title={section === 'security' ? 'Sign in to manage security' : 'Sign in to manage settings'}
       />
     );
   }
@@ -117,6 +123,11 @@ export default function ProfileShell({ userId }: { userId: string }) {
           label="Profile"
           active={section === 'profile'}
           onClick={() => switchSection('profile')}
+        />
+        <SidebarItem
+          label="Security"
+          active={section === 'security'}
+          onClick={() => switchSection('security')}
         />
         <SidebarItem
           label="Settings"
@@ -162,6 +173,7 @@ export default function ProfileShell({ userId }: { userId: string }) {
       <div className="min-w-0">
         {section === 'profile' && <ArtistProfile userId={userId} />}
         {section === 'setting' && <SettingsPanel />}
+        {section === 'security' && <SecurityPanel />}
       </div>
     </div>
   );
@@ -215,10 +227,18 @@ function SettingsPanel() {
       <section id="appearance" className="mb-10">
         <AppearanceSettings />
       </section>
-      <section id="email" className="mb-10 pt-8 border-t border-border">
+      <section id="email" className="pt-8 border-t border-border">
         <EmailPreferences />
       </section>
-      <section id="password" className="pt-8 border-t border-border">
+    </div>
+  );
+}
+
+function SecurityPanel() {
+  return (
+    <div className="max-w-[600px]">
+      <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Security</h1>
+      <section id="password">
         <PasswordSettings />
       </section>
     </div>
