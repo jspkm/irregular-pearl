@@ -332,10 +332,29 @@ function renderBodyPreview(draft: PendingDraft) {
   if (draft.kind === 'interpretive_school') {
     const name = typeof p.name === 'string' ? p.name : '(unnamed)';
     const body = typeof p.body === 'string' ? p.body : '';
+    const cueEntries =
+      p.tempo_cues && typeof p.tempo_cues === 'object' && !Array.isArray(p.tempo_cues)
+        ? Object.entries(p.tempo_cues as Record<string, unknown>).filter(
+            ([, v]) => typeof v === 'string' && v.trim().length > 0,
+          )
+        : [];
     return (
       <>
         <div className="pending-draft-school-name">{name}</div>
         <div className="pending-draft-prose">{body}</div>
+        {cueEntries.length > 0 && (
+          <div className="pending-draft-tempo">
+            <span className="pending-draft-tempo-label">Tempo cues</span>
+            <ul className="pending-draft-tempo-list">
+              {cueEntries.map(([section, value]) => (
+                <li key={section}>
+                  <span className="pending-draft-tempo-section">{section}</span>
+                  <span className="pending-draft-tempo-value">{value as string}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </>
     );
   }

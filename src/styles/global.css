@@ -568,6 +568,45 @@ body {
   font-size: 16px;
   margin-bottom: 6px;
 }
+.pending-draft-tempo {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--color-surface);
+  border: 0.5px solid var(--border-strong);
+}
+.pending-draft-tempo-label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.pending-draft-tempo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.pending-draft-tempo-list li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+.pending-draft-tempo-section {
+  font-family: var(--font-sans);
+  color: var(--muted);
+  font-style: italic;
+}
+.pending-draft-tempo-value {
+  font-family: var(--font-serif);
+  color: var(--ink);
+}
 .pending-draft-landmark-head {
   display: flex;
   align-items: baseline;
