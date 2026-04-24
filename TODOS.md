@@ -52,6 +52,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Cleanup
 
+### `/settings` direct URL returns 404
+
+**What:** Navigating to `http://.../settings` returns 404. The canonical URL for the settings tab is `/profile/<uuid>?section=setting`, and the user-menu "Settings" link points there correctly. But a user who types `/settings` in the address bar or a bookmark that guessed the path lands on "Page Not Found".
+
+**Why:** Low-severity UX paper cut. The tab link works; only direct-URL users hit this. Easy fix: add a permanent redirect from `/settings` → `/profile/<current-user-uuid>?section=setting` (or a server-rendered 302 that resolves the current user).
+
+**Context:** Found by `/qa` on 2026-04-24. Report: `.gstack/qa-reports/qa-report-localhost-2026-04-24-signed.md` (ISSUE-002).
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
 ### Fix `AddPieceForm` for `canonical_index_id` requirement
 
 **What:** [AddPieceForm.tsx](src/components/AddPieceForm.tsx) inserts into `pieces` without `canonical_index_id`, but migration `20260522000000` made the column NOT NULL. The v0.5.1 type-cleanup pass cast the insert payload `as any` with a TODO comment so `tsc --noEmit` passes, but the form would still fail at runtime on the FK constraint.

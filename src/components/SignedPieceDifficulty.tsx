@@ -67,7 +67,7 @@ interface AxisDraft {
   note: string;
 }
 
-type Draft = Record<AxisKey, AxisDraft>;
+export type Draft = Record<AxisKey, AxisDraft>;
 
 function emptyDraft(): Draft {
   return {
@@ -76,6 +76,10 @@ function emptyDraft(): Draft {
     interpretive: { level: 0, note: '' },
     ensemble: { level: 0, note: '' },
   };
+}
+
+export function hasRatedAxis(draft: Draft): boolean {
+  return AXIS_ORDER.some(({ key }) => draft[key].level > 0);
 }
 
 function draftFromRating(r: PublishedPieceDifficulty): Draft {
@@ -501,6 +505,8 @@ function DifficultyEditForm(props: {
   const setAxis = (key: AxisKey, patch: Partial<AxisDraft>) =>
     setDraft((d) => ({ ...d, [key]: { ...d[key], ...patch } }));
 
+  const canSubmit = hasRatedAxis(draft);
+
   return (
     <div>
       <div className="diff-edit-grid">
@@ -551,7 +557,7 @@ function DifficultyEditForm(props: {
         <button
           type="button"
           onClick={() => props.onSubmit(draft)}
-          disabled={props.submitting}
+          disabled={props.submitting || !canSubmit}
           className="diff-edit-primary"
         >
           {props.submitting ? submittingLabel : submitLabel}
