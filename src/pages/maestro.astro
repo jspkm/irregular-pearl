@@ -1,18 +1,7 @@
 ---
-import AdminPage from '../components/admin/AdminPage';
+// /maestro is a legacy URL from when the playlist surface had its own route.
+// Everything role-gated now lives at /admin; the AdminPage component filters
+// tabs by role so maestro-only users land on the playlist tab automatically.
+// Permanent redirect preserves any outstanding bookmarks.
+return Astro.redirect('/admin', 301);
 ---
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maestro | Irregular Pearl</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-</head>
-<style>
-  @import '../styles/global.css';
-</style>
-<body>
-  <AdminPage initialTab="playlist" client:load />
-</body>
-</html>
