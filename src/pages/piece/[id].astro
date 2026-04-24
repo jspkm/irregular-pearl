@@ -41,13 +41,13 @@ const stub = isStub(piece);
 
 let hasActiveRequests = false;
 if (stub && !expand && !composing && hasSupabase) {
-  const { count } = await supabase
-    .from('contribution_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('piece_id', piece.id)
-    .is('cleared_at', null)
-    .not('sent_at', 'is', null);
-  hasActiveRequests = (count ?? 0) > 0;
+  // Call the security-definer RPC: SSR's anon-session client can't SELECT
+  // contribution_requests directly (RLS scopes reads to sender/recipient/staff),
+  // so we go through a function that exposes only a boolean.
+  const { data } = await supabase.rpc('piece_has_active_contribution_requests', {
+    p_piece_id: piece.id,
+  });
+  hasActiveRequests = data === true;
 }
 
 const mode: 'pre-piece' | 'full' =
