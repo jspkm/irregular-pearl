@@ -157,6 +157,18 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </div>
   </div>
 
+  {/* Identity-layer description. The encyclopedia paragraph is part
+      of what the piece *is* — like the title and catalog number — not
+      content awaiting a signature. Render in both modes; in 'full' mode
+      it also appears as the bottom-of-stack "Seed data" card inside
+      SignedPieceDescription with vote thumbs (a different role). Here
+      it's plain identity prose. */}
+  {isAwaiting && piece.description && piece.description.trim().length > 0 && (
+    <section class="block" id="identity-description">
+      <p class="piece-intro">{piece.description}</p>
+    </section>
+  )}
+
   {isAwaiting && (
     <section class="block pp-invite" id="invitation">
       <p class="pp-invite-lede">
