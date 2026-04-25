@@ -127,7 +127,11 @@ export async function getPieceBasic(id: string): Promise<PieceBasic | null> {
       .eq('id', id)
       .single();
 
-    if (error || !data) return null;
+    // `.single()` should return one row or an error, but in environments
+    // where the Accept header is mangled (happy-dom in component tests),
+    // postgrest can fall back to returning an empty array — treat that as
+    // "no row".
+    if (error || !data || (Array.isArray(data) && data.length === 0)) return null;
 
     return {
       id: data.id,
@@ -196,7 +200,13 @@ export async function getPieceFull(id: string): Promise<PieceFull | null> {
         .maybeSingle(),
     ]);
 
-    if (pieceResult.error || !pieceResult.data) return null;
+    if (
+      pieceResult.error ||
+      !pieceResult.data ||
+      (Array.isArray(pieceResult.data) && pieceResult.data.length === 0)
+    ) {
+      return null;
+    }
 
     const data = pieceResult.data;
     const has_signed_content = stateResult.data?.has_signed_content ?? false;
