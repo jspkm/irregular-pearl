@@ -235,13 +235,20 @@ export async function getPieceFull(id: string): Promise<PieceFull | null> {
 }
 
 /**
- * Returns true when the piece is in its "pre-piece" state — no published
- * signed content (performer's note, interpretive school, landmark, piece
- * description). The URL exists but the page is a deliberate blank slot,
- * inviting the first contributor.
+ * Returns true when the piece is in its "awaiting first contribution" state —
+ * no published signed content (no performer's notes, no signed schools,
+ * no landmarks, no signed piece descriptions). Editions, external links,
+ * movements, recordings, pedagogical arc, and the unsigned identity-layer
+ * description paragraph are NOT signals that lift a piece out of the
+ * awaiting state — only signed editorial work counts.
  *
- * Design doc: the pre-piece page is visibly different from an active piece
- * page. This predicate drives that branch.
+ * Design doc: the awaiting-first-contribution page is visibly different
+ * from an active piece page. Identity (title, catalog, byline, pills,
+ * description paragraph) and reference (editions, links, movements,
+ * recordings, pedagogical arc) render normally; signed-content sections
+ * are gated behind the invite block until the first contribution lands.
+ *
+ * This predicate drives that branch.
  */
 export function isStub(piece: PieceFull): boolean {
   return !piece.has_signed_content;
