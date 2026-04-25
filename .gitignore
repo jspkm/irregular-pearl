@@ -16,6 +16,7 @@ supabase/.branches/
 dist-preview/
 .context/
 .claude/
+.worktrees/
 outreach-emails.csv
 
 # Local dev bring-up script — gitignored so it can carry real secrets.
