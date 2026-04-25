@@ -186,6 +186,14 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 
 ## Completed
 
+### Awaiting-first-contribution page renders identity + reference layer
+
+**What:** Restructured the piece page so awaiting-first-contribution mode renders the unsigned identity description (encyclopedia paragraph), editions, external references, recordings, movements, pedagogical arc, and change log link — only signed-content sections stay hidden. Mode renamed from `pre-piece` to `awaiting-first-contribution` for clarity. The movements section kicker reads "Movements" in awaiting mode and "Structural landmarks" in full mode.
+
+**Why:** Stub pages were barren by accident — seeded reference data (IMSLP links, edition list, movement structure, encyclopedia paragraph) existed in the database but was hidden by the pre-piece collapse. The 17 of 18 production pieces still in awaiting state now display real reference content for visitors and a coherent invite for would-be contributors. The encyclopedia description is identity, not content awaiting a signature.
+
+**Completed:** v0.5.3 (2026-04-25)
+
 ### Dark-theme visibility sweep + color-palette.htm + tsc cleanup
 
 **What:** Swept every surface that paired literal `#fff` text with a token-driven background, fixing the dark-mode invisible-button family of bugs (Save/Publish/Send/Delete in modals, difficulty-axis level chips, wiki-edit dialog, signed-content edit forms, NavbarBell badge, Toast). Adopted `color-palette.htm` at repo root as the visual source of truth — both themes side-by-side with tagged component samples (T/B/C/D/A/R/P/F/W/I/X/H/E). Defined missing `--accent-hover` and `--accent-border` in `:root` + dark block. Pinned Toast and admin header always-dark with literal hex (interrupt-surface UX). Replaced 60+ Tailwind arbitrary `text-[#XXX]`/`bg-[#XXX]` with semantic utilities that flip with the theme. Cleaned up 66 pre-existing TypeScript errors that had been silently passing because `bun run build` doesn't run `tsc --noEmit` (added `@types/bun`, set `"types": ["bun"]`, excluded `supabase/functions` from the Node-side typecheck, fixed lib mappers + component RPC sites).
