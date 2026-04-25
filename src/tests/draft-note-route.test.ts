@@ -17,6 +17,18 @@
 
 import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from 'bun:test';
 
+// Capture the real createClient BEFORE installing the fake. Bun's mock.module
+// is process-global, so once installed the fake leaks into every test file in
+// the run (src/lib/supabase.test.ts and src/lib/pieces.test.ts both saw a
+// createClient stripped of `.from`). We make the fake conditional: when
+// `useFake` is off, calls fall through to the real createClient. This file's
+// describe blocks flip the flag on/off in beforeAll/afterAll, so other test
+// files always see the real implementation. Save the FN reference, not the
+// namespace — `import * as` returns a live binding that follows the mock.
+const realSupabaseModule = await import('@supabase/supabase-js');
+const realCreateClient = realSupabaseModule.createClient;
+let useFake = false;
+
 // ── Programmable Supabase fake ──
 // Each test sets these via seedSupabase({...}); the mock's auth.getUser() and
 // rpc() read them. Default is "everything succeeds" so the happy path is
@@ -38,10 +50,13 @@ function seedSupabase(patch: Partial<SupabaseSeed>): void {
 }
 
 await mock.module('@supabase/supabase-js', () => ({
-  createClient: () => ({
-    auth: { getUser: (...args: unknown[]) => currentSeed.getUser(...(args as [])) },
-    rpc: (...args: unknown[]) => currentSeed.rpc(...(args as [])),
-  }),
+  createClient: (...args: Parameters<typeof realCreateClient>) =>
+    useFake
+      ? {
+          auth: { getUser: (...a: unknown[]) => currentSeed.getUser(...(a as [])) },
+          rpc: (...a: unknown[]) => currentSeed.rpc(...(a as [])),
+        }
+      : realCreateClient(...args),
 }));
 
 // Import the route AFTER mock.module is registered so the handler's
@@ -57,6 +72,7 @@ let fetchImpl: (url: string, init: RequestInit) => Promise<Response> = async () 
 const realFetch = globalThis.fetch;
 
 beforeEach(() => {
+  useFake = true;
   currentSeed = defaultSeed;
   fetchCalls = [];
   fetchImpl = async () =>
@@ -72,6 +88,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  useFake = false;
   globalThis.fetch = realFetch;
 });
 

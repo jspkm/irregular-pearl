@@ -74,7 +74,7 @@ describe('fetchPendingDraftsOnPiece (recipient view)', () => {
     // Recipient queries the table directly — RLS scopes to live drafts addressed to them.
     const { data: rows, error } = await recipient.client
       .from('contribution_request_drafts')
-      .select('id, request_id, kind, payload, created_at, inline_dismissed_at');
+      .select('id, request_id, kind, payload, created_at');
     expect(error).toBeNull();
     expect(rows?.length).toBe(2);
     const kinds = rows!.map((r) => r.kind).sort();
@@ -112,30 +112,6 @@ describe('fetchPendingDraftsOnPiece (recipient view)', () => {
       await deleteTestPiece(otherPieceId);
       await deleteAuthUser(otherRecipient.id);
     }
-  });
-
-  test('inline_dismissed_at set: recipient still sees row but UI filters it', async () => {
-    const { data: requestId } = await staff.client.rpc('create_outbox_request', {
-      p_piece_id: pieceId,
-      p_recipient_id: recipient.id,
-      p_note: null,
-    });
-    const { data: draftId } = await staff.client.rpc('propose_draft', {
-      p_request_id: requestId as string,
-      p_kind: 'piece_description',
-      p_payload: { body: 'For todos.' },
-    });
-    await staff.client.rpc('send_request', { p_request_id: requestId as string });
-    await recipient.client.rpc('dismiss_draft_inline', { p_draft_id: draftId as string });
-
-    const { data } = await recipient.client
-      .from('contribution_request_drafts')
-      .select('id, inline_dismissed_at')
-      .eq('id', draftId as string)
-      .single();
-    expect(data?.inline_dismissed_at).not.toBeNull();
-    // The lib filters out inlineDismissedAt rows from the inline render. Pinned
-    // here so a future "always show" change is intentional.
   });
 
   test('dispositioned drafts disappear from recipient view (RLS)', async () => {
@@ -227,29 +203,6 @@ describe('fetchPendingDraftsForViewer (cross-piece, Drafts tab)', () => {
 
     const pieceIds = [...new Set((rawRequests ?? []).map((r) => r.piece_id))].sort();
     expect(pieceIds).toEqual([piece1, piece2]);
-  });
-
-  test('inline_dismissed_at drafts still appear (Drafts tab includes them)', async () => {
-    const { data: req3 } = await staff.client.rpc('create_outbox_request', {
-      p_piece_id: piece1, p_recipient_id: recipient.id, p_note: null,
-    });
-    const { data: draftId } = await staff.client.rpc('propose_draft', {
-      p_request_id: req3 as string,
-      p_kind: 'interpretive_school',
-      p_payload: { name: 'School', body: 'For todos.' },
-    });
-    await staff.client.rpc('send_request', { p_request_id: req3 as string });
-    await recipient.client.rpc('dismiss_draft_inline', { p_draft_id: draftId as string });
-
-    // Cross-piece query: dismissed-from-inline drafts STILL show on the
-    // Drafts tab (the lib's fetchPendingDraftsForViewer doesn't filter
-    // them out — that's the whole point of "Add to Todo").
-    const { data } = await recipient.client
-      .from('contribution_request_drafts')
-      .select('id, inline_dismissed_at')
-      .eq('id', draftId as string)
-      .single();
-    expect(data?.inline_dismissed_at).not.toBeNull();
   });
 
   test('pieces query exposes title + composer_name for each draft', async () => {
