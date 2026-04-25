@@ -15,7 +15,7 @@ A non-profit, cellist-forward classical music knowledge hub. Every piece gets a 
 - **Wiki-edit movements** — any signed-in user can fix a movement name, tempo, key, or ordinal in place, with version history and revert
 - **Edition comparisons** with publisher, editor, year, and editorial notes
 - **Artist profiles** — public pages at `/@username` with bio and instruments
-- **Search** across pieces via Supabase full-text search, with grouped typeahead showing IN THE CATALOG (materialized pieces) and NOT YET CURATED (canonical index entries not yet live as full piece pages)
+- **Search** across pieces via Supabase full-text search, with grouped typeahead showing IN THE CATALOG (pieces with at least one signed contribution) and NOT YET CURATED (stubs and canonical index entries not yet contributed to)
 - **Request a contribution** — any musician with >= 1 published signed contribution can ask a specific user (by username) to curate a piece; recipients see a contextual "asked you to contribute here" ribbon on the piece page and an entry in their unified Messages feed. Staff can draft the personal note with an LLM assist (Claude Haiku 4.5, 20 drafts/staff/24h).
 - **Browse by** composer, instrument, or era — each with a dedicated, crawlable page
 

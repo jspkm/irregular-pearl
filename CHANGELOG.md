@@ -14,6 +14,8 @@ Mode label `pre-piece` renamed to `awaiting-first-contribution` across the layou
 
 No DB changes. No new components. The `.piece-intro` class previously used only in `full` mode now carries identity prose in awaiting mode.
 
+Typeahead grouping aligned with the `has_signed_content` semantic. Previously any `pieces` row was counted as IN THE CATALOG; stubs (materialized but zero signed contributions) were misclassified. The `search_pieces_typeahead` RPC now derives `result_type` from `v_pieces_with_content_state` (`'in_catalog'` when at least one signed contribution exists, `'not_yet_curated'` for stubs and canonical-only entries). A new `is_materialized` boolean lets the click handler branch between navigate (pieces row exists) and materialize-then-navigate (canonical only). Locked by a new integration test against the local Supabase stack.
+
 ## [0.5.2] - 2026-04-24
 
 ### Email templates + settings consolidation
