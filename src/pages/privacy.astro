@@ -21,16 +21,20 @@ import Navbar from '../components/Navbar.astro';
       <p>Your data is used solely to operate Irregular Pearl: displaying your contributions, attributing your reviews, and showing which pieces you're working on. We use Supabase for authentication and database hosting.</p>
 
       <h2 class="text-base font-semibold text-ink pt-4">4. Third-party services</h2>
+      <p>Services that handle your data:</p>
       <ul class="list-disc pl-5 space-y-1">
-        <li><strong class="text-ink">Supabase</strong> — authentication and database hosting</li>
-        <li><strong class="text-ink">Cloudflare</strong> — website hosting and CDN</li>
+        <li><strong class="text-ink">Supabase</strong> — authentication, database hosting, and Edge Functions for transactional email composition</li>
+        <li><strong class="text-ink">Cloudflare</strong> — website hosting, CDN, and edge runtime</li>
         <li><strong class="text-ink">Google</strong> — optional OAuth sign-in provider</li>
-        <li><strong class="text-ink">YouTube</strong> — embedded recordings (loaded only when you click play)</li>
+        <li><strong class="text-ink">Resend</strong> — transactional email delivery (welcome, weekly digests, contribution notifications)</li>
+        <li><strong class="text-ink">Anthropic (Claude)</strong> — used by staff as a coding and editing assistant. We do not publish anonymous AI-generated content under false bylines.</li>
+        <li><strong class="text-ink">YouTube, Vimeo, Spotify, SoundCloud, Bandcamp, Internet Archive</strong> — embedded recordings</li>
+        <li><strong class="text-ink">IMSLP, Wikipedia</strong> — external reference links</li>
       </ul>
       <p>Each service has its own privacy policy. We encourage you to review them.</p>
 
       <h2 class="text-base font-semibold text-ink pt-4">5. Data retention</h2>
-      <p>Your account data and contributions are retained as long as your account exists. You may request deletion of your account and all associated data by contacting us.</p>
+      <p>Your account data and contributions are retained as long as your account exists. You can account and all associated data using <strong> Delete my account</strong> feature.</p>
 
       <h2 class="text-base font-semibold text-ink pt-4">6. Children</h2>
       <p>Irregular Pearl is not directed at children under 13. We do not knowingly collect data from children under 13.</p>
@@ -39,7 +43,7 @@ import Navbar from '../components/Navbar.astro';
       <p>We may update this policy. Material changes will be noted on this page with an updated effective date.</p>
 
       <h2 class="text-base font-semibold text-ink pt-4">8. Contact</h2>
-      <p>For privacy questions, reach out through our GitHub repository.</p>
+      <p>For privacy questions, email <a class="text-accent underline" href="mailto:info@irregularpearl.org">info@irregularpearl.org</a>.</p>
     </div>
   </main>
 </Layout>
