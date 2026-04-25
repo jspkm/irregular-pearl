@@ -161,7 +161,7 @@ export default function AdminSignals() {
           </label>
         </div>
         {viewedNoContent.length === 0 ? (
-          <p className="text-sm text-muted italic">No piece views recorded yet for pre-piece entries.</p>
+          <p className="text-sm text-muted italic">No piece views recorded yet for awaiting-first-contribution entries.</p>
         ) : (
           <table className="w-full text-sm border-t-[0.5px] border-border">
             <thead>
