@@ -960,6 +960,45 @@
             </div>
             <div class="cap">H · inverted bar at top of /admin · bg-ink + text-bg (never text-white)</div>
           </div>
+
+          <div class="sample">
+            <div class="sample-label">[AFC] Awaiting first contribution · <span class="ref">src/components/PiecePageLayout.astro (mode=awaiting-first-contribution) · .piece-intro / .pp-invite-* / .pp-cta-* / .kicker in piece-page.css</span></div>
+            <!-- AFC1: Piece header — title + catalog number + byline + pills -->
+            <div style="margin-bottom:20px">
+              <div style="font-family:var(--font-serif);font-size:34px;font-weight:500;line-height:1.15;letter-spacing:-0.005em;color:var(--ink);margin-bottom:6px">
+                <span class="tag">AFC1</span>Suite for cello solo no. 1 in G major
+                <span style="font-family:var(--font-mono);font-size:16px;color:var(--muted);font-weight:400;letter-spacing:0;margin-left:6px">BWV 1007</span>
+              </div>
+              <div style="font-size:15px;color:var(--muted);margin-bottom:16px">
+                by <a href="#" style="color:var(--ink);text-decoration-color:var(--border-strong);text-underline-offset:3px">Johann Sebastian Bach</a>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0;align-items:center">
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">cello</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">baroque</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">suite</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">~20 min</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">advanced</span>
+              </div>
+            </div>
+            <!-- AFC2: Identity description — .piece-intro paragraph -->
+            <p style="font-family:var(--font-serif);font-size:16px;line-height:1.68;color:var(--ink);max-width:640px;margin:0 0 32px"><span class="tag">AFC2</span>The first of Bach's six suites for unaccompanied cello, composed during his Cöthen period, is the most widely performed of the set. Its Prelude has become a cultural emblem far beyond the concert hall. Despite its seeming simplicity, each movement rewards lifelong study — the suites stand as the cellist's counterpart to the Well-Tempered Clavier.</p>
+            <!-- AFC3: Invite block — .pp-invite-lede + .pp-invite-prose + .pp-cta-row -->
+            <p style="font-family:var(--font-serif);font-size:22px;font-weight:500;line-height:1.35;color:var(--ink);margin:0 0 12px"><span class="tag">AFC3</span>This piece has no signed contributions yet.</p>
+            <p style="font-size:15px;color:var(--muted);line-height:1.6;max-width:640px;margin:0 0 32px">Write the first performer's note, a practice note on a specific passage, or an interpretive school you'd defend in front of colleagues.</p>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:32px">
+              <button class="btn-cta"><span class="tag">AFC4</span>Start the first contribution</button>
+              <button class="btn-link"><span class="tag">AFC5</span>Know someone who should? Request a contribution.</button>
+            </div>
+            <!-- AFC6: Section kicker + one movement row -->
+            <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px"><span class="tag">AFC6</span>Movements</div>
+            <div style="display:grid;grid-template-columns:82px 1fr;gap:20px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:start">
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">I</span>
+              <span style="font-size:14px;font-weight:500;color:var(--ink)">Prélude
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:10px">G major · 4/4</span>
+              </span>
+            </div>
+            <div class="cap">AFC1 piece header: h1.piece (--font-serif 34px 500) + .cat (--font-mono 16px muted) · byline 15px muted, composer underlined as link · AFC2 identity desc (.piece-intro): --font-serif 16px lh 1.68 ink, max-width 640px · AFC3 invite lede (.pp-invite-lede): --font-serif 22px 500 lh 1.35 ink · invite prose (.pp-invite-prose): 15px muted lh 1.6 · AFC4 primary CTA (.pp-cta-primary = .btn-cta): ink bg + var(--bg) text · AFC5 ghost link (.pp-cta-ghost = .btn-link): accent color with trailing arrow · AFC6 section kicker (.kicker): 11px 500 uppercase accent · movement row mirrors .lm in piece-page.css</div>
+          </div>
         </div>
       </div>
     </section>
@@ -1232,6 +1271,45 @@
               </div>
             </div>
             <div class="cap">H · inverted bar at top of /admin · bg-ink + text-bg (never text-white)</div>
+          </div>
+
+          <div class="sample">
+            <div class="sample-label">[AFC] Awaiting first contribution · <span class="ref">src/components/PiecePageLayout.astro (mode=awaiting-first-contribution) · .piece-intro / .pp-invite-* / .pp-cta-* / .kicker in piece-page.css</span></div>
+            <!-- AFC1: Piece header — title + catalog number + byline + pills -->
+            <div style="margin-bottom:20px">
+              <div style="font-family:var(--font-serif);font-size:34px;font-weight:500;line-height:1.15;letter-spacing:-0.005em;color:var(--ink);margin-bottom:6px">
+                <span class="tag">AFC1</span>Suite for cello solo no. 1 in G major
+                <span style="font-family:var(--font-mono);font-size:16px;color:var(--muted);font-weight:400;letter-spacing:0;margin-left:6px">BWV 1007</span>
+              </div>
+              <div style="font-size:15px;color:var(--muted);margin-bottom:16px">
+                by <a href="#" style="color:var(--ink);text-decoration-color:var(--border-strong);text-underline-offset:3px">Johann Sebastian Bach</a>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0;align-items:center">
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">cello</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">baroque</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">suite</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">~20 min</span>
+                <span style="font-size:12px;padding:3px 10px;border-radius:9999px;background:var(--bg-tint);color:var(--muted);border:0.5px solid var(--border)">advanced</span>
+              </div>
+            </div>
+            <!-- AFC2: Identity description — .piece-intro paragraph -->
+            <p style="font-family:var(--font-serif);font-size:16px;line-height:1.68;color:var(--ink);max-width:640px;margin:0 0 32px"><span class="tag">AFC2</span>The first of Bach's six suites for unaccompanied cello, composed during his Cöthen period, is the most widely performed of the set. Its Prelude has become a cultural emblem far beyond the concert hall. Despite its seeming simplicity, each movement rewards lifelong study — the suites stand as the cellist's counterpart to the Well-Tempered Clavier.</p>
+            <!-- AFC3: Invite block — .pp-invite-lede + .pp-invite-prose + .pp-cta-row -->
+            <p style="font-family:var(--font-serif);font-size:22px;font-weight:500;line-height:1.35;color:var(--ink);margin:0 0 12px"><span class="tag">AFC3</span>This piece has no signed contributions yet.</p>
+            <p style="font-size:15px;color:var(--muted);line-height:1.6;max-width:640px;margin:0 0 32px">Write the first performer's note, a practice note on a specific passage, or an interpretive school you'd defend in front of colleagues.</p>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin-bottom:32px">
+              <button class="btn-cta"><span class="tag">AFC4</span>Start the first contribution</button>
+              <button class="btn-link"><span class="tag">AFC5</span>Know someone who should? Request a contribution.</button>
+            </div>
+            <!-- AFC6: Section kicker + one movement row -->
+            <div style="font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px"><span class="tag">AFC6</span>Movements</div>
+            <div style="display:grid;grid-template-columns:82px 1fr;gap:20px;padding:10px 0;border-bottom:0.5px solid var(--border);align-items:start">
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">I</span>
+              <span style="font-size:14px;font-weight:500;color:var(--ink)">Prélude
+                <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted);font-weight:400;margin-left:10px">G major · 4/4</span>
+              </span>
+            </div>
+            <div class="cap">AFC1 piece header: h1.piece (--font-serif 34px 500) + .cat (--font-mono 16px muted) · byline 15px muted, composer underlined as link · AFC2 identity desc (.piece-intro): --font-serif 16px lh 1.68 ink, max-width 640px · AFC3 invite lede (.pp-invite-lede): --font-serif 22px 500 lh 1.35 ink · invite prose (.pp-invite-prose): 15px muted lh 1.6 · AFC4 primary CTA (.pp-cta-primary = .btn-cta): ink bg + var(--bg) text · AFC5 ghost link (.pp-cta-ghost = .btn-link): accent color with trailing arrow · AFC6 section kicker (.kicker): 11px 500 uppercase accent · movement row mirrors .lm in piece-page.css</div>
           </div>
         </div>
       </div>
