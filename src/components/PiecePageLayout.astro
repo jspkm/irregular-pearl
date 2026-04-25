@@ -58,16 +58,12 @@ interface Props {
    *
    * 'full' renders the complete piece page including all signed-content
    * sections.
-   *
-   * 'pre-piece' is a deprecated alias for 'awaiting-first-contribution'
-   * retained for one PR cycle to keep the build green during rename.
-   * Remove in a follow-up commit.
    */
-  mode?: 'awaiting-first-contribution' | 'pre-piece' | 'full';
+  mode?: 'awaiting-first-contribution' | 'full';
 }
 
 const { piece, mode = 'full' } = Astro.props;
-const isAwaiting = mode === 'awaiting-first-contribution' || mode === 'pre-piece';
+const isAwaiting = mode === 'awaiting-first-contribution';
 // Drafting mode: a staff member opens a piece with ?compose=<request_id> to
 // compose drafts on an outbox request before sending. The banner + composer
 // are client-mounted (they make their own auth + ownership checks); we only
