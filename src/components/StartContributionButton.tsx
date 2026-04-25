@@ -1,9 +1,8 @@
-// "Start the first contribution" primary CTA on the pre-piece page.
-// - Signed-in: navigates to the same piece URL with ?expand=1, which
-//   server-renders the full PiecePageLayout (all writeable sections:
-//   performer's notes, schools, landmarks, etc.). The pre-piece page
-//   stays deliberately read-only until this click so no one nudges
-//   into writing accidentally.
+// "Start the first contribution" primary CTA on the awaiting-first-contribution
+// piece page. Routes to /piece/<id>?expand=1 which forces the layout into
+// 'full' mode so every signed-content section is rendered (performer's notes,
+// schools, landmarks, etc.). The awaiting page surfaces this CTA once and
+// only once, at the bottom of the invite block.
 // - Signed-out: opens the SignInPanel inline on the current piece page
 //   (no home-page detour). After successful sign-in the pending action
 //   auto-resumes via useRequireAuth, so the user doesn't click twice.
