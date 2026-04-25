@@ -34,12 +34,13 @@ describe('getPieceFull', () => {
 });
 
 describe('isStub', () => {
-  // Pre-piece semantics (current): a piece is a "stub" iff it has no
-  // published signed content. Editions, external links, and seed-sourced
-  // metadata are NOT sufficient to lift a piece out of pre-piece state —
-  // only a published performer's note / interpretive school / landmark /
-  // piece description counts. Matches the design doc's pre-piece model and
-  // aligns the language with the typeahead's NOT YET CURATED group.
+  // Awaiting-first-contribution semantics: a piece is a "stub" iff it has
+  // no published signed content. Editions, external links, movements, and
+  // the unsigned identity-layer description paragraph are NOT sufficient
+  // to lift a piece out of the awaiting state — only a published
+  // performer's note / interpretive school / landmark / piece description
+  // counts. Matches the design doc and aligns the language with the
+  // typeahead's NOT YET CURATED group.
 
   function pieceBase(overrides: Partial<PieceFull> = {}): PieceFull {
     return {
@@ -93,6 +94,22 @@ describe('isStub', () => {
       external_links: [],
     });
     expect(isStub(activeNoResources)).toBe(false);
+  });
+
+  test('awaiting-first-contribution state survives identity + reference layer being populated', () => {
+    // Identity layer (description) and reference layer (editions, links,
+    // movements) are all populated, but no signed content exists. The
+    // piece is still in the awaiting state — only signed editorial work
+    // lifts it out. This is the rule the layout depends on for deciding
+    // when to render the invite block.
+    const populatedButUnsigned = pieceBase({
+      has_signed_content: false,
+      description: 'A short virtuoso showpiece for cello and piano...',
+      editions: [{ id: 'e1', publisher: 'Henle', editor: 'Ed', year: 2020, description: 'Good' }],
+      external_links: [{ type: 'youtube', url: 'https://youtube.com/x', label: 'Video', source: 'user' }],
+      movements: [{ name: 'I.', key: 'C', meter: '4/4' }],
+    });
+    expect(isStub(populatedButUnsigned)).toBe(true);
   });
 });
 

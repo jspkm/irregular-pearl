@@ -4,6 +4,18 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-04-25
+
+### Awaiting-first-contribution page renders identity + reference layer
+
+Pieces with zero signed contributions now render the unsigned identity description, editions, external references, recordings, movements, and pedagogical arc. Only signed-content sections (performer's notes, signed piece descriptions, signed difficulty, interpretive schools, structural landmarks) stay hidden behind the invite block. The encyclopedia description is treated as identity — like the title — not as content awaiting a signature.
+
+Mode label `pre-piece` renamed to `awaiting-first-contribution` across the layout, route, and tests. Section kicker on the movements block reads "Movements" in awaiting mode and "Structural landmarks" in full mode, reflecting the role shift when landmarks unlock.
+
+No DB changes. No new components. The `.piece-intro` class previously used only in `full` mode now carries identity prose in awaiting mode.
+
+Typeahead grouping aligned with the `has_signed_content` semantic. Previously any `pieces` row was counted as IN THE CATALOG; stubs (materialized but zero signed contributions) were misclassified. The `search_pieces_typeahead` RPC now derives `result_type` from `v_pieces_with_content_state` (`'in_catalog'` when at least one signed contribution exists, `'not_yet_curated'` for stubs and canonical-only entries). A new `is_materialized` boolean lets the click handler branch between navigate (pieces row exists) and materialize-then-navigate (canonical only). Locked by a new integration test against the local Supabase stack.
+
 ## [0.5.2] - 2026-04-24
 
 ### Email templates + settings consolidation

@@ -49,18 +49,21 @@ import DraftingModeBanner from './DraftingModeBanner';
 interface Props {
   piece: PieceFull;
   /**
-   * 'pre-piece' hides every write surface below the ribbon and shows
-   * the invitation block + CTAs. 'full' renders the complete piece
-   * page: signed descriptions, difficulty, performer's notes, landmarks,
-   * schools, editions, recordings, pedagogical arc, references.
-   * There is only one piece page; `mode` is the one axis that
-   * decides whether write affordances are visible. Defaults to 'full'.
+   * 'awaiting-first-contribution' renders identity (title, catalog,
+   * byline, pills, description paragraph) + reference layer (editions,
+   * external links, movements, recordings, pedagogical arc) + the
+   * invite block. Signed-content sections (performer's notes,
+   * signed piece descriptions, signed difficulty, interpretive schools,
+   * structural landmarks) are hidden.
+   *
+   * 'full' renders the complete piece page including all signed-content
+   * sections.
    */
-  mode?: 'pre-piece' | 'full';
+  mode?: 'awaiting-first-contribution' | 'full';
 }
 
 const { piece, mode = 'full' } = Astro.props;
-const isPrePiece = mode === 'pre-piece';
+const isAwaiting = mode === 'awaiting-first-contribution';
 // Drafting mode: a staff member opens a piece with ?compose=<request_id> to
 // compose drafts on an outbox request before sending. The banner + composer
 // are client-mounted (they make their own auth + ownership checks); we only
@@ -146,7 +149,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
         by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
       </p>
 
-      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isPrePiece} />
+      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isAwaiting} />
     </div>
 
     <div class="piece-header-aside">
@@ -154,7 +157,20 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </div>
   </div>
 
-  {isPrePiece && (
+  {/* Identity-layer description. The encyclopedia paragraph is part
+      of what the piece *is* — like the title and catalog number — not
+      content awaiting a signature. Renders only in awaiting mode here
+      as plain identity prose; in 'full' mode the same text appears as
+      the bottom-of-stack "Seed data" card inside SignedPieceDescription
+      with vote thumbs (a different role). */}
+  {isAwaiting && piece.description && piece.description.trim().length > 0 && (
+    <section class="block" id="identity-description">
+      <p class="piece-intro">{piece.description}</p>
+    </section>
+  )}
+
+  {/* ===== Status: awaiting first contribution ===== */}
+  {isAwaiting && (
     <section class="block pp-invite" id="invitation">
       <p class="pp-invite-lede">
         This piece has no signed contributions yet.
@@ -177,65 +193,66 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </section>
   )}
 
-  {!isPrePiece && (
+  {/* ===== Signed-content sections (gated to full mode) ===== */}
+  {!isAwaiting && (
     <>
-  {/* Signed descriptions stack (includes the unsigned pieces.description as
-      a synthetic "Seed data" card at the bottom of the stack; user-authored
-      entries sort above by vote score). */}
-  <section class="block" id="signed-description">
-    <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} seedDescriptionVoteId={seedDescriptionVoteId} />
-  </section>
+      {/* Signed descriptions stack (includes the unsigned pieces.description as
+          a synthetic "Seed data" card at the bottom of the stack; user-authored
+          entries sort above by vote score). */}
+      <section class="block" id="signed-description">
+        <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} seedDescriptionVoteId={seedDescriptionVoteId} />
+      </section>
 
+      <section class="block" id="difficulty">
+        <div class="kicker">Difficulty</div>
+        <SignedPieceDifficulty
+          client:load
+          pieceId={piece.id}
+          initialRatings={difficultyRatings}
+          seedAxes={axes ?? null}
+          seedDifficultyVoteId={seedDifficultyVoteId}
+        />
+      </section>
 
-  <section class="block" id="difficulty">
-    <div class="kicker">Difficulty</div>
-    <SignedPieceDifficulty
-      client:load
-      pieceId={piece.id}
-      initialRatings={difficultyRatings}
-      seedAxes={axes ?? null}
-      seedDifficultyVoteId={seedDifficultyVoteId}
-    />
-  </section>
+      <section class="block" id="performers-notes">
+        <div class="kicker">Performer's notes</div>
+        <PerformersNotes client:load pieceId={piece.id} initialNotes={performersNotes} />
+      </section>
 
+      <section class="block" id="interpretive-schools">
+        <div class="kicker">Interpretive schools</div>
+        <InterpretiveSchools client:load pieceId={piece.id} initialSchools={interpretiveSchools} />
+      </section>
+    </>
+  )}
 
-  {/* ---------- Performer's notes ---------- */}
-  <section class="block" id="performers-notes">
-    <div class="kicker">Performer's notes</div>
-    <PerformersNotes client:load pieceId={piece.id} initialNotes={performersNotes} />
-  </section>
-
-  {/* ---------- Structural landmarks ---------- */}
+  {/* ===== Reference layer (renders in both modes) =====
+      Movements, editions, recordings, pedagogical arc, external references
+      are unsigned reference data per PRD §54 ("structured fields can be
+      unsigned"). They render regardless of whether signed content exists.
+      Landmarks ride inside MovementsList; in awaiting mode we pass an
+      empty landmarksByMovement so the signed landmarks stay gated. */}
   <section class="block">
-    <div class="kicker">Structural landmarks</div>
+    <div class="kicker">{isAwaiting ? 'Movements' : 'Structural landmarks'}</div>
     <MovementsList
       client:load
       pieceId={piece.id}
       initialMovements={dbMovements}
       seedMovements={seedMovements}
-      landmarksByMovement={landmarksByMovement}
+      landmarksByMovement={isAwaiting ? {} : landmarksByMovement}
     />
   </section>
 
-  {/* ---------- Interpretive schools ---------- */}
-  <section class="block" id="interpretive-schools">
-    <div class="kicker">Interpretive schools</div>
-    <InterpretiveSchools client:load pieceId={piece.id} initialSchools={interpretiveSchools} />
-  </section>
-
-  {/* ---------- Editions (wiki-edit) ---------- */}
   <section class="block">
     <div class="kicker">Editions</div>
     <EditionsList client:load pieceId={piece.id} initialEditions={dbEditions} />
   </section>
 
-  {/* ---------- Recordings (collapsed list, open to play) ---------- */}
   <section class="block">
     <div class="kicker">Recordings</div>
     <RecordingsList client:load pieceId={piece.id} initialLinks={dbRecordingLinks} />
   </section>
 
-  {/* ---------- Pedagogical arc (wiki-edit) ---------- */}
   <section class="block">
     <div class="kicker">Pedagogical arc</div>
     <PedagogicalArcList
@@ -246,19 +263,14 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     />
   </section>
 
-  {/* ---------- External references (IMSLP, Wikipedia) — wiki-edit ---------- */}
   <section class="block">
     <div class="kicker">External references</div>
     <ExternalRefsList client:load pieceId={piece.id} initialLinks={dbReferenceLinks} />
   </section>
 
-  {/* ---------- Change log link (its own page) ---------- */}
   <p class="change-log-link">
     <a href={`/piece/${piece.id}/change-log`}>Change log</a>
   </p>
-
-    </>
-  )}
 
 </main>
 

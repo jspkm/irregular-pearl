@@ -1,6 +1,6 @@
 # Version
 
-Current: **0.5.2** (2026-04-24)
+Current: **0.5.3** (2026-04-25)
 
 The version number lives in three places that must stay in sync:
 
@@ -36,6 +36,7 @@ Pre-1.0, this project follows a relaxed semver:
 
 | Version | Date | Tag | GitHub release | Anchor commit | One-line summary |
 |---------|------|-----|----------------|---------------|------------------|
+| 0.5.3 | 2026-04-25 | `v0.5.3` | [v0.5.3](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.3) | release commit | Awaiting-first-contribution page renders identity + reference layer: unsigned encyclopedia description, editions, external references, recordings, movements, and pedagogical arc visible in awaiting mode; signed-content sections stay hidden behind the invite block. Mode label renamed from `pre-piece` to `awaiting-first-contribution`. Movements kicker reads "Movements" in awaiting mode and "Structural landmarks" in full mode. No DB changes. |
 | 0.5.2 | 2026-04-24 | `v0.5.2` | [v0.5.2](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.2) | release commit | Email + settings refresh: welcome email ported to Claude-kit layout with PRD-aligned copy, weekly digest cron moved to Sunday mornings (9:30 ET, offset from daily notification-digest), notification-digest footer cleaned, new Notification Email pref toggle (email_notification_digest column + opt-out branch in edge function), /settings page consolidated into profile shell as a URL-routed Settings tab, password panel split into its own Security tab, inline SignInPanel preserves destination URL across auth. |
 | 0.5.1 | 2026-04-24 | `v0.5.1` | [v0.5.1](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.1) | release commit | Dark-mode contrast pass: every white-on-token-bg surface readable in both themes (Save/Publish/Send/Delete buttons, Toast, badges, wiki-edit dialog, signed-content forms). Tailwind arbitrary `text-[#XXX]` swept to semantic utilities. New `color-palette.htm` reference doc with tagged component samples. TypeScript type-drift cleanup across lib/ + components (66 errors → 0; tsconfig now excludes Deno files and pulls `@types/bun`). |
 | 0.5.0 | 2026-04-23 | `v0.5.0` | [v0.5.0](https://github.com/jspkm/irregular-pearl/releases/tag/v0.5.0) | release commit | Contribution-request drafts completed: staff drafting mode on the piece page (banner + composer panel), new Requests admin tab (outbox + immutable sent archive), three legacy admin pages retired, 21 staff-draft RPCs dropped, `draft_status` + `notification_type` enums rebuilt, `fulfilled_at` + vestigial columns removed. Self-author path unchanged. No-feedback principle enforced end-to-end. |

@@ -52,6 +52,18 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Cleanup
 
+### Decide gating for landmark + movement wiki-edit affordances in awaiting mode
+
+**What:** v0.5.3 made the reference layer render in awaiting-first-contribution mode (movements, editions, etc.). `MovementsList` shows the per-movement reorder ↑↓, edit ✎, delete ×, and "+ Add movement" affordances unconditionally; `StructuralLandmarks` (rendered inside MovementsList per movement) shows its "+ Add landmark at this passage" button regardless of mode. All anon-gated, but a signed-in user on an awaiting piece can author a landmark today — which is a signed structural contribution that should arguably route through the invite block, not appear as a sibling reference action.
+
+**Why:** Two product calls overlap here. (a) Movement metadata (key, meter, tempo) is unsigned reference per PRD §54 — wiki-edit affordances on movements are arguably correct in awaiting mode. (b) Landmarks are a signed editorial contribution per PRD §440 — the "Add landmark" button bypasses the awaiting-mode invite framing. Decide whether: (i) suppress landmark-creation affordance in awaiting mode (add `awaitingMode` prop to MovementsList → forwards to StructuralLandmarks); or (ii) accept that landmark authoring is a valid alternate path to flipping `has_signed_content` and let it stand. If (i), one new prop, one conditional, no migration.
+
+**Context:** Surfaced in the v0.5.3 final code review (`docs/superpowers/plans/2026-04-25-awaiting-first-contribution-page.md` Task 7b open question). Pre-existing behavior of StructuralLandmarks — not introduced by v0.5.3, just made visible by it.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** None
+
 ### `/settings` direct URL returns 404
 
 **What:** Navigating to `http://.../settings` returns 404. The canonical URL for the settings tab is `/profile/<uuid>?section=setting`, and the user-menu "Settings" link points there correctly. But a user who types `/settings` in the address bar or a bookmark that guessed the path lands on "Page Not Found".
@@ -185,6 +197,14 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 ---
 
 ## Completed
+
+### Awaiting-first-contribution page renders identity + reference layer
+
+**What:** Restructured the piece page so awaiting-first-contribution mode renders the unsigned identity description (encyclopedia paragraph), editions, external references, recordings, movements, pedagogical arc, and change log link — only signed-content sections stay hidden. Mode renamed from `pre-piece` to `awaiting-first-contribution` for clarity. The movements section kicker reads "Movements" in awaiting mode and "Structural landmarks" in full mode. Typeahead grouping updated: IN THE CATALOG now requires at least one signed contribution (`has_signed_content`); stubs join canonical-only entries under NOT YET CURATED, with `is_materialized` letting the click handler branch between navigate and materialize-then-navigate.
+
+**Why:** Stub pages were barren by accident — seeded reference data (IMSLP links, edition list, movement structure, encyclopedia paragraph) existed in the database but was hidden by the pre-piece collapse. The 17 of 18 production pieces still in awaiting state now display real reference content for visitors and a coherent invite for would-be contributors. The encyclopedia description is identity, not content awaiting a signature. The typeahead grouping fix aligns the IN THE CATALOG label with the product's signed-content definition rather than the weaker "piece row exists" proxy.
+
+**Completed:** v0.5.3 (2026-04-25)
 
 ### Dark-theme visibility sweep + color-palette.htm + tsc cleanup
 

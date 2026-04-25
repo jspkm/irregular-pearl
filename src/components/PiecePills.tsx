@@ -31,8 +31,9 @@ interface Props {
   initialPills: Pill[];
   /**
    * Display-only mode: hides the + add affordance and the per-pill ×
-   * delete affordance. Used on the pre-piece (stub) page where no
-   * edit surfaces should appear until the viewer clicks the primary CTA.
+   * delete affordance. Used on the awaiting-first-contribution page
+   * where no signed content exists yet and the pills carry identity,
+   * not editorial.
    */
   readOnly?: boolean;
 }

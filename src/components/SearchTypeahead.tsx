@@ -1,9 +1,11 @@
-// Global navbar typeahead. Calls search_pieces_typeahead RPC which returns
-// two groups: IN THE CATALOG (already-materialized pieces) and NOT YET
-// CURATED (seed entries from the canonical index). Clicking a catalog row
-// navigates to the piece page. Clicking a seed row triggers materialize
-// (signed-in only); signed-out users get the existing sign-in prompt and
-// finish the click post-auth via a return_to URL.
+// Search typeahead. Returns up to ~16 results from search_pieces_typeahead,
+// split into two groups by the catalog status: IN THE CATALOG (pieces with
+// at least one signed contribution) and NOT YET CURATED (everything else —
+// stubs whose page exists but has no signed prose yet, plus canonical
+// index entries that haven't been materialized into a pieces row at all).
+// Clicking a row with is_materialized=true navigates to the existing
+// piece page. Clicking a row with is_materialized=false triggers
+// materialize_piece_from_index and then navigates to the new page.
 //
 // Inherits the navbar's search-input visual spec (shadow-md exception per
 // DESIGN.md decisions log). Dropdown follows the popover pattern: bg-surface,
@@ -16,7 +18,8 @@ import { useRequireAuth } from '../lib/useRequireAuth';
 import SignInPanel from './SignInPanel';
 
 interface Result {
-  result_type: 'materialized' | 'seed';
+  result_type: 'in_catalog' | 'not_yet_curated';
+  is_materialized: boolean;
   id: string;
   title: string;
   composer_name: string;
@@ -190,12 +193,14 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
   }
 
   function handleSelect(r: Result) {
-    if (r.result_type === 'materialized') {
+    if (r.is_materialized) {
+      // Pieces row exists (in_catalog or stub): navigate directly.
       window.location.href = piecePath(r.id);
       return;
     }
-    // Seed: anon gets SignInPanel with the seed stashed as the pending
-    // action; on successful sign-in the materialize + navigate resumes.
+    // Canonical-only entry: anon gets SignInPanel with the entry stashed as
+    // the pending action; on successful sign-in the materialize + navigate
+    // resumes.
     setPendingSeed(r);
     gate(() => {
       setPendingSeed(null);
@@ -225,8 +230,8 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     }
   }
 
-  const materialized = results.filter((r) => r.result_type === 'materialized');
-  const seed = results.filter((r) => r.result_type === 'seed');
+  const inCatalog = results.filter((r) => r.result_type === 'in_catalog');
+  const notYetCurated = results.filter((r) => r.result_type === 'not_yet_curated');
   const hasResults = results.length > 0;
   const showNoMatch = open && !loading && q.trim().length >= 2 && !hasResults;
   const showDropdown = open && (loading || hasResults || showNoMatch);
@@ -335,24 +340,24 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
             <div className="px-4 py-3 text-xs text-muted">Searching…</div>
           )}
 
-          {materialized.length > 0 && (
+          {inCatalog.length > 0 && (
             <div>
               <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">
                 In the catalog
               </div>
               <div className="divide-y divide-border">
-                {materialized.map((r) => renderRow(r, results.indexOf(r)))}
+                {inCatalog.map((r) => renderRow(r, results.indexOf(r)))}
               </div>
             </div>
           )}
 
-          {seed.length > 0 && (
-            <div className={materialized.length > 0 ? 'border-t border-border mt-1 pt-1' : ''}>
+          {notYetCurated.length > 0 && (
+            <div className={inCatalog.length > 0 ? 'border-t border-border mt-1 pt-1' : ''}>
               <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">
                 Not yet curated
               </div>
               <div className="divide-y divide-border">
-                {seed.map((r) => renderRow(r, results.indexOf(r)))}
+                {notYetCurated.map((r) => renderRow(r, results.indexOf(r)))}
               </div>
             </div>
           )}

@@ -22,18 +22,20 @@ if (!piece) {
   return Astro.redirect('/');
 }
 
-// One piece page, one layout. Mode decides whether write surfaces are
-// visible. Pre-piece mode (the page has no signed content yet, and the
-// viewer hasn't clicked the primary CTA) hides every write affordance
-// and shows only the invitation block. ?expand=1 flips to the full
-// writeable mode — that's where "Start the first contribution" routes.
+// One piece page, one layout. Mode decides which sections render.
+// Awaiting-first-contribution mode (no signed content yet, and the viewer
+// hasn't clicked the primary CTA) renders identity (title, byline, pills,
+// description) + reference layer (movements, editions, recordings,
+// pedagogical arc, external references) + the invite block; signed-content
+// sections (performer's notes, signed piece descriptions, signed
+// difficulty, interpretive schools, structural landmarks) stay hidden.
+// ?expand=1 flips to the full writeable mode — that's where "Start the
+// first contribution" routes.
 // ?compose=<request_id> also forces 'full' so the sender can draft into
 // each section of a piece that's still a stub.
 // A piece with un-cleared sent contribution_requests also renders 'full',
 // because it's under active editorial conversation — the recipient needs
-// the section components to render so proposed drafts display inline, and
-// the "no signed contributions yet" pre-piece framing is wrong for a page
-// someone is actively being asked to contribute to.
+// the signed-content sections to render so proposed drafts display inline.
 // Pieces that already have signed content always render 'full' regardless.
 const expand = Astro.url.searchParams.get('expand') === '1';
 const composing = Astro.url.searchParams.has('compose');
@@ -50,8 +52,8 @@ if (stub && !expand && !composing && hasSupabase) {
   hasActiveRequests = data === true;
 }
 
-const mode: 'pre-piece' | 'full' =
-  !expand && !composing && !hasActiveRequests && stub ? 'pre-piece' : 'full';
+const mode: 'awaiting-first-contribution' | 'full' =
+  !expand && !composing && !hasActiveRequests && stub ? 'awaiting-first-contribution' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`
