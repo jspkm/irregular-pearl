@@ -50,8 +50,8 @@ if (stub && !expand && !composing && hasSupabase) {
   hasActiveRequests = data === true;
 }
 
-const mode: 'pre-piece' | 'full' =
-  !expand && !composing && !hasActiveRequests && stub ? 'pre-piece' : 'full';
+const mode: 'awaiting-first-contribution' | 'full' =
+  !expand && !composing && !hasActiveRequests && stub ? 'awaiting-first-contribution' : 'full';
 const breadcrumb = [piece.instruments[0] || 'Music', piece.composer_name];
 const seoDescription = stub
   ? `${piece.title}${piece.catalog_number ? ` (${piece.catalog_number})` : ''} by ${piece.composer_name} — help build this page on Irregular Pearl.`

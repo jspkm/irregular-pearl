@@ -49,18 +49,25 @@ import DraftingModeBanner from './DraftingModeBanner';
 interface Props {
   piece: PieceFull;
   /**
-   * 'pre-piece' hides every write surface below the ribbon and shows
-   * the invitation block + CTAs. 'full' renders the complete piece
-   * page: signed descriptions, difficulty, performer's notes, landmarks,
-   * schools, editions, recordings, pedagogical arc, references.
-   * There is only one piece page; `mode` is the one axis that
-   * decides whether write affordances are visible. Defaults to 'full'.
+   * 'awaiting-first-contribution' renders identity (title, catalog,
+   * byline, pills, description paragraph) + reference layer (editions,
+   * external links, movements, recordings, pedagogical arc) + the
+   * invite block. Signed-content sections (performer's notes,
+   * signed piece descriptions, signed difficulty, interpretive schools,
+   * structural landmarks) are hidden.
+   *
+   * 'full' renders the complete piece page including all signed-content
+   * sections.
+   *
+   * 'pre-piece' is a deprecated alias for 'awaiting-first-contribution'
+   * retained for one PR cycle to keep the build green during rename.
+   * Remove in a follow-up commit.
    */
-  mode?: 'pre-piece' | 'full';
+  mode?: 'awaiting-first-contribution' | 'pre-piece' | 'full';
 }
 
 const { piece, mode = 'full' } = Astro.props;
-const isPrePiece = mode === 'pre-piece';
+const isAwaiting = mode === 'awaiting-first-contribution' || mode === 'pre-piece';
 // Drafting mode: a staff member opens a piece with ?compose=<request_id> to
 // compose drafts on an outbox request before sending. The banner + composer
 // are client-mounted (they make their own auth + ownership checks); we only
@@ -146,7 +153,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
         by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
       </p>
 
-      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isPrePiece} />
+      <PiecePills client:load pieceId={piece.id} initialPills={initialPills} readOnly={isAwaiting} />
     </div>
 
     <div class="piece-header-aside">
@@ -154,7 +161,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </div>
   </div>
 
-  {isPrePiece && (
+  {isAwaiting && (
     <section class="block pp-invite" id="invitation">
       <p class="pp-invite-lede">
         This piece has no signed contributions yet.
@@ -177,7 +184,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </section>
   )}
 
-  {!isPrePiece && (
+  {!isAwaiting && (
     <>
   {/* Signed descriptions stack (includes the unsigned pieces.description as
       a synthetic "Seed data" card at the bottom of the stack; user-authored
