@@ -2143,7 +2143,6 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
-          contributor_active: boolean
           contributor_agreement_signed_at: string | null
           contributor_bio_short: string | null
           created_at: string
@@ -2157,7 +2156,6 @@ export type Database = {
           id: string
           instrument: string | null
           is_banned: boolean
-          is_contributor: boolean
           is_maestro: boolean
           level: Database["public"]["Enums"]["user_level"] | null
           location: string | null
@@ -2170,7 +2168,6 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
-          contributor_active?: boolean
           contributor_agreement_signed_at?: string | null
           contributor_bio_short?: string | null
           created_at?: string
@@ -2184,7 +2181,6 @@ export type Database = {
           id: string
           instrument?: string | null
           is_banned?: boolean
-          is_contributor?: boolean
           is_maestro?: boolean
           level?: Database["public"]["Enums"]["user_level"] | null
           location?: string | null
@@ -2197,7 +2193,6 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
-          contributor_active?: boolean
           contributor_agreement_signed_at?: string | null
           contributor_bio_short?: string | null
           created_at?: string
@@ -2211,7 +2206,6 @@ export type Database = {
           id?: string
           instrument?: string | null
           is_banned?: boolean
-          is_contributor?: boolean
           is_maestro?: boolean
           level?: Database["public"]["Enums"]["user_level"] | null
           location?: string | null

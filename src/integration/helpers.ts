@@ -59,8 +59,6 @@ export async function createAuthUser(opts: {
   const patch: Record<string, unknown> = {};
   if (opts.displayName) patch.display_name = opts.displayName;
   if (opts.isContributor) {
-    patch.is_contributor = true;
-    patch.contributor_active = true;
     patch.contributor_agreement_signed_at = new Date().toISOString();
   }
   if (opts.contributorBioShort) patch.contributor_bio_short = opts.contributorBioShort;

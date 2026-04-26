@@ -64,30 +64,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 **Priority:** P3
 **Depends on:** None
 
-### `/settings` direct URL returns 404
-
-**What:** Navigating to `http://.../settings` returns 404. The canonical URL for the settings tab is `/profile/<uuid>?section=setting`, and the user-menu "Settings" link points there correctly. But a user who types `/settings` in the address bar or a bookmark that guessed the path lands on "Page Not Found".
-
-**Why:** Low-severity UX paper cut. The tab link works; only direct-URL users hit this. Easy fix: add a permanent redirect from `/settings` → `/profile/<current-user-uuid>?section=setting` (or a server-rendered 302 that resolves the current user).
-
-**Context:** Found by `/qa` on 2026-04-24. Report: `.gstack/qa-reports/qa-report-localhost-2026-04-24-signed.md` (ISSUE-002).
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Fix `AddPieceForm` for `canonical_index_id` requirement
-
-**What:** [AddPieceForm.tsx](src/components/AddPieceForm.tsx) inserts into `pieces` without `canonical_index_id`, but migration `20260522000000` made the column NOT NULL. The v0.5.1 type-cleanup pass cast the insert payload `as any` with a TODO comment so `tsc --noEmit` passes, but the form would still fail at runtime on the FK constraint.
-
-**Why:** Either (a) the form is obsolete now that the request-a-contribution flow + materialize-from-canonical-index is the canonical path for adding pieces, or (b) the form needs to upsert into `canonical_piece_index` first and then insert with the resulting id. Pick one and either delete the form or wire it up.
-
-**Context:** Find callers (`grep -r "AddPieceForm"` in src/). If only one entry point and it's behind a stub page, deletion is the cheapest fix. If still wired into a user-facing flow, the upsert-then-insert path is straightforward — `canonical_piece_index` already has a unique constraint on `(composer_name, title, catalog_number)` so the upsert is idempotent.
-
-**Effort:** S
-**Priority:** P2
-**Depends on:** None
-
 ### Sweep Tailwind arbitrary `[XXXpx]` classes for canonical equivalents
 
 **What:** Tailwind v4's lint flags arbitrary-value classes like `max-w-[760px]` in favor of canonical scale classes (`max-w-190` since v4's spacing scale is 4px × n). The v0.5.1 sweep did the obvious one (`max-w-[760px]` → `max-w-190` in [ArtistProfile.tsx](src/components/ArtistProfile.tsx) and [@[slug].astro](src/pages/@[slug].astro)). About 30 sites remain across NavbarBell, ProfileShell, EmailPreferences, AppearanceSettings, Navbar.astro, StubContributionForms, PasswordSettings, etc.
@@ -95,18 +71,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 **Why:** Canonical classes survive theme/scale changes; arbitrary values don't. Cleaner codebase, fewer IDE warnings.
 
 **Context:** `grep -rE "(max-w|w|h|max-h|min-w|min-h)-\[[0-9]+px\]" src/ --include="*.tsx" --include="*.astro"`. Tailwind v4 spacing scale: `n` = `n × 4px`, so `760px` → `190`, `420px` → `105`, `360px` → `90`, etc. Some values like `[16px]`, `[10px]` align to `4`, `2.5` already; others like `[110px]` don't have a clean integer (use `27.5` or keep arbitrary). When the value is genuinely off-scale, leave it.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Remove `discussions` table and code references
-
-**What:** Drop the `discussions` table, RLS policies, and any remaining discussion-surface code.
-
-**Why:** PRD "What Irregular Pearl is not": "Not a social network... a public discussion feed, forum, or comment section" is on the "will not build, in any tier" list. The table contradicts a load-bearing PRD invariant.
-
-**Context:** Earlier cleanup in PR #17 removed most legacy features but left this table. Write a migration (drop table + related policies + any dead realtime entries) and delete related seed helpers if any remain.
 
 **Effort:** S
 **Priority:** P3
@@ -127,18 +91,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 ---
 
 ## Contributor pipeline (post-Slice-A)
-
-### Drop vestigial `is_contributor` + `contributor_active` columns on `users`
-
-**What:** Cleanup migration to drop `users.is_contributor` and `users.contributor_active`. Both are now unused as gates — Slice C governance (PR #56, 20260513000000_open_self_authoring.sql) rewrote `_require_active_contributor()` to require only auth, and the 3 staff-drafts-for-other RPCs check only that the target user exists. The columns remain purely as an editorial marker that nothing reads.
-
-**Why:** The old flagged-contributor posture is gone — any registered user can self-author. Keeping vestigial columns invites regression (a future code path might re-adopt them). Dropping them makes the schema state match the governance state.
-
-**Context:** Audit `supabase/migrations/` and `src/` for any remaining `is_contributor` / `contributor_active` references before dropping. `scripts/seed-contributor.ts` currently sets them; keep the script but have it set only the bio fields and `role`. One migration, one script patch, grep sweep to verify zero runtime references.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** Slice C governance (shipped in #56)
 
 ### Diff block in NotificationsQueue
 
@@ -198,7 +150,13 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 
 ## Completed
 
-### Awaiting-first-contribution page renders identity + reference layer
+### Quick paper cuts: `/settings` redirect + AddPieceForm deletion + drop vestigial contributor flag columns
+
+**What:** Three small cleanups in one batch. (1) `/settings` direct URL now resolves: new [src/pages/settings.astro](src/pages/settings.astro) mounts a thin client island ([SettingsRedirect.tsx](src/components/SettingsRedirect.tsx)) that redirects signed-in users to `/profile/<uid>?section=setting` and shows `SignInPanel` for anon (with `redirectTo=/settings` so OAuth round-trips back here, then redirects). (2) Deleted [AddPieceForm.tsx](src/components/AddPieceForm.tsx) and `src/pages/add-piece.astro` — orphan since the request-a-contribution flow + `materialize_piece_from_index` became the canonical path; no nav links or refs anywhere. (3) Dropped `users.is_contributor` and `users.contributor_active` via [20260609000000_drop_vestigial_contributor_flags.sql](supabase/migrations/20260609000000_drop_vestigial_contributor_flags.sql); patched `scripts/seed-contributor.ts`, `scripts/seed-local-queue.ts`, `src/integration/helpers.ts`, and trimmed `src/lib/database.types.ts`. Old migration RPC bodies that referenced the columns were already replaced by 20260513000000_open_self_authoring.sql, so the historical chain stays valid through `db reset`. Also removed the stale `discussions` TODO entry — that table was dropped in 20260419000000_drop_legacy_features.sql; only old migrations reference it as history.
+
+**Why:** Three P3 paper cuts that had stacked up. The settings 404 was a UX cut found by `/qa`; AddPieceForm was dead-but-loud (TODO + `as any` cast hiding a runtime FK failure); the contributor-flag columns invited regression now that any registered user is a contributor.
+
+**Completed:** 2026-04-25
 
 **What:** Restructured the piece page so awaiting-first-contribution mode renders the unsigned identity description (encyclopedia paragraph), editions, external references, recordings, movements, pedagogical arc, and change log link — only signed-content sections stay hidden. Mode renamed from `pre-piece` to `awaiting-first-contribution` for clarity. The movements section kicker reads "Movements" in awaiting mode and "Structural landmarks" in full mode. Typeahead grouping updated: IN THE CATALOG now requires at least one signed contribution (`has_signed_content`); stubs join canonical-only entries under NOT YET CURATED, with `is_materialized` letting the click handler branch between navigate and materialize-then-navigate.
 
