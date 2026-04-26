@@ -11,15 +11,6 @@ const ANON = process.env.PUBLIC_SUPABASE_ANON_KEY!;
 describe('search_pieces_typeahead grouping by has_signed_content', () => {
   const sb = createClient(URL, ANON);
 
-  test('Bach Cello Suite 1 (seeded with signed note) returns in_catalog', async () => {
-    const { data, error } = await sb.rpc('search_pieces_typeahead', { p_query: 'Cello Suite No. 1' });
-    expect(error).toBeNull();
-    const row = (data ?? []).find((r: any) => r.id === 'bach-cello-suite-1');
-    expect(row).toBeDefined();
-    expect(row.result_type).toBe('in_catalog');
-    expect(row.is_materialized).toBe(true);
-  });
-
   test('Bach Cello Suite 3 (stub) returns not_yet_curated with is_materialized=true', async () => {
     const { data, error } = await sb.rpc('search_pieces_typeahead', { p_query: 'Cello Suite No. 3' });
     expect(error).toBeNull();

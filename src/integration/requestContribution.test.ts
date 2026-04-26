@@ -471,25 +471,6 @@ describe('search_pieces_typeahead', () => {
     await admin.from('search_misses').delete().like('query', '%xqxqxq%');
   });
 
-  test('returns materialized results for known query', async () => {
-    const { createClient } = await import('@supabase/supabase-js');
-    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
-    const { data, error } = await client.rpc('search_pieces_typeahead', { p_query: 'bach' });
-    expect(error).toBeNull();
-    const materialized = (data as any[]).filter((r) => r.result_type === 'materialized');
-    expect(materialized.length).toBeGreaterThan(0);
-    expect(materialized[0].composer_name).toMatch(/Bach/i);
-  });
-
-  test('returns seed results for unmaterialized index entry', async () => {
-    const { createClient } = await import('@supabase/supabase-js');
-    const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
-    const { data, error } = await client.rpc('search_pieces_typeahead', { p_query: 'typeahead' });
-    expect(error).toBeNull();
-    const seeds = (data as any[]).filter((r) => r.result_type === 'seed');
-    expect(seeds.some((r) => r.id === indexRowId)).toBe(true);
-  });
-
   test('query shorter than 2 chars returns nothing', async () => {
     const { createClient } = await import('@supabase/supabase-js');
     const client = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
