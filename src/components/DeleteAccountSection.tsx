@@ -80,14 +80,6 @@ export default function DeleteAccountSection() {
           <li>Every up/down vote you have cast</li>
           <li>Your profile, email, and account record</li>
         </ul>
-        <p>
-          Wiki-edited reference data you added (edition entries, recording
-          links, pedagogical connections) and your past edits to other
-          contributors' content stay in place — but your name is replaced
-          with <em>former contributor</em> on every byline and audit trail
-          where it appeared. Anonymous search signals stay on the site
-          without any link back to your account.
-        </p>
       </div>
 
       <form onSubmit={submit} className="flex flex-col gap-3 max-w-105">
@@ -108,7 +100,7 @@ export default function DeleteAccountSection() {
           <div className="ip-signin-error" role="alert">{status.message}</div>
         )}
 
-        <div className="ip-signin-actions">
+        <div className="flex justify-center mt-2">
           <button
             type="submit"
             className="ip-signin-btn ip-signin-btn-danger"

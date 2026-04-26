@@ -242,8 +242,7 @@ function SecurityPanel() {
       <section id="password">
         <PasswordSettings />
       </section>
-      <section id="danger-zone" className="mt-12 pt-8 border-t border-error/40">
-        <h2 className="font-display italic text-lg text-error mb-6 tracking-tight">Danger zone</h2>
+      <section id="delete-account" className="mt-12 pt-8 border-t border-error/40">
         <DeleteAccountSection />
       </section>
     </div>

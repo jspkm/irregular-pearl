@@ -1001,29 +1001,22 @@
           </div>
 
           <div class="sample">
-            <div class="sample-label">[DZ] Danger zone — delete account · <span class="ref">src/components/DeleteAccountSection.tsx · Profile -&gt; Security</span></div>
-            <!-- DZ1: Section divider + heading -->
+            <div class="sample-label">[DZ] Delete account · <span class="ref">src/components/DeleteAccountSection.tsx · Profile -&gt; Security</span></div>
             <div style="border-top:0.5px solid color-mix(in srgb, var(--danger) 40%, transparent);padding-top:32px;max-width:600px">
-              <h2 style="font-family:var(--font-serif);font-style:italic;font-size:18px;color:var(--danger);margin:0 0 24px;letter-spacing:-0.005em"><span class="tag">DZ1</span>Danger zone</h2>
-              <h3 style="font-family:var(--font-serif);font-size:20px;color:var(--danger);margin:0 0 16px"><span class="tag">DZ2</span>Delete account</h3>
-              <!-- DZ3: Plain-language explanation -->
-              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 16px"><span class="tag">DZ3</span>Deleting your account is <strong>permanent and cannot be undone</strong>. Everything you have published under your byline is erased — performer's notes, interpretive schools, signed piece descriptions, structural landmarks, pending drafts, contribution requests, library data, votes, profile, and account record.</p>
-              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 24px">Wiki-edited reference data and your past edits to other contributors' content stay in place — but your name is replaced with <em>former contributor</em> on every byline and audit trail.</p>
-              <!-- DZ4: Type-confirm input -->
+              <h2 style="font-family:var(--font-serif);font-size:20px;color:var(--danger);margin:0 0 16px"><span class="tag">DZ1</span>Delete account</h2>
+              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 24px"><span class="tag">DZ2</span>Deleting your account is <strong>permanent and cannot be undone</strong>. Everything you have published under your byline is erased — performer's notes, interpretive schools, signed piece descriptions, structural landmarks, pending drafts, contribution requests, library data, votes, profile, and account record.</p>
               <label style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-width:420px">
-                <span style="font-size:13px;color:var(--ink)"><span class="tag">DZ4</span>Type <code style="font-family:var(--font-mono);color:var(--danger)">delete</code> to confirm</span>
+                <span style="font-size:13px;color:var(--ink)"><span class="tag">DZ3</span>Type <code style="font-family:var(--font-mono);color:var(--danger)">delete</code> to confirm</span>
                 <input type="text" value="delete" style="font-family:var(--font-sans);font-size:14px;padding:8px 10px;border:0.5px solid var(--border-strong);border-radius:4px;background:var(--bg);color:var(--ink)" />
               </label>
-              <!-- DZ5: Destructive button (enabled state) -->
-              <div style="display:flex;justify-content:flex-end;max-width:420px;margin-bottom:8px">
-                <button style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger);color:#FFFFFF;cursor:pointer"><span class="tag">DZ5</span>Delete account</button>
+              <div style="display:flex;justify-content:center;max-width:420px;margin-bottom:8px">
+                <button style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger);color:#FFFFFF;cursor:pointer"><span class="tag">DZ4</span>Delete account</button>
               </div>
-              <!-- DZ6: Destructive button (disabled state — typed-confirm gate) -->
-              <div style="display:flex;justify-content:flex-end;max-width:420px">
-                <button disabled style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger-soft);color:var(--danger);cursor:default"><span class="tag">DZ6</span>Delete account</button>
+              <div style="display:flex;justify-content:center;max-width:420px">
+                <button disabled style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger-soft);color:var(--danger);cursor:default"><span class="tag">DZ5</span>Delete account</button>
               </div>
             </div>
-            <div class="cap">DZ1 section divider: 0.5px border in --danger @ 40% alpha · h2 italic --font-serif 18px --danger · DZ2 panel heading h3 --font-serif 20px --danger · DZ3 explanation: 14px --ink @ 80% alpha lh 1.6, two paragraphs (first lists what is erased; second names "former contributor" reassignment) · DZ4 typed-confirm input: standard ip-signin-field, accepts case-insensitive "delete" exact match · DZ5 enabled .ip-signin-btn-danger: bg --danger + text white · DZ6 disabled state: bg --danger-soft + text --danger, never collapses to grey opacity (the danger semantic stays visible)</div>
+            <div class="cap">DZ1 panel heading h2 --font-serif 20px --danger · top divider 0.5px border in --danger @ 40% alpha · DZ2 explanation: 14px --ink @ 80% alpha lh 1.6, single paragraph listing what is erased · DZ3 typed-confirm input: ip-signin-field, accepts case-insensitive "delete" exact match · DZ4 enabled .ip-signin-btn-danger: bg --danger + text white · DZ5 disabled state: bg --danger-soft + text --danger (the danger semantic stays visible — never collapses to grey opacity)</div>
           </div>
         </div>
       </div>
@@ -1339,24 +1332,22 @@
           </div>
 
           <div class="sample">
-            <div class="sample-label">[DZ] Danger zone — delete account · <span class="ref">src/components/DeleteAccountSection.tsx · Profile -&gt; Security</span></div>
+            <div class="sample-label">[DZ] Delete account · <span class="ref">src/components/DeleteAccountSection.tsx · Profile -&gt; Security</span></div>
             <div style="border-top:0.5px solid color-mix(in srgb, var(--danger) 40%, transparent);padding-top:32px;max-width:600px">
-              <h2 style="font-family:var(--font-serif);font-style:italic;font-size:18px;color:var(--danger);margin:0 0 24px;letter-spacing:-0.005em"><span class="tag">DZ1</span>Danger zone</h2>
-              <h3 style="font-family:var(--font-serif);font-size:20px;color:var(--danger);margin:0 0 16px"><span class="tag">DZ2</span>Delete account</h3>
-              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 16px"><span class="tag">DZ3</span>Deleting your account is <strong>permanent and cannot be undone</strong>. Everything you have published under your byline is erased — performer's notes, interpretive schools, signed piece descriptions, structural landmarks, pending drafts, contribution requests, library data, votes, profile, and account record.</p>
-              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 24px">Wiki-edited reference data and your past edits to other contributors' content stay in place — but your name is replaced with <em>former contributor</em> on every byline and audit trail.</p>
+              <h2 style="font-family:var(--font-serif);font-size:20px;color:var(--danger);margin:0 0 16px"><span class="tag">DZ1</span>Delete account</h2>
+              <p style="font-size:14px;color:var(--ink);opacity:0.8;line-height:1.6;margin:0 0 24px"><span class="tag">DZ2</span>Deleting your account is <strong>permanent and cannot be undone</strong>. Everything you have published under your byline is erased — performer's notes, interpretive schools, signed piece descriptions, structural landmarks, pending drafts, contribution requests, library data, votes, profile, and account record.</p>
               <label style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-width:420px">
-                <span style="font-size:13px;color:var(--ink)"><span class="tag">DZ4</span>Type <code style="font-family:var(--font-mono);color:var(--danger)">delete</code> to confirm</span>
+                <span style="font-size:13px;color:var(--ink)"><span class="tag">DZ3</span>Type <code style="font-family:var(--font-mono);color:var(--danger)">delete</code> to confirm</span>
                 <input type="text" value="delete" style="font-family:var(--font-sans);font-size:14px;padding:8px 10px;border:0.5px solid var(--border-strong);border-radius:4px;background:var(--bg);color:var(--ink)" />
               </label>
-              <div style="display:flex;justify-content:flex-end;max-width:420px;margin-bottom:8px">
-                <button style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger);color:#FFFFFF;cursor:pointer"><span class="tag">DZ5</span>Delete account</button>
+              <div style="display:flex;justify-content:center;max-width:420px;margin-bottom:8px">
+                <button style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger);color:#FFFFFF;cursor:pointer"><span class="tag">DZ4</span>Delete account</button>
               </div>
-              <div style="display:flex;justify-content:flex-end;max-width:420px">
-                <button disabled style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger-soft);color:var(--danger);cursor:default"><span class="tag">DZ6</span>Delete account</button>
+              <div style="display:flex;justify-content:center;max-width:420px">
+                <button disabled style="font-family:var(--font-sans);font-size:14px;padding:8px 16px;border-radius:4px;border:0.5px solid transparent;background:var(--danger-soft);color:var(--danger);cursor:default"><span class="tag">DZ5</span>Delete account</button>
               </div>
             </div>
-            <div class="cap">DZ1 section divider: 0.5px border in --danger @ 40% alpha · h2 italic --font-serif 18px --danger · DZ2 panel heading h3 --font-serif 20px --danger · DZ3 explanation: 14px --ink @ 80% alpha lh 1.6 · DZ4 typed-confirm input: ip-signin-field · DZ5 enabled .ip-signin-btn-danger: bg --danger + text white · DZ6 disabled state: bg --danger-soft + text --danger</div>
+            <div class="cap">DZ1 panel heading h2 --font-serif 20px --danger · top divider 0.5px border in --danger @ 40% alpha · DZ2 explanation 14px --ink @ 80% alpha · DZ3 ip-signin-field · DZ4 enabled .ip-signin-btn-danger · DZ5 disabled state</div>
           </div>
         </div>
       </div>
