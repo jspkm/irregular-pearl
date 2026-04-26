@@ -100,7 +100,7 @@ export default function DeleteAccountSection() {
           <div className="ip-signin-error" role="alert">{status.message}</div>
         )}
 
-        <div className="flex justify-center mt-2">
+        <div className="ip-signin-actions">
           <button
             type="submit"
             className="ip-signin-btn ip-signin-btn-danger"
