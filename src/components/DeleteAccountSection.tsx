@@ -76,7 +76,7 @@ export default function DeleteAccountSection() {
         <ul className="list-disc pl-5 space-y-1">
           <li>Performer's notes, interpretive schools, and signed piece descriptions</li>
           <li>Structural landmarks with their flags and practice notes</li>
-          <li>Pending drafts in the approval queue, contribution requests you sent, and your private library data</li>
+          <li>Pending drafts, contribution requests you sent, and your private library data</li>
           <li>Every up/down vote you have cast</li>
           <li>Your profile, email, and account record</li>
         </ul>
