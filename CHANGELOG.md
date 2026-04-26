@@ -4,6 +4,14 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Awaiting-mode landmark gating + Tailwind arbitrary-px sweep + bell badge mobile fix
+
+Three more P3 cleanups.
+
+- **Awaiting mode no longer offers landmark creation.** Landmarks are signed editorial per PRD §440; the awaiting-first-contribution page is supposed to frame the first-contribution invite coherently, and a sibling "+ Add landmark at this passage" button bypassed that framing. We already gated landmark *display* in awaiting mode by passing an empty `landmarksByMovement`; this commit closes the loop on creation. New `awaitingMode?: boolean` prop on [`MovementsList.tsx`](src/components/MovementsList.tsx) forwards to [`StructuralLandmarks.tsx`](src/components/StructuralLandmarks.tsx); the create button is gated behind `!awaitingMode`. Movement metadata edits (key, meter, tempo) stay available because they're unsigned reference per PRD §54. Wired from [`PiecePageLayout.astro`](src/components/PiecePageLayout.astro).
+- **Tailwind v4 arbitrary-px sweep.** 18 sites converted from `*-[XXXpx]` to canonical scale (`max-w-[600px]` → `max-w-150`, `max-w-[720px]` → `max-w-180`, etc.) across NavbarBell, ProfileShell, EmailPreferences, AppearanceSettings, PasswordSettings, Navbar.astro, StubContributionForms, and seven /pages (settings, terms, privacy, index, notifications, auth/reset, auth/confirm, auth/check-inbox). Only `min-h-[110px]` in StubContributionForms remains (110/4 = 27.5, off-scale per the sweep guidance — kept arbitrary).
+- **Bell badge sits on the bell at all viewports.** At ≤1024px the global mobile-touch-target rule ([`global.css:211`](src/styles/global.css)) inflates every `<a>` to 44×44, including the navbar bell. Anchoring the count badge to the anchor's `top-right` floated it past the bell SVG by ~24px on mobile and tablet. Wrapped the SVG in a `relative inline-flex` span so the badge anchors to the SVG's actual box, not the inflated tap target. Pre-existing — surfaced when the user spotted it on tablet.
+
 ### Paper cuts: `/settings` redirect, AddPieceForm deletion, contributor-flag drop, mobile toggle fix
 
 Four small cleanups in one batch.

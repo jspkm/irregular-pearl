@@ -52,42 +52,6 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Cleanup
 
-### Decide gating for landmark + movement wiki-edit affordances in awaiting mode
-
-**What:** v0.5.3 made the reference layer render in awaiting-first-contribution mode (movements, editions, etc.). `MovementsList` shows the per-movement reorder ↑↓, edit ✎, delete ×, and "+ Add movement" affordances unconditionally; `StructuralLandmarks` (rendered inside MovementsList per movement) shows its "+ Add landmark at this passage" button regardless of mode. All anon-gated, but a signed-in user on an awaiting piece can author a landmark today — which is a signed structural contribution that should arguably route through the invite block, not appear as a sibling reference action.
-
-**Why:** Two product calls overlap here. (a) Movement metadata (key, meter, tempo) is unsigned reference per PRD §54 — wiki-edit affordances on movements are arguably correct in awaiting mode. (b) Landmarks are a signed editorial contribution per PRD §440 — the "Add landmark" button bypasses the awaiting-mode invite framing. Decide whether: (i) suppress landmark-creation affordance in awaiting mode (add `awaitingMode` prop to MovementsList → forwards to StructuralLandmarks); or (ii) accept that landmark authoring is a valid alternate path to flipping `has_signed_content` and let it stand. If (i), one new prop, one conditional, no migration.
-
-**Context:** Surfaced in the v0.5.3 final code review (`docs/superpowers/plans/2026-04-25-awaiting-first-contribution-page.md` Task 7b open question). Pre-existing behavior of StructuralLandmarks — not introduced by v0.5.3, just made visible by it.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Sweep Tailwind arbitrary `[XXXpx]` classes for canonical equivalents
-
-**What:** Tailwind v4's lint flags arbitrary-value classes like `max-w-[760px]` in favor of canonical scale classes (`max-w-190` since v4's spacing scale is 4px × n). The v0.5.1 sweep did the obvious one (`max-w-[760px]` → `max-w-190` in [ArtistProfile.tsx](src/components/ArtistProfile.tsx) and [@[slug].astro](src/pages/@[slug].astro)). About 30 sites remain across NavbarBell, ProfileShell, EmailPreferences, AppearanceSettings, Navbar.astro, StubContributionForms, PasswordSettings, etc.
-
-**Why:** Canonical classes survive theme/scale changes; arbitrary values don't. Cleaner codebase, fewer IDE warnings.
-
-**Context:** `grep -rE "(max-w|w|h|max-h|min-w|min-h)-\[[0-9]+px\]" src/ --include="*.tsx" --include="*.astro"`. Tailwind v4 spacing scale: `n` = `n × 4px`, so `760px` → `190`, `420px` → `105`, `360px` → `90`, etc. Some values like `[16px]`, `[10px]` align to `4`, `2.5` already; others like `[110px]` don't have a clean integer (use `27.5` or keep arbitrary). When the value is genuinely off-scale, leave it.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
-### Adopt DESIGN-REFERENCES.md as the taste compass companion
-
-**What:** Create `DESIGN-REFERENCES.md` from the references doc (NYT graphics desk, Stripe docs, Grove Music, museum catalogs, anti-references, anchor phrases for prompting). Cross-link from DESIGN.md and CLAUDE.md.
-
-**Why:** The system defines rules, the references define the feeling. Having both documented gives future design sessions a clear second source of truth and specific verbatim anchor phrases that reliably pull AI toward the right register.
-
-**Context:** Source material is at `/Users/jspkm/Downloads/design-references.docx`. Complementary, not replacement. Keep DESIGN.md authoritative for tokens; DESIGN-REFERENCES.md authoritative for taste.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** None
-
 ---
 
 ## Contributor pipeline (post-Slice-A)
@@ -149,6 +113,14 @@ See [jspkm-main-design-request-contribution-20260421-183606.md](~/.gstack/projec
 ---
 
 ## Completed
+
+### Quick paper cuts: `/settings` redirect + AddPieceForm deletion + drop vestigial contributor flag columns + mobile toggle rendering
+
+**What:** Four small cleanups in one batch. (1) `/settings` direct URL now resolves: new [src/pages/settings.astro](src/pages/settings.astro) mounts a thin client island ([SettingsRedirect.tsx](src/components/SettingsRedirect.tsx)) that redirects signed-in users to `/profile/<uid>?section=setting` and shows `SignInPanel` for anon (with `redirectTo=/settings` so OAuth round-trips back here, then redirects). (2) Deleted [AddPieceForm.tsx](src/components/AddPieceForm.tsx) and `src/pages/add-piece.astro` — orphan since the request-a-contribution flow + `materialize_piece_from_index` became the canonical path; no nav links or refs anywhere. (3) Dropped `users.is_contributor` and `users.contributor_active` via [20260609000000_drop_vestigial_contributor_flags.sql](supabase/migrations/20260609000000_drop_vestigial_contributor_flags.sql); patched `scripts/seed-contributor.ts`, `scripts/seed-local-queue.ts`, `src/integration/helpers.ts`, and trimmed `src/lib/database.types.ts`. Old migration RPC bodies that referenced the columns were already replaced by 20260513000000_open_self_authoring.sql, so the historical chain stays valid through `db reset`. (4) Email Preferences toggles were rendering as 44×44 purple discs in mobile/tablet because the global mobile-touch-target rule in [global.css:209](src/styles/global.css) forced `min-height/min-width: 44px` on every `<button>` at viewports ≤1024px, inflating the intended 24×44 pill — excluded `[role="switch"]` from the rule so the inner thumb keeps the generous tap target without distorting the pill. Also removed the stale `discussions` TODO entry — that table was dropped in 20260419000000_drop_legacy_features.sql; only old migrations reference it as history.
+
+**Why:** Four P3 paper cuts that had stacked up. The settings 404 was a UX cut found by `/qa`; AddPieceForm was dead-but-loud (TODO + `as any` cast hiding a runtime FK failure); the contributor-flag columns invited regression now that any registered user is a contributor; the toggle disc was a visible mobile glitch on the freshly-shipped Email Preferences panel.
+
+**Completed:** 2026-04-25 (PR #81)
 
 ### Quick paper cuts: `/settings` redirect + AddPieceForm deletion + drop vestigial contributor flag columns + mobile toggle rendering
 

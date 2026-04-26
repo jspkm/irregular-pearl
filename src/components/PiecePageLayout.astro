@@ -240,6 +240,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
       initialMovements={dbMovements}
       seedMovements={seedMovements}
       landmarksByMovement={isAwaiting ? {} : landmarksByMovement}
+      awaitingMode={isAwaiting}
     />
   </section>
 

@@ -28,6 +28,12 @@ interface Props {
   pieceId: string;
   movementId: string;
   initialLandmarks: PublishedLandmark[];
+  // When true, suppress the landmark-creation affordance — landmarks are
+  // signed editorial per PRD §440 and should route through the awaiting-mode
+  // first-contribution invite, not appear as a sibling reference action.
+  // Movement metadata edits (key, meter, tempo) remain available because
+  // they are unsigned reference per PRD §54.
+  awaitingMode?: boolean;
 }
 
 const FLAG_TYPES: { value: string; label: string }[] = [
@@ -92,7 +98,7 @@ function FlagPill({ flag }: { flag: LandmarkFlag }) {
 
 type EditMode = null | { action: 'edit'; landmarkId: string };
 
-export default function StructuralLandmarks({ pieceId, movementId, initialLandmarks }: Props) {
+export default function StructuralLandmarks({ pieceId, movementId, initialLandmarks, awaitingMode = false }: Props) {
   const [landmarks, setLandmarks] = useState<PublishedLandmark[]>(initialLandmarks);
   const [viewerId, setViewerId] = useState<string | null>(null);
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -265,7 +271,7 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
           onPublished={async () => { setFormOpen(false); await refetch(); }}
         />
       ) : (
-        mode === null && (
+        mode === null && !awaitingMode && (
           <button type="button" className="landmark-add" onClick={onAddClick}>
             Add landmark at this passage &rarr;
           </button>

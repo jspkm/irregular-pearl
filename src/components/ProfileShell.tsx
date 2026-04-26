@@ -117,7 +117,7 @@ export default function ProfileShell({ userId }: { userId: string }) {
   if (userRole === 'moderator') roleLinks.push({ href: '/admin', label: 'Moderator' });
 
   return (
-    <div className="max-w-[1100px] mx-auto px-4 md:px-8 py-6 md:py-10">
+    <div className="max-w-275 mx-auto px-4 md:px-8 py-6 md:py-10">
       <nav className="flex items-center gap-1 border-b border-border pb-2 mb-6 md:mb-8">
         <SidebarItem
           label="Profile"
@@ -222,7 +222,7 @@ function SidebarItem({
 
 function SettingsPanel() {
   return (
-    <div className="max-w-[600px]">
+    <div className="max-w-150">
       <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Settings</h1>
       <section id="appearance" className="mb-10">
         <AppearanceSettings />
@@ -236,7 +236,7 @@ function SettingsPanel() {
 
 function SecurityPanel() {
   return (
-    <div className="max-w-[600px]">
+    <div className="max-w-150">
       <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Security</h1>
       <section id="password">
         <PasswordSettings />
