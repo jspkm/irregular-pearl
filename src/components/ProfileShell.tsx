@@ -5,6 +5,7 @@ import ArtistProfile from './ArtistProfile';
 import AppearanceSettings from './AppearanceSettings';
 import EmailPreferences from './EmailPreferences';
 import PasswordSettings from './PasswordSettings';
+import DeleteAccountSection from './DeleteAccountSection';
 import SignInPanel from './SignInPanel';
 
 type Section = 'profile' | 'setting' | 'security';
@@ -240,6 +241,10 @@ function SecurityPanel() {
       <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-6">Security</h1>
       <section id="password">
         <PasswordSettings />
+      </section>
+      <section id="danger-zone" className="mt-12 pt-8 border-t border-error/40">
+        <h2 className="font-display italic text-lg text-error mb-6 tracking-tight">Danger zone</h2>
+        <DeleteAccountSection />
       </section>
     </div>
   );

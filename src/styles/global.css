@@ -352,6 +352,12 @@ body {
   color: var(--bg);
 }
 .ip-signin-btn-primary:hover:not(:disabled) { background: var(--accent-hover, #4C385C); }
+.ip-signin-btn-danger {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+.ip-signin-btn-danger:hover:not(:disabled) { filter: brightness(0.9); }
+.ip-signin-btn-danger:disabled { background: var(--danger-soft); color: var(--danger); opacity: 1; }
 .ip-signin-error {
   font-family: var(--font-sans);
   font-size: 13px;
