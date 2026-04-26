@@ -204,9 +204,11 @@ body {
   line-height: 1.55;
 }
 
-/* Touch targets on tablet/mobile */
+/* Touch targets on tablet/mobile.
+   `[role="switch"]` is opted out — toggle pills have their own intentional
+   24×44 footprint and the inner thumb already gives a generous tap target. */
 @media (max-width: 1024px) {
-  button, a, [role="button"] {
+  button:not([role="switch"]), a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }

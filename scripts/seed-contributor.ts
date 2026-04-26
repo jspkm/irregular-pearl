@@ -1,10 +1,13 @@
 #!/usr/bin/env bun
-// Promote an existing auth user to a signed contributor.
+// Mark an existing auth user as a signed contributor.
 //
-// Looks up the user by email in auth.users, then sets the Slice A contributor
-// fields on public.users: is_contributor, contributor_active,
-// contributor_agreement_signed_at (now), and optionally contributor_bio_short.
-// Idempotent — re-running just refreshes the same fields.
+// Looks up the user by email in auth.users, then stamps
+// contributor_agreement_signed_at on public.users (and optionally
+// contributor_bio_short). Slice C governance opened self-authoring to any
+// registered user — the old is_contributor/contributor_active flag columns
+// were dropped — but the agreement timestamp + bio remain real fields used
+// by the bylined surfaces. Idempotent — re-running refreshes the same
+// fields.
 //
 // Usage:
 //   bun run scripts/seed-contributor.ts <email> [bio_short]
@@ -47,8 +50,6 @@ if (!target) {
 }
 
 const patch: Record<string, unknown> = {
-  is_contributor: true,
-  contributor_active: true,
   contributor_agreement_signed_at: new Date().toISOString(),
 };
 if (bioShort) patch.contributor_bio_short = bioShort;
@@ -57,7 +58,7 @@ const { data: updated, error: updateErr } = await admin
   .from('users')
   .update(patch)
   .eq('id', target.id)
-  .select('id, display_name, is_contributor, contributor_active, contributor_agreement_signed_at, contributor_bio_short')
+  .select('id, display_name, contributor_agreement_signed_at, contributor_bio_short')
   .single();
 
 if (updateErr) {

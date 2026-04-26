@@ -58,8 +58,6 @@ async function ensureUser(email: string, password: string, patch: Record<string,
 
 const hajiId = await ensureUser('haji@local.test', 'hajilocal', {
   display_name: 'Haji Kim',
-  is_contributor: true,
-  contributor_active: true,
   contributor_agreement_signed_at: new Date().toISOString(),
   contributor_bio_short: 'cellist, NYC',
 });
@@ -74,8 +72,6 @@ const staffId = await ensureUser('staff@local.test', 'stafflocal', {
 const modId = await ensureUser('mod@local.test', 'modlocal', {
   display_name: 'Mod Local',
   role: 'moderator',
-  is_contributor: true,
-  contributor_active: true,
   contributor_agreement_signed_at: new Date().toISOString(),
   contributor_bio_short: 'moderator, local test',
 });
