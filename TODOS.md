@@ -6,6 +6,27 @@ Tracked work for Irregular Pearl, organized by component and sorted by priority.
 
 ## Up next (immediate)
 
+### Account deletion in Profile → Security
+
+**What:** New "Security" entry in the profile sidebar (alongside Profile / Setting / Logout). Section is titled "Danger zone" with a single "Delete account" panel at the bottom. Panel explains in plain language what deletion means: the account, profile, email, and **every signed contribution under your byline** (performer's notes, interpretive schools, signed piece descriptions, structural landmarks with their flags + practice notes, pedagogical connections, edition/recording/external-reference edits, signed movement edits, private library reflections, draft-note requests, contribution requests sent, pending drafts in the approval queue) are **permanently deleted from the site and cannot be recovered**. Aggregate signals that don't carry your byline — vote tallies and search-misses — stay so the editorial signal those produce isn't lost; the link between those rows and the deleted user is severed (user_id nulled). To confirm, the user types `delete` (case-insensitive, exact match — no other text) into a text input; the Delete button stays disabled until the input matches. Clicking Delete calls a `delete_own_account` RPC that signs the user out, clears session, and redirects to the landing page with a one-time toast confirming the deletion.
+
+**Why:** Right-to-erasure under GDPR (Art. 17) and equivalent statutes (CCPA, UK DPA, LGPD, PIPEDA) requires hard delete of personally identifiable data on request — anonymization-only of signed bylines does not satisfy the bar in the EU because the byline + contribution metadata is itself personal data. Site Terms commit to the same standard. The absence is a P1 legal + trust gap on a site that asks users to sign in to contribute. The typed-confirmation pattern (vs. a single click) is the established guardrail against accidental destruction — the same pattern GitHub, Stripe, and Vercel use for account/repo/project deletion.
+
+**Deletion policy:**
+- **Hard delete** — no sentinel "former contributor" user; rows are removed, not reassigned.
+- **Bylined signed content** (everything carrying the account holder's signage) → DELETE the rows + their `*_versions` history. Cascades from `users` FK with `on delete cascade`. Schema audit: confirm `performers_notes`, `interpretive_schools`, `piece_descriptions`, `landmarks`, `pedagogical_connections`, `external_links`, `movement_versions`, `recordings` and all their `*_versions` tables FK to `users.id` with cascade — add the cascade where missing in the deletion migration.
+- **Pending drafts in the approval queue** → auto-reject before delete (mark `status = 'rejected'` with `rejected_reason = 'account_deleted'`) so the queue and notification ledger stay consistent; then cascade-delete with the user.
+- **Notifications** → cascade-delete (recipient_id and actor_id both).
+- **Personal data** (profile row in `public.users`, `auth.users`, library reflections once that lands, `draft_note_requests`, `contribution_requests` sent by the user) → DELETE.
+- **Aggregate signals that stay** — `votes` and `search_misses`. NULL out `user_id` (do not cascade-delete) so the tally / unmatched-query leaderboard isn't distorted by the deletion. Confirm those FKs are `on delete set null`, not cascade.
+- **Votes the user *received* on their bylined content** → moot, because the bylined content itself is deleted; the votes cascade-delete with the subject row.
+
+**Context:** Server RPC `delete_own_account()` runs as `security definer`, validated against `auth.uid()`; rejects the staff role unless the staff member has another staff member to take over. Order of operations matters: (1) auto-reject pending drafts inside a single transaction, (2) NULL `user_id` on `votes` + `search_misses`, (3) DELETE from `public.users` (cascades hit signed content + versions + notifications), (4) DELETE from `auth.users` via `auth.admin.deleteUser` from the edge function (RPC can't reach auth schema directly). Wrap in a transaction with savepoints around the auth deletion since that step crosses schemas. Inline confirm pattern (per [feedback_no_native_dialogs.md](~/.claude/projects/-Users-jspkm-dev-irregular-pearl/memory/feedback_no_native_dialogs.md)) — never `confirm()` / `alert()`. Add a `[D]` (danger) sample to color-palette.htm covering the panel chrome + destructive button state so the dark-theme treatment is locked in. Integration test must cover: a user with one of every bylined content type + votes + search-misses + pending drafts + notifications, run delete, assert all bylined rows + their versions + notifications are gone, votes/search-misses rows still exist with NULL user_id, auth.users row gone.
+
+**Effort:** M
+**Priority:** P1
+**Depends on:** None
+
 ## Piece page (PRD Tier 1)
 
 ### Redesign piece page per PRD revision 2
