@@ -99,7 +99,7 @@ export default function PasswordSettings() {
           : 'Your account was created via Google. Set a password to also sign in with email and password.'}
       </p>
 
-      <form onSubmit={submit} className="flex flex-col gap-3 max-w-[420px]">
+      <form onSubmit={submit} className="flex flex-col gap-3 max-w-105">
         {hasPassword && (
           <label className="ip-signin-field">
             <span>Current password</span>

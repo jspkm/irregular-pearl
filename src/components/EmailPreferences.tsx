@@ -75,7 +75,7 @@ export default function EmailPreferences() {
 
   if (loading || !prefs) {
     return (
-      <div className="max-w-[600px] mx-auto px-6 py-10">
+      <div className="max-w-150 mx-auto px-6 py-10">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 rounded w-48" />
           <div className="h-16 bg-gray-100 rounded-lg" />

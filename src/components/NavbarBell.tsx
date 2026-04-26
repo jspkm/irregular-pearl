@@ -103,21 +103,27 @@ export default function NavbarBell() {
       href="/notifications"
       aria-label={badgeText ? `Notifications (${badgeText})` : 'Notifications'}
       onClick={acknowledgeBell}
-      className="relative inline-flex items-center text-ink hover:text-accent transition-colors no-underline"
+      className="inline-flex items-center justify-center text-ink hover:text-accent transition-colors no-underline"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-      </svg>
-      {badgeText && (
-        <span
-          aria-hidden="true"
-          className="absolute -top-1 -right-1.5 min-w-[16px] h-[16px] px-1 text-[10px] leading-[16px] text-center rounded-full font-medium"
-          style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
-        >
-          {badgeText}
-        </span>
-      )}
+      {/* Inner wrapper is the badge's positioning context — at viewports
+          ≤1024px the global mobile-touch-target rule inflates this anchor
+          to 44×44; anchoring the badge to the anchor's corner would float
+          it well past the bell SVG, so we anchor it to the SVG instead. */}
+      <span className="relative inline-flex">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        </svg>
+        {badgeText && (
+          <span
+            aria-hidden="true"
+            className="absolute -top-1 -right-1.5 min-w-4 h-4 px-1 text-[10px] leading-[16px] text-center rounded-full font-medium"
+            style={{ background: 'var(--color-accent)', color: 'var(--color-bg)' }}
+          >
+            {badgeText}
+          </span>
+        )}
+      </span>
     </a>
   );
 }

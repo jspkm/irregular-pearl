@@ -61,7 +61,7 @@ export default function StubContributionForms({ pieceId, existingDescription, ex
         </div>
         <div
           onClick={handleDescriptionClick}
-          className={`border rounded-lg p-4 min-h-[100px] cursor-text transition-all ${
+          className={`border rounded-lg p-4 min-h-25 cursor-text transition-all ${
             editing
               ? 'border-accent border-solid bg-surface'
               : 'border-dashed border-border hover:border-[#C4C0BC]'

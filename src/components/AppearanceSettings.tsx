@@ -24,7 +24,7 @@ export default function AppearanceSettings() {
       <h2 className="text-sm font-medium text-ink mb-1">Appearance</h2>
       <p className="text-xs text-muted mb-5">Choose how Irregular Pearl looks on this device.</p>
 
-      <div className="grid grid-cols-3 gap-3 md:gap-4 max-w-[520px]">
+      <div className="grid grid-cols-3 gap-3 md:gap-4 max-w-130">
         {OPTIONS.map((opt) => (
           <ThemeOption
             key={opt.value}

@@ -33,6 +33,12 @@ interface Props {
   initialMovements: Movement[];
   seedMovements: SeedMovement[];
   landmarksByMovement?: Record<string, PublishedLandmark[]>;
+  // Awaiting-first-contribution mode: movement metadata stays editable
+  // (unsigned reference per PRD §54), but the landmark-creation affordance
+  // is suppressed so the awaiting-mode invite framing remains coherent —
+  // landmarks are signed editorial per PRD §440 and should route through
+  // the dedicated first-contribution CTA.
+  awaitingMode?: boolean;
 }
 
 type Busy = { kind: 'idle' } | { kind: 'working'; movementId?: string } | { kind: 'error'; message: string };
@@ -42,6 +48,7 @@ export default function MovementsList({
   initialMovements,
   seedMovements,
   landmarksByMovement = {},
+  awaitingMode = false,
 }: Props) {
   const { user } = useAuth();
   const {
@@ -197,6 +204,7 @@ export default function MovementsList({
                   pieceId={pieceId}
                   movementId={m.id}
                   initialLandmarks={landmarksByMovement[m.id] ?? []}
+                  awaitingMode={awaitingMode}
                 />
               </div>
             );
