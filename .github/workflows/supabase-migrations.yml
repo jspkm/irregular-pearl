@@ -70,7 +70,12 @@ jobs:
       - name: Push migrations
         # `supabase db push` applies only migrations not already recorded in
         # the project's schema_migrations table. Idempotent; safe on re-runs.
-        run: supabase db push
+        # `--include-all` covers the case where a feature branch's migration
+        # has a timestamp older than what's already on prod (timestamp
+        # inversion). Without it, the CLI fails closed and blocks every later
+        # migration too. We've already merged the PR by the time this runs,
+        # so the gating decision was made at review time, not here.
+        run: supabase db push --include-all
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
