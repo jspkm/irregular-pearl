@@ -1,18 +1,23 @@
--- Multi-token typeahead search.
+-- Multi-token typeahead search with per-token typo tolerance.
 --
 -- The previous version matched the whole query as a single phrase against
 -- each column. Multi-word queries that combined composer + title (e.g.
 -- "bach sonata", "cello bach", "bach s" while typing "bach sonatas")
 -- returned zero rows because no single column contains both tokens —
 -- composer is "Johann Sebastian Bach" and title is "Cello Suite No. 1
--- in G major". Trigram similarity also fails on short fragments that
--- straddle column boundaries.
+-- in G major". Trigram similarity also failed on whole-string compares
+-- where the haystack is much longer than the query (similarity('bachh',
+-- 'Johann Sebastian Bach') ≈ 0.17, below the 0.3 default threshold).
 --
 -- New behavior: split the query on whitespace, build a per-row haystack
 -- from composer_name + title + catalog_number + instruments (also
 -- native_title for canonical entries), and require every token to
--- appear as an ILIKE substring of the haystack. Trigram similarity is
--- preserved for single-token typo tolerance and for ranking.
+-- either (a) appear as an ILIKE substring of the haystack OR (b) match
+-- a haystack word via word_similarity above 0.6. word_similarity is the
+-- pg_trgm function that compares the query against the closest
+-- word-aligned substring of the haystack, which catches typos like
+-- "bachh" matching the "Bach" word inside the longer composer string.
+-- Full-string similarity() is preserved for ranking.
 
 drop function if exists public.search_pieces_typeahead(text);
 
@@ -67,12 +72,11 @@ begin
       ) hay
       where v.has_signed_content = true
         and (
-          (select bool_and(hay.h like '%' || t || '%') from unnest(v_tokens) t)
-          or (cardinality(v_tokens) = 1 and (
-                p.title % v_trimmed
-                or p.composer_name % v_trimmed
-                or (p.catalog_number is not null and p.catalog_number % v_trimmed)
-              ))
+          select bool_and(
+            hay.h like '%' || t || '%'
+            or word_similarity(t, hay.h) > 0.6
+          )
+          from unnest(v_tokens) t
         )
       order by greatest(
         similarity(p.title, v_trimmed),
@@ -104,12 +108,11 @@ begin
       ) hay
       where v.has_signed_content = false
         and (
-          (select bool_and(hay.h like '%' || t || '%') from unnest(v_tokens) t)
-          or (cardinality(v_tokens) = 1 and (
-                p.title % v_trimmed
-                or p.composer_name % v_trimmed
-                or (p.catalog_number is not null and p.catalog_number % v_trimmed)
-              ))
+          select bool_and(
+            hay.h like '%' || t || '%'
+            or word_similarity(t, hay.h) > 0.6
+          )
+          from unnest(v_tokens) t
         )
       order by greatest(
         similarity(p.title, v_trimmed),
@@ -142,13 +145,11 @@ begin
       where not exists (
               select 1 from public.pieces p where p.canonical_index_id = c.id)
         and (
-          (select bool_and(hay.h like '%' || t || '%') from unnest(v_tokens) t)
-          or (cardinality(v_tokens) = 1 and (
-                c.canonical_title % v_trimmed
-                or (c.native_title is not null and c.native_title % v_trimmed)
-                or c.composer_name % v_trimmed
-                or (c.catalog_number is not null and c.catalog_number % v_trimmed)
-              ))
+          select bool_and(
+            hay.h like '%' || t || '%'
+            or word_similarity(t, hay.h) > 0.6
+          )
+          from unnest(v_tokens) t
         )
       order by greatest(
         similarity(c.canonical_title, v_trimmed),

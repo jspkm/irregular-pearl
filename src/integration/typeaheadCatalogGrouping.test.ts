@@ -63,6 +63,14 @@ describe('search_pieces_typeahead grouping by has_signed_content', () => {
     expect(rows.every((r) => /bach/i.test(r.composer_name))).toBe(true);
   });
 
+  test('"bachh" (typo) still returns Bach via word_similarity fallback', async () => {
+    const { data, error } = await sb.rpc('search_pieces_typeahead', { p_query: 'bachh' });
+    expect(error).toBeNull();
+    const rows = (data ?? []) as Array<{ composer_name: string }>;
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((r) => /bach/i.test(r.composer_name))).toBe(true);
+  });
+
   test('multi-token narrows results vs single token', async () => {
     const { data: bach } = await sb.rpc('search_pieces_typeahead', { p_query: 'bach' });
     const { data: bachSonata } = await sb.rpc('search_pieces_typeahead', { p_query: 'bach sonata' });
