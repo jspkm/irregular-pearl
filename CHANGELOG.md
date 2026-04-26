@@ -4,6 +4,15 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Paper cuts: `/settings` redirect, AddPieceForm deletion, contributor-flag drop, mobile toggle fix
+
+Four small cleanups in one batch.
+
+- **`/settings` direct URL resolves.** Anon visitors see `SignInPanel` with `redirectTo=/settings` so OAuth round-trips back; signed-in users redirect to `/profile/<uid>?section=setting`. Closes a `/qa`-found 404. New thin client island [`SettingsRedirect.tsx`](src/components/SettingsRedirect.tsx) mounted from [`src/pages/settings.astro`](src/pages/settings.astro).
+- **Dead `AddPieceForm` removed.** [`AddPieceForm.tsx`](src/components/AddPieceForm.tsx) and `src/pages/add-piece.astro` deleted — orphan since request-a-contribution + `materialize_piece_from_index` became the canonical add path. A latent runtime FK failure on `canonical_index_id NOT NULL` (hidden behind an `as any` cast) goes with it.
+- **Vestigial contributor flags dropped.** `users.is_contributor` and `users.contributor_active` removed via [`20260609000000_drop_vestigial_contributor_flags.sql`](supabase/migrations/20260609000000_drop_vestigial_contributor_flags.sql). PR #56 (`open_self_authoring`) made these unread back in v0.2.0; columns lingered as a regression invitation. Sweeps in `scripts/seed-contributor.ts`, `scripts/seed-local-queue.ts`, `src/integration/helpers.ts`, and `src/lib/database.types.ts`. Old migrations referencing the columns were already replaced by 20260513000000, so `supabase db reset` stays valid through the historical chain.
+- **Email Preferences toggles render as pills, not discs.** The mobile-touch-target rule at [`global.css:209`](src/styles/global.css) was forcing `min-height/min-width: 44px` on every `<button>` at viewports ≤1024px, inflating each `[role="switch"]` toggle into a 44×44 purple disc. Excluded `[role="switch"]` from the rule; toggles keep their intentional 24×44 oval footprint, the inner thumb still gives a generous tap target.
+
 ## [0.5.3] - 2026-04-25
 
 ### Awaiting-first-contribution page renders identity + reference layer
