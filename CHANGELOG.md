@@ -4,6 +4,13 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Profile username updates instantly without page reload
+
+Saving a username in Profile → Edit wrote to the database but the chip kept showing "Claim your URL" and the Edit form didn't collapse to the new `irregularpearl.org/@<name>` display until a manual refresh. The editor was firing `onUsernameChange?.(trimmed)` on success, but [`ArtistProfile.tsx:98`](src/components/ArtistProfile.tsx) wasn't passing a callback, so the parent's `profile.username` stayed stale and the editor's "view" mode rendered the old prop.
+
+- **Wired the callback** in [`src/components/ArtistProfile.tsx`](src/components/ArtistProfile.tsx): `onUsernameChange={(username) => setProfile(prev => prev ? { ...prev, username } : prev)}`. The View / Change-username affordance now appears the moment Save resolves, no refresh.
+- Tests in [`src/components/UsernameEditor.test.tsx`](src/components/UsernameEditor.test.tsx) already exercise the callback contract; this PR makes the parent honor it.
+
 ### Auth email templates — confirmation, email change, magic link
 
 PR #88 styled the password-reset (`recovery`) email but left the rest of the Supabase Auth templates on their bare defaults. The signup confirmation in particular still rendered as a stark "Confirm your signup / Follow this link to confirm your user:" with no masthead — exactly the kind of low-content shape spam filters flag and new users mistrust.
