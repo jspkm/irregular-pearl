@@ -231,9 +231,21 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+[auth.email.template.confirmation]
+subject = "Confirm your Irregular Pearl signup"
+content_path = "./supabase/templates/confirmation.html"
+
 [auth.email.template.recovery]
-subject = "Reset your IrregularPearl password"
+subject = "Reset your Irregular Pearl password"
 content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.email_change]
+subject = "Confirm your email change for Irregular Pearl"
+content_path = "./supabase/templates/email-change.html"
+
+[auth.email.template.magic_link]
+subject = "Your Irregular Pearl sign-in link"
+content_path = "./supabase/templates/magic-link.html"
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]

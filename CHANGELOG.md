@@ -4,6 +4,16 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Auth email templates — confirmation, email change, magic link
+
+PR #88 styled the password-reset (`recovery`) email but left the rest of the Supabase Auth templates on their bare defaults. The signup confirmation in particular still rendered as a stark "Confirm your signup / Follow this link to confirm your user:" with no masthead — exactly the kind of low-content shape spam filters flag and new users mistrust.
+
+- **Three new templates**: [`supabase/templates/confirmation.html`](supabase/templates/confirmation.html) (signup), [`supabase/templates/email-change.html`](supabase/templates/email-change.html) (email change, used for both old and new address confirmations), [`supabase/templates/magic-link.html`](supabase/templates/magic-link.html) (passwordless sign-in). All three mirror the recovery template's layout: 600px table-based column, `IrregularPearl` wordmark + "Account" subtitle, ink CTA, accent-purple link fallback, 1px `#E5E3DE` borders, `color-scheme: light` meta to prevent dark-mode inversion.
+- **Branded subject lines** so all four auth emails name the sender on the inbox line: `Confirm your Irregular Pearl signup`, `Reset your Irregular Pearl password`, `Confirm your email change for Irregular Pearl`, `Your Irregular Pearl sign-in link`.
+- **Subject regression fixed**: the recovery subject merged on PR #88 was `"Reset your IrregularPearl password"` (no space) — contradicting the wordmark-vs-prose convention the user had already set. Restored to `Reset your Irregular Pearl password` in the same commit.
+- **Email-change template uses both `{{ .Email }}` and `{{ .NewEmail }}`**: explicit "from X to Y" framing in bold so the recipient can verify the destination and spot tampered-with confirmation requests at a glance.
+- **All four templates wired** under `[auth.email.template.*]` in [`supabase/config.toml`](supabase/config.toml). Push with `bunx supabase config push` (or paste each into the dashboard's Auth → Email Templates pane).
+
 ### Email deliverability hardening — recovery template, List-Unsubscribe, branded subjects
 
 The Supabase-default password-reset email and the two cron-driven digests were all hitting Gmail spam in fresh accounts. Single sweep to bring them in line with the same `renderEmailLayout` masthead the welcome email already uses, and to add the bulk-sender hygiene Gmail/Yahoo started enforcing in early 2024.
