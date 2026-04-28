@@ -95,7 +95,13 @@ export default function ArtistProfile({ userId }: { userId: string }) {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="font-display italic text-2xl md:text-[28px] leading-tight mb-1">{displayName}</h1>
-          {isOwnProfile && <UsernameEditor currentUsername={profile.username} userId={profile.id} />}
+          {isOwnProfile && (
+            <UsernameEditor
+              currentUsername={profile.username}
+              userId={profile.id}
+              onUsernameChange={(username) => setProfile(prev => prev ? { ...prev, username } : prev)}
+            />
+          )}
           <div className="mt-2 flex flex-wrap gap-2 items-center">
             {profile.instrument && profile.instrument.split(',').map(i => i.trim()).filter(Boolean).map(inst => (
               <span key={inst} className="text-[11px] px-2.5 py-1 bg-accent-soft text-accent rounded-full font-medium">{inst}</span>
