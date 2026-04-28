@@ -4,6 +4,21 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Email deliverability hardening — recovery template, List-Unsubscribe, branded subjects
+
+The Supabase-default password-reset email and the two cron-driven digests were all hitting Gmail spam in fresh accounts. Single sweep to bring them in line with the same `renderEmailLayout` masthead the welcome email already uses, and to add the bulk-sender hygiene Gmail/Yahoo started enforcing in early 2024.
+
+- **Password reset uses the shared masthead.** New [`supabase/templates/recovery.html`](supabase/templates/recovery.html) hand-rendered against the same primitives as `_lib/email-template.ts` (table-based 600px column, `IrregularPearl` wordmark + "Account" subtitle, ink CTA, accent-purple link, 1px `#E5E3DE` borders). Subject branded `Reset your Irregular Pearl password`. Body explains why the email arrived, expiry, "ignore if not you" reassurance — pure prose plus a single link, no tracking pixels. Wired via [`supabase/config.toml`](supabase/config.toml) `[auth.email.template.recovery]`. Push to the cloud project with `supabase config push` (or paste into the dashboard's recovery template field) for the change to reach prod.
+- **One-click unsubscribe (RFC 8058).** Both digest emails now ship `List-Unsubscribe: <https://…>, <mailto:…>` and `List-Unsubscribe-Post: List-Unsubscribe=One-Click`. The HTTPS link is signed with HMAC-SHA256 against a new `UNSUBSCRIBE_SECRET` env var, and the secret-protected Astro endpoint at [`src/pages/unsubscribe.ts`](src/pages/unsubscribe.ts) verifies the token in constant time before flipping the matching `email_*_digest` column to false. POST returns 200 OK (Gmail's silent one-click); GET renders a styled "You're unsubscribed" confirmation page that links to /settings for granular control. Sign helper at [`supabase/functions/_lib/unsubscribe-token.ts`](supabase/functions/_lib/unsubscribe-token.ts), Node-side mirror at [`src/lib/unsubscribeToken.ts`](src/lib/unsubscribeToken.ts) (Deno can't import from `src/`, so the two stay in sync by convention — same pattern as `contributorSubjects.ts`). Edge functions refuse to send if `UNSUBSCRIBE_SECRET` isn't set, so we never ship a digest that violates Gmail's bulk-sender rule.
+- **Subject lines branded.** Weekly: `Your Weekly Digest — …` → `Irregular Pearl · weekly · …`. Notification: `3 drafts await your review` → `Irregular Pearl: 3 drafts await your review`. Both subjects now name the sender on the inbox line, which is the strongest filter signal short of full DMARC alignment.
+- **Plain-text alternatives.** Both digests now provide a hand-built `text` body alongside the HTML instead of letting Resend auto-strip the table-heavy HTML. Same content, stripped to a one-pass-readable form, with the unsubscribe URL inlined at the bottom for clients that don't honor `List-Unsubscribe`.
+- **Color-scheme meta on the shared layout.** `renderEmailLayout` now declares `color-scheme: light` + `supported-color-schemes: light` so Gmail-on-dark and Outlook-on-dark stop inverting the white card backgrounds. One change in [`supabase/functions/_lib/email-template.ts`](supabase/functions/_lib/email-template.ts) covers every email that uses the layout.
+- **Notification digest gets a "Notifications" subtitle.** Mirrors the recovery template's "Account" subtitle so recipients can tell at a glance which channel an email is coming from. Single-line addition in `renderNotificationDigest`.
+- **Optional `Reply-To` env var.** `EMAIL_REPLY_TO` (unset by default, documented in `.env.example`) lets a future deploy point the notification digest's reply path at `hello@irregularpearl.org` once that inbox is wired up. The `noreply@` From address stays unchanged so nothing breaks if the env stays unset.
+- **Weekly CTA copy.** "Explore Irregular Pearl" → "Open the catalog" — same destination, more specific.
+
+Outside this PR: DMARC is still `p=none` on `irregularpearl.org`. Once the new traffic patterns settle (~2 weeks of clean reports), flip to `p=quarantine` to capture the remaining trust signal.
+
 ### Awaiting-mode landmark gating + Tailwind arbitrary-px sweep + bell badge mobile fix
 
 Three more P3 cleanups.

@@ -17,10 +17,16 @@ import {
   primaryButton,
   renderEmailLayout,
 } from "../_lib/email-template.ts";
+import { buildUnsubscribeUrl, signUnsubscribeToken } from "../_lib/unsubscribe-token.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const UNSUBSCRIBE_SECRET = Deno.env.get("UNSUBSCRIBE_SECRET");
+
+const SITE_ORIGIN = "https://irregularpearl.org";
+const FROM_ADDRESS = "Irregular Pearl <noreply@irregularpearl.org>";
+const UNSUBSCRIBE_MAILTO = "mailto:unsubscribe@irregularpearl.org?subject=unsubscribe-weekly";
 
 interface DigestPiece {
   id: string;
@@ -74,7 +80,7 @@ function renderWeeklyDigest(opts: {
   piecesHtml: string;
   piecesCount: number;
   totalPieces: number;
-  unsubscribeUrl: string;
+  manageUrl: string;
 }): string {
   const bodyHtml = `
   <div style="padding-bottom:12px;">${paragraph(`Dear ${opts.recipientName},`)}</div>
@@ -84,7 +90,7 @@ function renderWeeklyDigest(opts: {
     ? `<div style="padding-bottom:12px;">${kicker("New this week")}</div>${opts.piecesHtml}`
     : ""}
   <div align="center" style="padding:24px 0 8px;">
-    ${primaryButton({ text: "Explore Irregular Pearl", href: "https://irregularpearl.org" })}
+    ${primaryButton({ text: "Open the catalog", href: SITE_ORIGIN })}
   </div>
   `;
 
@@ -94,8 +100,90 @@ function renderWeeklyDigest(opts: {
     subtitle: "Weekly Digest",
     bodyHtml,
     footerNote: "You're receiving this because you opted in to the weekly digest.",
-    footerLink: { text: "Manage email preferences", href: opts.unsubscribeUrl },
+    footerLink: { text: "Manage email preferences", href: opts.manageUrl },
   });
+}
+
+function renderWeeklyDigestText(opts: {
+  recipientName: string;
+  weekRange: string;
+  summary: string;
+  pieces: DigestPiece[];
+  totalPieces: number;
+  manageUrl: string;
+  unsubscribeUrl: string;
+}): string {
+  const lines: string[] = [];
+  lines.push(`IrregularPearl — Weekly Digest`);
+  lines.push(opts.weekRange);
+  lines.push("");
+  lines.push(`Dear ${opts.recipientName},`);
+  lines.push("");
+  lines.push(opts.summary);
+  lines.push("");
+  lines.push(`Pieces in catalog: ${opts.totalPieces}`);
+  lines.push(`New this week: ${opts.pieces.length}`);
+  lines.push("");
+  if (opts.pieces.length > 0) {
+    lines.push("NEW THIS WEEK");
+    lines.push("-------------");
+    for (const p of opts.pieces) {
+      const meta = [p.instruments.slice(0, 2).join(", "), p.era].filter(Boolean).join(" · ");
+      const cat = p.catalog_number ? ` · ${p.catalog_number}` : "";
+      const desc = p.description.length > 200
+        ? p.description.slice(0, 200).replace(/\s+\S*$/, "") + "..."
+        : p.description;
+      lines.push("");
+      lines.push(p.title);
+      lines.push(`by ${p.composer_name}${cat}`);
+      if (meta) lines.push(meta);
+      if (desc) lines.push(desc);
+      lines.push(`${SITE_ORIGIN}/piece/${p.id}`);
+    }
+    lines.push("");
+  }
+  lines.push(`Open the catalog: ${SITE_ORIGIN}`);
+  lines.push("");
+  lines.push("---");
+  lines.push("You're receiving this because you opted in to the weekly digest.");
+  lines.push(`Manage email preferences: ${opts.manageUrl}`);
+  lines.push(`Unsubscribe: ${opts.unsubscribeUrl}`);
+  lines.push("");
+  lines.push("Irregular Pearl — a non-profit, community-driven classical music knowledge hub.");
+  return lines.join("\n");
+}
+
+interface SendInputs {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  unsubscribeUrl: string | null;
+}
+
+async function sendViaResend(inputs: SendInputs): Promise<{ ok: boolean; error?: string }> {
+  const headers: Record<string, string> = {};
+  if (inputs.unsubscribeUrl) {
+    headers["List-Unsubscribe"] = `<${inputs.unsubscribeUrl}>, <${UNSUBSCRIBE_MAILTO}>`;
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+  }
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [inputs.to],
+      subject: inputs.subject,
+      html: inputs.html,
+      text: inputs.text,
+      ...(Object.keys(headers).length > 0 ? { headers } : {}),
+    }),
+  });
+  if (res.ok) return { ok: true };
+  return { ok: false, error: await res.text() };
 }
 
 async function fetchAndSendDigests(previewTo?: string, previewName?: string): Promise<{ sent: number; skipped: number; errors: string[] }> {
@@ -134,9 +222,11 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
   // Preview mode: render one digest with real prod data and send only to
   // previewTo. Skips the recipient DB loop and all per-user personalization
   // beyond the greeting, since a single template render is sufficient for
-  // visual review.
+  // visual review. The List-Unsubscribe link uses a placeholder token that
+  // won't actually unsubscribe — preview is for visual QA only.
   if (previewTo) {
     const firstName = (previewName || "").split(" ")[0] || "there";
+    const manageUrl = `${SITE_ORIGIN}/profile/preview?section=setting#email`;
     const html = renderWeeklyDigest({
       recipientName: firstName,
       weekRange,
@@ -144,24 +234,30 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
       piecesHtml,
       piecesCount: (newPieces || []).length,
       totalPieces: totalPieces ?? 0,
-      unsubscribeUrl: "https://irregularpearl.org/profile/preview?section=setting#email",
+      manageUrl,
     });
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Irregular Pearl <noreply@irregularpearl.org>",
-        to: [previewTo],
-        subject: `[PREVIEW] Your Weekly Digest — ${weekRange}`,
-        html,
-      }),
+    const text = renderWeeklyDigestText({
+      recipientName: firstName,
+      weekRange,
+      summary,
+      pieces: (newPieces ?? []) as DigestPiece[],
+      totalPieces: totalPieces ?? 0,
+      manageUrl,
+      unsubscribeUrl: `${SITE_ORIGIN}/unsubscribe?u=preview&k=weekly&t=preview`,
     });
-    if (res.ok) return { sent: 1, skipped: 0, errors: [] };
-    const errText = await res.text();
-    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${errText}`] };
+    const result = await sendViaResend({
+      to: previewTo,
+      subject: `[PREVIEW] Irregular Pearl · weekly · ${weekRange}`,
+      html,
+      text,
+      unsubscribeUrl: null,
+    });
+    if (result.ok) return { sent: 1, skipped: 0, errors: [] };
+    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${result.error}`] };
+  }
+
+  if (!UNSUBSCRIBE_SECRET) {
+    return { sent: 0, skipped: 0, errors: ["UNSUBSCRIBE_SECRET not set — refusing to send digests without one-click unsubscribe support"] };
   }
 
   const { data: recipients } = await supabase
@@ -182,7 +278,9 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
       }
 
       const firstName = (recipient.display_name || "").split(" ")[0] || "there";
-      const unsubscribeUrl = `https://irregularpearl.org/profile/${recipient.id}?section=setting#email`;
+      const manageUrl = `${SITE_ORIGIN}/profile/${recipient.id}?section=setting#email`;
+      const token = await signUnsubscribeToken(UNSUBSCRIBE_SECRET, recipient.id, "weekly");
+      const unsubscribeUrl = buildUnsubscribeUrl({ origin: SITE_ORIGIN, userId: recipient.id, kind: "weekly", token });
 
       const html = renderWeeklyDigest({
         recipientName: firstName,
@@ -191,29 +289,31 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
         piecesHtml,
         piecesCount: (newPieces || []).length,
         totalPieces: totalPieces ?? 0,
+        manageUrl,
+      });
+      const text = renderWeeklyDigestText({
+        recipientName: firstName,
+        weekRange,
+        summary,
+        pieces: (newPieces ?? []) as DigestPiece[],
+        totalPieces: totalPieces ?? 0,
+        manageUrl,
         unsubscribeUrl,
       });
 
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Irregular Pearl <noreply@irregularpearl.org>",
-          to: [authUser.email],
-          subject: `Your Weekly Digest — ${weekRange}`,
-          html,
-        }),
+      const result = await sendViaResend({
+        to: authUser.email,
+        subject: `Irregular Pearl · weekly · ${weekRange}`,
+        html,
+        text,
+        unsubscribeUrl,
       });
 
-      if (res.ok) {
+      if (result.ok) {
         sent++;
         console.log(`Digest sent to ${authUser.email} (${firstName})`);
       } else {
-        const err = await res.text();
-        errors.push(`Failed for ${authUser.email}: ${err}`);
+        errors.push(`Failed for ${authUser.email}: ${result.error}`);
       }
     } catch (err) {
       errors.push(`Error for ${recipient.id}: ${err instanceof Error ? err.message : String(err)}`);
