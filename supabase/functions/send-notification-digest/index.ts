@@ -18,10 +18,17 @@ import {
   primaryButton,
   renderEmailLayout,
 } from "../_lib/email-template.ts";
+import { buildUnsubscribeUrl, signUnsubscribeToken } from "../_lib/unsubscribe-token.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const UNSUBSCRIBE_SECRET = Deno.env.get("UNSUBSCRIBE_SECRET");
+const EMAIL_REPLY_TO = Deno.env.get("EMAIL_REPLY_TO");
+
+const SITE_ORIGIN = "https://irregularpearl.org";
+const FROM_ADDRESS = "Irregular Pearl <noreply@irregularpearl.org>";
+const UNSUBSCRIBE_MAILTO = "mailto:unsubscribe@irregularpearl.org?subject=unsubscribe-notification";
 
 interface NotificationRow {
   id: string;
@@ -122,42 +129,45 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
     for (const [id, p] of syntheticPieceById) samplePieceById.set(id, p);
 
     const firstName = (previewName || "").split(" ")[0] || "there";
+    const items = effectiveRows.map((n) => {
+      const pieceId = sampleSubjectToPiece.get(`${n.subject_table}:${n.subject_id}`)
+        ?? (syntheticPieceById.has(n.subject_id) ? n.subject_id : undefined);
+      return {
+        body: n.body,
+        linkPath: n.link_path,
+        piece: pieceId ? samplePieceById.get(pieceId) ?? null : null,
+      };
+    });
+    const manageUrl = `${SITE_ORIGIN}/profile/preview?section=setting#email`;
     const html = renderNotificationDigest({
       recipientId: "preview",
       recipientName: firstName,
       count: effectiveRows.length,
-      items: effectiveRows.map((n) => {
-        const pieceId = sampleSubjectToPiece.get(`${n.subject_table}:${n.subject_id}`)
-          ?? (syntheticPieceById.has(n.subject_id) ? n.subject_id : undefined);
-        return {
-          body: n.body,
-          linkPath: n.link_path,
-          piece: pieceId ? samplePieceById.get(pieceId) ?? null : null,
-        };
-      }),
+      items,
+    });
+    const text = renderNotificationDigestText({
+      recipientId: "preview",
+      recipientName: firstName,
+      count: effectiveRows.length,
+      items,
+      manageUrl,
+      unsubscribeUrl: `${SITE_ORIGIN}/unsubscribe?u=preview&k=notification&t=preview`,
     });
 
     const subject = effectiveRows.length === 1
-      ? "[PREVIEW] 1 draft awaits your review"
-      : `[PREVIEW] ${effectiveRows.length} drafts await your review`;
+      ? "[PREVIEW] Irregular Pearl: 1 draft awaits your review"
+      : `[PREVIEW] Irregular Pearl: ${effectiveRows.length} drafts await your review`;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Irregular Pearl <noreply@irregularpearl.org>",
-        to: [previewTo],
-        subject,
-        html,
-      }),
+    const result = await sendViaResend({
+      to: previewTo,
+      subject,
+      html,
+      text,
+      unsubscribeUrl: null,
     });
 
-    if (res.ok) return { sent: 1, skipped: 0, errors: [] };
-    const errText = await res.text();
-    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${errText}`] };
+    if (result.ok) return { sent: 1, skipped: 0, errors: [] };
+    return { sent: 0, skipped: 0, errors: [`Preview send failed: ${result.error}`] };
   }
 
   // Unsent, un-cleared notifications. One email per notification, ever —
@@ -171,6 +181,10 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
 
   if (!rows || rows.length === 0) {
     return { sent: 0, skipped: 0, errors: [] };
+  }
+
+  if (!UNSUBSCRIBE_SECRET) {
+    return { sent: 0, skipped: 0, errors: ["UNSUBSCRIBE_SECRET not set — refusing to send digests without one-click unsubscribe support"] };
   }
 
   // Group by recipient.
@@ -250,42 +264,47 @@ async function fetchAndSendDigests(previewTo?: string, previewName?: string): Pr
       }
 
       const firstName = (profile?.display_name ?? "").split(" ")[0] || "there";
+      const items = notifications.map((n) => {
+        const pieceId = subjectToPiece.get(`${n.subject_table}:${n.subject_id}`);
+        return {
+          body: n.body,
+          linkPath: n.link_path,
+          piece: pieceId ? pieceById.get(pieceId) ?? null : null,
+        };
+      });
+      const manageUrl = `${SITE_ORIGIN}/profile/${recipientId}?section=setting#email`;
+      const token = await signUnsubscribeToken(UNSUBSCRIBE_SECRET!, recipientId, "notification");
+      const unsubscribeUrl = buildUnsubscribeUrl({ origin: SITE_ORIGIN, userId: recipientId, kind: "notification", token });
 
       const html = renderNotificationDigest({
         recipientId,
         recipientName: firstName,
         count: notifications.length,
-        items: notifications.map((n) => {
-          const pieceId = subjectToPiece.get(`${n.subject_table}:${n.subject_id}`);
-          return {
-            body: n.body,
-            linkPath: n.link_path,
-            piece: pieceId ? pieceById.get(pieceId) ?? null : null,
-          };
-        }),
+        items,
+      });
+      const text = renderNotificationDigestText({
+        recipientId,
+        recipientName: firstName,
+        count: notifications.length,
+        items,
+        manageUrl,
+        unsubscribeUrl,
       });
 
       const subject = notifications.length === 1
-        ? "1 draft awaits your review"
-        : `${notifications.length} drafts await your review`;
+        ? "Irregular Pearl: 1 draft awaits your review"
+        : `Irregular Pearl: ${notifications.length} drafts await your review`;
 
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Irregular Pearl <noreply@irregularpearl.org>",
-          to: [authUser.email],
-          subject,
-          html,
-        }),
+      const result = await sendViaResend({
+        to: authUser.email,
+        subject,
+        html,
+        text,
+        unsubscribeUrl,
       });
 
-      if (!res.ok) {
-        const errText = await res.text();
-        errors.push(`Resend failed for ${authUser.email}: ${errText}`);
+      if (!result.ok) {
+        errors.push(`Resend failed for ${authUser.email}: ${result.error}`);
         // Do NOT update last_digest_sent_at — next run retries.
         continue;
       }
@@ -326,7 +345,7 @@ function renderNotificationDigest(opts: {
       ? `${item.piece.title}${item.piece.catalog_number ? ` · ${item.piece.catalog_number}` : ""}`
       : null;
     const composer = item.piece?.composer_name;
-    const deepLink = `https://irregularpearl.org${item.linkPath}`;
+    const deepLink = `${SITE_ORIGIN}${item.linkPath}`;
     const inner = `
       ${pieceLabel ? heading(pieceLabel, { level: "h3", href: deepLink }) : ""}
       ${composer ? `<div style="padding-top:2px;">${paragraph(`by ${composer}`, { muted: true })}</div>` : ""}
@@ -335,7 +354,7 @@ function renderNotificationDigest(opts: {
     return card({ html: inner, accent: true });
   }).join("\n");
 
-  const queueUrl = "https://irregularpearl.org/notifications";
+  const queueUrl = `${SITE_ORIGIN}/notifications`;
 
   const bodyHtml = `
     <div style="padding-bottom:12px;">${paragraph(greeting)}</div>
@@ -353,10 +372,86 @@ function renderNotificationDigest(opts: {
         ? "Irregular Pearl — 1 draft awaits your review"
         : `Irregular Pearl — ${opts.count} drafts await your review`,
     preheader: lede,
+    subtitle: "Notifications",
     bodyHtml,
     footerNote: "You're receiving this because a draft was routed to your byline.",
-    footerLink: { text: "Manage email preferences", href: `https://irregularpearl.org/profile/${opts.recipientId}?section=setting#email` },
+    footerLink: { text: "Manage email preferences", href: `${SITE_ORIGIN}/profile/${opts.recipientId}?section=setting#email` },
   });
+}
+
+function renderNotificationDigestText(opts: {
+  recipientId: string;
+  recipientName: string;
+  count: number;
+  items: Array<{ body: string; linkPath: string; piece: PieceRef | null }>;
+  manageUrl: string;
+  unsubscribeUrl: string;
+}): string {
+  const lines: string[] = [];
+  lines.push("IrregularPearl — Notifications");
+  lines.push("");
+  lines.push(`Dear ${opts.recipientName},`);
+  lines.push("");
+  lines.push(opts.count === 1
+    ? "A draft is waiting for your review."
+    : `${opts.count} drafts are waiting for your review.`);
+  lines.push("");
+  lines.push("AWAITING YOUR REVIEW");
+  lines.push("--------------------");
+  for (const item of opts.items) {
+    const pieceLabel = item.piece
+      ? `${item.piece.title}${item.piece.catalog_number ? ` · ${item.piece.catalog_number}` : ""}`
+      : null;
+    lines.push("");
+    if (pieceLabel) lines.push(pieceLabel);
+    if (item.piece?.composer_name) lines.push(`by ${item.piece.composer_name}`);
+    lines.push(item.body);
+    lines.push(`${SITE_ORIGIN}${item.linkPath}`);
+  }
+  lines.push("");
+  lines.push(`Open the queue: ${SITE_ORIGIN}/notifications`);
+  lines.push("");
+  lines.push("---");
+  lines.push("You're receiving this because a draft was routed to your byline.");
+  lines.push(`Manage email preferences: ${opts.manageUrl}`);
+  lines.push(`Unsubscribe: ${opts.unsubscribeUrl}`);
+  lines.push("");
+  lines.push("Irregular Pearl — a non-profit, community-driven classical music knowledge hub.");
+  return lines.join("\n");
+}
+
+interface SendInputs {
+  to: string;
+  subject: string;
+  html: string;
+  text: string;
+  unsubscribeUrl: string | null;
+}
+
+async function sendViaResend(inputs: SendInputs): Promise<{ ok: boolean; error?: string }> {
+  const headers: Record<string, string> = {};
+  if (inputs.unsubscribeUrl) {
+    headers["List-Unsubscribe"] = `<${inputs.unsubscribeUrl}>, <${UNSUBSCRIBE_MAILTO}>`;
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+  }
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [inputs.to],
+      subject: inputs.subject,
+      html: inputs.html,
+      text: inputs.text,
+      ...(EMAIL_REPLY_TO ? { reply_to: EMAIL_REPLY_TO } : {}),
+      ...(Object.keys(headers).length > 0 ? { headers } : {}),
+    }),
+  });
+  if (res.ok) return { ok: true };
+  return { ok: false, error: await res.text() };
 }
 
 Deno.serve(async (req) => {

@@ -130,6 +130,8 @@ export function renderEmailLayout(opts: EmailLayoutOpts): string {
   return `<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="color-scheme" content="light"/>
+<meta name="supported-color-schemes" content="light"/>
 <title>${esc(opts.title)}</title>
 <style>body,table,td,a{-webkit-text-size-adjust:100%}table,td{border-collapse:collapse}body{margin:0;padding:0;background:${TOKENS.bg}}
 @media only screen and (max-width:620px){.w{width:100%!important}.wi{padding:0 16px!important}}</style>
