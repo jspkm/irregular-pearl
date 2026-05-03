@@ -125,7 +125,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
 
     const [versionsRes, contribsRes] = await Promise.all([
       supabase.from('v_performers_note_versions_published').select('id, body, version_number, approved_at').in('id', versionIds),
-      supabase.from('users').select('id, display_name, contributor_bio_short').in('id', contribIds),
+      supabase.from('users').select('id, display_name, username, contributor_bio_short').in('id', contribIds),
     ]);
     const vById = new Map((versionsRes.data ?? []).map((v) => [v.id, v]));
     const cById = new Map((contribsRes.data ?? []).map((c) => [c.id, c]));
@@ -143,7 +143,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
         body: v.body,
         versionNumber: v.version_number,
         approvedAt: v.approved_at,
-        contributor: { id: c.id, displayName: c.display_name, bioShort: c.contributor_bio_short ?? null },
+        contributor: { id: c.id, displayName: c.display_name, username: c.username ?? null, bioShort: c.contributor_bio_short ?? null },
       });
     }
     setNotes(rows);
@@ -231,7 +231,7 @@ export default function PerformersNotes({ pieceId, initialNotes }: Props) {
                       {note.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
                     </div>
                     <div className="by">
-                      <span className="name">{note.contributor.displayName}</span>
+                      <a className="name" href={note.contributor.username ? `/@${note.contributor.username}` : `/profile/${note.contributor.id}`}>{note.contributor.displayName}</a>
                       {note.contributor.bioShort && (
                         <>
                           <span className="dot" aria-hidden="true"></span>

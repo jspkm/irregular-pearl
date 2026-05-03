@@ -161,7 +161,7 @@ export default function SignedPieceDifficulty({
     const contribIds = [...new Set(data.map((r) => r.contributor_id))];
     const { data: contribs } = await supabase
       .from('users')
-      .select('id, display_name, contributor_bio_short')
+      .select('id, display_name, username, contributor_bio_short')
       .in('id', contribIds);
     const cById = new Map((contribs ?? []).map((c) => [c.id, c]));
 
@@ -178,6 +178,7 @@ export default function SignedPieceDifficulty({
         contributor: {
           id: c.id,
           displayName: c.display_name,
+          username: c.username ?? null,
           bioShort: c.contributor_bio_short ?? null,
         },
       });
@@ -321,7 +322,7 @@ export default function SignedPieceDifficulty({
                   />
                   <div className="diff-card-by">
                     <div className="diff-card-by-left">
-                      <span className="name">{r.contributor.displayName}</span>
+                      <a className="name" href={r.contributor.username ? `/@${r.contributor.username}` : `/profile/${r.contributor.id}`}>{r.contributor.displayName}</a>
                       {r.contributor.bioShort && (
                         <>
                           <span className="dot" aria-hidden="true"></span>
@@ -412,7 +413,7 @@ export default function SignedPieceDifficulty({
           gap: 6px;
           flex: 0 0 auto;
         }
-        .diff-card-by .name { font-weight: 500; }
+        .diff-card-by .name { font-weight: 500; text-decoration: none; color: inherit; }
         .diff-card-by .dot {
           display: inline-block;
           width: 3px; height: 3px;

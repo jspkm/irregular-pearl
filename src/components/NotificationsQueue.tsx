@@ -26,6 +26,8 @@ interface ContributionRequestMessage {
   composerName: string;
   catalogNumber: string | null;
   senderName: string;
+  senderId: string;
+  senderUsername: string | null;
   note: string | null;
   createdAt: string;
 }
@@ -89,7 +91,7 @@ export default function NotificationsQueue() {
     const pieceIdsForMsgs = [...new Set(crList.map((r) => r.piece_id))];
     const [sendersRes, piecesForMsgsRes] = await Promise.all([
       senderIds.length
-        ? supabase.from('users').select('id, display_name').in('id', senderIds)
+        ? supabase.from('users').select('id, display_name, username').in('id', senderIds)
         : Promise.resolve({ data: [], error: null }),
       pieceIdsForMsgs.length
         ? supabase
@@ -99,7 +101,7 @@ export default function NotificationsQueue() {
         : Promise.resolve({ data: [], error: null }),
     ]);
     const senderById = new Map(
-      ((sendersRes.data ?? []) as { id: string; display_name: string }[]).map((u) => [u.id, u.display_name]),
+      ((sendersRes.data ?? []) as { id: string; display_name: string; username: string | null }[]).map((u) => [u.id, u]),
     );
     const pieceForMsgsById = new Map(
       (
@@ -127,7 +129,9 @@ export default function NotificationsQueue() {
             pieceTitle: piece.title,
             composerName: piece.composer_name,
             catalogNumber: piece.catalog_number ?? null,
-            senderName: senderById.get(cr.sender_id) ?? 'Someone',
+            senderName: senderById.get(cr.sender_id)?.display_name ?? 'Someone',
+            senderId: cr.sender_id,
+            senderUsername: senderById.get(cr.sender_id)?.username ?? null,
             note: cr.note,
             createdAt: cr.created_at,
           },
@@ -259,7 +263,7 @@ function MessageCard({
       </div>
 
       <div className="text-sm text-ink font-body mb-2">
-        <span className="font-medium">{m.senderName}</span>
+        <a className="font-medium" href={m.senderUsername ? `/@${m.senderUsername}` : `/profile/${m.senderId}`} style={{ textDecoration: 'none', color: 'inherit' }}>{m.senderName}</a>
         <span className="text-muted"> asked you to contribute.</span>
       </div>
       <div className="text-[11px] text-tertiary mb-4">{formatTimestamp(m.createdAt)}</div>

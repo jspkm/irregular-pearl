@@ -248,7 +248,7 @@ export default function StructuralLandmarks({ pieceId, movementId, initialLandma
                 )}
 
                 <div className="landmark-by">
-                  <span className="landmark-by-name">{l.contributor.displayName}</span>
+                  <a className="landmark-by-name" href={l.contributor.username ? `/@${l.contributor.username}` : `/profile/${l.contributor.id}`}>{l.contributor.displayName}</a>
                   {l.contributor.bioShort && (
                     <>
                       <span className="landmark-by-dash" aria-hidden="true">—</span>

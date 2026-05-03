@@ -119,7 +119,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
 
     const [versionsRes, contribsRes] = await Promise.all([
       supabase.from('v_interpretive_school_versions_published').select('id, body, version_number, approved_at').in('id', versionIds),
-      supabase.from('users').select('id, display_name, contributor_bio_short').in('id', contribIds),
+      supabase.from('users').select('id, display_name, username, contributor_bio_short').in('id', contribIds),
     ]);
     const vById = new Map((versionsRes.data ?? []).map((v) => [v.id, v]));
     const cById = new Map((contribsRes.data ?? []).map((c) => [c.id, c]));
@@ -139,7 +139,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
         tempoCues: (s.tempo_cues as Record<string, unknown> | null) ?? null,
         versionNumber: v.version_number,
         approvedAt: v.approved_at,
-        contributor: { id: c.id, displayName: c.display_name, bioShort: c.contributor_bio_short ?? null },
+        contributor: { id: c.id, displayName: c.display_name, username: c.username ?? null, bioShort: c.contributor_bio_short ?? null },
       });
     }
     setSchools(rows);
@@ -235,7 +235,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
                       {s.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
                     </div>
                     <div className="by">
-                      <span className="name">{s.contributor.displayName}</span>
+                      <a className="name" href={s.contributor.username ? `/@${s.contributor.username}` : `/profile/${s.contributor.id}`}>{s.contributor.displayName}</a>
                       {s.contributor.bioShort && (
                         <>
                           <span className="dot" aria-hidden="true"></span>
@@ -378,7 +378,7 @@ export default function InterpretiveSchools({ pieceId, initialSchools }: Props) 
           font-size: 13px;
           color: var(--ink);
         }
-        .school-card .by .name { font-weight: 500; }
+        .school-card .by .name { font-weight: 500; text-decoration: none; color: inherit; }
         .school-card .by .dot {
           display: inline-block;
           width: 3px; height: 3px;

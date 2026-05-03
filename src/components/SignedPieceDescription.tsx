@@ -130,7 +130,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
 
     const [versionsRes, contribsRes] = await Promise.all([
       supabase.from('v_piece_description_versions_published').select('id, body, version_number, approved_at').in('id', versionIds),
-      supabase.from('users').select('id, display_name, contributor_bio_short').in('id', contribIds),
+      supabase.from('users').select('id, display_name, username, contributor_bio_short').in('id', contribIds),
     ]);
     const vById = new Map((versionsRes.data ?? []).map((v) => [v.id, v]));
     const cById = new Map((contribsRes.data ?? []).map((c) => [c.id, c]));
@@ -148,7 +148,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
         body: v.body,
         versionNumber: v.version_number,
         approvedAt: v.approved_at,
-        contributor: { id: c.id, displayName: c.display_name, bioShort: c.contributor_bio_short ?? null },
+        contributor: { id: c.id, displayName: c.display_name, username: c.username ?? null, bioShort: c.contributor_bio_short ?? null },
       });
     }
     setDescriptions(rows);
@@ -242,7 +242,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
                       </div>
                       <div className="by">
                         <div className="by-left">
-                          <span className="name">{d.contributor.displayName}</span>
+                          <a className="name" href={d.contributor.username ? `/@${d.contributor.username}` : `/profile/${d.contributor.id}`}>{d.contributor.displayName}</a>
                           {d.contributor.bioShort && (
                             <>
                               <span className="dot" aria-hidden="true"></span>
@@ -378,7 +378,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
           gap: 6px;
           flex: 0 0 auto;
         }
-        .description-essay .by .name { font-weight: 500; }
+        .description-essay .by .name { font-weight: 500; text-decoration: none; color: inherit; }
         .description-essay .by .dot {
           display: inline-block;
           width: 3px; height: 3px;

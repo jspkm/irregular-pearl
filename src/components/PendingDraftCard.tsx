@@ -156,7 +156,7 @@ export default function PendingDraftCard({ draft, onResolved, trailingAction }: 
     <div className="pending-draft" data-kind={draft.kind}>
       <div className="pending-draft-kicker">
         <span className="pending-draft-spark" aria-hidden="true">✦</span>
-        <span>Proposed by {senderName}</span>
+        <span>Proposed by <a className="pending-draft-sender" href={draft.sender.username ? `/@${draft.sender.username}` : `/profile/${draft.sender.id}`}>{senderName}</a></span>
       </div>
 
       {!editing && (
