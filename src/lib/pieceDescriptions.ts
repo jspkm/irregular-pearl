@@ -13,6 +13,7 @@ export interface PublishedPieceDescription {
   contributor: {
     id: string;
     displayName: string;
+    username: string | null;
     bioShort: string | null;
   };
 }
@@ -43,7 +44,7 @@ export async function getPublishedPieceDescriptions(
       .in('id', versionIds),
     supabase
       .from('users')
-      .select('id, display_name, contributor_bio_short')
+      .select('id, display_name, username, contributor_bio_short')
       .in('id', contributorIds),
   ]);
   if (versionsRes.error || !versionsRes.data) return [];
@@ -70,6 +71,7 @@ export async function getPublishedPieceDescriptions(
       contributor: {
         id: contributor.id,
         displayName: contributor.display_name,
+        username: contributor.username ?? null,
         bioShort: contributor.contributor_bio_short ?? null,
       },
     });

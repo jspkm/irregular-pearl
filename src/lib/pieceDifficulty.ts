@@ -19,6 +19,7 @@ export interface PublishedPieceDifficulty {
   contributor: {
     id: string;
     displayName: string;
+    username: string | null;
     bioShort: string | null;
   };
 }
@@ -42,7 +43,7 @@ export async function getPublishedPieceDifficultyRatings(
   const contributorIds = [...new Set(data.map((r) => r.contributor_id))];
   const { data: contribs } = await supabase
     .from('users')
-    .select('id, display_name, contributor_bio_short')
+    .select('id, display_name, username, contributor_bio_short')
     .in('id', contributorIds);
   const contribById = new Map((contribs ?? []).map((c) => [c.id, c]));
 
@@ -59,6 +60,7 @@ export async function getPublishedPieceDifficultyRatings(
       contributor: {
         id: c.id,
         displayName: c.display_name,
+        username: c.username ?? null,
         bioShort: c.contributor_bio_short ?? null,
       },
     });

@@ -26,7 +26,7 @@ export interface PendingDraft {
   kind: DraftKind;
   payload: Record<string, unknown>;
   createdAt: string;
-  sender: { id: string; displayName: string | null };
+  sender: { id: string; displayName: string | null; username: string | null };
   /** Populated by fetchPendingDraftsForViewer() (Open items tab needs
    * piece context to render cross-piece). Null when fetched via
    * fetchPendingDraftsOnPiece() — the piece is implicit there. */
@@ -88,7 +88,7 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
   const senderIds = [...new Set(requests.map((r) => r.sender_id))];
   const { data: senders } = await supabase
     .from('users')
-    .select('id, display_name')
+    .select('id, display_name, username')
     .in('id', senderIds);
   const senderById = new Map((senders ?? []).map((s) => [s.id, s]));
 
@@ -103,7 +103,7 @@ export async function fetchPendingDraftsOnPiece(pieceId: string): Promise<Pendin
       kind: d.kind as DraftKind,
       payload: (d.payload as Record<string, unknown>) ?? {},
       createdAt: d.created_at,
-      sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      sender: { id: req.sender_id, displayName: sender?.display_name ?? null, username: sender?.username ?? null },
       piece: null,
     });
   }
@@ -146,7 +146,7 @@ export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
   const pieceIds = [...new Set(requests.map((r) => r.piece_id))];
 
   const [{ data: senders }, { data: pieces }] = await Promise.all([
-    supabase.from('users').select('id, display_name').in('id', senderIds),
+    supabase.from('users').select('id, display_name, username').in('id', senderIds),
     supabase.from('pieces').select('id, title, composer_name').in('id', pieceIds),
   ]);
 
@@ -167,7 +167,7 @@ export async function fetchPendingDraftsForViewer(): Promise<PendingDraft[]> {
       kind: d.kind as DraftKind,
       payload: (d.payload as Record<string, unknown>) ?? {},
       createdAt: d.created_at,
-      sender: { id: req.sender_id, displayName: sender?.display_name ?? null },
+      sender: { id: req.sender_id, displayName: sender?.display_name ?? null, username: sender?.username ?? null },
       piece,
     });
   }
