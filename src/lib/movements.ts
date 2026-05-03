@@ -128,6 +128,7 @@ export interface ChangeLogEntry {
   createdAt: string;
   authoredBy: string | null;
   authoredByDisplayName: string;
+  authoredByUsername: string | null;
   subjectType: ChangeLogSubjectType;
   subjectId: string;
   subjectLabel: string;
@@ -155,6 +156,7 @@ export async function fetchPieceChangelog(pieceId: string): Promise<ChangeLogEnt
     createdAt: r.created_at,
     authoredBy: r.authored_by,
     authoredByDisplayName: r.authored_by_display_name,
+    authoredByUsername: r.authored_by_username ?? null,
     subjectType: r.subject_type,
     subjectId: r.subject_id,
     subjectLabel: r.subject_label,

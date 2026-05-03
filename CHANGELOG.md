@@ -4,6 +4,17 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### Contributor names link to their profile across every signed surface
+
+Every contributor name attached to content was rendered as plain text — readers couldn't click through to the contributor's profile from the byline that prompted the question. Now the name on every signed surface is a link: `/@{username}` if the contributor has claimed a username, `/profile/{id}` as a fallback for users who haven't set one yet. Visual treatment is unchanged (same ink color, same font-weight, no underline) so the byline still reads as type, not a link island.
+
+- **Five signed surfaces wrap the name in `<a>`**: piece descriptions ([`SignedPieceDescription.tsx`](src/components/SignedPieceDescription.tsx)), performer's notes ([`PerformersNotes.tsx`](src/components/PerformersNotes.tsx)), interpretive schools ([`InterpretiveSchools.tsx`](src/components/InterpretiveSchools.tsx)), difficulty ratings ([`SignedPieceDifficulty.tsx`](src/components/SignedPieceDifficulty.tsx)), structural landmarks ([`StructuralLandmarks.tsx`](src/components/StructuralLandmarks.tsx)).
+- **Three meta surfaces** also link: change log entries ([`ChangeLog.tsx`](src/components/ChangeLog.tsx)) — "Seed data" rows stay as plain text since they have no author; pending-draft "Proposed by" lines ([`PendingDraftCard.tsx`](src/components/PendingDraftCard.tsx)); and notification queue rows ([`NotificationsQueue.tsx`](src/components/NotificationsQueue.tsx)).
+- **Lib types carry `username` end-to-end**: every contributor object on `PublishedPieceDescription`, `PublishedPerformersNote`, `PublishedInterpretiveSchool`, `PublishedLandmark`, `PublishedPieceDifficulty`, plus the `PendingDraft.sender` and `ChangeLogEntry.authoredByUsername`. Each fetch query now selects `username` alongside `display_name` and `contributor_bio_short`.
+- **Changelog RPC returns `authored_by_username`** ([`20260612000000_changelog_authored_by_username.sql`](supabase/migrations/20260612000000_changelog_authored_by_username.sql)). Single migration adds the field to every union branch of `fetch_piece_changelog`.
+- **CSS keeps the link looking like type**: `.signed .by .name`, `.changelog-who`, `.landmark-by-name`, and the per-component `.by .name` rules in the signed-content components all carry `text-decoration: none; color: inherit;` so an `<a>` styled with `class="name"` is visually identical to the previous `<span>`.
+- **Test seed**: [`scripts/seed-profile-link-test.ts`](scripts/seed-profile-link-test.ts) seeds two users with usernames + one without, then publishes a description, two notes, two schools, a difficulty rating, and a landmark on `bach-cello-suite-1`. Idempotent; rerun any time. Use it to verify both the `/@{username}` path and the `/profile/{id}` fallback.
+
 ### Profile username updates instantly without page reload
 
 Saving a username in Profile → Edit wrote to the database but the chip kept showing "Claim your URL" and the Edit form didn't collapse to the new `irregularpearl.org/@<name>` display until a manual refresh. The editor was firing `onUsernameChange?.(trimmed)` on success, but [`ArtistProfile.tsx:98`](src/components/ArtistProfile.tsx) wasn't passing a callback, so the parent's `profile.username` stayed stale and the editor's "view" mode rendered the old prop.

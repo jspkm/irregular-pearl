@@ -66,7 +66,11 @@ export default function ChangeLog({ pieceId, initialEntries }: Props) {
       <ol className="changelog-list">
         {entries.map((r) => (
           <li key={r.id} className="changelog-row">
-            <span className="changelog-who">{r.authoredByDisplayName}</span>
+            {r.authoredByUsername
+              ? <a className="changelog-who" href={`/@${r.authoredByUsername}`}>{r.authoredByDisplayName}</a>
+              : r.authoredBy
+                ? <a className="changelog-who" href={`/profile/${r.authoredBy}`}>{r.authoredByDisplayName}</a>
+                : <span className="changelog-who">{r.authoredByDisplayName}</span>}
             <span className="changelog-sep">·</span>
             <time className="changelog-when" dateTime={r.createdAt}>
               {formatUtc(r.createdAt)}
