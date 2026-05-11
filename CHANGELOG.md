@@ -4,6 +4,10 @@ All notable changes to Irregular Pearl are recorded here. Format follows [Keep a
 
 ## [Unreleased]
 
+### DMARC policy ready to flip to p=quarantine
+
+The `_dmarc.irregularpearl.org` record has been at `p=none` since late April while the new transactional email surfaces (one-click unsubscribe, branded subjects, plain-text alts, all auth templates) warmed up and built a clean report baseline. Two weeks of aggregate reports show no legitimate mail failing alignment. The DNS record should now be updated in Cloudflare to `p=quarantine; pct=100` — keeping the existing `rua` reporting address and `adkim`/`aspf` settings unchanged. The code change is DNS-only; no application code is affected.
+
 ### Contributor names link to their profile across every signed surface
 
 Every contributor name attached to content was rendered as plain text — readers couldn't click through to the contributor's profile from the byline that prompted the question. Now the name on every signed surface is a link: `/@{username}` if the contributor has claimed a username, `/profile/{id}` as a fallback for users who haven't set one yet. Visual treatment is unchanged (same ink color, same font-weight, no underline) so the byline still reads as type, not a link island.
