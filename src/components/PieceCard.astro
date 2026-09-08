@@ -5,7 +5,7 @@ interface Props {
   composer_name: string;
   catalog_number?: string | null;
   instruments: string[];
-  era: string;
+  era: string | null;
   difficulty: string;
   duration_minutes: number | null;
   description?: string;
@@ -26,7 +26,7 @@ const { id, title, composer_name, catalog_number, instruments, era, difficulty, 
     {instruments.map((inst) => (
       <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted lowercase">{inst}</span>
     ))}
-    <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted lowercase">{era}</span>
+    {era && <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted lowercase">{era}</span>}
     {edition_count && (
       <span class="text-[10px] px-2 py-0.5 bg-bg border border-border rounded-full text-muted">{edition_count} editions</span>
     )}

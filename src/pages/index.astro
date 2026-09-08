@@ -80,14 +80,21 @@ if (query) {
 // { piece_title, piece_id, kind, pull_quote, byline, byline_bio }.
 //
 // Rendered only when non-null. When null, the landing page flows navbar → list.
-const inFocus: {
+interface InFocus {
   piece_title: string;
   piece_id: string;
   kind: string;
   pull_quote: string;
   byline: string;
   byline_bio: string;
-} | null = null;
+}
+
+// `as` rather than a plain annotation: a const initialised to null narrows to
+// the literal type null, which collapses the render block below to `never` and
+// makes every field access an error. Widening to InFocus | null keeps the
+// placeholder null while still type-checking the markup against the shape a
+// real data source will have to supply.
+const inFocus = null as InFocus | null;
 
 const totalPieceCount = pieces.length > 0
   ? (hasSupabase
