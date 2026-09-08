@@ -255,14 +255,7 @@ export default function SignedPieceDifficulty({
       <div className="diff-stack">
         {renderError(error)}
         {renderWriteEntry()}
-        {signInOpen && (
-          <SignInPanel
-            onClose={signInOnClose}
-            onSignedIn={signInOnSignedIn}
-            title="Sign in to rate"
-            body={<>Signed ratings are authored — any registered user can publish their own four-axis difficulty. Sign in or create an account to post yours.</>}
-          />
-        )}
+        {renderSignInPanel()}
       </div>
     );
   }
@@ -379,13 +372,7 @@ export default function SignedPieceDifficulty({
 
       {mode !== 'write' && !isEditing && renderWriteEntry()}
 
-      {signInOpen && (
-        <SignInPanel
-          onClose={() => setSignInOpen(false)}
-          title="Sign in to rate"
-          body={<>Signed ratings are authored — any registered user can publish their own four-axis difficulty. Sign in or create an account to post yours.</>}
-        />
-      )}
+      {renderSignInPanel()}
 
       <style>{`
         .diff-stack { margin-bottom: 48px; }
@@ -438,6 +425,18 @@ export default function SignedPieceDifficulty({
       `}</style>
     </div>
   );
+
+  function renderSignInPanel() {
+    if (!signInOpen) return null;
+    return (
+      <SignInPanel
+        onClose={signInOnClose}
+        onSignedIn={signInOnSignedIn}
+        title="Sign in to rate"
+        body={<>Signed ratings are authored — any registered user can publish their own four-axis difficulty. Sign in or create an account to post yours.</>}
+      />
+    );
+  }
 
   function renderError(err: string | null) {
     if (!err) return null;
