@@ -1,8 +1,17 @@
 name: Supabase Migrations
 
-# Applies new migrations to the linked Supabase project on every push to main
-# that touches supabase/migrations/. Idempotent — existing migrations are
-# skipped via the schema_migrations table the CLI maintains.
+# Applies new migrations to the linked Supabase project after CI passes on
+# main. Idempotent — existing migrations are skipped via the schema_migrations
+# table the CLI maintains.
+#
+# Gated on the CI workflow rather than firing on the push itself: this job
+# applies irreversible schema changes to the production database, so it should
+# be the most-verified step in the pipeline, not the least. Previously it ran
+# with no test, typecheck or build gate at all.
+#
+# workflow_run cannot carry the old `paths:` filter, so this now runs after
+# every green CI on main. That is safe and cheap — `supabase db push` is a
+# no-op when there are no unapplied migrations.
 #
 # Manual trigger available via workflow_dispatch when a one-off push is needed
 # (e.g. replaying after a rollback, or catching up after disabling this
@@ -21,11 +30,10 @@ name: Supabase Migrations
 #                           extracted from the subdomain.
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-    paths:
-      - 'supabase/migrations/**'
-      - '.github/workflows/supabase-migrations.yml'
   workflow_dispatch:
 
 concurrency:
@@ -37,10 +45,19 @@ jobs:
   push:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # workflow_run fires on failure too, so a red CI must not reach the
+    # database. A manual dispatch is an explicit human override and is allowed.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # workflow_run defaults to the default branch tip; pin to the exact
+          # commit CI validated so the migrations applied are the ones tested.
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
@@ -73,8 +90,8 @@ jobs:
         # `--include-all` covers the case where a feature branch's migration
         # has a timestamp older than what's already on prod (timestamp
         # inversion). Without it, the CLI fails closed and blocks every later
-        # migration too. We've already merged the PR by the time this runs,
-        # so the gating decision was made at review time, not here.
+        # migration too. The gate for reaching this step is a green CI run on
+        # the merged commit (see the `if:` above), not review alone.
         run: supabase db push --include-all
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
