@@ -1,0 +1,83 @@
+name: Digest Send (reusable)
+
+# Shared invoker for the digest Edge Functions. Both digest workflows were
+# byte-for-byte identical apart from the function name and the label in the
+# error message, so the curl, the UNSUBSCRIBE_SECRET probe and the HTTP error
+# handling live here once instead of being copied a third time when preview
+# mode was added.
+#
+# preview_to routes the send to a single address: the Edge Function skips the
+# recipient loop entirely (send-weekly-digest/index.ts:227), so a smoke test
+# cannot reach real subscribers. Empty preview_to means a normal live send.
+
+on:
+  workflow_call:
+    inputs:
+      function:
+        description: 'Edge Function slug, e.g. send-weekly-digest'
+        required: true
+        type: string
+      label:
+        description: 'Human-readable name used in error messages'
+        required: true
+        type: string
+      preview_to:
+        description: 'Send only to this address. Blank = live send to all subscribers.'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Invoke ${{ inputs.function }}
+        env:
+          # Passed through the environment rather than interpolated into the
+          # script body: a ${{ }} expansion inside `run:` is a shell injection
+          # sink, and preview_to is attacker-controllable by anyone who can
+          # dispatch the workflow.
+          PREVIEW_TO: ${{ inputs.preview_to }}
+          FUNCTION: ${{ inputs.function }}
+          LABEL: ${{ inputs.label }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "$PREVIEW_TO" ]; then
+            # Validate before it reaches the JSON body. Rejects anything that
+            # is not a plain address, so a crafted value cannot break out.
+            if ! printf '%s' "$PREVIEW_TO" | grep -qE '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'; then
+              echo "::error::preview_to is not a valid email address"
+              exit 1
+            fi
+            REQUEST_BODY=$(jq -nc --arg to "$PREVIEW_TO" '{preview_to: $to}')
+            echo "PREVIEW MODE — sending only to $PREVIEW_TO. No subscriber will be emailed."
+          else
+            REQUEST_BODY='{}'
+            echo "LIVE MODE — sending to all subscribers."
+          fi
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST "$SUPABASE_URL/functions/v1/$FUNCTION" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$REQUEST_BODY")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Response ($HTTP_CODE): $BODY"
+
+          if echo "$BODY" | grep -q "UNSUBSCRIBE_SECRET not set"; then
+            echo "::error::UNSUBSCRIBE_SECRET is not configured on the Supabase project. Set it with: bunx supabase secrets set UNSUBSCRIBE_SECRET=\$(openssl rand -hex 32). The same value must also live in Cloudflare Pages env."
+            exit 1
+          fi
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::$LABEL failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
