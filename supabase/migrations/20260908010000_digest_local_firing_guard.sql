@@ -30,23 +30,27 @@ as $fn$
 declare
   v_secret text := current_setting('app.settings.jwt_secret', true);
 begin
-  if v_secret is null or v_secret = '' then
-    raise exception
-      'is_local_stack: app.settings.jwt_secret is unreadable, so the environment cannot be identified. '
-      'Refusing to guess: guessing "hosted" risks emailing production subscribers from a dev stack, '
-      'and guessing "local" silently disables digests in production.';
-  end if;
-
-  -- The Supabase CLI ships this exact secret in every local install; a hosted
-  -- project generates a unique one.
-  return v_secret = 'super-secret-jwt-token-with-at-least-32-characters-long';
+  -- Positive detection only. The Supabase CLI writes this exact secret into
+  -- every local stack, so its presence is a definitive "local".
+  --
+  -- Absence means hosted. Hosted Supabase does not expose app.settings.*
+  -- at all — confirmed the hard way: the first version of this function
+  -- raised on an unreadable setting, and the production deploy failed with
+  -- "app.settings.jwt_secret is unreadable". That is the normal hosted
+  -- state, not a misconfiguration.
+  --
+  -- Residual risk, stated plainly: if a future CLI release stops setting
+  -- this, a local stack would read as hosted. The post-condition check at
+  -- the bottom of this migration does not cover that case. Re-verify this
+  -- signal when upgrading the Supabase CLI.
+  return coalesce(v_secret, '') = 'super-secret-jwt-token-with-at-least-32-characters-long';
 end;
 $fn$;
 
 revoke all on function public.is_local_stack() from public, anon, authenticated;
 
 comment on function public.is_local_stack() is
-  'True on a local Supabase CLI stack, false on a hosted project. Raises if the environment cannot be determined. Used to keep dev machines from invoking production Edge Functions.';
+  'True on a local Supabase CLI stack (detected by the CLI''s well-known JWT secret), false on a hosted project. Used to keep dev machines from invoking production Edge Functions.';
 
 create or replace function public.trigger_digest(p_function text)
 returns void
@@ -105,6 +109,18 @@ begin
     '30 13 * * 0',
     $cron$ select public.trigger_digest('send-weekly-digest') $cron$
   );
+
+  -- Post-condition. Scheduling silently doing nothing is the exact failure
+  -- this whole change exists to prevent, so assert the jobs actually landed
+  -- rather than trusting that cron.schedule worked. A red migration is a
+  -- far cheaper signal than another stretch of undelivered email.
+  if (select count(*) from cron.job
+       where jobname in ('send_notification_digest_daily', 'send_weekly_digest')) <> 2 then
+    raise exception
+      'digest scheduling failed: expected both cron jobs to be registered, found %',
+      (select coalesce(string_agg(jobname, ', '), '<none>') from cron.job
+        where jobname in ('send_notification_digest_daily', 'send_weekly_digest'));
+  end if;
 
   raise notice 'Hosted stack - digest cron jobs scheduled.';
 end
