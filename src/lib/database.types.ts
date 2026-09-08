@@ -188,7 +188,6 @@ export type Database = {
           disposition: string | null
           dispositioned_at: string | null
           id: string
-          inline_dismissed_at: string | null
           kind: Database["public"]["Enums"]["draft_kind"]
           ordinal: number
           payload: Json
@@ -200,7 +199,6 @@ export type Database = {
           disposition?: string | null
           dispositioned_at?: string | null
           id?: string
-          inline_dismissed_at?: string | null
           kind: Database["public"]["Enums"]["draft_kind"]
           ordinal: number
           payload: Json
@@ -212,7 +210,6 @@ export type Database = {
           disposition?: string | null
           dispositioned_at?: string | null
           id?: string
-          inline_dismissed_at?: string | null
           kind?: Database["public"]["Enums"]["draft_kind"]
           ordinal?: number
           payload?: Json
@@ -232,7 +229,6 @@ export type Database = {
         Row: {
           cleared_at: string | null
           created_at: string
-          fulfilled_at: string | null
           id: string
           note: string | null
           piece_id: string
@@ -244,7 +240,6 @@ export type Database = {
         Insert: {
           cleared_at?: string | null
           created_at?: string
-          fulfilled_at?: string | null
           id?: string
           note?: string | null
           piece_id: string
@@ -256,7 +251,6 @@ export type Database = {
         Update: {
           cleared_at?: string | null
           created_at?: string
-          fulfilled_at?: string | null
           id?: string
           note?: string | null
           piece_id?: string
@@ -519,7 +513,7 @@ export type Database = {
       interpretive_school_versions: {
         Row: {
           approved_at: string | null
-          authored_by: string
+          authored_by: string | null
           body: string
           contributor_id: string
           created_at: string
@@ -531,7 +525,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
-          authored_by: string
+          authored_by?: string | null
           body: string
           contributor_id: string
           created_at?: string
@@ -543,7 +537,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
-          authored_by?: string
+          authored_by?: string | null
           body?: string
           contributor_id?: string
           created_at?: string
@@ -607,10 +601,7 @@ export type Database = {
           rejected_by: string | null
           removed_at: string | null
           removed_by: string | null
-          retracted_at: string | null
-          retracted_by: string | null
           status: Database["public"]["Enums"]["draft_status"]
-          submitted_by: string | null
           tempo_cues: Json | null
           updated_at: string
         }
@@ -629,10 +620,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           tempo_cues?: Json | null
           updated_at?: string
         }
@@ -651,10 +639,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           tempo_cues?: Json | null
           updated_at?: string
         }
@@ -729,26 +714,12 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "interpretive_schools_retracted_by_fkey"
-            columns: ["retracted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "interpretive_schools_submitted_by_fkey"
-            columns: ["submitted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       landmark_versions: {
         Row: {
           approved_at: string | null
-          authored_by: string
+          authored_by: string | null
           contributor_id: string
           created_at: string
           description: string | null
@@ -767,7 +738,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
-          authored_by: string
+          authored_by?: string | null
           contributor_id: string
           created_at?: string
           description?: string | null
@@ -786,7 +757,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
-          authored_by?: string
+          authored_by?: string | null
           contributor_id?: string
           created_at?: string
           description?: string | null
@@ -862,10 +833,7 @@ export type Database = {
           rejected_by: string | null
           removed_at: string | null
           removed_by: string | null
-          retracted_at: string | null
-          retracted_by: string | null
           status: Database["public"]["Enums"]["draft_status"]
-          submitted_by: string | null
           updated_at: string
         }
         Insert: {
@@ -881,10 +849,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -900,10 +865,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -973,20 +935,6 @@ export type Database = {
           {
             foreignKeyName: "landmarks_removed_by_fkey"
             columns: ["removed_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "landmarks_retracted_by_fkey"
-            columns: ["retracted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "landmarks_submitted_by_fkey"
-            columns: ["submitted_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -1291,7 +1239,7 @@ export type Database = {
       performers_note_versions: {
         Row: {
           approved_at: string | null
-          authored_by: string
+          authored_by: string | null
           body: string
           contributor_id: string
           created_at: string
@@ -1303,7 +1251,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
-          authored_by: string
+          authored_by?: string | null
           body: string
           contributor_id: string
           created_at?: string
@@ -1315,7 +1263,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
-          authored_by?: string
+          authored_by?: string | null
           body?: string
           contributor_id?: string
           created_at?: string
@@ -1376,10 +1324,7 @@ export type Database = {
           rejected_by: string | null
           removed_at: string | null
           removed_by: string | null
-          retracted_at: string | null
-          retracted_by: string | null
           status: Database["public"]["Enums"]["draft_status"]
-          submitted_by: string | null
           updated_at: string
         }
         Insert: {
@@ -1394,10 +1339,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -1412,10 +1354,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1482,26 +1421,12 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "performers_notes_retracted_by_fkey"
-            columns: ["retracted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "performers_notes_submitted_by_fkey"
-            columns: ["submitted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       piece_description_versions: {
         Row: {
           approved_at: string | null
-          authored_by: string
+          authored_by: string | null
           body: string
           contributor_id: string
           created_at: string
@@ -1513,7 +1438,7 @@ export type Database = {
         }
         Insert: {
           approved_at?: string | null
-          authored_by: string
+          authored_by?: string | null
           body: string
           contributor_id: string
           created_at?: string
@@ -1525,7 +1450,7 @@ export type Database = {
         }
         Update: {
           approved_at?: string | null
-          authored_by?: string
+          authored_by?: string | null
           body?: string
           contributor_id?: string
           created_at?: string
@@ -1586,10 +1511,7 @@ export type Database = {
           rejected_by: string | null
           removed_at: string | null
           removed_by: string | null
-          retracted_at: string | null
-          retracted_by: string | null
           status: Database["public"]["Enums"]["draft_status"]
-          submitted_by: string | null
           updated_at: string
         }
         Insert: {
@@ -1604,10 +1526,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -1622,10 +1541,7 @@ export type Database = {
           rejected_by?: string | null
           removed_at?: string | null
           removed_by?: string | null
-          retracted_at?: string | null
-          retracted_by?: string | null
           status?: Database["public"]["Enums"]["draft_status"]
-          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1688,20 +1604,6 @@ export type Database = {
           {
             foreignKeyName: "piece_descriptions_removed_by_fkey"
             columns: ["removed_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "piece_descriptions_retracted_by_fkey"
-            columns: ["retracted_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "piece_descriptions_submitted_by_fkey"
-            columns: ["submitted_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -2728,10 +2630,6 @@ export type Database = {
           unique_viewers: number
         }[]
       }
-      approve_and_edit_interpretive_school: {
-        Args: { p_body: string; p_school_id: string }
-        Returns: string
-      }
       approve_and_edit_landmark: {
         Args: {
           p_description: string
@@ -2744,24 +2642,7 @@ export type Database = {
         }
         Returns: string
       }
-      approve_and_edit_performers_note: {
-        Args: { p_body: string; p_note_id: string }
-        Returns: string
-      }
-      approve_and_edit_piece_description: {
-        Args: { p_body: string; p_description_id: string }
-        Returns: string
-      }
-      approve_interpretive_school: {
-        Args: { p_school_id: string }
-        Returns: string
-      }
       approve_landmark: { Args: { p_landmark_id: string }; Returns: string }
-      approve_performers_note: { Args: { p_note_id: string }; Returns: string }
-      approve_piece_description: {
-        Args: { p_description_id: string }
-        Returns: string
-      }
       cast_vote: {
         Args: {
           p_subject_id: string
@@ -2847,14 +2728,6 @@ export type Database = {
         }
         Returns: string
       }
-      create_performers_note_draft: {
-        Args: { p_body: string; p_contributor_id: string; p_piece_id: string }
-        Returns: string
-      }
-      create_piece_description_draft: {
-        Args: { p_body: string; p_contributor_id: string; p_piece_id: string }
-        Returns: string
-      }
       delete_edition: { Args: { p_id: string }; Returns: undefined }
       delete_external_link: { Args: { p_id: string }; Returns: undefined }
       delete_movement: {
@@ -2874,7 +2747,6 @@ export type Database = {
         Args: { p_request_id: string }
         Returns: undefined
       }
-      dismiss_draft_inline: { Args: { p_draft_id: string }; Returns: undefined }
       fetch_movement_history: {
         Args: { p_movement_id: string }
         Returns: {
@@ -2904,6 +2776,7 @@ export type Database = {
         Returns: {
           authored_by: string
           authored_by_display_name: string
+          authored_by_username: string
           created_at: string
           edit_summary: string
           id: string
@@ -2946,6 +2819,10 @@ export type Database = {
       materialize_piece_from_index: {
         Args: { p_index_id: string }
         Returns: string
+      }
+      piece_has_active_contribution_requests: {
+        Args: { p_piece_id: string }
+        Returns: boolean
       }
       propose_draft: {
         Args: {
@@ -3037,20 +2914,8 @@ export type Database = {
         }
         Returns: undefined
       }
-      reject_interpretive_school: {
-        Args: { p_reason?: string; p_school_id: string }
-        Returns: undefined
-      }
       reject_landmark: {
         Args: { p_landmark_id: string; p_reason?: string }
-        Returns: undefined
-      }
-      reject_performers_note: {
-        Args: { p_note_id: string; p_reason?: string }
-        Returns: undefined
-      }
-      reject_piece_description: {
-        Args: { p_description_id: string; p_reason?: string }
         Returns: undefined
       }
       remove_interpretive_school: {
@@ -3080,19 +2945,7 @@ export type Database = {
         }
         Returns: string
       }
-      retract_interpretive_school: {
-        Args: { p_school_id: string }
-        Returns: undefined
-      }
       retract_landmark: { Args: { p_landmark_id: string }; Returns: undefined }
-      retract_performers_note: {
-        Args: { p_note_id: string }
-        Returns: undefined
-      }
-      retract_piece_description: {
-        Args: { p_description_id: string }
-        Returns: undefined
-      }
       revert_movement: {
         Args: {
           p_edit_summary?: string
@@ -3108,6 +2961,7 @@ export type Database = {
           composer_name: string
           id: string
           instruments: string[]
+          is_materialized: boolean
           result_type: string
           title: string
         }[]
@@ -3115,19 +2969,7 @@ export type Database = {
       send_request: { Args: { p_request_id: string }; Returns: undefined }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
-      submit_interpretive_school: {
-        Args: { p_school_id: string }
-        Returns: undefined
-      }
       submit_landmark: { Args: { p_landmark_id: string }; Returns: undefined }
-      submit_performers_note: {
-        Args: { p_note_id: string }
-        Returns: undefined
-      }
-      submit_piece_description: {
-        Args: { p_description_id: string }
-        Returns: undefined
-      }
       swap_edition_ordinals: {
         Args: { p_id_a: string; p_id_b: string }
         Returns: undefined
@@ -3209,14 +3051,6 @@ export type Database = {
           p_related_piece_id: string
         }
         Returns: undefined
-      }
-      update_performers_note_draft: {
-        Args: { p_body: string; p_note_id: string }
-        Returns: string
-      }
-      update_piece_description_draft: {
-        Args: { p_body: string; p_description_id: string }
-        Returns: string
       }
     }
     Enums: {
@@ -3444,8 +3278,10 @@ export const Constants = {
   },
 } as const
 
+
 // Convenience aliases for the most-used DB enums.
+// Hand-written: `supabase gen types` does not emit these, so re-append them
+// after every regeneration.
 export type Difficulty = Database["public"]["Enums"]["difficulty"]
 export type UserLevel = Database["public"]["Enums"]["user_level"]
 export type LinkType = Database["public"]["Enums"]["link_type"]
-
