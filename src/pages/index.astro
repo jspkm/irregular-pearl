@@ -8,7 +8,8 @@ import { mapFuzzyResults } from '../lib/helpers';
 
 const query = Astro.url.searchParams.get('q')?.trim() || '';
 
-// Temporary: the landing page shows the About copy in place of the piece list.
+// Temporary: the landing page shows the About copy in place of the piece list
+// and hides the navbar.
 // Flip to false to restore the browse list; search results (?q=) are unaffected.
 const ABOUT_ON_LANDING = true;
 
@@ -133,7 +134,7 @@ const orgLd = {
 };
 ---
 <Layout title="Home" jsonLd={[homeLd, orgLd]}>
-  <Navbar />
+  {(query || !ABOUT_ON_LANDING) && <Navbar />}
 
   <main class="max-w-200 mx-auto px-4 md:px-6">
     {query ? (
