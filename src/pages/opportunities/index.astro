@@ -1,0 +1,275 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import { careerStages, getCareerStages, opportunities, opportunityTypes } from '../../data/opportunities';
+import { musicSchools } from '../../data/musicSchools';
+import { careerResources, getCareerResourceTypes, studyResourceTypes, performanceResourceTypes, type CareerResource } from '../../data/careerResources';
+
+const categoryLabel = (label: string) => label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+const catalogCategoryLabel = (label: string) => label.split(' ').map((word, index) => ['and', 'or', 'in', 'of', 'for'].includes(word.toLowerCase()) && index > 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+const seoDescription = 'A sourced catalog of classical music competitions, grants and awards, and selective summer festivals for musicians.';
+const schoolTypes = ['University music program', 'Conservatory'] as const;
+const resourceTypes = ['Orchestra jobs and auditions', 'Music career resources', 'Performance Resources', ...performanceResourceTypes, ...studyResourceTypes, 'Teaching Resources', 'Classical Music News Database'] as const;
+const getResourceStages = (resource: CareerResource) => getCareerResourceTypes(resource).some(type => (type === 'Performance Resources' || type.startsWith('Performance Resources —')) || type.startsWith('Study Resources —') || type === 'Classical Music News Database' || type === 'Teaching Resources') ? careerStages : careerStages.filter(stage => stage !== 'Pre-College');
+const catalogTypes = [...opportunityTypes, ...schoolTypes, ...resourceTypes];
+const typeLabels: Record<string, string> = {
+  'Summer festival': 'Summer festivals', 'Grant or award': 'Grants and awards',
+  Competition: 'Competitions', 'University music program': 'University programs', Conservatory: 'Conservatories',
+};
+const catalogOptions = [...catalogTypes.map(type => ({ value: type, label: typeLabels[type] ?? type })),
+  { value: 'instrumental-upkeep', label: 'Instrumental Upkeep' }]
+  .sort((a, b) => a.label.localeCompare(b.label));
+const catalogSize = opportunities.length + musicSchools.length + careerResources.length;
+const requestedStage = Astro.url.searchParams.get('stage');
+const stageAliases: Record<string, string> = {
+  'pre-professional': 'Pre-College',
+  student: 'College Student',
+};
+const normalizedRequestedStage = requestedStage
+  ? stageAliases[requestedStage.toLowerCase()] ?? requestedStage
+  : null;
+const initialStage = careerStages.find((stage) => stage.toLowerCase() === normalizedRequestedStage?.toLowerCase()) ?? 'all';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Classical music opportunities and resources',
+  description: seoDescription,
+  url: Astro.url.href,
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: catalogSize,
+    itemListElement: [
+      ...opportunities.map((entry) => ({ name: entry.name, url: `${Astro.url.origin}/opportunities/${entry.id}` })),
+      ...musicSchools.map((school) => ({ name: school.name, url: school.websiteUrl ?? new URL(school.admissionsUrl).origin })),
+      ...careerResources.map((resource) => ({ name: resource.name, url: resource.url })),
+    ].map((entry, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: entry.name,
+      url: entry.url,
+    })),
+  },
+};
+---
+<Layout title="Classical music opportunities and resources" description={seoDescription} jsonLd={jsonLd}>
+  <Navbar />
+
+  <main class="catalog-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a><span aria-hidden="true">/</span><span>Opportunities and Resources</span>
+    </nav>
+
+    <header class="catalog-header">
+      <p class="kicker">Career reference</p>
+      <h1>Classical music opportunities and resources</h1>
+      <p class="lede">Schools, competitions, grants and awards, summer festivals, and resources for performance, study, and musical careers.</p>
+    </header>
+
+    <section class="catalog-controls" aria-label="Filter opportunities and resources">
+      <label for="opportunity-search">Search the catalog</label>
+      <div class="catalog-search-row">
+        <select id="catalog-type" aria-label="Content category">
+          <option value="all">All Content</option>
+          {catalogOptions.map(option => <option value={option.value}>{catalogCategoryLabel(option.label)}</option>)}
+        </select>
+        <input id="opportunity-search" value={Astro.url.searchParams.get('q') ?? ''} type="search" placeholder="Name, instrument, place, or career stage" autocomplete="off" />
+      </div>
+      <div class="stage-row" role="group" aria-label="Career stage">
+        <span class="filter-label">Career stage</span>
+        <button type="button" class:list={['stage-button', { active: initialStage === 'all' }]} data-stage="all" aria-pressed={initialStage === 'all' ? 'true' : 'false'}>All stages</button>
+        {careerStages.map((stage) => (
+          <button type="button" class:list={['stage-button', { active: initialStage === stage }]} data-stage={stage} aria-pressed={initialStage === stage ? 'true' : 'false'}>{stage === 'Pre-College' ? 'Pre-college (≈ under 18)' : stage === 'College Student' ? 'College student (≈ 18–24)' : categoryLabel(stage)}</button>
+        ))}
+      </div>
+    </section>
+
+    <p id="result-count" class="result-count" aria-live="polite">Showing all {catalogSize} opportunities and resources</p>
+
+    <div class="opportunity-list">
+      {opportunities.map((entry) => (
+        <a
+          class="opportunity-row"
+          href={`/opportunities/${entry.id}`}
+          data-opportunity
+          data-type={entry.type}
+          data-stages={getCareerStages(entry).join('|')}
+          data-search={`${entry.name} ${entry.shortName ?? ''} ${entry.location} ${entry.country} ${entry.disciplines.join(' ')} ${entry.careerStage} ${getCareerStages(entry).join(' ')}`.toLowerCase()}
+        >
+          <span class="row-main">
+            <span class="row-kicker">{entry.type}</span>
+            <span class="row-name">{entry.name}</span>
+            <span class="row-summary">{entry.summary}</span>
+          </span>
+          <span class="row-meta">
+            <span>{entry.location}</span>
+            <span>{entry.applicationRoute}</span>
+            <span>{entry.schedule}</span>
+          </span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      ))}
+      {musicSchools.map((school) => (
+        <a
+          class="opportunity-row"
+          href={school.websiteUrl ?? new URL(school.admissionsUrl).origin}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-opportunity
+          data-type={school.kind}
+          data-stages={(school.careerStages ?? ['Pre-College']).join('|')}
+          data-search={`${school.name} ${school.kind} ${school.city} ${school.state} ${school.repertoire} ${(school.careerStages ?? ['Pre-College']).join(' ')}`.toLowerCase()}
+        >
+          <span class="row-main">
+            <span class="row-kicker">{school.kind}</span>
+            <span class="row-name">{school.name}</span>
+            <span class="row-summary">{school.repertoire}</span>
+          </span>
+          <span class="row-meta">
+            <span>{school.city}, {school.state}</span>
+            <span>{new URL(school.websiteUrl ?? school.admissionsUrl).hostname.replace(/^www\./, '')}</span>
+          </span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      ))}
+      {careerResources.map((resource) => (
+        <a
+          class="opportunity-row resource-catalog-row"
+          href={resource.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-opportunity
+          data-type={getCareerResourceTypes(resource).join('|')}
+          data-stages={getResourceStages(resource).join('|')}
+          data-search={`${resource.name} ${resource.authors ?? ''} ${resource.focus} ${resource.description} ${getResourceStages(resource).join(' ')}`.toLowerCase()}
+        >
+          <span class="row-main">
+            <span class="row-kicker">{categoryLabel(resource.focus)}</span>
+            <span class="row-name">{resource.name}</span>
+            {resource.authors && <span class="row-summary">By {resource.authors}</span>}
+            <span class="row-summary">{resource.description}</span>
+          </span>
+          <span class="row-meta">
+            <span>{getCareerResourceTypes(resource).map(categoryLabel).join(' · ')}</span>
+            <span>{getResourceStages(resource).map(categoryLabel).join(' · ')}</span>
+            {resource.accessNote && <span>{resource.accessNote}</span>}
+          </span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      ))}
+    </div>
+
+    <p id="empty-state" class="empty-state" hidden>No opportunities or resources match those filters.</p>
+
+    <aside class="source-note">
+      <h2>Use this catalog as a starting point</h2>
+      <p>Dates, eligibility, award amounts, and audition requirements change. Every listing links to the official program and records when its source was reviewed; confirm all details before planning an application.</p>
+    </aside>
+  </main>
+</Layout>
+
+<script>
+  const search = document.querySelector<HTMLInputElement>('#opportunity-search');
+  const category = document.querySelector<HTMLSelectElement>('#catalog-type');
+  const stageButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-stage]'));
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-opportunity]'));
+  const count = document.querySelector<HTMLElement>('#result-count');
+  const empty = document.querySelector<HTMLElement>('#empty-state');
+  let activeType = 'all';
+  let activeStage = document.querySelector<HTMLButtonElement>('[data-stage][aria-pressed="true"]')?.dataset.stage ?? 'all';
+
+  function applyFilters() {
+    const query = search?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+    for (const row of rows) {
+      const matchesType = activeType === 'all' || row.dataset.type?.split('|').includes(activeType);
+      const matchesQuery = !query || row.dataset.search?.includes(query);
+      const matchesStage = activeStage === 'all' || row.dataset.stages?.split('|').includes(activeStage);
+      const show = Boolean(matchesType && matchesQuery && matchesStage);
+      row.hidden = !show;
+      if (show) visible += 1;
+    }
+    if (count) count.textContent = visible === rows.length && !query && activeType === 'all' && activeStage === 'all'
+      ? `Showing all ${visible} opportunities and resources`
+      : `Showing ${visible} ${visible === 1 ? 'opportunity or resource' : 'opportunities and resources'}`;
+    if (empty) empty.hidden = visible !== 0;
+  }
+
+  category?.addEventListener('change', () => {
+    if (category.value === 'instrumental-upkeep') {
+      category.value = activeType;
+      window.location.href = '/instrumental-upkeep';
+      return;
+    }
+    activeType = category.value;
+    applyFilters();
+  });
+  for (const button of stageButtons) {
+    button.addEventListener('click', () => {
+      activeStage = button.dataset.stage ?? 'all';
+      for (const item of stageButtons) {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      }
+      const url = new URL(window.location.href);
+      if (activeStage === 'all') url.searchParams.delete('stage');
+      else url.searchParams.set('stage', activeStage);
+      history.replaceState({}, '', url);
+      applyFilters();
+    });
+  }
+  search?.addEventListener('input', applyFilters);
+  applyFilters();
+</script>
+
+<style>
+  .catalog-shell { max-width: 1100px; margin: 0 auto; padding: 32px 16px 64px; }
+  .breadcrumbs { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 12px; margin-bottom: 48px; }
+  .breadcrumbs a { color: var(--muted); text-decoration: none; }
+  .catalog-header { max-width: 760px; margin-bottom: 32px; }
+  .kicker { color: var(--accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 8px; }
+  h1 { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.25; margin: 0 0 12px; }
+  .lede { color: var(--muted); font-size: 16px; line-height: 1.55; margin: 0; }
+  .catalog-controls { padding: 24px; border: .5px solid var(--border); border-radius: 12px; background: var(--bg-tint); }
+  .catalog-controls label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 8px; }
+  .catalog-search-row { display: grid; grid-template-columns: minmax(240px, 320px) minmax(0, 1fr); gap: 12px; }
+  .catalog-search-row select { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: .5px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--ink); font: 14px var(--font-sans); }
+  .catalog-search-row select:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  .catalog-controls input { box-sizing: border-box; min-width: 0; width: 100%; min-height: 44px; padding: 10px 12px; color: var(--ink); background: var(--bg); border: .5px solid var(--border-strong); border-radius: 8px; font: 15px var(--font-sans); }
+  .catalog-controls input:focus { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+  .filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .filter-button { min-height: 36px; padding: 7px 12px; border: .5px solid var(--border-strong); border-radius: 6px; color: var(--muted); background: transparent; font: 13px var(--font-sans); cursor: pointer; }
+  .upkeep-catalog-link { display: inline-flex; align-items: center; text-decoration: none; }
+  .upkeep-catalog-link:hover { color: var(--accent); border-color: var(--accent-border); }
+  .filter-button span { margin-left: 5px; color: var(--tertiary); }
+  .filter-button.active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-border); }
+  .stage-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: .5px solid var(--border); }
+  .filter-label { margin-right: 4px; color: var(--muted); font-size: 12px; font-weight: 500; }
+  .stage-button { min-height: 32px; padding: 5px 10px; border: .5px solid var(--border); border-radius: 999px; color: var(--muted); background: transparent; font: 12px var(--font-sans); cursor: pointer; }
+  .stage-button.active { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-border); }
+  .result-count { margin: 24px 0 8px; color: var(--muted); font-size: 12px; }
+  .opportunity-list { display: flex; flex-direction: column; border-top: .5px solid var(--border-strong); }
+  .resource-catalog-row { order: -1; }
+  .opportunity-row { display: grid; grid-template-columns: minmax(0, 1fr) 220px 20px; gap: 28px; align-items: start; padding: 24px 0; border-bottom: .5px solid var(--border); color: var(--ink); text-decoration: none; }
+  .opportunity-row[hidden] { display: none; }
+  .row-main { display: grid; gap: 7px; }
+  .row-kicker { color: var(--accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+  .row-name { font-family: var(--font-serif); font-size: 22px; line-height: 1.25; }
+  .row-summary { color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .row-meta { display: grid; gap: 6px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .arrow { color: var(--accent); font-size: 16px; }
+  .opportunity-row:hover .row-name { color: var(--accent); }
+  .empty-state { padding: 48px 0; color: var(--muted); text-align: center; }
+  .source-note { max-width: 760px; margin-top: 48px; padding: 20px 24px; border-left: 2px solid var(--accent); background: var(--accent-soft); }
+  .source-note h2 { font-size: 16px; font-weight: 500; margin: 0 0 6px; }
+  .source-note p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+  @media (min-width: 768px) { .catalog-shell { padding: 40px 32px 80px; } }
+  @media (max-width: 700px) {
+    .breadcrumbs { margin-bottom: 32px; }
+    .catalog-controls { padding: 16px; }
+    .catalog-search-row { grid-template-columns: minmax(0, 1fr); }
+    .opportunity-row { grid-template-columns: minmax(0, 1fr) 20px; gap: 12px; }
+    .row-meta { grid-column: 1; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .arrow { grid-column: 2; grid-row: 1; }
+  }
+</style>

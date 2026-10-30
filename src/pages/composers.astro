@@ -1,0 +1,44 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import { historicalComposerEras } from '../data/historicalComposers';
+---
+<Layout title="Composers" description="Browse non-living composers represented on Irregular Pearl, grouped chronologically by era and listed by surname.">
+  <Navbar />
+  <main class="composer-directory-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Composers</span></nav>
+    <header>
+      <h1>Composers</h1>
+      <p>Non-living composers represented on Irregular Pearl, grouped from Antiquity to the 20th century, then arranged alphabetically by surname within each era. Select a surname to explore the composer’s page.</p>
+      <p class="directory-note">Composers known by a single name or historical appellation are listed under that name.</p>
+    </header>
+    {historicalComposerEras.map(era => <section class="composer-era" aria-labelledby={`era-${era.id}`}>
+      <header class="composer-era-heading"><h2 id={`era-${era.id}`}>{era.title}</h2><span>{era.span}</span></header>
+      <ul class="composer-directory" aria-label={`${era.title} composers by surname`}>
+        {era.composers.map(composer => <li>
+          {composer.given && <span>{composer.given} </span>}<a href={`/composer/${encodeURIComponent(composer.name)}`} aria-label={composer.name}>{composer.surname}</a>
+        </li>)}
+      </ul>
+    </section>)}
+  </main>
+</Layout>
+<style>
+  .composer-directory-shell { max-width: 960px; margin: 0 auto; padding: 32px 16px 72px; }
+  .breadcrumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 48px; color: var(--muted); font-size: 12px; }
+  .breadcrumbs a { color: var(--muted); text-decoration: none; }
+  header { max-width: 680px; margin-bottom: 24px; }
+  h1 { margin: 0 0 16px; font: 500 26px/1.25 var(--font-serif); }
+  header p { margin: 0 0 12px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+  header .directory-note { font-size: 12px; }
+  .composer-era { max-width: 680px; margin-top: 32px; }
+  .composer-era-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 16px; }
+  .composer-era-heading h2 { margin: 0; font: 500 22px/1.25 var(--font-serif); }
+  .composer-era-heading span { color: var(--muted); font-size: 12px; }
+  .composer-directory { list-style: none; margin: 0; padding: 0; max-width: 680px; border-top: .5px solid var(--border-strong); }
+  .composer-directory li { padding: 12px 0; border-bottom: .5px solid var(--border); font-size: 16px; line-height: 1.55; }
+  .composer-directory li>span { color: var(--muted); }
+  .composer-directory a { display: inline-block; color: var(--accent); text-underline-offset: 4px; }
+  a:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+  @media (min-width: 768px) { .composer-directory-shell { padding: 40px 32px 88px; } }
+  @media (max-width: 767px) { .composer-directory a { min-height: 44px; display: inline-flex; align-items: center; } }
+</style>

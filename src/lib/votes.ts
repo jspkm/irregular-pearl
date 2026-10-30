@@ -13,7 +13,8 @@ export type VoteSubjectTable =
   | 'landmarks'
   | 'pieces_seed_description'
   | 'piece_difficulty_ratings'
-  | 'pieces_seed_difficulty';
+  | 'pieces_seed_difficulty'
+  | 'piece_summary_comments';
 
 /**
  * Reorder a list of subject IDs by vote_tallies.net_score DESC (tie-break

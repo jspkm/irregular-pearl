@@ -1,0 +1,35 @@
+.journal-reader{margin-top:24px;outline-offset:6px}.journal-reader:focus-visible{outline:1px solid var(--accent)}.journal-book{display:grid;grid-template-columns:40px minmax(0,1fr);padding:8px 8px 8px 0;background:var(--accent);border:1px solid var(--border-strong);border-radius:4px 12px 12px 4px;perspective:1600px}.journal-binding{display:flex;align-items:center;justify-content:center;color:var(--bg)}.journal-binding span{writing-mode:vertical-rl;transform:rotate(180deg);font:12px var(--font-sans);letter-spacing:.08em}.journal-paper{position:relative;box-sizing:border-box;min-height:480px;padding:32px 48px 56px;background:var(--bg-tint);color:var(--ink);border-left:.5px solid var(--border-strong);border-radius:0 6px 6px 0;transform-origin:left center;backface-visibility:hidden}.journal-paper:before{content:'';position:absolute;left:24px;top:0;bottom:0;border-left:.5px solid var(--border);pointer-events:none}.journal-page-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:16px;border-bottom:.5px solid var(--border);color:var(--muted);font:12px/1.4 var(--font-sans)}.journal-paper h3{font:500 26px/1.25 var(--font-serif);margin:32px 0 24px;overflow-wrap:anywhere}.journal-writing{font:16px/1.9 var(--font-serif);white-space:pre-wrap;overflow-wrap:anywhere;min-height:280px}.journal-blank{max-width:440px;padding-top:24px}.journal-blank p{font:16px/1.68 var(--font-serif);color:var(--muted)}.journal-page-number{position:absolute;bottom:20px;right:32px;color:var(--muted);font:12px var(--font-serif)}.journal-page-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}.journal-page-controls>span{font:12px var(--font-sans);color:var(--muted);text-align:center}.journal-page-controls button:disabled{opacity:.4;cursor:default}.journal-entry-tools{display:flex;gap:16px;align-items:center;margin-top:8px;font:12px var(--font-sans);color:var(--muted)}.journal-turn-next{animation:journal-next .36s ease-in-out both}.journal-turn-previous{animation:journal-previous .36s ease-in-out both}@keyframes journal-next{from{transform:rotateY(0)}to{transform:rotateY(-85deg);opacity:.25}}@keyframes journal-previous{from{transform:rotateY(0)}to{transform:rotateY(65deg);opacity:.25}}@media(prefers-reduced-motion:reduce){.journal-turn-next,.journal-turn-previous{animation:none}}@media(max-width:640px){.journal-book{grid-template-columns:20px minmax(0,1fr);padding:5px 5px 5px 0}.journal-binding span{display:none}.journal-paper{padding:24px 20px 48px;min-height:400px}.journal-paper:before{left:10px}.journal-paper h3{font-size:22px}.journal-writing{font-size:15px}.journal-page-controls{gap:8px;flex-wrap:wrap}.journal-page-controls .member-edit{padding:8px;font-size:12px}.journal-page-controls>span{order:3;width:100%}}
+
+.journal-open-book{position:relative;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;padding:8px;border-radius:8px;perspective:1800px}
+.journal-open-book .journal-paper{height:460px;min-height:0;padding:24px 24px 48px;border-radius:0;border-left:0;backface-visibility:hidden}
+.journal-open-book .journal-left-page{border-right:1px solid var(--border-strong);transform-origin:right center;border-radius:4px 0 0 4px}
+.journal-open-book .journal-right-page{transform-origin:left center;border-radius:0 4px 4px 0}
+.journal-open-book .journal-paper:before{display:none}
+.journal-open-book .journal-page-content{height:100%;overflow-y:auto;scrollbar-width:thin}
+.journal-open-book .journal-paper h3{font-size:22px;margin:24px 0 16px}
+.journal-open-book .journal-writing{min-height:0;font-size:16px;line-height:1.68}
+.journal-open-book .journal-left-page .journal-page-number{left:24px;right:auto}
+.journal-flip-next .journal-right-page{z-index:2;animation:journal-fold-next .36s ease-in both}
+.journal-flip-previous .journal-left-page{z-index:2;animation:journal-fold-previous .36s ease-in both}
+@keyframes journal-fold-next{to{transform:rotateY(-90deg)}}
+@keyframes journal-fold-previous{to{transform:rotateY(90deg)}}
+@media(max-width:640px){.journal-open-book{padding:5px}.journal-open-book .journal-paper{height:380px;padding:16px 12px 40px}.journal-open-book .journal-paper h3{font-size:18px}.journal-open-book .journal-writing,.journal-open-book .journal-blank p{font-size:15px}.journal-open-book .journal-page-top{font-size:11px}.journal-open-book .journal-left-page .journal-page-number{left:12px}}
+@media(prefers-reduced-motion:reduce){.journal-flip-next .journal-right-page,.journal-flip-previous .journal-left-page{animation:none}}
+
+/* Three underlying leaves show the thickness of the open notebook. */
+.journal-stack{position:relative;margin:0 12px 12px;padding-top:12px;isolation:isolate}
+.journal-stack>.journal-book{position:relative;z-index:1}
+.journal-page-layers{position:absolute;inset:12px 0 0;pointer-events:none;z-index:0}
+.journal-paper-layer{position:absolute;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.journal-paper-layer span{display:block;background:var(--bg-tint);border:1px solid var(--border-strong)}
+.journal-paper-layer span:first-child{border-radius:6px 0 0 6px}
+.journal-paper-layer span:last-child{border-radius:0 6px 6px 0}
+.journal-paper-layer-1{inset:-4px -4px 4px}
+.journal-paper-layer-2{inset:-8px -8px 8px}
+.journal-paper-layer-3{inset:-12px -12px 12px}
+@media(max-width:640px){.journal-stack{margin-right:9px;margin-left:9px;padding-top:9px}.journal-page-layers{top:9px}.journal-paper-layer-1{inset:-3px -3px 3px}.journal-paper-layer-2{inset:-6px -6px 6px}.journal-paper-layer-3{inset:-9px -9px 9px}}
+/* The cover sits behind every leaf, rather than framing the active spread. */
+.journal-stack{margin-left:20px;margin-right:20px;margin-bottom:20px}
+.journal-stack:before{content:'';position:absolute;inset:-6px -20px -8px;background:var(--accent);border:1px solid var(--border-strong);border-radius:8px;z-index:-1;pointer-events:none}
+.journal-stack>.journal-book{background:transparent;border:0;padding:0;border-radius:0}
+@media(max-width:640px){.journal-stack{margin-left:16px;margin-right:16px}.journal-stack:before{inset:-5px -16px -7px}}

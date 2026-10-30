@@ -1,0 +1,705 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import AddPiece from '../../components/AddPiece';
+import AddComposer from '../../components/AddComposer';
+import { getCommunityComposers } from '../../lib/communityComposers';
+import PieceSamples from '../../components/PieceSamples.astro';
+import { getPieceFull } from '../../lib/pieces';
+import { seedPieces } from '../../data/seed';
+import { supabase, hasSupabase } from '../../lib/supabase';
+import { mapFuzzyResults } from '../../lib/helpers';
+import { getComposerProfile } from '../../data/composerProfiles';
+import { musicPeriodProfiles } from '../../data/musicPeriodProfiles';
+import { standardPieceForms } from '../../data/pieceForms';
+import { composerCareerStages, livingComposers, type ComposerCareerStage } from '../../data/livingComposers';
+import { instrumentFamilies, pieceEraPeriods } from '../../data/pieceBrowseTaxonomy';
+
+const communityComposers = await getCommunityComposers();
+const directoryComposers = [...livingComposers, ...communityComposers.filter(entry => !livingComposers.some(existing => existing.name.toLowerCase() === entry.name.toLowerCase()))];
+const samplePieces = (await Promise.all(['beethoven-symphony-5', 'bach-cello-suite-1', 'elgar-cello-concerto'].map(getPieceFull))).filter((piece): piece is NonNullable<typeof piece> => piece !== null);
+const query = Astro.url.searchParams.get('q')?.trim() || '';
+const browseViews = ['all', 'instrumentation', 'composer', 'era', 'form', 'living', 'underrepresented'] as const;
+type BrowseView = typeof browseViews[number];
+const requestedView = Astro.url.searchParams.get('view') as BrowseView | null;
+const activeView: BrowseView = requestedView && browseViews.includes(requestedView) ? requestedView : 'all';
+const activeFilter = Astro.url.searchParams.get('filter')?.trim() || '';
+const requestedCareer = Astro.url.searchParams.get('career') as ComposerCareerStage | null;
+const activeCareer = composerCareerStages.some((stage) => stage.id === requestedCareer) ? requestedCareer : null;
+
+interface ListPiece {
+  id: string;
+  title: string;
+  composer_name: string;
+  catalog_number: string | null;
+  instruments: string[];
+  era: string;
+  form: string;
+}
+
+function toListPiece(p: { id: string; title: string; composer_name: string; catalog_number: string | null; instruments?: string[] | null; era?: string | null; form?: string | null }): ListPiece {
+  const seed = seedPieces.find((entry) => entry.id === p.id);
+  return { id: p.id, title: p.title, composer_name: p.composer_name, catalog_number: p.catalog_number, instruments: p.instruments ?? [], era: p.era ?? seed?.era ?? 'Other', form: p.form ?? seed?.form ?? 'Other' };
+}
+
+let pieces: ListPiece[] = [];
+
+if (query) {
+  if (hasSupabase) {
+    const { data } = await supabase
+      .from('pieces')
+      .select('id, title, composer_name, catalog_number, instruments, era, form, created_at')
+      .textSearch('fts', query, { type: 'websearch' })
+      .limit(50);
+
+    if (data && data.length > 0) {
+      const databasePieces = data.map(toListPiece);
+      const databaseIds = new Set(databasePieces.map((piece) => piece.id));
+      pieces = [...databasePieces, ...seedPieces.filter((piece) => !databaseIds.has(piece.id)).map(toListPiece)];
+    } else {
+      const { data: fuzzyData } = await supabase.rpc('fuzzy_search', { search_query: query });
+      if (fuzzyData && fuzzyData.length > 0) {
+        const fuzzy = mapFuzzyResults(fuzzyData);
+        if (fuzzy.pieceIds.length > 0) {
+          const { data: fuzzyPieces } = await supabase
+            .from('pieces')
+            .select('id, title, composer_name, catalog_number, instruments, era, form')
+            .in('id', fuzzy.pieceIds);
+          if (fuzzyPieces) pieces = fuzzyPieces.map(toListPiece);
+        }
+      }
+    }
+
+    if (!query.includes('{') && !query.includes('}')) {
+      supabase.from('search_queries').insert({ query, result_count: pieces.length }).then(() => {});
+    }
+  } else {
+    const q = query.toLowerCase();
+    pieces = seedPieces
+      .filter(p =>
+        p.title.toLowerCase().includes(q) ||
+        p.composer_name.toLowerCase().includes(q) ||
+        p.instruments.some(i => i.toLowerCase().includes(q))
+      )
+      .map(toListPiece);
+  }
+} else {
+  if (hasSupabase) {
+    const { data } = await supabase
+      .from('pieces')
+      .select('id, title, composer_name, catalog_number, instruments, era, form, created_at')
+      .order('title')
+      .limit(100);
+    if (data && data.length > 0) {
+      pieces = data.map(toListPiece);
+    } else {
+      pieces = seedPieces.map(toListPiece);
+    }
+  } else {
+    pieces = seedPieces.map(toListPiece);
+  }
+}
+
+// In Focus: the most recently approved signed work (performer's note, interpretive school,
+// practice note, or newly published piece). Returns null until the contributor approval
+// pipeline exists. When it does, this queries across the signed-content tables and returns
+// { piece_title, piece_id, kind, pull_quote, byline, byline_bio }.
+//
+// Rendered only when non-null. When null, the landing page flows navbar → list.
+const inFocus: {
+  piece_title: string;
+  piece_id: string;
+  kind: string;
+  pull_quote: string;
+  byline: string;
+  byline_bio: string;
+} | null = null;
+
+const totalPieceCount = pieces.length > 0
+  ? (hasSupabase
+      ? (await supabase.from('pieces').select('id', { count: 'exact', head: true })).count ?? pieces.length
+      : pieces.length)
+  : seedPieces.length;
+
+type ComposerGroup = { composer: string; pieces: ListPiece[] };
+type InstrumentGroup = { instrument: string; composers: ComposerGroup[] };
+
+const instrumentMap = new Map<string, Map<string, ListPiece[]>>();
+for (const piece of pieces) {
+  for (const instrument of piece.instruments.length > 0 ? piece.instruments : ['Other']) {
+    if (!instrumentMap.has(instrument)) instrumentMap.set(instrument, new Map());
+    const composerMap = instrumentMap.get(instrument)!;
+    if (!composerMap.has(piece.composer_name)) composerMap.set(piece.composer_name, []);
+    composerMap.get(piece.composer_name)!.push(piece);
+  }
+}
+
+const instrumentGroups: InstrumentGroup[] = [...instrumentMap.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([instrument, composerMap]) => ({
+    instrument,
+    composers: [...composerMap.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([composer, composerPieces]) => ({
+        composer,
+        pieces: [...composerPieces].sort((a, b) => a.title.localeCompare(b.title)),
+      })),
+  }));
+
+const sortedPieces = [...pieces].sort((a, b) => a.title.localeCompare(b.title));
+const composerGroups = [...new Set([
+  ...pieces.map((piece) => piece.composer_name),
+  ...musicPeriodProfiles.flatMap((profile) => profile.composers),
+  ...livingComposers.map((composer) => composer.name),
+])].sort((a, b) => a.localeCompare(b));
+const composerPieceCounts = new Map(composerGroups.map((composer) => [
+  composer,
+  pieces.filter((piece) => piece.composer_name === composer).length,
+]));
+const composerLastName = (name: string) => name.trim().split(/\s+/).at(-1) ?? name;
+const composerFilterChoices = composerGroups
+  .filter(composer => (composerPieceCounts.get(composer) ?? 0) > 0)
+  .sort((a, b) => composerLastName(a).localeCompare(composerLastName(b), 'en', { sensitivity: 'base' }) || a.localeCompare(b));
+const eraGroups = [...new Set(pieces.map((piece) => piece.era))].sort();
+const formGroups = [...new Set([...standardPieceForms, ...pieces.map((piece) => piece.form)])]
+  .sort((a, b) => a.localeCompare(b));
+const featuredPieces = sortedPieces.filter((piece) => {
+  const profile = getComposerProfile(piece.composer_name);
+  return activeView === 'living' ? profile.living : activeView === 'underrepresented' ? profile.underrepresented : true;
+});
+const viewLabels: Record<BrowseView, string> = {
+  all: 'Browse All', instrumentation: 'By Instrumentation', composer: 'By Composer', era: 'By Era / Period', form: 'By Genre / Form', living: 'Living Composers', underrepresented: 'Underrepresented Composers Resource Database',
+};
+const underrepresentedResources = [
+  {
+    title: 'Cultural Inclusion — Music Resources',
+    organization: 'Manhattan School of Music Library',
+    description: 'A library guide connecting musicians with culturally inclusive repertoire, research tools, and composer resources.',
+    url: 'https://libraryguides.msmnyc.edu/az/cultural-inclusion',
+  },
+  {
+    title: 'Databases of Repertoire by Underrepresented Composers',
+    organization: 'League of American Orchestras',
+    description: 'A directory of repertoire databases covering composers from the African Diaspora, Indigenous artists, women, non-binary composers, BIPOC composers, Latin American composers, and other historically excluded communities.',
+    url: 'https://americanorchestras.org/databases-of-repertoire-by-underrepresented-composers/',
+  },
+];
+const filterableViews = ['instrumentation', 'composer', 'era', 'form'] as const;
+const usesCombinedFilters = activeView === 'all' || filterableViews.includes(activeView as typeof filterableViews[number]);
+
+const piecesLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Classical music pieces',
+  description: 'Classical music pieces organized by instrument and composer, with signed performer knowledge, editions, recordings, and structural landmarks.',
+  url: Astro.url.href,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: `${Astro.url.origin}/pieces?q={search_term_string}`,
+    },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+---
+<Layout title={activeView === 'living' ? 'Composers of our time' : activeView === 'underrepresented' ? 'Discover underrepresented composers' : 'Classical music pieces'} description={activeView === 'living' ? 'Explore living composers, discover their music, and meet the voices shaping classical music today.' : activeView === 'underrepresented' ? 'Databases and research guides for discovering underrepresented composers and their music.' : 'Classical music pieces organized by instrument and composer, with signed performer knowledge, editions, recordings, and structural landmarks.'} jsonLd={piecesLd}>
+  <Navbar />
+
+  <main class="max-w-200 mx-auto px-4 md:px-6">
+    {query ? (
+      <section class="py-10">
+        <p class="text-sm text-muted mb-6">
+          {pieces.length > 0
+            ? `${pieces.length} result${pieces.length === 1 ? '' : 's'} for "${query}"`
+            : `No results for "${query}"`}
+          <a href="/pieces" class="ml-3 text-accent no-underline hover:underline">← Back to pieces</a>
+        </p>
+
+        {pieces.length > 0 && (
+          <ul class="ip-list">
+            {pieces.map((p) => (
+              <li class="ip-row">
+                <a href={`/piece/${p.id}`} class="ip-row-link">
+                  <span class="ip-row-title">{p.title}</span>
+                  <span class="ip-row-composer">{p.composer_name}</span>
+                  <span class="ip-row-catalog">{p.catalog_number ?? ''}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    ) : (
+      <>
+        <section class="pt-12 md:pt-16 pb-6">
+          <p class="text-[11px] font-medium uppercase tracking-[0.08em] text-accent mb-2">{activeView === 'living' ? 'Living composers' : activeView === 'underrepresented' ? 'Composer resources' : 'Repertoire reference'}</p>
+          <h1 class="font-display text-[30px] md:text-[34px] font-medium leading-[1.2] text-ink">
+            {activeView === 'living' ? 'Explore the composers of our time' : activeView === 'underrepresented' ? 'Discover underrepresented composers' : 'Classical music pieces'}
+          </h1>
+          <p class="mt-3 max-w-2xl text-[15px] text-muted leading-relaxed">
+            {activeView === 'living' ? 'Discover the voices shaping classical music today. Explore living composers at every stage of their careers, learn about their work, and find new music to listen to, study, and perform.' : activeView === 'underrepresented' ? 'Explore databases and research guides that help you find composers whose music has been underrepresented in classical programming, publishing, and study. Use these resources to discover composers, explore their work, and broaden the music you listen to, study, teach, and perform.' : 'Explore works through signed performer knowledge, structural landmarks, edition comparisons, recordings, and repertoire connections.'}
+          </p>
+          <p class="mt-3 text-[12px] text-tertiary">{activeView === 'living' ? `${directoryComposers.length} composers` : activeView === 'underrepresented' ? `${underrepresentedResources.length} resources` : `${totalPieceCount} pieces`}</p>
+          {activeView !== 'living' && activeView !== 'underrepresented' && <AddPiece client:load />}
+        </section>
+
+        {activeView === 'living' ? (
+          <section class="composer-search-controls" aria-label="Search living composers">
+            <label for="composer-directory-search">Search composers</label>
+            <div class="composer-search-row">
+              <select id="composer-career-filter" aria-label="Composer career stage">
+                <option value="all" selected={!activeCareer}>All composers</option>
+                {composerCareerStages.map(stage => <option value={stage.id} selected={activeCareer === stage.id}>{stage.label}</option>)}
+              </select>
+              <input id="composer-directory-search" type="search" placeholder="Name, composition, or career highlight" autocomplete="off" />
+            </div>
+          </section>
+        ) : activeView !== 'underrepresented' && (
+        <nav class="browse-controls" aria-label="Browse pieces">
+          <a href="/pieces" data-browse-all class:list={['browse-control', { active: activeView === 'all' }]}>Browse All</a>
+          {filterableViews.map((view) => (
+            <button
+              type="button"
+              class:list={['browse-control', 'filter-toggle', { active: activeView === view }]}
+              data-filter-toggle={view}
+              aria-pressed={activeView === view ? 'true' : 'false'}
+            >
+              {viewLabels[view]}
+            </button>
+          ))}
+        </nav>
+        )}
+
+        {inFocus && (
+          <section class="max-w-180 mx-auto py-10 md:py-12">
+            <div class="text-[11px] font-medium uppercase tracking-[0.08em] text-accent">In focus</div>
+            <h2 class="mt-3 font-display text-[22px] md:text-[26px] font-medium leading-[1.3] text-ink">
+              <a href={`/piece/${inFocus.piece_id}`} class="no-underline text-ink hover:text-accent transition-colors">
+                {inFocus.piece_title}
+              </a>
+            </h2>
+            <blockquote class="mt-4 border-l-2 border-accent pl-5 font-display italic text-[18px] md:text-[20px] leading-[1.55] text-ink">
+              {inFocus.pull_quote}
+            </blockquote>
+            <div class="mt-3 text-[14px]">
+              <span class="font-medium text-ink">{inFocus.byline}</span>
+              <span class="text-muted"> · {inFocus.byline_bio}</span>
+            </div>
+            <a href={`/piece/${inFocus.piece_id}`} class="mt-2 inline-block text-[14px] text-ink underline underline-offset-4 decoration-border hover:decoration-accent">
+              Read the full note →
+            </a>
+          </section>
+        )}
+
+        {activeView === 'living' ? (
+          <section class="living-composer-directory" aria-label="Living composers by career stage">
+            <header class="living-directory-header">
+              <div><p class="directory-kicker">Living composers</p></div>
+              {activeCareer && <a href="/pieces?view=living">All career stages →</a>}
+            </header>
+            {composerCareerStages.map((stage) => {
+              const stageComposers = directoryComposers
+                .filter((composer) => composer.stage === stage.id)
+                .sort((a, b) => a.name.localeCompare(b.name));
+              return (
+                <div class="career-stage-group" data-composer-stage={stage.id}>
+                  <div class="career-stage-heading"><div><h3>{stage.label}</h3><p>{stage.description}</p></div><span>{stageComposers.length} composers</span></div>
+                  <AddComposer client:load existingNames={directoryComposers.map(entry => entry.name)} initialStage={stage.id} />
+                  {stageComposers.length > 0 ? (
+                    <div class="composer-directory-list">
+                      <div class="composer-directory-labels"><span>Composer</span><span>Notable composition</span><span>Career highlight</span></div>
+                      {stageComposers.map((composer) => (
+                        <a class="composer-directory-row" data-composer-entry href={`/composer/${encodeURIComponent(composer.name)}`}>
+                          <strong>{composer.name}</strong>
+                          <span><small>{composer.awardedWork ?? composer.notableWork}</small></span>
+                          <span class="composer-career-highlight">{composer.year ? `${composer.year} Pulitzer Prize for Music` : [composer.distinction, composer.affiliations?.join(' · ')].filter(Boolean).join(' · ')}</span>
+                        </a>
+                      ))}
+                    </div>
+                  ) : <p class="career-stage-empty">Composer submissions for this section will be added through the editorial catalog.</p>}
+                </div>
+              );
+            })}
+            <p class="pulitzer-source">This directory includes living recipients of the Pulitzer Prize for Music from 2000 onward whose winning work is in classical or contemporary concert music, plus current composition faculty from selected conservatories. <a href="https://www.pulitzer.org/prize-winners-by-category/225" target="_blank" rel="noreferrer">Pulitzer record →</a> · <a href="https://www.juilliard.edu/music/composition" target="_blank" rel="noreferrer">Juilliard faculty →</a> · <a href="https://www.msmnyc.edu/programs/composition/" target="_blank" rel="noreferrer">MSM faculty →</a> · <a href="https://necmusic.edu/the-college/departments/composition/" target="_blank" rel="noreferrer">NEC faculty →</a></p>
+          </section>
+        ) : activeView === 'underrepresented' ? (
+          <section class="underrepresented-resources" aria-labelledby="underrepresented-resources-title">
+            <header class="resources-header">
+              <p class="directory-kicker">Repertoire discovery</p>
+              <h2 id="underrepresented-resources-title">Underrepresented Composers Resource Database</h2>
+              <p>Start with these independently maintained guides and databases for discovering composers, scores, and repertoire beyond the traditional canon.</p>
+            </header>
+            <div class="resource-list">
+              {underrepresentedResources.map((resource) => (
+                <a class="resource-row" href={resource.url} target="_blank" rel="noreferrer">
+                  <span><small>{resource.organization}</small><strong>{resource.title}</strong><p>{resource.description}</p></span>
+                  <span>Visit resource ↗</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        ) : usesCombinedFilters ? (
+          <>
+            <section class="filter-bubble-area" data-filter-bubble-area aria-label="Piece filter choices" hidden={activeView === 'all'}>
+              <div class="filter-fields">
+                <div class="filter-field" data-filter-field="instrumentation" hidden={activeView !== 'instrumentation'}>
+                  <span class="filter-field-label">Instrumentation</span>
+                  <div class="subcategory-bubbles">
+                    <button type="button" class:list={['subcategory-bubble', { active: !activeFilter && activeView === 'instrumentation' }]} data-filter-option="instrumentation" data-filter-value="">All</button>
+                    {instrumentFamilies.map((family) => <button type="button" class:list={['subcategory-bubble', { active: activeFilter === `family:${family.id}` }]} data-filter-option="instrumentation" data-filter-value={`family:${family.id}`}>{family.label}</button>)}
+                    {instrumentGroups.map((group) => <button type="button" class:list={['subcategory-bubble', { active: activeFilter === group.instrument }]} data-filter-option="instrumentation" data-filter-value={group.instrument}>{group.instrument}</button>)}
+                  </div>
+                  <select class="filter-state-select" data-filter-select="instrumentation" aria-hidden="true" tabindex="-1">
+                    <option value="">Any instrumentation</option>
+                    <optgroup label="Instrument families">
+                      {instrumentFamilies.map((family) => <option value={`family:${family.id}`} data-members={JSON.stringify(family.instruments)} selected={activeFilter === `family:${family.id}`}>{family.label}</option>)}
+                    </optgroup>
+                    <optgroup label="Individual instruments">
+                    {instrumentGroups.map((group) => <option value={group.instrument} selected={activeFilter === group.instrument}>{group.instrument}</option>)}
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="filter-field" data-filter-field="composer" hidden={activeView !== 'composer'}>
+                  <span class="filter-field-label">Composer</span>
+                  <div class="subcategory-bubbles">
+                    <button type="button" class:list={['subcategory-bubble', { active: activeView === 'composer' }]} data-filter-option="composer" data-filter-value="">All</button>
+                    {composerFilterChoices.map((composer) => <button type="button" class="subcategory-bubble" data-filter-option="composer" data-filter-value={composer} aria-label={composer} title={composer}>{composerLastName(composer)}</button>)}
+                  </div>
+                  <select class="filter-state-select" data-filter-select="composer" aria-hidden="true" tabindex="-1">
+                    <option value="">Any composer</option>
+                    {composerFilterChoices.map((composer) => <option value={composer}>{composerLastName(composer)}</option>)}
+                  </select>
+                </div>
+                <div class="filter-field" data-filter-field="era" hidden={activeView !== 'era'}>
+                  <span class="filter-field-label">Era / Period</span>
+                  <div class="subcategory-bubbles">
+                    <button type="button" class:list={['subcategory-bubble', { active: !activeFilter && activeView === 'era' }]} data-filter-option="era" data-filter-value="">All</button>
+                    {pieceEraPeriods.map((period) => <button type="button" class:list={['subcategory-bubble', { active: activeFilter === `period:${period.id}` }]} data-filter-option="era" data-filter-value={`period:${period.id}`}>{period.label}</button>)}
+                  </div>
+                  <select class="filter-state-select" data-filter-select="era" aria-hidden="true" tabindex="-1">
+                    <option value="">Any era or period</option>
+                    <optgroup label="Broad periods">
+                      {pieceEraPeriods.map((period) => <option value={`period:${period.id}`} data-members={JSON.stringify(period.eras)} selected={activeFilter === `period:${period.id}`}>{period.label}</option>)}
+                    </optgroup>
+                    <optgroup label="Catalog eras">
+                    {eraGroups.map((era) => <option value={era} selected={activeFilter === era}>{era}</option>)}
+                    </optgroup>
+                  </select>
+                </div>
+                <div class="filter-field" data-filter-field="form" hidden={activeView !== 'form'}>
+                  <span class="filter-field-label">Genre / Form</span>
+                  <div class="subcategory-bubbles">
+                    <button type="button" class:list={['subcategory-bubble', { active: !activeFilter && activeView === 'form' }]} data-filter-option="form" data-filter-value="">All</button>
+                    {formGroups.map((form) => <button type="button" class:list={['subcategory-bubble', { active: activeFilter === form }]} data-filter-option="form" data-filter-value={form}>{form}</button>)}
+                  </div>
+                  <select class="filter-state-select" data-filter-select="form" aria-hidden="true" tabindex="-1">
+                    <option value="">Any genre or form</option>
+                    {formGroups.map((form) => <option value={form} selected={activeFilter === form}>{form}</option>)}
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="clear-filters" data-clear-filters hidden={activeView === 'all'}>Clear all filters</button>
+            </section>
+
+            {samplePieces.length > 0 && <div data-featured-piece hidden={activeView !== 'all'}>
+              <PieceSamples pieces={samplePieces} />
+            </div>}
+            <div data-filter-results hidden={activeView === 'all' && samplePieces.length > 0}>
+            <div class="result-summary" aria-live="polite"><span data-result-count>{sortedPieces.length}</span> pieces</div>
+            <section class="piece-catalog filter-results" aria-label="Filtered pieces">
+              {sortedPieces.map((piece) => (
+                <a
+                  class="compact-piece"
+                  aria-label={`${piece.title}, ${piece.composer_name}, ${piece.era}, ${piece.form}`}
+                  href={`/piece/${piece.id}`}
+                  data-piece-row
+                  data-composer={piece.composer_name}
+                  data-era={piece.era}
+                  data-form={piece.form}
+                  data-instruments={JSON.stringify(piece.instruments.length > 0 ? piece.instruments : ['Other'])}
+                ><span class="compact-piece-title">{piece.title}</span><small class="compact-piece-composer" title={piece.composer_name}>{composerLastName(piece.composer_name)}</small><small class="compact-piece-era">{piece.era}</small><small class="compact-piece-form">{piece.form}</small></a>
+              ))}
+              <div class="empty-filter-results" data-empty-results hidden>No pieces match this combination yet. Try changing or clearing one filter.</div>
+            </section>
+            </div>
+          </>
+        ) : (
+          <section class="piece-catalog" aria-label={viewLabels[activeView]}>
+            {(activeView === 'living' || activeView === 'underrepresented') && featuredPieces.length === 0 ? (
+              <div class="empty-view"><h2>{viewLabels[activeView]}</h2><p>No pieces in the current catalog have been editorially tagged for this collection yet.</p></div>
+            ) : featuredPieces.map((piece) => (
+              <a class="compact-piece" aria-label={`${piece.title}, ${piece.composer_name}, ${piece.era}, ${piece.form}`} href={`/piece/${piece.id}`}><span class="compact-piece-title">{piece.title}</span><small class="compact-piece-composer" title={piece.composer_name}>{composerLastName(piece.composer_name)}</small><small class="compact-piece-era">{piece.era}</small><small class="compact-piece-form">{piece.form}</small></a>
+            ))}
+          </section>
+        )}
+      </>
+    )}
+  </main>
+</Layout>
+
+<script>
+  const careerFilter = document.querySelector<HTMLSelectElement>('#composer-career-filter');
+  const composerSearch = document.querySelector<HTMLInputElement>('#composer-directory-search');
+  function filterComposers() {
+    const query = composerSearch?.value.trim().toLocaleLowerCase() ?? '';
+    for (const group of document.querySelectorAll<HTMLElement>('[data-composer-stage]')) {
+      const stageMatches = careerFilter?.value === 'all' || group.dataset.composerStage === careerFilter?.value;
+      const entries = [...group.querySelectorAll<HTMLElement>('[data-composer-entry]')];
+      for (const entry of entries) entry.hidden = !entry.textContent?.toLocaleLowerCase().includes(query);
+      group.hidden = !stageMatches || (!!query && !entries.some(entry => !entry.hidden));
+    }
+  }
+  careerFilter?.addEventListener('change', () => {
+    const url = new URL(window.location.href);
+    if (careerFilter.value === 'all') url.searchParams.delete('career');
+    else url.searchParams.set('career', careerFilter.value);
+    history.replaceState({}, '', url);
+    filterComposers();
+  });
+  composerSearch?.addEventListener('input', filterComposers);
+  if (careerFilter) filterComposers();
+  const toggles = [...document.querySelectorAll<HTMLButtonElement>('[data-filter-toggle]')];
+  const fields = [...document.querySelectorAll<HTMLElement>('[data-filter-field]')];
+  const selects = [...document.querySelectorAll<HTMLSelectElement>('[data-filter-select]')];
+  const optionButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter-option]')];
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-piece-row]')];
+  const count = document.querySelector<HTMLElement>('[data-result-count]');
+  const empty = document.querySelector<HTMLElement>('[data-empty-results]');
+  const clear = document.querySelector<HTMLButtonElement>('[data-clear-filters]');
+  const browseAll = document.querySelector<HTMLElement>('[data-browse-all]');
+  const bubbleArea = document.querySelector<HTMLElement>('[data-filter-bubble-area]');
+
+  const featured = document.querySelector<HTMLElement>('[data-featured-piece]');
+  const results = document.querySelector<HTMLElement>('[data-filter-results]');
+
+  function activeDimensions() {
+    return new Set(toggles.filter((button) => button.getAttribute('aria-pressed') === 'true').map((button) => button.dataset.filterToggle));
+  }
+
+  function updateResults() {
+    const active = activeDimensions();
+    if (featured) featured.hidden = active.size > 0;
+    if (results) results.hidden = active.size === 0 && !!featured;
+    const values = new Map(selects.map((select) => [select.dataset.filterSelect, select.value]));
+    let visible = 0;
+
+    rows.forEach((row) => {
+      const instruments = JSON.parse(row.dataset.instruments || '[]') as string[];
+      const matches = [...active].every((dimension) => {
+        const value = values.get(dimension) || '';
+        if (!value) return true;
+        const selectedOption = selects.find((select) => select.dataset.filterSelect === dimension)?.selectedOptions[0];
+        const groupedMembers = selectedOption?.dataset.members ? JSON.parse(selectedOption.dataset.members) as string[] : null;
+        if (dimension === 'instrumentation') return groupedMembers ? groupedMembers.some((instrument) => instruments.includes(instrument)) : instruments.includes(value);
+        if (dimension === 'composer') return row.dataset.composer === value;
+        if (dimension === 'era') return groupedMembers ? groupedMembers.includes(row.dataset.era || '') : row.dataset.era === value;
+        if (dimension === 'form') return row.dataset.form === value;
+        return true;
+      });
+      row.hidden = !matches;
+      if (matches) visible += 1;
+    });
+
+    if (count) count.textContent = String(visible);
+    if (empty) empty.hidden = visible !== 0;
+    browseAll?.classList.toggle('active', active.size === 0);
+    if (bubbleArea) bubbleArea.hidden = active.size === 0;
+    if (clear) clear.hidden = active.size === 0;
+    optionButtons.forEach((button) => {
+      const select = selects.find((item) => item.dataset.filterSelect === button.dataset.filterOption);
+      button.classList.toggle('active', (select?.value ?? '') === (button.dataset.filterValue ?? ''));
+    });
+  }
+
+  toggles.forEach((button) => {
+    button.addEventListener('click', () => {
+      const dimension = button.dataset.filterToggle;
+      const isActive = button.getAttribute('aria-pressed') === 'true';
+      button.setAttribute('aria-pressed', String(!isActive));
+      button.classList.toggle('active', !isActive);
+      const field = fields.find((item) => item.dataset.filterField === dimension);
+      if (field) field.hidden = isActive;
+      if (isActive) {
+        const select = selects.find((item) => item.dataset.filterSelect === dimension);
+        if (select) select.value = '';
+      }
+      updateResults();
+    });
+  });
+
+  optionButtons.forEach((button) => button.addEventListener('click', () => {
+    const select = selects.find((item) => item.dataset.filterSelect === button.dataset.filterOption);
+    if (select) select.value = button.dataset.filterValue ?? '';
+    updateResults();
+  }));
+  clear?.addEventListener('click', () => {
+    toggles.forEach((button) => {
+      button.setAttribute('aria-pressed', 'false');
+      button.classList.remove('active');
+    });
+    fields.forEach((field) => { field.hidden = true; });
+    selects.forEach((select) => { select.value = ''; });
+    updateResults();
+  });
+
+  updateResults();
+</script>
+
+<style>
+  .composer-search-controls { padding:24px; margin-bottom:24px; border:.5px solid var(--border); border-radius:12px; background:var(--bg-tint); }
+  .composer-search-controls label { display:block; margin-bottom:8px; font-size:12px; font-weight:500; }
+  .composer-search-row { display:grid; grid-template-columns:minmax(240px,320px) minmax(0,1fr); gap:12px; }
+  .composer-search-row input,.composer-search-row select { box-sizing:border-box; width:100%; min-width:0; min-height:44px; padding:10px 12px; border:.5px solid var(--border-strong); border-radius:8px; color:var(--ink); background:var(--bg); font:14px var(--font-sans); }
+  .composer-search-row input:focus-visible,.composer-search-row select:focus-visible { outline:1px solid var(--accent); outline-offset:2px; }
+  [data-composer-entry][hidden], [data-composer-stage][hidden] { display:none; }
+  @media(max-width:700px) { .composer-search-row { grid-template-columns:minmax(0,1fr); } .composer-search-controls { padding:16px; } }
+
+  .ip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 0.5px solid var(--color-border);
+  }
+  .browse-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 32px; padding: 16px 0; border-top: 1px solid var(--color-border-strong); border-bottom: 1px solid var(--color-border-strong); }
+  .browse-control { padding: 8px 11px; border: .5px solid var(--color-border); border-radius: 999px; color: var(--color-muted); background: transparent; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
+  .browse-control:hover, .browse-control.active { color: var(--color-accent); border-color: var(--color-accent-border); background: var(--color-accent-soft); }
+  .filter-bubble-area { margin: -18px 0 24px; padding: 0 0 18px; border-bottom: .5px solid var(--color-border); }
+  .clear-filters { margin-top: 12px; padding: 5px 0; border: 0; color: var(--color-accent); background: transparent; font: inherit; font-size: 11px; cursor: pointer; }
+  .clear-filters:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .filter-fields { display: grid; gap: 15px; }
+  .filter-field { display: grid; gap: 8px; }
+  .filter-field[hidden] { display: none; }
+  .filter-field-label { color: var(--color-tertiary); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .subcategory-bubbles { display: flex; flex-wrap: wrap; gap: 7px; }
+  .subcategory-bubble { padding: 6px 10px; border: .5px solid var(--color-border); border-radius: 999px; color: var(--color-muted); background: var(--color-bg); font: inherit; font-size: 11px; cursor: pointer; }
+  .subcategory-bubble:hover, .subcategory-bubble.active { color: var(--color-accent); border-color: var(--color-accent-border); background: var(--color-accent-soft); }
+  .filter-state-select { display: none; }
+  .result-summary { margin: 0 0 10px; color: var(--color-muted); font-size: 12px; }
+  .empty-filter-results { padding: 40px 4px; color: var(--color-muted); font-size: 14px; }
+  .empty-filter-results[hidden], .compact-piece[hidden] { display: none; }
+  .living-composer-directory { margin: 0 0 64px; }
+  .living-directory-header { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 0 4px 20px; border-bottom: .5px solid var(--color-border-strong); }
+  .directory-kicker { margin: 0 0 6px; color: var(--color-accent); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .living-directory-header h2 { margin: 0; font-family: var(--font-display); font-size: 26px; font-weight: 500; }
+  .living-directory-header a, .pulitzer-source a { color: var(--color-accent); font-size: 12px; text-decoration: none; }
+  .career-stage-group { padding: 28px 4px 10px; }
+  .career-stage-heading { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
+  .career-stage-heading h3 { margin: 0; font-family: var(--font-display); font-size: 21px; font-weight: 500; }
+  .career-stage-heading p { max-width: 650px; margin: 5px 0 0; color: var(--color-muted); font-size: 13px; }
+  .career-stage-heading > span { flex: none; color: var(--color-tertiary); font-size: 11px; }
+  .composer-directory-list { border-top: .5px solid var(--color-border-strong); }
+  .composer-directory-labels { display: grid; grid-template-columns: minmax(170px, .65fr) minmax(190px, 1fr) minmax(220px, 1.1fr); gap: 24px; padding: 9px 4px; border-bottom: .5px solid var(--color-border); color: var(--color-tertiary); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .composer-directory-row { display: grid; grid-template-columns: minmax(170px, .65fr) minmax(190px, 1fr) minmax(220px, 1.1fr); align-items: baseline; gap: 24px; padding: 14px 4px; border-bottom: .5px solid var(--color-border); color: var(--color-ink); text-decoration: none; }
+  .composer-directory-row:hover { background: var(--color-bg-tint); }
+  .composer-directory-row strong { font-family: var(--font-display); font-size: 18px; font-weight: 500; }
+  .composer-directory-row > span { display: block; }
+  .composer-directory-row small { color: var(--color-muted); font-size: 12px; line-height: 1.4; }
+  .composer-directory-row .composer-career-highlight { color: var(--color-accent); font-size: 11px; line-height: 1.45; }
+  .career-stage-empty { margin: 0; padding: 20px; border: .5px dashed var(--color-border); color: var(--color-muted); font-size: 13px; }
+  .pulitzer-source { margin: 28px 4px 0; padding-top: 18px; border-top: .5px solid var(--color-border); color: var(--color-muted); font-size: 11px; line-height: 1.6; }
+  .underrepresented-resources { margin: 0 0 64px; }
+  .resources-header { max-width: 760px; padding: 4px 4px 26px; }
+  .resources-header h2 { margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.25; }
+  .resources-header > p:last-child { margin: 12px 0 0; color: var(--color-muted); font-size: 14px; line-height: 1.6; }
+  .resource-list { border-top: .5px solid var(--color-border-strong); }
+  .resource-row { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding: 22px 4px; border-bottom: .5px solid var(--color-border); color: var(--color-ink); text-decoration: none; }
+  .resource-row:hover { background: var(--color-bg-tint); }
+  .resource-row > span:first-child { display: grid; gap: 5px; max-width: 760px; }
+  .resource-row small { color: var(--color-accent); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+  .resource-row strong { font-family: var(--font-display); font-size: 20px; font-weight: 500; }
+  .resource-row p { margin: 2px 0 0; color: var(--color-muted); font-size: 13px; line-height: 1.55; }
+  .resource-row > span:last-child { flex: none; color: var(--color-accent); font-size: 12px; }
+  .directory-list, .piece-catalog { margin-bottom: 64px; border-top: .5px solid var(--color-border-strong); }
+  .directory-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 90px; padding: 18px 4px; border-bottom: .5px solid var(--color-border); color: var(--color-ink); text-decoration: none; }
+  .directory-row > span:first-child { display: grid; gap: 5px; }
+  .directory-row strong { font-family: var(--font-display); font-size: 22px; font-weight: 500; }
+  .directory-row small, .directory-row > span:last-child { color: var(--color-muted); font-size: 12px; }
+  .directory-row > span:last-child { color: var(--color-accent); }
+  .compact-piece { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr); column-gap: 24px; align-items: baseline; padding: 14px 4px; border-bottom: .5px solid var(--color-border); color: var(--color-ink); text-decoration: none; }
+  .compact-piece > span { font-family: var(--font-display); font-size: 17px; }
+  .compact-piece small { color: var(--color-muted); text-align: left; font-size: 12px; overflow-wrap: anywhere; }
+  .compact-piece-title { min-width: 0; }
+  .form-group { padding: 22px 0 8px; }
+  .filtered-group { padding: 22px 0; }
+  .filtered-group h2 { margin: 14px 0; font-family: var(--font-display); font-size: 25px; font-weight: 500; }
+  .back-link { color: var(--color-accent); font-size: 12px; text-decoration: none; }
+  .form-group h2 { margin: 0 0 8px; color: var(--color-accent); font-family: var(--font-display); font-size: 22px; font-weight: 500; }
+  .empty-view { padding: 48px 4px; }
+  .empty-view h2 { font-family: var(--font-display); font-size: 24px; font-weight: 500; }
+  .empty-view p { color: var(--color-muted); }
+  .instrument-list { border-top: 0.5px solid var(--color-border-strong); }
+  .instrument-row { display: flex; justify-content: space-between; align-items: center; gap: 32px; min-height: 108px; padding: 20px 4px; border-bottom: 0.5px solid var(--color-border); color: var(--color-ink); text-decoration: none; transition: background-color 120ms ease-out; }
+  .instrument-row:hover { background: var(--color-bg-tint); }
+  .instrument-main { display: grid; gap: 7px; }
+  .instrument-name { font-family: var(--font-display); font-size: 26px; font-weight: 500; line-height: 1.25; }
+  .instrument-summary { color: var(--color-muted); font-size: 13px; }
+  .instrument-action { flex: none; color: var(--color-accent); font-size: 13px; font-weight: 500; }
+  .ip-row {
+    border-bottom: 0.5px solid var(--color-border);
+  }
+  .ip-row-link {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 180px 110px;
+    align-items: baseline;
+    gap: 16px;
+    padding: 14px 4px;
+    text-decoration: none;
+    color: var(--color-ink);
+    transition: background-color 120ms ease-out;
+  }
+  .ip-row-link:hover {
+    background-color: var(--color-bg-tint);
+  }
+  .ip-row-title {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.35;
+    color: var(--color-ink);
+  }
+  .ip-row-composer {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-muted);
+  }
+  .ip-row-catalog {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+  @media (max-width: 640px) {
+    .filter-bubble-area { margin-top: -14px; }
+    .composer-directory-row { grid-template-columns: 1fr; gap: 5px; }
+    .composer-directory-labels { display: none; }
+    .living-directory-header, .career-stage-heading { align-items: start; }
+    .resource-row { align-items: start; gap: 16px; }
+    .resource-row > span:last-child { max-width: 70px; text-align: right; }
+    .compact-piece { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 20px; }
+    .compact-piece-title { grid-column: 1 / -1; }
+    .compact-piece small { text-align: left; }
+    .instrument-row { min-height: 96px; padding: 16px 4px; gap: 16px; }
+    .instrument-name { font-size: 22px; }
+    .instrument-action { text-align: right; }
+    .ip-row-link {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-rows: auto auto;
+      gap: 4px 12px;
+      padding: 12px 4px;
+    }
+    .ip-row-title {
+      grid-column: 1 / -1;
+      font-size: 16px;
+    }
+    .ip-row-composer {
+      grid-column: 1;
+    }
+    .ip-row-catalog {
+      grid-column: 2;
+      justify-self: end;
+    }
+  }
+</style>

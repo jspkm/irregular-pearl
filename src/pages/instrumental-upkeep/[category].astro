@@ -1,0 +1,7 @@
+---
+import { upkeepCategories } from '../../data/instrumentalUpkeep';
+export const prerender = false;
+const category = upkeepCategories.find(item => item.id === Astro.params.category);
+if (!category) return new Response(null, { status: 404 });
+return Astro.redirect(`/instrumental-upkeep#${category.id}`, 301);
+---

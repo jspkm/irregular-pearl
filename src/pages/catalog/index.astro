@@ -1,0 +1,4 @@
+---
+const query = Astro.url.searchParams.toString();
+return Astro.redirect(`/pieces${query ? `?${query}` : ''}`, 301);
+---

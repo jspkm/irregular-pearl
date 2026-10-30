@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+const description = 'Irregular Pearl is a nonprofit, open-access classical music knowledge platform connecting performers, musicologists, researchers, educators, and curious audiences.';
+const jsonLd = { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'Who we are', description, url: Astro.url.href };
+---
+<Layout title="Who we are" description={description} jsonLd={jsonLd}>
+  <Navbar />
+  <main class="who-shell">
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Who we are</span></nav>
+    <article>
+      <h1>Who we are</h1>
+      <div class="who-copy">
+        <p>Irregular Pearl is a nonprofit classical music platform dedicated to making musical knowledge more accessible while fostering a connected community around classical music. We aim to serve as a free, open-access space where performers, musicologists, researchers, educators, and enthusiasts can share their knowledge, experiences, and individuality. Beyond providing resources, Irregular Pearl seeks to cultivate a culture of curiosity, conversation, and discovery, where individuals can engage with music not only as an art form to study or perform, but also as something to explore, discuss, and enjoy together.</p>
+        <p>In all fields, knowledge is power. However, classical music knowledge can be surprisingly difficult to access. Valuable information is often scattered across academic publications, institutional archives, specialized websites, and conversations, making it challenging to navigate without prior experience or professional connections. Existing resources can feel outdated, fragmented, or overly academic, creating unnecessary barriers between those who possess knowledge and those eager to learn. At the same time, opportunities for meaningful conversation and shared discovery around classical music remain limited.</p>
+        <p>Irregular Pearl seeks to bridge these gaps by providing a centralized online space where knowledge and community can grow alongside one another. Through a combination of community participation and editorial oversight, we aim to create a resource that is both reliable and continually evolving, reflecting the breadth of knowledge and experience within the classical music world.</p>
+      </div>
+      <aside class="name-note" aria-label="The story behind our name"><p>The name Irregular Pearl comes from the etymology of the word baroque, an irregularly shaped pearl. Once used as an insult for extravagance, baroque has since become the name of one of the most celebrated periods in music history. We believe that the most beautiful and interesting moments in music are rarely perfect.</p></aside>
+    </article>
+  </main>
+</Layout>
+<style>
+  .who-shell { max-width: 960px; margin: 0 auto; padding: 32px 16px 72px; }
+  .breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 48px; color: var(--muted); font-size: 12px; }
+  .breadcrumbs a { color: var(--muted); text-decoration: none; }
+  .breadcrumbs a:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+  article { max-width: 680px; }
+  h1 { margin: 0 0 24px; font: 500 26px/1.25 var(--font-serif); }
+  .who-copy { padding-top: 24px; border-top: .5px solid var(--border); font-size: 16px; line-height: 1.55; color: var(--ink); }
+  .who-copy p { margin: 0 0 24px; }
+  .who-copy p:last-child { margin-bottom: 0; }
+  .name-note { margin-top: 32px; padding-top: 24px; border-top: .5px solid var(--border); color: var(--muted); font: italic 400 15px/1.68 var(--font-serif); }
+  .name-note p { margin: 0; }
+  @media (min-width: 768px) { .who-shell { padding: 40px 32px 88px; } }
+  @media (max-width: 767px) { .who-copy { font-size: 15px; } }
+</style>

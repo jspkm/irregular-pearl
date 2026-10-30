@@ -27,11 +27,12 @@ import SignInPanel from './SignInPanel';
 interface Props {
   pieceId: string;
   initialLinks: ExternalLink[];
+  showAddControl?: boolean;
 }
 
 type Busy = { kind: 'idle' } | { kind: 'working'; id?: string } | { kind: 'error'; message: string };
 
-export default function RecordingsList({ pieceId, initialLinks }: Props) {
+export default function RecordingsList({ pieceId, initialLinks, showAddControl = true }: Props) {
   const {
     signInOpen,
     onClose: signInOnClose,
@@ -205,9 +206,11 @@ export default function RecordingsList({ pieceId, initialLinks }: Props) {
         </ul>
       )}
 
-      <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
-        + Add recording
-      </button>
+      {showAddControl && (
+        <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
+          + Add recording
+        </button>
+      )}
 
       {busy.kind === 'error' && (
         <div className="mvmt-toast" role="alert">

@@ -79,6 +79,5 @@ export function pillsFromPieceFields(piece: {
   if (piece.era) pills.push(make('era', piece.era.toLowerCase()));
   if (piece.form) pills.push(make('form', piece.form.toLowerCase()));
   if (piece.duration_minutes != null) pills.push(make('duration', `~${piece.duration_minutes} min`));
-  if (piece.difficulty) pills.push(make('difficulty', piece.difficulty));
   return pills;
 }

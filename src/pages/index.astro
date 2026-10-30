@@ -2,260 +2,82 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import { seedPieces } from '../data/seed';
-import { supabase, hasSupabase } from '../lib/supabase';
-import { mapFuzzyResults } from '../lib/helpers';
+import { musicTerms } from '../data/musicTerms';
+import { opportunities } from '../data/opportunities';
 
-const query = Astro.url.searchParams.get('q')?.trim() || '';
+const legacyQuery = Astro.url.searchParams.get('q');
+if (legacyQuery) return Astro.redirect(`/pieces?q=${encodeURIComponent(legacyQuery)}`, 301);
 
-interface ListPiece {
-  id: string;
-  title: string;
-  composer_name: string;
-  catalog_number: string | null;
-}
-
-function toListPiece(p: { id: string; title: string; composer_name: string; catalog_number: string | null }): ListPiece {
-  return { id: p.id, title: p.title, composer_name: p.composer_name, catalog_number: p.catalog_number };
-}
-
-let pieces: ListPiece[] = [];
-
-if (query) {
-  if (hasSupabase) {
-    const { data } = await supabase
-      .from('pieces')
-      .select('id, title, composer_name, catalog_number, created_at')
-      .textSearch('fts', query, { type: 'websearch' })
-      .limit(50);
-
-    if (data && data.length > 0) {
-      pieces = data.map(toListPiece);
-    } else {
-      const { data: fuzzyData } = await supabase.rpc('fuzzy_search', { search_query: query });
-      if (fuzzyData && fuzzyData.length > 0) {
-        const fuzzy = mapFuzzyResults(fuzzyData);
-        if (fuzzy.pieceIds.length > 0) {
-          const { data: fuzzyPieces } = await supabase
-            .from('pieces')
-            .select('id, title, composer_name, catalog_number')
-            .in('id', fuzzy.pieceIds);
-          if (fuzzyPieces) pieces = fuzzyPieces.map(toListPiece);
-        }
-      }
-    }
-
-    if (!query.includes('{') && !query.includes('}')) {
-      supabase.from('search_queries').insert({ query, result_count: pieces.length }).then(() => {});
-    }
-  } else {
-    const q = query.toLowerCase();
-    pieces = seedPieces
-      .filter(p =>
-        p.title.toLowerCase().includes(q) ||
-        p.composer_name.toLowerCase().includes(q) ||
-        p.instruments.some(i => i.toLowerCase().includes(q))
-      )
-      .map(toListPiece);
-  }
-} else {
-  if (hasSupabase) {
-    const { data } = await supabase
-      .from('pieces')
-      .select('id, title, composer_name, catalog_number, created_at')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (data && data.length > 0) {
-      pieces = data.map(toListPiece);
-    } else {
-      pieces = seedPieces.map(toListPiece);
-    }
-  } else {
-    pieces = seedPieces.map(toListPiece);
-  }
-}
-
-// In Focus: the most recently approved signed work (performer's note, interpretive school,
-// practice note, or newly published piece). Returns null until the contributor approval
-// pipeline exists. When it does, this queries across the signed-content tables and returns
-// { piece_title, piece_id, kind, pull_quote, byline, byline_bio }.
-//
-// Rendered only when non-null. When null, the landing page flows navbar → list.
-const inFocus: {
-  piece_title: string;
-  piece_id: string;
-  kind: string;
-  pull_quote: string;
-  byline: string;
-  byline_bio: string;
-} | null = null;
-
-const totalPieceCount = pieces.length > 0
-  ? (hasSupabase
-      ? (await supabase.from('pieces').select('id', { count: 'exact', head: true })).count ?? pieces.length
-      : pieces.length)
-  : seedPieces.length;
+const sections = [
+  { href: '/residency', kicker: 'Program', title: 'Artist Residency', description: 'Supporting emerging artists through a guest concerto opportunity.', count: 'Annual program', link: 'Explore the residency' },
+  { href: '/pieces', kicker: 'Repertoire', title: 'Classical music pieces', description: 'Piece pages, performer insights, editions, and recordings.', count: `${seedPieces.length} pieces`, link: 'Explore the pieces' },
+  { href: '/opportunities', kicker: 'Career', title: 'Opportunities and Resources', description: 'Competitions, grants, awards, and summer festivals.', count: `${opportunities.length} programs`, link: 'Browse opportunities and resources' },
+  { href: '/glossary', kicker: 'Reference', title: 'Music glossary', description: 'Musical terms, styles, and history, explained for musicians.', count: `${musicTerms.length} terms`, link: 'Browse the glossary' },
+];
 
 const homeLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Irregular Pearl',
-  description: 'A reference for working classical musicians. Signed performer\'s notes on a small, curated catalog.',
-  url: Astro.url.origin,
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: `${Astro.url.origin}/?q={search_term_string}`,
-    },
-    'query-input': 'required name=search_term_string',
-  },
+  '@context': 'https://schema.org', '@type': 'WebSite', name: 'Irregular Pearl',
+  description: 'A classical music knowledge platform for repertoire, career opportunities, music history terms, and instrumental upkeep.', url: Astro.url.origin,
+  hasPart: sections.map((section) => ({ '@type': 'CollectionPage', name: section.title, description: section.description, url: `${Astro.url.origin}${section.href}` })),
+  potentialAction: { '@type': 'SearchAction', target: { '@type': 'EntryPoint', urlTemplate: `${Astro.url.origin}/pieces?q={search_term_string}` }, 'query-input': 'required name=search_term_string' },
 };
-
-const orgLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Irregular Pearl',
-  url: Astro.url.origin,
-  description: 'A non-profit reference for working classical musicians.',
-  nonprofitStatus: 'NonprofitType',
-};
+const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Irregular Pearl', url: Astro.url.origin, description: 'A non-profit reference for working classical musicians.', nonprofitStatus: 'NonprofitType' };
 ---
-<Layout title="Home" jsonLd={[homeLd, orgLd]}>
+<Layout title="Home" description="A classical music knowledge platform for repertoire, career opportunities, music history terms, and instrumental upkeep." jsonLd={[homeLd, orgLd]}>
   <Navbar />
-
-  <main class="max-w-200 mx-auto px-4 md:px-6">
-    {query ? (
-      <section class="py-10">
-        <p class="text-sm text-muted mb-6">
-          {pieces.length > 0
-            ? `${pieces.length} result${pieces.length === 1 ? '' : 's'} for "${query}"`
-            : `No results for "${query}"`}
-          <a href="/" class="ml-3 text-accent no-underline hover:underline">← Back</a>
-        </p>
-
-        {pieces.length > 0 && (
-          <ul class="ip-list">
-            {pieces.map((p) => (
-              <li class="ip-row">
-                <a href={`/piece/${p.id}`} class="ip-row-link">
-                  <span class="ip-row-title">{p.title}</span>
-                  <span class="ip-row-composer">{p.composer_name}</span>
-                  <span class="ip-row-catalog">{p.catalog_number ?? ''}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-    ) : (
-      <>
-        <section class="text-center pt-16 md:pt-24 pb-6">
-          <h1 class="font-body text-[30px] md:text-[34px] font-medium leading-[1.2] text-ink tracking-tight">
-            IrregularPearl
-          </h1>
-          <p class="mt-3 text-[15px] text-muted">
-            Classical music knowledge platform
-          </p>
-        </section>
-
-        {inFocus && (
-          <section class="max-w-180 mx-auto py-10 md:py-12">
-            <div class="text-[11px] font-medium uppercase tracking-[0.08em] text-accent">In focus</div>
-            <h2 class="mt-3 font-display text-[22px] md:text-[26px] font-medium leading-[1.3] text-ink">
-              <a href={`/piece/${inFocus.piece_id}`} class="no-underline text-ink hover:text-accent transition-colors">
-                {inFocus.piece_title}
-              </a>
-            </h2>
-            <blockquote class="mt-4 border-l-2 border-accent pl-5 font-display italic text-[18px] md:text-[20px] leading-[1.55] text-ink">
-              {inFocus.pull_quote}
-            </blockquote>
-            <div class="mt-3 text-[14px]">
-              <span class="font-medium text-ink">{inFocus.byline}</span>
-              <span class="text-muted"> · {inFocus.byline_bio}</span>
-            </div>
-            <a href={`/piece/${inFocus.piece_id}`} class="mt-2 inline-block text-[14px] text-ink underline underline-offset-4 decoration-border hover:decoration-accent">
-              Read the full note →
-            </a>
-          </section>
-        )}
-
-        <section class={`pb-16 ${inFocus ? 'pt-2' : 'pt-8 md:pt-10'}`}>
-          <ul class="ip-list">
-            {pieces.map((p) => (
-              <li class="ip-row">
-                <a href={`/piece/${p.id}`} class="ip-row-link">
-                  <span class="ip-row-title">{p.title}</span>
-                  <span class="ip-row-composer">{p.composer_name}</span>
-                  <span class="ip-row-catalog">{p.catalog_number ?? ''}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </>
-    )}
+  <main class="home-shell">
+    <header class="home-header">
+      <h1>A place to learn about classical music, share what you know, and discover what it means to others.</h1>
+      <p class="lede">Explore our program and reference collections.</p>
+    </header>
+    <section class="section-grid" aria-label="Explore Irregular Pearl">
+      {sections.map((section, index) => (
+        <a class="section-card" href={section.href}>
+          <span class="section-number" aria-hidden="true">0{index + 1}</span>
+          <span class="section-kicker">{section.kicker}</span>
+          <h2>{section.title}</h2>
+          <p>{section.description}</p>
+          <span class="section-footer"><span class="section-count">{section.count}</span><span class="section-link">{section.link} <span aria-hidden="true">→</span></span></span>
+        </a>
+      ))}
+    </section>
+    <aside class="mission-note">
+      <p>Irregular Pearl is a 501(c)(3) Charitable Organization headquartered California. EIN: 39-2985134</p>
+      <a href="/who-we-are">Who we are →</a>
+    </aside>
   </main>
 </Layout>
 
 <style>
-  .ip-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border-top: 0.5px solid var(--color-border);
-  }
-  .ip-row {
-    border-bottom: 0.5px solid var(--color-border);
-  }
-  .ip-row-link {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 180px 110px;
-    align-items: baseline;
-    gap: 16px;
-    padding: 14px 4px;
-    text-decoration: none;
-    color: var(--color-ink);
-    transition: background-color 120ms ease-out;
-  }
-  .ip-row-link:hover {
-    background-color: var(--color-bg-tint);
-  }
-  .ip-row-title {
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 1.35;
-    color: var(--color-ink);
-  }
-  .ip-row-composer {
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: var(--color-muted);
-  }
-  .ip-row-catalog {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--color-muted);
-    text-align: right;
-    white-space: nowrap;
-  }
-  @media (max-width: 640px) {
-    .ip-row-link {
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-rows: auto auto;
-      gap: 4px 12px;
-      padding: 12px 4px;
-    }
-    .ip-row-title {
-      grid-column: 1 / -1;
-      font-size: 16px;
-    }
-    .ip-row-composer {
-      grid-column: 1;
-    }
-    .ip-row-catalog {
-      grid-column: 2;
-      justify-self: end;
-    }
+  .home-shell { max-width: 1100px; margin: 0 auto; padding: 24px 16px 32px; }
+  .home-header { max-width: 780px; margin-bottom: 24px; }
+  .kicker, .section-kicker { color: var(--accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+  .kicker { margin: 0 0 8px; }
+  h1 { font-family: var(--font-serif); font-size: 26px; font-weight: 500; line-height: 1.25; margin: 0; }
+  .lede { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 12px 0 0; }
+  .section-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: .5px solid var(--border-strong); border-left: .5px solid var(--border); }
+  .section-card { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 16px; border-right: .5px solid var(--border); border-bottom: .5px solid var(--border); color: var(--ink); text-decoration: none; }
+  .section-card:hover { background: var(--bg-tint); }
+  .section-card:focus-visible { outline: 1px solid var(--accent); outline-offset: -3px; }
+  .section-card:first-child { grid-column: auto; }
+  .section-number { position: absolute; top: 16px; right: 16px; color: var(--tertiary); font: 11px var(--font-mono); }
+  .section-kicker { padding-right: 24px; }
+  h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 500; line-height: 1.25; margin: 0; }
+  .section-card > p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
+  .section-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; margin-top: auto; padding-top: 8px; }
+  .section-count { color: var(--tertiary); font-size: 12px; }
+  .section-link { color: var(--accent); font-size: 12px; font-weight: 500; }
+  .mission-note { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-top: 16px; }
+  .mission-note p { max-width: 680px; color: var(--muted); font-family: var(--font-serif); font-size: 13px; line-height: 1.55; margin: 0; }
+  .mission-note a { flex: none; color: var(--ink); font-size: 13px; text-decoration: none; }
+  .mission-note a:hover { color: var(--accent); }
+  @media (min-width: 768px) { .home-shell { padding-inline: 32px; } }
+  @media (max-width: 767px) {
+    .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .section-card:first-child { grid-column: auto; }
+    .section-card { padding: 12px; }
+    h2 { font-size: 18px; }
+    .section-number { top: 12px; right: 12px; }
+    .mission-note { flex-direction: column; gap: 12px; }
   }
 </style>

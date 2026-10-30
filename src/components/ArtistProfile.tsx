@@ -5,6 +5,7 @@ import { useAuth } from '../lib/useAuth';
 import { normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 import UsernameEditor from './UsernameEditor';
 import GenerativeAvatar from './GenerativeAvatar';
+import ProfileCulture from './ProfileCulture';
 
 interface ProfileData {
   id: string;
@@ -187,6 +188,8 @@ export default function ArtistProfile({ userId }: { userId: string }) {
           </div>
         </div>
       )}
+
+      <ProfileCulture userId={userId} />
     </main>
   );
 }

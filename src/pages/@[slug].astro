@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 import ProfileOwnerBar from '../components/ProfileOwnerBar';
+import ProfileCulture from '../components/ProfileCulture';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { normalizeSocialUrl, getSocialIcon, normalizeWebsiteUrl } from '../lib/helpers';
 
@@ -94,5 +95,7 @@ const breadcrumbLd = {
         )}
       </div>
     )}
+
+    <ProfileCulture userId={user.id} client:load />
   </main>
 </Layout>

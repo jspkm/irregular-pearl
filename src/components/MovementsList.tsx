@@ -39,6 +39,8 @@ interface Props {
   // landmarks are signed editorial per PRD §440 and should route through
   // the dedicated first-contribution CTA.
   awaitingMode?: boolean;
+  showAddControl?: boolean;
+  showLandmarks?: boolean;
 }
 
 type Busy = { kind: 'idle' } | { kind: 'working'; movementId?: string } | { kind: 'error'; message: string };
@@ -49,6 +51,8 @@ export default function MovementsList({
   seedMovements,
   landmarksByMovement = {},
   awaitingMode = false,
+  showAddControl = true,
+  showLandmarks = true,
 }: Props) {
   const { user } = useAuth();
   const {
@@ -200,12 +204,14 @@ export default function MovementsList({
                     )}
                   </div>
                 </div>
-                <StructuralLandmarks
-                  pieceId={pieceId}
-                  movementId={m.id}
-                  initialLandmarks={landmarksByMovement[m.id] ?? []}
-                  awaitingMode={awaitingMode}
-                />
+                {showLandmarks && (
+                  <StructuralLandmarks
+                    pieceId={pieceId}
+                    movementId={m.id}
+                    initialLandmarks={landmarksByMovement[m.id] ?? []}
+                    awaitingMode={awaitingMode}
+                  />
+                )}
               </div>
             );
           })}
@@ -220,22 +226,20 @@ export default function MovementsList({
                   <h3>{m.name}</h3>
                   {meta && <span className="meta">{meta}</span>}
                 </div>
-                <p className="empty-state">Landmarks not yet curated for this movement.</p>
+                {showLandmarks && <p className="empty-state">Landmarks not yet curated for this movement.</p>}
               </div>
             );
           })}
         </div>
       ) : (
-        <p className="empty-state">Landmarks not yet curated.</p>
+        <p className="empty-state">Movements not yet listed.</p>
       )}
 
-      <button
-        type="button"
-        className="mvmt-add"
-        onClick={() => gate(() => setAddOpen(true))}
-      >
-        + Add movement
-      </button>
+      {showAddControl && (
+        <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
+          + Add movement
+        </button>
+      )}
 
       {busy.kind === 'error' && (
         <div className="mvmt-toast" role="alert">

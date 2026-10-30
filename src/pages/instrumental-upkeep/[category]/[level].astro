@@ -1,0 +1,36 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Navbar from '../../../components/Navbar.astro';
+import { upkeepCategories, upkeepLevels } from '../../../data/instrumentalUpkeep';
+import '../../../styles/instrumental-upkeep.css';
+import UpkeepResources from '../../../components/UpkeepResources';
+import { curatedResources } from '../../../lib/upkeepResources';
+export const prerender = true;
+export function getStaticPaths() {
+  return upkeepCategories.flatMap(category => upkeepLevels.map(level => ({
+    params: { category: category.id, level: level.id }, props: { category, level },
+  })));
+}
+interface Props { category: (typeof upkeepCategories)[number]; level: (typeof upkeepLevels)[number] }
+const { category, level } = Astro.props;
+const resources = curatedResources(category.id, level.id);
+const resourceIntro = category.id === 'voice'
+  ? (level.id === 'beginner'
+    ? 'Build a foundation for caring for your voice. This page brings together resources to help you develop informed habits and understand when to seek specialist support.'
+    : 'Support your voice as the demands of your musical life grow. This page helps you explore professional perspectives and make informed decisions about ongoing care.')
+  : (level.id === 'beginner'
+    ? 'Build confidence caring for your instrument. This page brings together resources to help you establish everyday habits, understand routine upkeep, and recognize when to seek professional help.'
+    : 'Care for your instrument throughout your musical life. This page helps experienced players make informed decisions about maintenance, specialist services, and the practical demands of owning and using an instrument.');
+---
+<Layout title={`${category.label}: ${level.label} — Instrumental upkeep`} description={`${level.label} upkeep resources for ${category.label.toLowerCase()}.`}>
+  <Navbar />
+  <main class="upkeep-shell">
+    <nav class="upkeep-breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/instrumental-upkeep">Instrumental upkeep</a><span aria-hidden="true">/</span><a href={`/instrumental-upkeep#${category.id}`}>{category.label}</a><span aria-hidden="true">/</span><span>{level.label}</span></nav>
+    <header class="upkeep-header"><p class="upkeep-kicker">Instrumental upkeep · {category.label}</p><h1>Resources - {level.label}</h1></header>
+    <UpkeepResources client:load category={category.id} level={level.id} initial={resources} intro={resourceIntro} />
+    <nav class="upkeep-category-nav" aria-label={`${category.label} upkeep by level`}>
+      {upkeepLevels.map(item => <a href={`/instrumental-upkeep/${category.id}/${item.id}`} aria-current={item.id === level.id ? 'page' : undefined}>{item.label}</a>)}
+    </nav>
+    <a class="upkeep-back" href={`/instrumental-upkeep#${category.id}`}>← All upkeep categories</a>
+  </main>
+</Layout>

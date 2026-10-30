@@ -195,6 +195,94 @@ The entities below are the atomic units of the product. Relationships between th
 
 *The site does not host audio. Recordings are references to performances that exist elsewhere, with editorial observation about them.*
 
+**MusicTerm**
+
+*A concise reference entry for a term that helps a working musician understand historical style, form, performance practice, or compositional technique.*
+
+**FIELDS**
+
+• id (stable lowercase slug)
+
+• term (the conventional English display form)
+
+• pronunciation (optional)
+
+• aliases (optional alternate names or original-language forms)
+
+• category (historical style, form, technique, performance practice, or theory)
+
+• period (the historical span in which the term is most useful)
+
+• concise definition (one or two sentences of unsigned reference copy)
+
+• historical context (factual reference copy)
+
+• listening cues (concrete features a musician can identify in a score or performance)
+
+• representative composers and pieces
+
+• related terms (references to other MusicTerm entities)
+
+• signed commentary (optional; one or more contributor-owned perspectives when the entry moves from fact into interpretive or pedagogical judgment)
+
+**RELATIONSHIPS**
+
+• relates to many other MusicTerms
+
+• may reference many Pieces
+
+• may have many signed contributor commentaries
+
+*Definitions and historical facts may be unsigned reference copy. Claims about how a style should be played, taught, or heard are editorial judgment and follow the same signed-human-expertise invariant as piece-page content.*
+
+**UpkeepResource**
+
+*A curated or member-submitted external reference within an instrument group and experience level.*
+
+Fields: stable id, instrument group (strings, woodwinds, brass, percussion, keyboard, voice), level (beginner, advanced), topic, original resource title, URL, publisher, applicable instrument scope, factual summary, optional editorial source-review date, submitting user (null for curated references), and creation date. Members may publish links in their own name and edit or remove their own submissions. Community submissions display their submitter and are not labeled editorially reviewed.
+
+Each signed-in user may mark another user's resource or a curated resource Helpful or Less helpful, change that vote, or clear it. A user has at most one vote per resource and cannot vote on their own submission. Votes rank the combined collection; public vote counts and other users' votes are not exposed. Removing a resource removes its votes. URLs must use HTTP or HTTPS; descriptions follow the signed-human-expertise rules above.
+
+**MusicOpportunity**
+
+*A maintained reference record for a classical-music competition, grant or award, or selective summer festival and training program.*
+
+**FIELDS**
+
+• id (stable lowercase slug)
+
+• name (organization’s official program name)
+
+• type (competition, grant or award, summer festival)
+
+• location (city, region, and country when applicable)
+
+• summary (short unsigned factual reference copy)
+
+• disciplines and instruments
+
+• career stage and age range (when the program publishes one)
+
+• application route (open application, nomination only, invitation, or varies by award)
+
+• support offered (prizes, grant funding, tuition, housing, travel, mentoring, or performance opportunities)
+
+• schedule pattern (annual, quadrennial, rotating discipline, or seasonal)
+
+• next-cycle note (optional, dated and explicitly marked as time-sensitive)
+
+• official URL and application URL
+
+• source reviewed date
+
+**RELATIONSHIPS**
+
+• may relate to many Instruments
+
+• may relate to one or more repertoire or training specialisms
+
+*The catalog is a discovery reference, not an application authority. Eligibility, dates, award values, and requirements may change; each record links to the official program and states when its source was last reviewed. Expired deadlines are not presented as current.*
+
 **Contributor**
 
 *A named human who signs editorial work on the site.*
@@ -499,13 +587,38 @@ Job: the universal entry point. Targets under 100ms p50 from keystroke to struct
 
 ## **Tier 2 — first nine months**
 
+### **Artist residency**
+
+The donor-supported Irregular Pearl Artist Residency supports and spotlights exceptional emerging classical musicians. Each year, one artist, chosen by the board, is invited to be a guest concerto soloist with an established orchestra, professional documentation, promotion, and artistic connections. Applying and participating are free.
+
+The program overview lives at `/residency`, with a distinct “Residency” navigation link to the left of search, separate from the public reference collections. The overview links to `/residency/application`, which publishes the application materials, recording requirements, selection criteria, and timeline supplied by the program. Dates remain “To be announced” until confirmed. Application submission and selection workflows are outside its current scope.
+
+
+### **Instrumental upkeep**
+
+A public reference category at `/instrumental-upkeep`, reached through an Instrumental Upkeep link styled as a catalog filter in Opportunities and Resources. It is not a top-level header item. Its six subcategories are strings, woodwinds, brass, percussion, keyboard, and voice, listed together on the upkeep overview. Each group has Beginner and Advanced links that open resources directly, without an intermediate level-selection page. Old group URLs redirect to the corresponding overview anchor. Level pages live at `/instrumental-upkeep/{group}/{level}`. Each Beginner and Advanced page for woodwinds, brass, percussion, keyboard, and voice contains two sourced resources. Voice resources link to established health organizations and clinician-led information. The Strings → Beginner page links to verified manufacturer guides for bow rehairing, changing strings, daily cleaning and storage, and routine checks. The Strings → Advanced page adds specialist resources on fingerboard dressing, soundpost fit, instrument and bow selection, historic makers, and official airline policies for cello seats. Workshop topics are described as professional services; airline details are dated and link to current carrier policies. Each resource names its publisher, instrument scope, original source, and review date. All upkeep pages allow signed-in users to submit external resources and vote on both curated and community resources. Submitters retain edit and remove controls. Helpfulness votes are private, reversible, and used for ranking without public counts. Summaries are factual reference copy; this directory does not publish original repair or health guidance.
+
+### **Music glossary**
+
+Job: give musicians a compact, repertoire-connected reference for historical styles, forms, performance-practice concepts, and compositional techniques encountered on piece pages. Audience: conservatory students, performers, and teachers who need a useful reminder rather than a general-audience encyclopedia article. Primary surface: an alphabetical glossary index and one page per term, each with a concise definition, historical context, listening cues, representative repertoire, and related terms. Factual reference copy may be unsigned; interpretive or pedagogical commentary is signed. Terms should link to pieces in the catalog when relevant, and piece pages may link back to terms without interrupting their primary practice-oriented hierarchy.
+
+### **Opportunities catalog**
+
+The catalog also links to external Performance Resources, Study Resources, Teaching Resources, and a Classical Music News Database. forScore supports performance preparation; IMSLP and the Henle Library App support score study. These references appear across all career stages and link to their official sites; the platform does not host scores or reproduce these tools.
+
+Job: help emerging and working classical musicians distinguish and discover major competitions, grants and awards, and selective summer festivals without flattening their very different application models. Audience: conservatory students, early-career performers, ensembles, teachers, and mentors. Primary surface: a filterable catalog at `/opportunities` with one reference page per program. Every record identifies the opportunity type, location, disciplines, career stage, application route, support offered, schedule pattern, official source, and source-review date. Time-sensitive details are secondary to stable program facts, carry an explicit “check official site” cue, and are never implied to be complete or guaranteed.
+
 ### **Landing page**
 
-Previously Tier 1. Demoted because week-one the landing page need be nothing more than a search input, a heading, and a link to a handful of populated pieces. The task-framed entry cards, chip rows for instrument and composer browsing with piece counts, the In Focus signed piece, and the contributor-count stat line are Tier 2 polish that arrives once there is a catalog and a contributor base worth showcasing.
+Previously Tier 1. The landing page includes the Artist Residency program and a compact box grid of the product's four public reference collections: pieces, opportunities, the music glossary, and instrumental upkeep. Each collection receives a short, concrete description and current record count. The repertoire list itself lives at `/pieces`; the home page does not duplicate it. Richer task-framed entry cards, chip rows, an In Focus signed piece, and contributor statistics remain Tier 2 polish.
 
 ### **Repertoire browse**
 
-Previously Tier 1. Demoted because week-one browse is a flat alphabetical list of pieces in the catalog with title, composer, and instrumentation. Faceted filtering (instrument, era, form, difficulty), multi-facet combinations including mixed chamber instrumentation, and sort controls beyond alphabetical are Tier 2.
+“Add a piece” entry points on `/pieces` and composer pages expose canonical-index search and the existing authenticated materialization action. Composer-page searches are scoped to that composer. Existing entries open their current page; identity is never typed into a creation form.
+
+The default Browse All view at `/pieces` shows three rotating piece previews (Beethoven Symphony No. 5, Bach Cello Suite No. 1, and Elgar Cello Concerto), limited to title, composer, metadata, and summary. Previous/next and pause controls accompany automatic rotation, which pauses during interaction and respects reduced-motion preferences. Activating a filter replaces it with catalog results; clearing all filters restores the piece view. Search results remain a list.
+
+Previously Tier 1. Browse at `/pieces` is a concise alphabetical directory of instruments with piece and composer counts; each instrument links to its full repertoire page. Instrument pages organize composers alphabetically and piece titles alphabetically within each composer. A multi-instrument piece appears under each applicable instrument. Faceted filtering (era, form, difficulty), multi-facet combinations, and alternate sort controls are Tier 2.
 
 ### **Contributor page**
 
@@ -549,3 +662,11 @@ This document is revised quarterly by the four leads together. Substantive chang
 *The document is a contract between the four leads, not a wish list. When it says a thing is not in scope, that is a decision, not a suggestion.*
 
 *Irregular Pearl · a non-profit for classical music knowledge*
+
+### **Who we are — approved public mission, October 21, 2026**
+
+The public mission page at `/who-we-are` presents the founder-provided description of Irregular Pearl as an open-access knowledge hub connecting performers, musicologists, researchers, and educators with a broader curious audience. This explicitly expands the audience described in the earlier working-musician-only framing for this public mission surface. The page preserves the supplied four paragraphs and is linked from the homepage and footer. The existing `/about` page remains available.
+
+### **Composer navigation**
+
+Composers is a separate top-level navigation category beside Pieces and Opportunities. Its Composers link opens `/composers`, a directory of explicitly listed non-living composers represented on the site. Full names are grouped chronologically from Antiquity through the 20th century, then shown in surname order within each era, and surnames link to the existing composer pages. Historical single names and appellations remain intact. The dropdown also links to living-composer browse (including career-stage filters), and Underrepresented Composers Resource Database. Pieces retains instrumentation, era/period, and genre/form navigation. This navigation change reuses the existing browse routes.

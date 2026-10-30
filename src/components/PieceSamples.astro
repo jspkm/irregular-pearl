@@ -1,0 +1,108 @@
+---
+import SummaryComments from './SummaryComments';
+import type { PieceFull } from '../lib/pieces';
+import { getPieceCompletionYear } from '../data/pieceCompletionYears';
+interface Props { pieces: PieceFull[] }
+const { pieces } = Astro.props;
+---
+<section class="piece-samples" aria-label="Explore a piece" aria-roledescription="carousel" data-piece-samples>
+  <div class="sample-controls">
+    <span>Explore a piece</span>
+    <div>
+      <button type="button" data-sample-prev aria-label="Previous piece">←</button>
+      <button type="button" data-sample-next aria-label="Next piece">→</button>
+      <button type="button" data-sample-pause aria-label="Pause automatic rotation">Pause</button>
+    </div>
+  </div>
+  <div class="sample-viewport">
+  {pieces.map((piece, index) => (
+    <article data-piece-sample hidden={index !== 0} aria-label={`${index + 1} of ${pieces.length}`} aria-roledescription="slide">
+      <h2><a href={`/piece/${piece.id}`}>{piece.title}</a> <small>{getPieceCompletionYear(piece.id)} {piece.catalog_number}</small></h2>
+      <p class="sample-composer">by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a></p>
+      <ul aria-label="Piece metadata">{[...piece.instruments, piece.era, piece.form].map(label => <li>{label}</li>)}</ul>
+      <div class="sample-summary"><SummaryComments client:load pieceId={piece.id} initialComments={[]} summaryText={piece.description?.trim() || 'This piece has not yet been given a summary.'} /></div>
+    </article>
+  ))}
+  </div>
+</section>
+<script>
+  const carousel = document.querySelector<HTMLElement>('[data-piece-samples]');
+  if (carousel) {
+    const slides = [...carousel.querySelectorAll<HTMLElement>('[data-piece-sample]')];
+    const pause = carousel.querySelector<HTMLButtonElement>('[data-sample-pause]');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+    let paused = reducedMotion.matches;
+    let transitioning = false;
+    async function show(index: number) {
+      if (transitioning || slides.length < 2) return;
+      const next = (index + slides.length) % slides.length;
+      if (next === current) return;
+      const outgoing = slides[current];
+      const incoming = slides[next];
+      const direction = index > current ? 1 : -1;
+      incoming.hidden = false;
+      incoming.inert = false;
+      incoming.removeAttribute('aria-hidden');
+      outgoing.inert = true;
+      outgoing.setAttribute('aria-hidden', 'true');
+      current = next;
+      if (reducedMotion.matches) {
+        outgoing.hidden = true;
+        return;
+      }
+      transitioning = true;
+      const timing = { duration: 250, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' };
+      const animations = [
+        outgoing.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${-direction * 100}%)` }], timing),
+        incoming.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'translateX(0)' }], timing),
+      ];
+      await Promise.allSettled(animations.map(animation => animation.finished));
+      outgoing.hidden = true;
+      transitioning = false;
+    }
+    function updatePause() {
+      if (!pause) return;
+      pause.textContent = paused ? 'Play' : 'Pause';
+      pause.setAttribute('aria-label', `${paused ? 'Start' : 'Pause'} automatic rotation`);
+    }
+    carousel.querySelector('[data-sample-prev]')?.addEventListener('click', () => { paused = true; show(current - 1); updatePause(); });
+    carousel.querySelector('[data-sample-next]')?.addEventListener('click', () => { paused = true; show(current + 1); updatePause(); });
+    pause?.addEventListener('click', () => { paused = !paused; updatePause(); });
+    reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; updatePause(); });
+    updatePause();
+    let timer: number;
+    let firstSwitch = true;
+    function scheduleRotation() {
+      timer = window.setTimeout(() => {
+        if (!paused && !document.hidden && carousel.getClientRects().length && !carousel.matches(':hover') && !carousel.contains(document.activeElement)) {
+          show(current + 1);
+          firstSwitch = false;
+        }
+        scheduleRotation();
+      }, firstSwitch ? 2000 : 10000);
+    }
+    scheduleRotation();
+    document.addEventListener('astro:before-swap', () => window.clearTimeout(timer), { once: true });
+  }
+</script>
+<style>
+  .piece-samples { padding: 24px; margin-bottom: 48px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--bg-tint); }
+  .sample-controls, .sample-controls > div { display: flex; align-items: center; gap: 16px; }
+  .sample-controls { justify-content: space-between; margin-bottom: 24px; color: var(--muted); font-size: 12px; }
+  button { background: transparent; border: .5px solid var(--border-strong); border-radius: 6px; padding: 4px 10px; color: var(--muted); font: inherit; cursor: pointer; }
+  button:hover { color: var(--ink); }
+  .sample-viewport { display: grid; overflow: hidden; }
+  article { grid-area: 1 / 1; min-width: 0; min-height: 320px; background: var(--bg-tint); }
+  article[hidden] { display: none; }
+  h2 { font: 500 26px/1.25 var(--font-serif); margin: 0 0 8px; }
+  h2 a { color: var(--ink); text-decoration: none; }
+  h2 a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  h2 small { font: 400 13px var(--font-mono); color: var(--muted); white-space: nowrap; }
+  .sample-composer { font-size: 14px; color: var(--muted); margin: 0; }
+  .sample-composer a { color: var(--accent); }
+  ul { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 16px 0 24px; }
+  li { border: .5px solid var(--border); border-radius: 999px; padding: 2px 8px; color: var(--muted); font-size: 12px; }
+  .sample-summary { font: 400 16px/1.68 var(--font-serif); color: var(--ink); margin: 0; }
+  @media(max-width: 480px) { .piece-samples { padding: 16px; } .sample-controls { align-items: flex-start; gap: 8px; } .sample-controls > div { gap: 8px; } }
+</style>

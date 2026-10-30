@@ -1,0 +1,16 @@
+.member-cover{font-family:var(--font-sans)}.member-cover-frame{aspect-ratio:3/1;width:100%;overflow:hidden;background:var(--bg-tint);border:.5px solid var(--border);box-sizing:border-box}.member-cover-frame>img{display:block;width:100%;height:100%;object-fit:cover}.member-cover-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;color:var(--muted);text-align:center}.member-cover-empty span{font-size:18px;font-weight:500}.member-cover-empty p{margin:8px 0 0;font-size:13px}.member-cover-tools{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:12px}.member-cover-tools>p{margin:0;font-size:12px;color:var(--muted)}.member-cover-input{display:none}.member-cover-position{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.member-cover-position input{width:100px;accent-color:var(--accent)}.member-cover-error{color:var(--danger);font-size:13px}@media(max-width:640px){.member-cover-frame{aspect-ratio:2/1}.member-cover-tools>p{width:100%}.member-cover-empty span{font-size:16px}}
+
+.member-cover-with-profile{position:relative;display:grid;align-content:start;min-height:320px;aspect-ratio:auto;padding:16px}
+.member-cover-with-profile>img,.member-cover-with-profile>.member-cover-empty{position:absolute;inset:0;width:100%;height:100%}
+.member-cover-with-profile>.member-cover-empty{align-items:flex-end;justify-content:flex-end;padding:24px}
+.member-cover-profile{position:relative;z-index:1;width:min(440px,100%);box-sizing:border-box;background:var(--bg);border:.5px solid var(--border)}
+.member-cover-profile .member-header{grid-template-columns:56px minmax(0,1fr);gap:16px;padding:16px;border:0}
+.member-cover-profile .member-avatar{width:56px;height:56px}
+.member-cover-profile .member-avatar svg{width:28px;height:28px}
+.member-cover-profile .member-name-row{gap:8px}
+.member-cover-profile .member-name-row h1{font:500 22px/1.25 var(--font-serif)}
+.member-cover-profile .member-handle{font-size:12px;margin-top:4px}
+.member-cover-profile .member-bio{font-size:14px;line-height:1.55;margin:12px 0}
+.member-cover-profile .member-details{font-size:12px;gap:8px 16px}
+.member-cover-profile .member-edit{padding:4px 8px;font-size:12px}
+@media(max-width:640px){.member-cover-with-profile{min-height:300px;padding:12px}.member-cover-profile .member-header{gap:12px;padding:12px}.member-cover-profile .member-name-row{align-items:flex-start}.member-cover-with-profile>.member-cover-empty{display:none}}

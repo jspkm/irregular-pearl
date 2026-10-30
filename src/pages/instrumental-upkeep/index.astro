@@ -1,0 +1,23 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import { upkeepCategories, upkeepLevels } from '../../data/instrumentalUpkeep';
+import '../../styles/instrumental-upkeep.css';
+---
+<Layout title="Instrumental upkeep" description="Explore instrumental upkeep by category: strings, woodwinds, brass, percussion, keyboard, and voice.">
+  <Navbar />
+  <main class="upkeep-shell">
+    <nav class="upkeep-breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Instrumental upkeep</span></nav>
+    <header class="upkeep-header">
+      <p class="upkeep-kicker">Reference</p>
+      <h1>Instrumental upkeep</h1>
+      <p>Choose your instrument group and level to explore resources.</p>
+    </header>
+    <nav class="upkeep-directory" aria-label="Instrumental upkeep categories">
+      {upkeepCategories.map(category => <section class="upkeep-group-row" id={category.id} aria-labelledby={`upkeep-group-${category.id}`}>
+        <h2 id={`upkeep-group-${category.id}`}>{category.label}</h2>
+        <div class="upkeep-group-levels">{upkeepLevels.map(level => <a href={`/instrumental-upkeep/${category.id}/${level.id}`} aria-label={`${category.label} — ${level.label}`}>{level.label}<span aria-hidden="true">→</span></a>)}</div>
+      </section>)}
+    </nav>
+  </main>
+</Layout>

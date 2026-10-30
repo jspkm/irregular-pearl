@@ -19,7 +19,6 @@ import {
   SINGLE_VALUE_CATEGORIES,
   ERAS,
   FORMS,
-  DIFFICULTIES,
   isValidPillValue,
   type PillCategory,
 } from '../data/pill-vocabulary';
@@ -99,6 +98,7 @@ export default function PiecePills({ pieceId, initialPills, readOnly = false }: 
   const addableCategories = useMemo<PillCategory[]>(() => {
     const result: PillCategory[] = [];
     for (const cat of PILL_CATEGORIES) {
+      if (cat === 'difficulty') continue;
       if (SINGLE_VALUE_CATEGORIES.has(cat)) {
         if (grouped[cat].length === 0) result.push(cat);
       } else {
@@ -121,7 +121,6 @@ export default function PiecePills({ pieceId, initialPills, readOnly = false }: 
     }
     if (cat === 'era') return [...ERAS];
     if (cat === 'form') return [...FORMS];
-    if (cat === 'difficulty') return [...DIFFICULTIES];
     return [];
   };
 
@@ -190,13 +189,12 @@ export default function PiecePills({ pieceId, initialPills, readOnly = false }: 
     return isStaff;
   };
 
-  // Display in the fixed pill order: instruments (sorted), era, form, duration, difficulty
+  // Display identity metadata only; difficulty levels are intentionally omitted.
   const displayOrder: Pill[] = [
     ...grouped.instrument,
     ...grouped.era,
     ...grouped.form,
     ...grouped.duration,
-    ...grouped.difficulty,
   ];
 
   return (

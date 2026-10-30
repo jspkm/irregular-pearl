@@ -9,8 +9,8 @@
 .crumbs .sep { margin: 0 8px; color: var(--tertiary); }
 
 /* ---------- Piece header ---------- */
-h1.piece { font-family: var(--font-serif); font-weight: 500; font-size: 34px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.005em; }
-h1.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 6px; }
+h1.piece, h2.piece { font-family: var(--font-serif); font-weight: 500; font-size: 34px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.005em; }
+h1.piece .cat, h2.piece .cat { font-family: var(--font-mono); font-size: 16px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 6px; }
 .byline { font-size: 15px; color: var(--muted); margin-bottom: 16px; }
 .byline a { color: var(--ink); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
 .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; align-items: center; }
@@ -73,6 +73,36 @@ section.block { margin-bottom: 64px; }
 .kicker { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
 h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; margin: 0 0 10px; }
 .section-desc { font-size: 14px; color: var(--muted); line-height: 1.55; margin-bottom: 28px; max-width: 640px; }
+
+/* ---------- Performance calendar ---------- */
+.performance-calendar { border-top: .5px solid var(--border-strong); }
+.performance-calendar-head { display: flex; justify-content: space-between; align-items: start; gap: 24px; padding: 20px 0; }
+.performance-calendar-head h2 { margin: 0 0 4px; font-family: var(--font-serif); font-size: 22px; font-weight: 500; }
+.performance-calendar-head p { margin: 0; color: var(--muted); font-size: 13px; }
+.performance-add, .performance-save { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 7px 11px; border: .5px solid var(--accent); border-radius: 5px; background: var(--accent); color: white; font: 12px var(--font-sans); cursor: pointer; white-space: nowrap; }
+.performance-form { padding: 18px; border: .5px solid var(--border); background: var(--bg-tint); }
+.performance-form-top { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 13px; }
+.performance-form-top button, .performance-remove { padding: 3px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.performance-fields { display: grid; grid-template-columns: 1.4fr .8fr 1fr 1.2fr; gap: 12px; }
+.performance-fields label { display: grid; gap: 5px; }
+.performance-fields label span { color: var(--muted); font-size: 11px; }
+.performance-fields input { width: 100%; min-width: 0; height: 38px; padding: 8px 9px; border: .5px solid var(--border-strong); border-radius: 5px; background: var(--bg); color: var(--ink); font: 13px var(--font-sans); }
+.performance-fields input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.performance-actions { display: flex; gap: 12px; align-items: center; margin-top: 14px; }
+.performance-cancel { border: 0; background: transparent; color: var(--muted); font: 12px var(--font-sans); cursor: pointer; }
+.performance-error { margin: 10px 0 0; color: var(--danger, #9d2b22); font-size: 12px; }
+.performance-empty { display: flex; align-items: center; gap: 8px; padding: 18px 0; border-bottom: .5px solid var(--border); color: var(--tertiary); font-size: 13px; }
+.performance-list { border-top: .5px solid var(--border); }
+.performance-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) 24px; gap: 14px; align-items: center; padding: 14px 0; border-bottom: .5px solid var(--border); }
+.performance-row time { display: grid; place-items: center; min-height: 46px; border: .5px solid var(--border); border-radius: 5px; line-height: 1; }
+.performance-row time span { color: var(--accent); font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.performance-row time strong { font-family: var(--font-serif); font-size: 19px; font-weight: 500; }
+.performance-copy { display: grid; gap: 4px; }
+.performance-copy > strong, .performance-copy > a { display: inline-flex; align-items: center; gap: 5px; width: fit-content; color: var(--ink); font-family: var(--font-serif); font-size: 16px; font-weight: 500; text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+.performance-copy > a:hover { color: var(--accent); }
+.performance-copy > span { color: var(--muted); font-size: 12px; }
+@media (max-width: 800px) { .performance-fields { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .performance-calendar-head { align-items: center; } .performance-fields { grid-template-columns: 1fr; } }
 
 /* ---------- Signed performer's notes (plural) ---------- */
 .notes-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -1956,3 +1986,5 @@ h2.section { font-family: var(--font-serif); font-size: 22px; font-weight: 500; 
   color: var(--tertiary);
   letter-spacing: 0.01em;
 }
+
+.embedded-piece h2.piece { font-size: 26px; line-height: 1.25; }

@@ -2,6 +2,9 @@
 import AuthButton from './AuthButton';
 import NavbarBell from './NavbarBell';
 import SearchTypeahead from './SearchTypeahead';
+import { musicPeriods } from '../data/musicPeriods';
+import { standardPieceForms } from '../data/pieceForms';
+import { instrumentFamilies, pieceEraPeriods } from '../data/pieceBrowseTaxonomy';
 ---
 <div class="sticky top-0 z-50 bg-surface border-b border-border">
   <nav class="relative flex items-center gap-4 md:gap-6 px-4 md:px-6 py-4">
@@ -9,17 +12,154 @@ import SearchTypeahead from './SearchTypeahead';
       IrregularPearl
     </a>
 
-    <div class="hidden sm:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 min-w-65 max-w-xl">
+    <a href="/residency" class="residency-link" aria-current={(Astro.url.pathname === '/residency' || Astro.url.pathname.startsWith('/residency/')) ? 'page' : undefined}>Residency</a>
+
+    <a href="/who-we-are" class="about-link" aria-current={Astro.url.pathname === '/who-we-are' ? 'page' : undefined}>About</a>
+
+    <div class="navbar-search hidden sm:block flex-1 min-w-0 max-w-xl">
       <SearchTypeahead client:load />
     </div>
 
-    <div class="flex items-center gap-4 md:gap-5 text-sm text-ink ml-auto">
+    <div class="navbar-actions flex shrink-0 items-center gap-4 md:gap-5 text-sm text-ink ml-auto">
+      <div class="pieces-menu hidden md:block">
+        <a href="/pieces" class="pieces-trigger inline-flex items-center gap-1 text-muted hover:text-ink no-underline" aria-haspopup="true">
+          Pieces <span class="menu-caret" aria-hidden="true">⌄</span>
+        </a>
+        <div class="pieces-submenu" aria-label="Browse pieces">
+          <div class="pieces-submenu-item">
+            <a class="pieces-form-trigger" href="/pieces?view=instrumentation" aria-haspopup="true">Instrumentation <span aria-hidden="true">›</span></a>
+            <div class="pieces-form-submenu" aria-label="Pieces by instrument family">
+              <a class="pieces-form-see-all" href="/pieces?view=instrumentation">See all instrumentation →</a>
+              {instrumentFamilies.map((family) => (
+                <a href={`/pieces?view=instrumentation&filter=family%3A${family.id}`}>{family.label}</a>
+              ))}
+            </div>
+          </div>
+          <div class="pieces-submenu-item">
+            <a class="pieces-form-trigger" href="/pieces?view=era" aria-haspopup="true">Era / Period <span aria-hidden="true">›</span></a>
+            <div class="pieces-form-submenu" aria-label="Pieces by era or period">
+              <a class="pieces-form-see-all" href="/pieces?view=era">See all eras / periods →</a>
+              {pieceEraPeriods.map((period) => (
+                <a href={`/pieces?view=era&filter=period%3A${period.id}`}>{period.label}</a>
+              ))}
+            </div>
+          </div>
+          <div class="pieces-submenu-item">
+            <a class="pieces-form-trigger" href="/pieces?view=form" aria-haspopup="true">Genre / Form <span aria-hidden="true">›</span></a>
+            <div class="pieces-form-submenu" aria-label="Pieces by genre or form">
+              <a class="pieces-form-see-all" href="/pieces?view=form">See all genres / forms →</a>
+              {standardPieceForms.map((form) => (
+                <a href={`/pieces?view=form&filter=${encodeURIComponent(form)}`}>{form}</a>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="pieces-menu composers-menu hidden md:block">
+        <a href="/composers" class="pieces-trigger inline-flex items-center gap-1 text-muted hover:text-ink no-underline" aria-haspopup="true">Composers <span class="menu-caret" aria-hidden="true">⌄</span></a>
+        <div class="pieces-submenu" aria-label="Browse composers">
+          <a href="/composers">Composers</a>
+          <div class="pieces-submenu-item living-submenu-item">
+            <a class="pieces-form-trigger living-composers-heading" href="/pieces?view=living" aria-haspopup="true">Living Composers <span aria-hidden="true">›</span></a>
+            <div class="pieces-form-submenu living-career-submenu" aria-label="Living composers by career stage">
+              <a class="pieces-form-see-all" href="/pieces?view=living">See all living composers →</a>
+              <a href="/pieces?view=living&career=established">Established Composers</a>
+              <a href="/pieces?view=living&career=recognized-emerging">Recognized Emerging Composers</a>
+              <a href="/pieces?view=living&career=early-career">Early-Career Composers</a>
+              <a href="/pieces?view=living&career=student">Student Composers</a>
+            </div>
+          </div>
+          <a href="/pieces?view=underrepresented">Underrepresented Composers Resource Database</a>
+        </div>
+      </div>
+      <div class="opportunities-menu hidden md:block">
+        <a href="/opportunities" class="opportunities-trigger inline-flex items-center gap-1 text-muted hover:text-ink no-underline" aria-haspopup="true">
+          Opportunities and Resources <span class="menu-caret" aria-hidden="true">⌄</span>
+        </a>
+        <div class="opportunities-submenu" aria-label="Opportunities and Resources by career stage">
+          <a href="/opportunities?stage=Pre-College">Pre-College</a>
+          <a href="/opportunities?stage=College+Student">College Student</a>
+          <a href="/opportunities?stage=Emerging+Professional">Emerging Professional</a>
+          <a href="/opportunities?stage=Professional">Professional</a>
+        </div>
+      </div>
+      <div class="glossary-menu hidden md:block">
+        <a href="/glossary" class="glossary-trigger inline-flex items-center gap-1 text-muted hover:text-ink no-underline" aria-haspopup="true">
+          Glossary <span class="menu-caret" aria-hidden="true">⌄</span>
+        </a>
+        <div class="glossary-submenu" aria-label="Glossary by historical period">
+          <a class="glossary-see-all" href="/glossary"><span>Full catalog</span><strong>See all eras →</strong></a>
+          {musicPeriods.map((period) => (
+            <a href={`/glossary/era/${period.id}`}><span>{period.span}</span><strong>{period.title}</strong></a>
+          ))}
+        </div>
+      </div>
       <NavbarBell client:load />
       <AuthButton client:load />
     </div>
   </nav>
 
+  <div class="md:hidden px-4 pb-3 flex flex-wrap gap-4"><a href="/composers" class="text-sm text-muted no-underline hover:text-ink">Composers</a></div>
   <div class="sm:hidden px-2 pb-2">
     <SearchTypeahead client:load />
   </div>
 </div>
+
+<style>
+  .about-link { display: inline-flex; align-items: center; min-height: 44px; flex-shrink: 0; color: var(--color-muted); font-size: 14px; text-decoration: none; }
+  .about-link:hover { color: var(--color-ink); }
+  .about-link:focus-visible { outline: 1px solid var(--color-accent); outline-offset: 4px; }
+  .about-link[aria-current="page"] { color: var(--color-ink); text-decoration: underline; text-underline-offset: 4px; }
+  @media (max-width: 639px) { nav { flex-wrap: wrap; gap: 8px 12px; } .about-link { font-size: 13px; } }
+
+  @media (min-width: 768px) and (max-width: 1199px) {
+    nav { flex-wrap: wrap; row-gap: 12px; }
+    .navbar-actions { flex-basis: 100%; justify-content: flex-end; }
+    .navbar-search { max-width: none; }
+  }
+
+  .residency-link { display: inline-flex; align-items: center; min-height: 44px; flex-shrink: 0; padding-left: 16px; border-left: .5px solid var(--color-border); color: var(--color-accent); font-size: 14px; font-weight: 500; text-decoration: none; }
+  .residency-link:hover { color: var(--color-accent-hover); text-decoration: underline; text-underline-offset: 4px; }
+  .residency-link:focus-visible { outline: 1px solid var(--color-accent); outline-offset: 4px; }
+  .residency-link[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; }
+  @media (max-width: 639px) { .residency-link { padding-left: 12px; font-size: 13px; } }
+  .navbar-search { width: clamp(120px, 42vw, 576px); }
+  @media (min-width: 768px) and (max-width: 1050px) {
+    .navbar-search { width: auto; }
+    .navbar-actions { gap: 12px; }
+  }
+  .pieces-menu, .opportunities-menu { position: relative; padding-block: 12px; margin-block: -12px; }
+  .glossary-menu { position: relative; padding-block: 12px; margin-block: -12px; }
+  .menu-caret { font-size: 12px; transition: transform 140ms ease; }
+  .opportunities-submenu { position: absolute; top: calc(100% - 1px); left: 50%; width: 210px; padding: 8px; border: .5px solid var(--color-border-strong); background: var(--color-surface); box-shadow: 0 10px 28px rgb(33 28 22 / 10%); opacity: 0; visibility: hidden; transform: translate(-50%, -4px); transition: opacity 120ms ease, transform 120ms ease, visibility 120ms; }
+  .opportunities-submenu a { display: block; padding: 10px 12px; color: var(--color-muted); text-decoration: none; font-size: 13px; }
+  .opportunities-submenu a:hover, .opportunities-submenu a:focus-visible { color: var(--color-ink); background: var(--color-bg-tint); outline: none; }
+  .opportunities-menu:hover .opportunities-submenu, .opportunities-menu:focus-within .opportunities-submenu { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+  .opportunities-menu:hover .menu-caret, .opportunities-menu:focus-within .menu-caret { transform: rotate(180deg); }
+  .pieces-submenu { position: absolute; top: calc(100% - 1px); left: 50%; width: 285px; padding: 8px; border: .5px solid var(--color-border-strong); background: var(--color-surface); box-shadow: 0 10px 28px rgb(33 28 22 / 10%); opacity: 0; visibility: hidden; transform: translate(-50%, -4px); transition: opacity 120ms ease, transform 120ms ease, visibility 120ms; }
+  .pieces-submenu > a, .pieces-submenu-item > a { display: block; padding: 10px 12px; color: var(--color-muted); text-decoration: none; font-size: 13px; }
+  .pieces-submenu > a + a, .pieces-submenu > a + .pieces-submenu-item, .pieces-submenu-item + .pieces-submenu-item, .pieces-submenu-item + a { border-top: .5px solid var(--color-border); }
+  .pieces-submenu a:hover, .pieces-submenu a:focus-visible { color: var(--color-ink); background: var(--color-bg-tint); outline: none; }
+  .pieces-submenu-item { position: relative; }
+  .pieces-form-trigger { display: flex!important; align-items: center; justify-content: space-between; }
+  .pieces-form-submenu { position: absolute; top: -9px; left: calc(100% - 2px); width: 225px; max-height: min(72vh, 540px); overflow-y: auto; padding: 8px; border: .5px solid var(--color-border-strong); background: var(--color-surface); box-shadow: 0 10px 28px rgb(33 28 22 / 10%); opacity: 0; visibility: hidden; transform: translateX(-4px); transition: opacity 120ms ease, transform 120ms ease, visibility 120ms; }
+  .pieces-form-submenu a { display: block; padding: 8px 10px; color: var(--color-muted); text-decoration: none; font-size: 12px; }
+  .pieces-form-submenu a + a { border-top: .5px solid var(--color-border); }
+  .pieces-form-submenu .pieces-form-see-all { color: var(--color-accent); background: var(--color-bg-tint); font-weight: 500; }
+  .pieces-submenu-item:hover .pieces-form-submenu, .pieces-submenu-item:focus-within .pieces-form-submenu { opacity: 1; visibility: visible; transform: translateX(0); }
+  .pieces-submenu .living-composers-heading { color: var(--color-muted); font-weight: 400; }
+  .living-career-submenu { max-height: none; overflow: visible; }
+  .pieces-menu:hover .pieces-submenu, .pieces-menu:focus-within .pieces-submenu { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+  .pieces-menu:hover .menu-caret, .pieces-menu:focus-within .menu-caret { transform: rotate(180deg); }
+  .glossary-submenu { position: absolute; top: calc(100% - 1px); right: -8px; width: 330px; max-height: min(70vh, 560px); overflow-y: auto; padding: 8px; border: .5px solid var(--color-border-strong); background: var(--color-surface); box-shadow: 0 10px 28px rgb(33 28 22 / 10%); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 120ms ease, transform 120ms ease, visibility 120ms; }
+  .glossary-submenu a { display: grid; grid-template-columns: 94px 1fr; gap: 10px; padding: 9px 10px; color: var(--color-muted); text-decoration: none; font-size: 12px; }
+  .glossary-submenu a + a { border-top: .5px solid var(--color-border); }
+  .glossary-submenu a span { color: var(--color-tertiary); }
+  .glossary-submenu a strong { color: var(--color-ink); font-weight: 500; }
+  .glossary-submenu .glossary-see-all { grid-template-columns: 94px 1fr; background: var(--color-bg-tint); }
+  .glossary-submenu .glossary-see-all strong { color: var(--color-accent); }
+  .glossary-submenu a:hover, .glossary-submenu a:focus-visible { background: var(--color-bg-tint); outline: none; }
+  .glossary-menu:hover .glossary-submenu, .glossary-menu:focus-within .glossary-submenu { opacity: 1; visibility: visible; transform: translateY(0); }
+  .glossary-menu:hover .menu-caret, .glossary-menu:focus-within .menu-caret { transform: rotate(180deg); }
+</style>

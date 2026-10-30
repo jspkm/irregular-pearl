@@ -12,13 +12,16 @@
 // 0.5px border, 12px radius, shadow-md, 0.5px row dividers, Escape/outside-
 // click dismiss.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { supabase, hasSupabase } from '../lib/supabase';
 import { useRequireAuth } from '../lib/useRequireAuth';
 import SignInPanel from './SignInPanel';
+import { searchSiteContent } from '../lib/siteSearch';
+import { searchLocalPieces, searchComposerPages } from '../lib/localPieceSearch';
 
 interface Result {
-  result_type: 'in_catalog' | 'not_yet_curated';
+  result_type: 'in_catalog' | 'not_yet_curated' | 'composer' | 'resource' | 'glossary';
+  href?: string;
   is_materialized: boolean;
   id: string;
   title: string;
@@ -34,6 +37,9 @@ export function piecePath(slug: string): string {
 }
 
 interface Props {
+  initialQuery?: string;
+  composerName?: string;
+  inputLabel?: string;
   className?: string;
   /** When set, the input autofocuses on mount (used in the mobile overlay). */
   autoFocus?: boolean;
@@ -71,8 +77,9 @@ function rememberLoggedMiss(query: string) {
   }
 }
 
-export default function SearchTypeahead({ className, autoFocus, onDismiss }: Props) {
-  const [q, setQ] = useState('');
+export default function SearchTypeahead({ className, autoFocus, onDismiss, initialQuery = '', composerName, inputLabel = 'Search' }: Props) {
+  const [q, setQ] = useState(initialQuery);
+  const listboxId = useId();
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -115,28 +122,34 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
       setLoading(false);
       return;
     }
+    let cancelled = false;
     setLoading(true);
+    setResults([]);
     const handle = setTimeout(async () => {
-      if (!hasSupabase) {
-        setLoading(false);
-        return;
+      const fallback = searchLocalPieces(trimmed, composerName);
+      let rows: Result[] = fallback;
+      if (hasSupabase) {
+        try {
+          const { data, error } = await supabase.rpc('search_pieces_typeahead', { p_query: composerName ? `${composerName} ${trimmed}` : trimmed });
+          if (!error) {
+            const remote = ((data || []) as Result[]).filter(row => !composerName || row.composer_name.toLocaleLowerCase() === composerName.toLocaleLowerCase());
+            const ids = new Set(remote.map(row => row.id));
+            rows = [...remote, ...fallback.filter(row => !ids.has(row.id))].slice(0, 16);
+          }
+        } catch {
+          // Existing local piece pages remain searchable during service outages.
+        }
       }
-      const { data, error } = await supabase.rpc('search_pieces_typeahead', { p_query: trimmed });
-      if (error) {
-        // Fail soft: just clear results. Log for debugging.
-        console.error('typeahead:', error.message);
-        setResults([]);
-        lastResultCountRef.current = 0;
-      } else {
-        const rows = (data || []) as Result[];
-        setResults(rows);
-        lastResultCountRef.current = rows.length;
-        setActiveIdx(0);
-      }
+      if (cancelled) return;
+      const composerRows = composerName ? [] : searchComposerPages(trimmed, rows.map(row => row.composer_name));
+      const orderedRows = [...composerRows, ...rows.filter(row => row.result_type === 'in_catalog'), ...rows.filter(row => row.result_type === 'not_yet_curated'), ...(composerName ? [] : searchSiteContent(trimmed))];
+      setResults(orderedRows);
+      lastResultCountRef.current = orderedRows.length;
+      setActiveIdx(0);
       setLoading(false);
     }, 120);
-    return () => clearTimeout(handle);
-  }, [q]);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [q, composerName]);
 
   // Outside-click dismiss
   useEffect(() => {
@@ -193,6 +206,11 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
   }
 
   function handleSelect(r: Result) {
+    if (r.href) { window.location.href = r.href; return; }
+    if (r.result_type === 'composer') {
+      window.location.href = `/composer/${encodeURIComponent(r.composer_name)}`;
+      return;
+    }
     if (r.is_materialized) {
       // Pieces row exists (in_catalog or stub): navigate directly.
       window.location.href = piecePath(r.id);
@@ -230,6 +248,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
     }
   }
 
+  const composerResults = results.filter(r => r.result_type === 'composer');
   const inCatalog = results.filter((r) => r.result_type === 'in_catalog');
   const notYetCurated = results.filter((r) => r.result_type === 'not_yet_curated');
   const hasResults = results.length > 0;
@@ -260,20 +279,19 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
         type="button"
         role="option"
         aria-selected={isActive}
-        id={`typeahead-opt-${globalIdx}`}
+        id={`${listboxId}-opt-${globalIdx}`}
         onClick={() => handleSelect(r)}
         onMouseEnter={() => setActiveIdx(globalIdx)}
-        className={`w-full text-left px-4 py-2 flex items-baseline justify-between gap-4 border-0 cursor-pointer font-body text-sm ${
+        className={`w-full text-left px-4 py-2 flex flex-col items-start gap-1 border-0 cursor-pointer font-body text-sm whitespace-normal [overflow-wrap:anywhere] ${
           isActive ? 'bg-accent-light' : 'bg-transparent'
         } hover:bg-accent-light transition-colors`}
       >
-        <span className="min-w-0 truncate">
-          <span className="text-muted">{highlightMatch(r.composer_name)}</span>
-          <span className="text-muted"> · </span>
-          <span className="text-ink">{highlightMatch(r.title)}</span>
+        <span className="min-w-0 w-full whitespace-normal [overflow-wrap:anywhere]">
+          {(r.result_type === 'composer' || r.href) ? <span className="text-ink">{highlightMatch(r.composer_name)}</span> : <><span className="text-muted">{highlightMatch(r.composer_name)}</span><span className="text-muted"> · </span><span className="text-ink">{highlightMatch(r.title)}</span></>}
         </span>
+        {r.href && <span className="text-xs text-muted">{r.composer_name}</span>}
         {r.catalog_number && (
-          <span className="font-mono text-xs text-muted shrink-0 tabular-nums">
+          <span className="font-mono text-xs text-muted whitespace-normal [overflow-wrap:anywhere] tabular-nums">
             {r.catalog_number}
           </span>
         )}
@@ -300,12 +318,12 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKey}
-          aria-label="Search"
+          aria-label={inputLabel}
           aria-haspopup="listbox"
           aria-expanded={showDropdown}
-          aria-controls={showDropdown ? 'typeahead-listbox' : undefined}
+          aria-controls={showDropdown ? listboxId : undefined}
           aria-activedescendant={
-            hasResults && showDropdown ? `typeahead-opt-${activeIdx}` : undefined
+            hasResults && showDropdown ? `${listboxId}-opt-${activeIdx}` : undefined
           }
           role="combobox"
           placeholder=" "
@@ -332,7 +350,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
 
       {showDropdown && (
         <div
-          id="typeahead-listbox"
+          id={listboxId}
           role="listbox"
           className="absolute left-0 right-0 top-full mt-2 bg-surface border border-border rounded-xl shadow-md z-50 max-h-[70vh] overflow-y-auto"
         >
@@ -340,6 +358,10 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
             <div className="px-4 py-3 text-xs text-muted">Searching…</div>
           )}
 
+          {composerResults.length > 0 && <div>
+            <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">Composers</div>
+            <div className="divide-y divide-border">{composerResults.map(r => renderRow(r, results.indexOf(r)))}</div>
+          </div>}
           {inCatalog.length > 0 && (
             <div>
               <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">
@@ -354,7 +376,7 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
           {notYetCurated.length > 0 && (
             <div className={inCatalog.length > 0 ? 'border-t border-border mt-1 pt-1' : ''}>
               <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">
-                Not yet curated
+                Pieces
               </div>
               <div className="divide-y divide-border">
                 {notYetCurated.map((r) => renderRow(r, results.indexOf(r)))}
@@ -362,9 +384,16 @@ export default function SearchTypeahead({ className, autoFocus, onDismiss }: Pro
             </div>
           )}
 
+          {(['resource', 'glossary'] as const).map(type => {
+            const group = results.filter(row => row.result_type === type);
+            return group.length > 0 && <div key={type} className="border-t border-border mt-1 pt-1">
+              <div className="px-4 pt-3 pb-1 text-[11px] tracking-[0.08em] uppercase text-accent font-medium">{type === 'resource' ? 'Opportunities and Resources' : 'Glossary'}</div>
+              <div className="divide-y divide-border">{group.map(row => renderRow(row, results.indexOf(row)))}</div>
+            </div>;
+          })}
           {showNoMatch && (
             <div className="px-4 py-3 text-xs text-muted">
-              No match. Try a different spelling or check the composer.
+              {composerName ? `No matching pieces by ${composerName}. Try another title or catalog number.` : 'No match. Try another title, name, resource, or musical term.'}
             </div>
           )}
         </div>

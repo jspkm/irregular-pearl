@@ -1,0 +1,20 @@
+import { GlobalRegistrator } from '@happy-dom/global-registrator';
+if (!globalThis.document) GlobalRegistrator.register();
+import { afterEach, expect, test } from 'bun:test';
+import { cleanup, fireEvent, render } from '@testing-library/react';
+import ProfileModules from './ProfileModules';
+afterEach(cleanup);
+test('users can choose any subset and hide sections independently', () => {
+ const view=render(<ProfileModules />);
+ expect(view.queryByRole('button',{name:'+ Create list'})).toBeNull();
+ fireEvent.click(view.getByRole('checkbox',{name:/Lists/}));
+ fireEvent.click(view.getByRole('checkbox',{name:/Digital journal/}));
+ expect(view.getByRole('button',{name:'+ Create list'})).toBeTruthy();
+ expect(view.getByRole('button',{name:'+ Write an entry'})).toBeTruthy();
+ expect(view.queryByRole('button',{name:'+ Add event'})).toBeNull();
+ fireEvent.click(view.getByRole('button',{name:'Hide Lists'}));
+ expect(view.queryByRole('button',{name:'+ Create list'})).toBeNull();
+ expect(view.getByRole('button',{name:'+ Write an entry'})).toBeTruthy();
+ fireEvent.click(view.getByRole('button',{name:'+ Write an entry'}));
+ expect(view.getByLabelText('Journal entry')).toBeTruthy();
+});

@@ -27,7 +27,8 @@ export type VoteSubjectTable =
   | 'landmarks'
   | 'pieces_seed_description'
   | 'piece_difficulty_ratings'
-  | 'pieces_seed_difficulty';
+  | 'pieces_seed_difficulty'
+  | 'piece_summary_comments';
 
 interface Props {
   subjectTable: VoteSubjectTable;

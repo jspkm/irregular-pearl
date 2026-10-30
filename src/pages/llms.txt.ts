@@ -29,7 +29,12 @@ Irregular Pearl organizes classical music knowledge around the PIECE as the atom
 ## Navigation
 - Homepage: ${origin}/
 - About: ${origin}/about
-- Search: ${origin}/?q={query} (searches pieces)
+- Classical music pieces: ${origin}/pieces
+- Music glossary: ${origin}/glossary
+- Glossary eras with inline definitions: ${origin}/glossary/era/{era-id}
+- Classical music opportunities: ${origin}/opportunities
+- Opportunity records: ${origin}/opportunities/{opportunity-slug}
+- Search: ${origin}/pieces?q={query} (searches pieces)
 - Piece pages: ${origin}/piece/{piece-id}
 - Composer pages: ${origin}/composer/{Composer Name} (e.g., ${origin}/composer/Johann%20Sebastian%20Bach)
 - Instrument category pages: ${origin}/instrument/{instrument} (e.g., ${origin}/instrument/piano)

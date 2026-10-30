@@ -1,0 +1,7 @@
+---
+export const prerender = false;
+import { musicTerms } from '../../data/musicTerms';
+const entry = musicTerms.find(term => term.id === Astro.params.slug);
+if (!entry) return new Response(null, { status: 404 });
+return Astro.redirect(`/glossary/era/${entry.historicalPeriodId}#term-${entry.id}`, 301);
+---

@@ -16,13 +16,14 @@ import { useRequireAuth } from '../lib/useRequireAuth';
 interface Props {
   pieceId: string;
   initialEditions: Edition[];
+  showAddControl?: boolean;
 }
 
 const TYPE_OPTIONS = ['urtext', 'scholarly', 'performer', 'facsimile', 'critical', 'practical'];
 
 type Busy = { kind: 'idle' } | { kind: 'working'; id?: string } | { kind: 'error'; message: string };
 
-export default function EditionsList({ pieceId, initialEditions }: Props) {
+export default function EditionsList({ pieceId, initialEditions, showAddControl = true }: Props) {
   const {
     signInOpen,
     onClose: signInOnClose,
@@ -192,9 +193,11 @@ export default function EditionsList({ pieceId, initialEditions }: Props) {
         </div>
       )}
 
-      <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
-        + Add edition
-      </button>
+      {showAddControl && (
+        <button type="button" className="mvmt-add" onClick={() => gate(() => setAddOpen(true))}>
+          + Add edition
+        </button>
+      )}
 
       {busy.kind === 'error' && (
         <div className="mvmt-toast" role="alert">

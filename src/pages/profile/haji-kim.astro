@@ -1,0 +1,10 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import ProfileTemplatePreview from '../../components/ProfileTemplatePreview';
+---
+
+<Layout title="Haji Kim — Profile template" description="A preview of the Irregular Pearl member profile template.">
+  <Navbar />
+  <main class="max-w-5xl mx-auto px-4 md:px-8 py-8 min-h-[70vh]"><ProfileTemplatePreview client:load /></main>
+</Layout>

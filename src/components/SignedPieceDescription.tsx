@@ -17,6 +17,8 @@ import PendingDraftCard from './PendingDraftCard';
 import SignInPanel from './SignInPanel';
 import ComposeDraftBlock from './ComposeDraftBlock';
 import { useRequireAuth } from '../lib/useRequireAuth';
+import SummaryComments from './SummaryComments';
+import type { SummaryComment } from '../lib/summaryComments';
 
 interface Props {
   pieceId: string;
@@ -30,6 +32,7 @@ interface Props {
   // though it isn't a row in piece_descriptions. May be null while offline
   // or on a DB that predates migration 20260516.
   seedDescriptionVoteId?: string | null;
+  initialSummaryComments: SummaryComment[];
 }
 
 type StackItem =
@@ -43,7 +46,7 @@ interface ViewerProfile {
 
 type Mode = null | 'write' | { action: 'edit'; descriptionId: string };
 
-export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription, seedDescriptionVoteId }: Props) {
+export default function SignedPieceDescription({ pieceId, initialDescriptions, seedDescription, seedDescriptionVoteId, initialSummaryComments }: Props) {
   const { user } = useAuth();
   const [descriptions, setDescriptions] = useState<PublishedPieceDescription[]>(initialDescriptions);
   const [profile, setProfile] = useState<ViewerProfile>({ displayName: null, bioShort: null });
@@ -238,7 +241,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
                   {!isEditing && (
                     <>
                       <div className="prose">
-                        {d.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
+                        {d.body.split(/\n\s*\n/).map((para, i, paragraphs) => i === paragraphs.length - 1 ? <div key={i}><SummaryComments pieceId={pieceId} initialComments={initialSummaryComments} summaryText={para.trim()} /></div> : <p key={i}>{para}</p>)}
                       </div>
                       <div className="by">
                         <div className="by-left">
@@ -280,7 +283,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
             active && (
               <article className="description-essay desc-stack-top desc-seed">
                 <div className="prose">
-                  {active.body.split(/\n\s*\n/).map((para, i) => <p key={i}>{para}</p>)}
+                  {active.body.split(/\n\s*\n/).map((para, i, paragraphs) => i === paragraphs.length - 1 ? <div key={i}><SummaryComments pieceId={pieceId} initialComments={initialSummaryComments} summaryText={para.trim()} /></div> : <p key={i}>{para}</p>)}
                 </div>
                 {seedDescriptionVoteId && (
                   <div className="desc-seed-vote">
@@ -290,6 +293,7 @@ export default function SignedPieceDescription({ pieceId, initialDescriptions, s
               </article>
             )
           )}
+
 
           {stackItems.length > 1 && (
             <div className="desc-stack-controls">

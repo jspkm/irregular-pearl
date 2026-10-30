@@ -2,6 +2,8 @@
 // Curated catalog aligned with PRD rev 2: narrow scope, deep craft.
 // Cello-forward editorial spine for the first real user's daily-use loop.
 // When adding a piece, it must be editorially intentional — not scraped, not exhaustive.
+import { instrumentationExpansionPieces } from './instrumentationExpansionPieces';
+import { genreExpansionPieces } from './genreExpansionPieces';
 
 export interface SeedPiece {
   id: string;
@@ -535,6 +537,9 @@ export const seedPieces: SeedPiece[] = [
     ],
   },
 ];
+
+seedPieces.push(...instrumentationExpansionPieces);
+seedPieces.push(...genreExpansionPieces);
 
 // Pieces referenced as examples in llms.txt and other outward-facing docs.
 // Kept in one place so the docs and the drift-detection test stay in sync.

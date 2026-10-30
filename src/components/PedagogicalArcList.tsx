@@ -26,6 +26,7 @@ interface Props {
   pieceId: string;
   initialConnections: PedagogicalConnection[];
   pieceOptions: PieceOption[];
+  showAddControl?: boolean;
 }
 
 type Busy = { kind: 'idle' } | { kind: 'working'; id?: string } | { kind: 'error'; message: string };
@@ -35,7 +36,7 @@ const KIND_LABELS: Record<PedagogicalKind, string> = {
   natural_next: 'Natural next',
 };
 
-export default function PedagogicalArcList({ pieceId, initialConnections, pieceOptions }: Props) {
+export default function PedagogicalArcList({ pieceId, initialConnections, pieceOptions, showAddControl = true }: Props) {
   const {
     signInOpen,
     onClose: signInOnClose,
@@ -199,9 +200,11 @@ export default function PedagogicalArcList({ pieceId, initialConnections, pieceO
                 })}
               </ul>
             )}
-            <button type="button" className="mvmt-add ped-add" onClick={() => gate(() => setAddOpenKind(kind))}>
-              + Add {KIND_LABELS[kind].toLowerCase()}
-            </button>
+            {showAddControl && (
+              <button type="button" className="mvmt-add ped-add" onClick={() => gate(() => setAddOpenKind(kind))}>
+                + Add {KIND_LABELS[kind].toLowerCase()}
+              </button>
+            )}
           </div>
         );
       })}

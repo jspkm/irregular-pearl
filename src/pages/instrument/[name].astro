@@ -21,7 +21,12 @@ if (pieces.length === 0) {
 const instrumentName = pieces[0].instruments.find(i => i.toLowerCase() === decodedName.toLowerCase()) || decodedName;
 
 const byComposer = groupBy(pieces, p => p.composer_name);
-const composerGroups = Object.entries(byComposer).sort(([, a], [, b]) => b.length - a.length);
+const composerGroups = Object.entries(byComposer)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([composer, composerPieces]) => [
+    composer,
+    [...composerPieces].sort((a, b) => a.title.localeCompare(b.title)),
+  ] as const);
 
 const eras = [...new Set(pieces.map(p => p.era))];
 
@@ -50,7 +55,8 @@ const breadcrumbLd = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.url.origin },
-    { '@type': 'ListItem', position: 2, name: instrumentName },
+    { '@type': 'ListItem', position: 2, name: 'Pieces', item: `${Astro.url.origin}/pieces` },
+    { '@type': 'ListItem', position: 3, name: instrumentName },
   ],
 };
 ---
@@ -59,6 +65,8 @@ const breadcrumbLd = {
 
   <div class="px-4 md:px-6 py-2 text-xs text-muted border-b border-border/50 bg-surface">
     <a href="/" class="hover:text-ink">Home</a>
+    <span class="mx-1">›</span>
+    <a href="/pieces" class="hover:text-ink">Pieces</a>
     <span class="mx-1">›</span>
     <span class="text-muted">{instrumentName}</span>
   </div>

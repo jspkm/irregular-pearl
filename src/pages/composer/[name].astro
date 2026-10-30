@@ -1,30 +1,52 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import AddPiece from '../../components/AddPiece';
+import { getCommunityComposers } from '../../lib/communityComposers';
+import SectionComments from '../../components/SectionComments';
 import PieceCard from '../../components/PieceCard.astro';
 import { seedPieces } from '../../data/seed';
 import { groupBy } from '../../lib/helpers';
 import { getComposerPieces } from '../../lib/pieces';
+import { musicPeriodProfiles } from '../../data/musicPeriodProfiles';
+import { musicPeriods } from '../../data/musicPeriods';
+import { musicTerms } from '../../data/musicTerms';
+import { livingComposers } from '../../data/livingComposers';
+import { getComposerYears } from '../../data/composerYears';
+import { getComposerSummary } from '../../data/composerSummaries';
 
 const { name } = Astro.params;
 const decodedName = decodeURIComponent(name || '');
+const eraComposerNames = musicPeriodProfiles.flatMap((profile) => profile.composers);
+const canonicalEraName = eraComposerNames.find((composer) => composer.toLowerCase() === decodedName.toLowerCase());
+const canonicalSeedName = seedPieces.find((piece) => piece.composer_name.toLowerCase() === decodedName.toLowerCase())?.composer_name;
+const composerDirectory = [...livingComposers, ...await getCommunityComposers()];
+const livingComposerProfile = composerDirectory.find((composer) => composer.name.toLowerCase() === decodedName.toLowerCase());
+const requestedComposerName = canonicalEraName ?? canonicalSeedName ?? livingComposerProfile?.name ?? decodedName;
 
 // Find pieces by this composer (seed + Supabase merged)
-const allPieces = await getComposerPieces(decodedName);
+const allPieces = await getComposerPieces(requestedComposerName);
 
 // Also check last-name match for seed pieces (existing behavior)
 if (allPieces.length === 0) {
   const lastNamePieces = await getComposerPieces(
-    seedPieces.find(p => p.composer_name.toLowerCase().endsWith(decodedName.toLowerCase()))?.composer_name || decodedName
+    seedPieces.find(p => p.composer_name.toLowerCase().endsWith(decodedName.toLowerCase()))?.composer_name || requestedComposerName
   );
-  if (lastNamePieces.length === 0) {
+  if (lastNamePieces.length === 0 && !canonicalEraName && !livingComposerProfile) {
     return Astro.redirect('/');
   }
   allPieces.push(...lastNamePieces);
 }
 
 const pieces = allPieces;
-const composerName = pieces[0].composer_name;
+const composerName = pieces[0]?.composer_name ?? canonicalEraName ?? requestedComposerName;
+const composerSummary = getComposerSummary(composerName) ?? (livingComposerProfile ? `A living composer${livingComposerProfile.notableWork ? ` whose works include ${livingComposerProfile.notableWork}` : ''}.` : undefined);
+const lifeYears = getComposerYears(composerName);
+const periodProfile = musicPeriodProfiles.find((profile) => profile.composers.includes(composerName));
+const historicalPeriod = musicPeriods.find((period) => period.id === periodProfile?.periodId);
+const associatedTerms = musicTerms
+  .filter((term) => term.examples.some((example) => example.composer === composerName))
+  .sort((a, b) => a.term.localeCompare(b.term));
 
 // Group by form (not instrument) for better browsing with 26K pieces
 const byForm = groupBy(pieces, p => p.form || 'Other');
@@ -34,7 +56,9 @@ const eras = [...new Set(pieces.map(p => p.era))];
 const forms = [...new Set(pieces.map(p => p.form))];
 const instruments = [...new Set(pieces.flatMap(p => p.instruments))];
 
-const seoDescription = `${composerName} on Irregular Pearl — browse ${pieces.length} pieces across ${instruments.join(', ')}. Compare editions and listen to recordings.`;
+const seoDescription = pieces.length > 0
+  ? `${composerName} on Irregular Pearl — browse ${pieces.length} pieces${instruments.length ? ` across ${instruments.join(', ')}` : ''}. Compare editions and listen to recordings.`
+  : `${composerName} on Irregular Pearl — a composer associated with ${historicalPeriod?.title ?? 'classical music history'}.`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -76,8 +100,10 @@ const breadcrumbLd = {
   <main class="max-w-5xl mx-auto px-4 md:px-6 py-8">
     <div class="mb-8">
       <h1 class="font-display text-3xl md:text-4xl italic mb-2">{composerName}</h1>
+      <p class="text-muted text-[14px] mb-2" aria-label="Biographical dates">{lifeYears?.label ?? (livingComposerProfile ? 'Birth year not yet documented.' : 'Birth and death years not yet documented.')}</p>
+      <div class="max-w-2xl text-ink text-[16px] leading-relaxed my-4"><SectionComments client:load subjectType="composer_summary" subjectKey={composerName} summaryText={composerSummary ?? `An individual introduction to ${composerName} has not yet been added.`} /></div>
       <p class="text-muted text-sm md:text-base">
-        {pieces.length} piece{pieces.length !== 1 ? 's' : ''} · {eras.join(', ')}
+        {pieces.length > 0 ? `${pieces.length} piece${pieces.length !== 1 ? 's' : ''}${eras.length ? ` · ${eras.join(', ')}` : ''}` : historicalPeriod ? `${historicalPeriod.span} · ${historicalPeriod.title}` : 'Composer profile'}
       </p>
       <div class="flex flex-wrap gap-1.5 mt-3">
         {instruments.map(i => (
@@ -88,6 +114,32 @@ const breadcrumbLd = {
         ))}
       </div>
     </div>
+
+    {historicalPeriod && (
+      <section class="mb-8 border-t border-border pt-5" aria-labelledby="composer-context-title">
+        <h2 id="composer-context-title" class="font-display text-[22px] mb-3">Musical context</h2>
+        <p class="text-muted text-[14px] mb-2">{historicalPeriod.title} · {historicalPeriod.span}</p>
+        <p class="max-w-2xl text-muted text-[16px] leading-relaxed">{historicalPeriod.description} <a class="text-accent no-underline" href={`/glossary/era/${historicalPeriod.id}`}>Explore the era →</a></p>
+      </section>
+    )}
+
+    {associatedTerms.length > 0 && (
+      <section class="mb-10 border-t border-border pt-5">
+        <h2 class="font-display text-xl mb-3">Related glossary terms</h2>
+        <div class="flex flex-wrap gap-2">
+          {associatedTerms.map((term) => <a class="text-xs px-3 py-1.5 border border-border rounded-full text-muted no-underline hover:text-accent hover:border-accent" href={`/glossary/era/${term.historicalPeriodId}#term-${term.id}`}>{term.term}</a>)}
+        </div>
+      </section>
+    )}
+
+    {pieces.length === 0 && (
+      <section class="border-t border-border py-8">
+        <h2 class="font-display text-xl mb-2">Pieces</h2>
+        <p class="text-muted text-sm">No pieces by {composerName} have been added to the catalog yet.</p>
+      </section>
+    )}
+
+    <div class="mb-6"><AddPiece client:load composerName={composerName} /></div>
 
     {Object.entries(byForm).map(([form, formPieces]) => (
       <details class="mb-8" open={formPieces.length <= 10}>

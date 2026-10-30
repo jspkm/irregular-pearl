@@ -18,6 +18,8 @@ A non-profit, cellist-forward classical music knowledge hub. Every piece gets a 
 - **Search** across pieces via Supabase full-text search, with grouped typeahead showing IN THE CATALOG (pieces with at least one signed contribution) and NOT YET CURATED (stubs and canonical index entries not yet contributed to)
 - **Request a contribution** — any musician with >= 1 published signed contribution can ask a specific user (by username) to curate a piece; recipients see a contextual "asked you to contribute here" ribbon on the piece page and an entry in their unified Messages feed. Staff can draft the personal note with an LLM assist (Claude Haiku 4.5, 20 drafts/staff/24h).
 - **Browse by** composer, instrument, or era — each with a dedicated, crawlable page
+- **Music glossary** — historical styles, forms, techniques, and performance-practice terms with repertoire examples
+- **Opportunities catalog** — sourced records for competitions, grants and awards, and selective summer festivals
 
 ## Stack
 
@@ -168,3 +170,9 @@ From the Portuguese *barroco* — an irregularly shaped pearl — the word that 
 ## License
 
 AGPL-3.0
+
+### Upkeep resource contributions
+
+Instrumental upkeep pages combine curated references with member-submitted links. Signed-in users can add, edit, or remove their own resources and mark other resources Helpful or Less helpful. Votes remain private and rank the combined list.
+
+Apply `supabase/migrations/20261021000000_upkeep_resources.sql` with the normal Supabase migration workflow before enabling this feature. It creates resources, owner-only mutation policies, private votes, the ranked public read RPC, and the initial curated rows. Configure the existing Supabase environment variables to enable persistence. An unconfigured preview displays curated references and the form, with submission and voting disabled. No browser-only submissions are represented as shared data.

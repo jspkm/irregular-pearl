@@ -8,11 +8,7 @@
 //   - Signed piece descriptions (stack: user-authored + unsigned seed)
 //   - Signed four-axis difficulty (stack: user ratings + seed from difficulty-axes.ts)
 //   - Performer's notes (plural signed, ordered by net_score)
-//   - Structural landmarks + flags + practice notes (grouped by movement)
 //   - Interpretive schools (plural signed)
-//   - Editions (wiki-edit)
-//   - Recordings (wiki-edit, per-row iframe disclosure)
-//   - Pedagogical arc (prepare-with / natural-next, wiki-edit)
 //   - External references (IMSLP / Wikipedia, wiki-edit)
 //   - Change log link (per-piece chronological feed)
 
@@ -23,31 +19,28 @@ import { getPublishedPerformersNotes } from '../lib/performersNotes';
 import { getPublishedInterpretiveSchools } from '../lib/interpretiveSchools';
 import { getPublishedPieceDescriptions } from '../lib/pieceDescriptions';
 import { fetchMovementsForPiece } from '../lib/movements';
-import { getPublishedLandmarksForPiece, groupLandmarksByMovement } from '../lib/landmarks';
 import { fetchOrderedSubjects, fetchSeedDescriptionVoteId } from '../lib/votes';
-import { fetchEditionsForPiece } from '../lib/editions';
 import { getPublishedPieceDifficultyRatings, fetchSeedDifficultyVoteId } from '../lib/pieceDifficulty';
 import PerformersNotes from './PerformersNotes';
 import InterpretiveSchools from './InterpretiveSchools';
 import SignedPieceDescription from './SignedPieceDescription';
 import SignedPieceDifficulty from './SignedPieceDifficulty';
 import MovementsList from './MovementsList';
-import RecordingsList from './RecordingsList';
-import EditionsList from './EditionsList';
 import ExternalRefsList from './ExternalRefsList';
-import { fetchExternalLinksForPiece, REFERENCE_TYPES, RECORDING_TYPES } from '../lib/externalLinks';
-import { fetchPedagogicalConnections, fetchAllPiecesForPicker } from '../lib/pedagogical';
-import PedagogicalArcList from './PedagogicalArcList';
+import { fetchExternalLinksForPiece, REFERENCE_TYPES } from '../lib/externalLinks';
 import { getPiecePills, pillsFromPieceFields } from '../lib/piecePills';
 import RecipientRibbon from './RecipientRibbon';
 import PiecePills from './PiecePills';
-import StartContributionButton from './StartContributionButton';
-import RequestContributionDialog from './RequestContributionDialog';
 import PieceViewLogger from './PieceViewLogger';
 import DraftingModeBanner from './DraftingModeBanner';
+import PerformanceCalendar from './PerformanceCalendar';
+import { getPieceCompletionYear } from '../data/pieceCompletionYears';
+import { getSummaryComments } from '../lib/summaryComments';
+import SummaryComments from './SummaryComments';
 
 interface Props {
   piece: PieceFull;
+  embedded?: boolean;
   /**
    * 'awaiting-first-contribution' renders identity (title, catalog,
    * byline, pills, description paragraph) + reference layer (editions,
@@ -62,7 +55,9 @@ interface Props {
   mode?: 'awaiting-first-contribution' | 'full';
 }
 
-const { piece, mode = 'full' } = Astro.props;
+const { piece, mode = 'full', embedded = false } = Astro.props;
+const PageContainer = embedded ? 'section' : 'main';
+const Title = embedded ? 'h2' : 'h1';
 const isAwaiting = mode === 'awaiting-first-contribution';
 // Drafting mode: a staff member opens a piece with ?compose=<request_id> to
 // compose drafts on an outbox request before sending. The banner + composer
@@ -70,26 +65,23 @@ const isAwaiting = mode === 'awaiting-first-contribution';
 // use Astro.url here to know whether to reserve space on the page.
 const composeRequestId = Astro.url.searchParams.get('compose') ?? null;
 const composing = composeRequestId !== null;
-const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbEditions, dbLinks, dbLandmarks, dbPedagogical, pedagogicalPickerOptions, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId, dbPills] = await Promise.all([
+const [performersNotesRaw, interpretiveSchoolsRaw, signedDescriptionsRaw, dbMovements, dbLinks, seedDescriptionVoteId, difficultyRatingsRaw, seedDifficultyVoteId, dbPills, summaryComments] = await Promise.all([
   getPublishedPerformersNotes(piece.id),
   getPublishedInterpretiveSchools(piece.id),
   getPublishedPieceDescriptions(piece.id),
   fetchMovementsForPiece(piece.id),
-  fetchEditionsForPiece(piece.id),
   fetchExternalLinksForPiece(piece.id),
-  getPublishedLandmarksForPiece(piece.id),
-  fetchPedagogicalConnections(piece.id),
-  fetchAllPiecesForPicker(),
   fetchSeedDescriptionVoteId(piece.id),
   getPublishedPieceDifficultyRatings(piece.id),
   fetchSeedDifficultyVoteId(piece.id),
   getPiecePills(piece.id),
+  getSummaryComments(piece.id),
 ]);
 // If the DB has no pills (e.g. preview build with no Supabase, or a piece
 // the seed pipeline missed), fall back to constructing read-only pills
 // from the piece's scalar fields.
-const initialPills = dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece);
-const landmarksByMovement = Object.fromEntries(groupLandmarksByMovement(dbLandmarks));
+const initialPills = (dbPills.length > 0 ? dbPills : pillsFromPieceFields(piece))
+  .filter((pill) => pill.category !== 'difficulty');
 const dbReferenceLinks = dbLinks.filter((l) => (REFERENCE_TYPES as readonly string[]).includes(l.type));
 
 // Reorder signed content by vote_tallies.net_score DESC (tie-break by id)
@@ -121,30 +113,28 @@ const hasSignedDescription = signedDescriptions.length > 0;
 const axes = difficultyAxes[piece.id];
 
 const composedHint = piece.era && piece.form ? `${piece.era} · ${piece.form}` : (piece.era || piece.form || '');
+const completionYear = getPieceCompletionYear(piece.id);
 
-// Recordings + references both come from the live external_links DB rows
-// (RecordingsList + ExternalRefsList own their own filtering). The recording
-// surface owns the audio/video subset; references owns IMSLP / Wikipedia.
-const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly string[]).includes(l.type));
 ---
 
 {composing && <DraftingModeBanner client:load pieceId={piece.id} />}
 
-<main class="page" data-compose-mode={composing ? '1' : undefined}>
-  <PieceViewLogger client:load pieceId={piece.id} />
+<PageContainer class:list={["page", { "embedded-piece": embedded }]} data-compose-mode={composing ? '1' : undefined}>
+  {!embedded && <PieceViewLogger client:load pieceId={piece.id} />}
 
-  <div class="crumbs">
-    <a href="/">Pieces</a><span class="sep">/</span>
+  <div class="crumbs" hidden={embedded}>
+    <a href="/pieces">Pieces</a><span class="sep">/</span>
     <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a><span class="sep">/</span>
     <span>{piece.title}</span>
   </div>
 
   <div class="piece-header-row">
     <div class="piece-header-main">
-      <h1 class="piece">
+      <Title class="piece">
         {piece.title}
+        {completionYear && <span class="completion-year">{completionYear}</span>}
         {piece.catalog_number && <span class="cat">{piece.catalog_number}</span>}
-      </h1>
+      </Title>
       <p class="byline">
         by <a href={`/composer/${encodeURIComponent(piece.composer_name)}`}>{piece.composer_name}</a>
       </p>
@@ -164,32 +154,8 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
       the bottom-of-stack "Seed data" card inside SignedPieceDescription
       with vote thumbs (a different role). */}
   {isAwaiting && piece.description && piece.description.trim().length > 0 && (
-    <section class="block" id="identity-description">
-      <p class="piece-intro">{piece.description}</p>
-    </section>
-  )}
-
-  {/* ===== Status: awaiting first contribution ===== */}
-  {isAwaiting && (
-    <section class="block pp-invite" id="invitation">
-      <p class="pp-invite-lede">
-        This piece has no signed contributions yet.
-      </p>
-      <p class="pp-invite-prose">
-        Write the first performer's note, a practice note on a specific passage,
-        or an interpretive school you'd defend in front of colleagues.
-      </p>
-      <div class="pp-cta-row">
-        <StartContributionButton client:load pieceId={piece.id} />
-        <RequestContributionDialog
-          client:load
-          pieceId={piece.id}
-          pieceTitle={piece.title}
-          composerName={piece.composer_name}
-          triggerLabel="Know someone who should? Request a contribution."
-          triggerClassName="pp-cta-ghost"
-        />
-      </div>
+    <section class="block identity-description-with-comments" id="identity-description">
+      <div class="piece-intro"><SummaryComments client:load pieceId={piece.id} initialComments={summaryComments} summaryText={piece.description.trim()} /></div>
     </section>
   )}
 
@@ -200,7 +166,7 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
           a synthetic "Seed data" card at the bottom of the stack; user-authored
           entries sort above by vote score). */}
       <section class="block" id="signed-description">
-        <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} seedDescriptionVoteId={seedDescriptionVoteId} />
+        <SignedPieceDescription client:load pieceId={piece.id} initialDescriptions={signedDescriptions} seedDescription={piece.description} seedDescriptionVoteId={seedDescriptionVoteId} initialSummaryComments={summaryComments} />
       </section>
 
       <section class="block" id="difficulty">
@@ -226,43 +192,24 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     </>
   )}
 
-  {/* ===== Reference layer (renders in both modes) =====
-      Movements, editions, recordings, pedagogical arc, external references
-      are unsigned reference data per PRD §54 ("structured fields can be
-      unsigned"). They render regardless of whether signed content exists.
-      Landmarks ride inside MovementsList; in awaiting mode we pass an
-      empty landmarksByMovement so the signed landmarks stay gated. */}
+  {/* ===== Reference layer (renders in both modes) ===== */}
   <section class="block">
-    <div class="kicker">{isAwaiting ? 'Movements' : 'Structural landmarks'}</div>
+    <div class="kicker">Movements</div>
     <MovementsList
       client:load
       pieceId={piece.id}
       initialMovements={dbMovements}
       seedMovements={seedMovements}
-      landmarksByMovement={isAwaiting ? {} : landmarksByMovement}
       awaitingMode={isAwaiting}
+      showAddControl={true}
+      showLandmarks={false}
     />
   </section>
 
-  <section class="block">
-    <div class="kicker">Editions</div>
-    <EditionsList client:load pieceId={piece.id} initialEditions={dbEditions} />
+  <section class="block" id="performance-calendar">
+    <PerformanceCalendar client:load pieceId={piece.id} pieceTitle={piece.title} />
   </section>
 
-  <section class="block">
-    <div class="kicker">Recordings</div>
-    <RecordingsList client:load pieceId={piece.id} initialLinks={dbRecordingLinks} />
-  </section>
-
-  <section class="block">
-    <div class="kicker">Pedagogical arc</div>
-    <PedagogicalArcList
-      client:load
-      pieceId={piece.id}
-      initialConnections={dbPedagogical}
-      pieceOptions={pedagogicalPickerOptions}
-    />
-  </section>
 
   <section class="block">
     <div class="kicker">External references</div>
@@ -273,9 +220,19 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     <a href={`/piece/${piece.id}/change-log`}>Change log</a>
   </p>
 
-</main>
+</PageContainer>
 
 <style>
+  .completion-year {
+    margin-left: 12px;
+    color: var(--muted);
+    font-family: var(--font-sans);
+    font-size: .42em;
+    font-style: normal;
+    font-weight: 400;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
   /* Empty state copy — state, not philosophy */
   .empty-state {
     font-size: 14px;
@@ -293,6 +250,12 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
     color: var(--ink);
     max-width: 640px;
     margin: 0 0 48px;
+  }
+
+  .identity-description-with-comments {
+    position: relative;
+    max-width: 690px;
+    padding: 20px 0;
   }
 
   /* 7A: metadata-strip treatment. When a signed piece description exists,
@@ -363,4 +326,9 @@ const dbRecordingLinks = dbLinks.filter((l) => (RECORDING_TYPES as readonly stri
       padding: 32px 20px 64px;
     }
   }
+</style>
+
+<style>
+  .embedded-piece { padding: 0 0 48px; }
+  .crumbs[hidden] { display: none; }
 </style>

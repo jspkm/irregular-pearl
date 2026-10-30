@@ -1,0 +1,7 @@
+---
+export const prerender = false;
+import { musicPeriods } from '../../../../data/musicPeriods';
+const period = musicPeriods.find(period => period.id === Astro.params.id);
+if (!period) return new Response(null, { status: 404 });
+return Astro.redirect(`/glossary/era/${period.id}#terms-title`, 301);
+---
