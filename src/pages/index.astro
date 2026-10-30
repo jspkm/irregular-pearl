@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
 import { seedPieces } from '../data/seed';
 import { musicTerms } from '../data/musicTerms';
 import { opportunities } from '../data/opportunities';
@@ -23,61 +22,106 @@ const homeLd = {
 };
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Irregular Pearl', url: Astro.url.origin, description: 'A non-profit reference for working classical musicians.', nonprofitStatus: 'NonprofitType' };
 ---
-<Layout title="Home" description="A classical music knowledge platform for repertoire, career opportunities, music history terms, and instrumental upkeep." jsonLd={[homeLd, orgLd]}>
-  <Navbar />
-  <main class="home-shell">
-    <header class="home-header">
-      <h1>A place to learn about classical music, share what you know, and discover what it means to others.</h1>
-      <p class="lede">Explore our program and reference collections.</p>
+<Layout title="Home" description="A place for classical music, shared knowledge, and the people who bring it to life." jsonLd={[homeLd, orgLd]} hideFooter>
+  <div class="landing">
+    <header class="masthead">
+      <a class="wordmark" href="/" aria-label="Irregular Pearl home">IrregularPearl</a>
+      <a class="about-link" href="/who-we-are">Who we are <span aria-hidden="true">↗</span></a>
     </header>
-    <section class="section-grid" aria-label="Explore Irregular Pearl">
-      {sections.map((section, index) => (
-        <a class="section-card" href={section.href}>
-          <span class="section-number" aria-hidden="true">0{index + 1}</span>
-          <span class="section-kicker">{section.kicker}</span>
-          <h2>{section.title}</h2>
-          <p>{section.description}</p>
-          <span class="section-footer"><span class="section-count">{section.count}</span><span class="section-link">{section.link} <span aria-hidden="true">→</span></span></span>
-        </a>
-      ))}
-    </section>
-    <aside class="mission-note">
-      <p>Irregular Pearl is a 501(c)(3) Charitable Organization headquartered California. EIN: 39-2985134</p>
-      <a href="/who-we-are">Who we are →</a>
-    </aside>
-  </main>
+    <main>
+      <div class="introduction">
+        <p class="eyebrow">A shared reference for classical music</p>
+        <h1>Music lives in<br />what we share.</h1>
+        <p class="lede">A place to learn, share what you know, and discover<br class="desktop-break" /> what classical music means to others.</p>
+        <a class="primary-link" href="/pieces">Explore the repertoire <span aria-hidden="true">→</span></a>
+      </div>
+      <nav class="collections" aria-label="Explore Irregular Pearl">
+        {sections.map((section, index) => (
+          <a class="collection" href={section.href}>
+            <span class="collection-top"><span>{section.kicker}</span><span class="number" aria-hidden="true">0{index + 1}</span></span>
+            <h2>{section.title}</h2>
+            <p>{section.description}</p>
+            <span class="collection-bottom"><span>{section.count}</span><span aria-hidden="true">↗</span></span>
+          </a>
+        ))}
+      </nav>
+    </main>
+    <footer class="landing-footer">
+      <span>© {new Date().getFullYear()} Irregular Pearl <span class="footer-mission">· A non-profit for classical music knowledge</span></span>
+      <div><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+    </footer>
+  </div>
 </Layout>
 
 <style>
-  .home-shell { max-width: 1100px; margin: 0 auto; padding: 24px 16px 32px; }
-  .home-header { max-width: 780px; margin-bottom: 24px; }
-  .kicker, .section-kicker { color: var(--accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
-  .kicker { margin: 0 0 8px; }
-  h1 { font-family: var(--font-serif); font-size: 26px; font-weight: 500; line-height: 1.25; margin: 0; }
-  .lede { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 12px 0 0; }
-  .section-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: .5px solid var(--border-strong); border-left: .5px solid var(--border); }
-  .section-card { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 16px; border-right: .5px solid var(--border); border-bottom: .5px solid var(--border); color: var(--ink); text-decoration: none; }
-  .section-card:hover { background: var(--bg-tint); }
-  .section-card:focus-visible { outline: 1px solid var(--accent); outline-offset: -3px; }
-  .section-card:first-child { grid-column: auto; }
-  .section-number { position: absolute; top: 16px; right: 16px; color: var(--tertiary); font: 11px var(--font-mono); }
-  .section-kicker { padding-right: 24px; }
-  h2 { font-family: var(--font-serif); font-size: 22px; font-weight: 500; line-height: 1.25; margin: 0; }
-  .section-card > p { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0; }
-  .section-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; margin-top: auto; padding-top: 8px; }
-  .section-count { color: var(--tertiary); font-size: 12px; }
-  .section-link { color: var(--accent); font-size: 12px; font-weight: 500; }
-  .mission-note { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding-top: 16px; }
-  .mission-note p { max-width: 680px; color: var(--muted); font-family: var(--font-serif); font-size: 13px; line-height: 1.55; margin: 0; }
-  .mission-note a { flex: none; color: var(--ink); font-size: 13px; text-decoration: none; }
-  .mission-note a:hover { color: var(--accent); }
-  @media (min-width: 768px) { .home-shell { padding-inline: 32px; } }
+  .landing { min-height: 100svh; padding: 0 clamp(20px, 5vw, 72px); display: grid; grid-template-rows: auto 1fr auto; max-width: 1440px; margin: auto; }
+  .masthead { display: flex; justify-content: space-between; align-items: center; min-height: 80px; border-bottom: .5px solid var(--border); }
+  a { color: var(--ink); text-decoration: none; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .wordmark { font-size: 18px; font-weight: 500; letter-spacing: -.5px; display: inline-flex; align-items: center; }
+  .about-link { font-size: 13px; display: inline-flex; align-items: center; gap: 20px; }
+  main { display: flex; flex-direction: column; justify-content: center; gap: clamp(24px, 5vh, 64px); padding-block: 24px; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin: 0 0 16px; }
+  h1 { font-family: var(--font-serif); font-size: 34px; line-height: 1.15; font-weight: 400; letter-spacing: -.7px; margin: 0; }
+  .lede { font-size: 15px; color: var(--muted); line-height: 1.55; margin: 16px 0 20px; }
+  .primary-link { display: inline-flex; align-items: center; justify-content: space-between; gap: 32px; padding: 10px 16px; background: var(--accent); color: var(--bg); font-size: 14px; font-weight: 500; }
+  .primary-link:hover { background: var(--accent-hover); }
+  .collections { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border-top: .5px solid var(--border-strong); }
+  .collection { display: flex; flex-direction: column; padding: 20px; border-right: .5px solid var(--border); }
+  .collection:first-child { padding-left: 0; }
+  .collection:last-child { border-right: 0; padding-right: 0; }
+  .collection:hover h2, .about-link:hover { color: var(--accent); }
+  .collection-top, .collection-bottom { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--muted); }
+  .collection-top { text-transform: uppercase; letter-spacing: .06em; }
+  .number { font-family: var(--font-mono); color: var(--tertiary); }
+  h2 { font: 500 22px/1.25 var(--font-serif); margin: 12px 0 8px; }
+  .collection p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
+  .collection-bottom { margin-top: auto; }
+  .collection-bottom > :last-child { color: var(--accent); font-size: 16px; }
+  .landing-footer { display: flex; justify-content: space-between; gap: 16px; align-items: center; min-height: 60px; border-top: .5px solid var(--border); color: var(--muted); font-size: 11px; }
+  .landing-footer div { display: flex; gap: 20px; }
+  .landing-footer a { color: var(--muted); display: inline-flex; align-items: center; }
   @media (max-width: 767px) {
-    .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .section-card:first-child { grid-column: auto; }
-    .section-card { padding: 12px; }
+    .masthead { min-height: 64px; }
+    main { gap: 24px; padding-block: 20px; }
+    .collections { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .collection, .collection:first-child, .collection:last-child { padding: 12px; }
+    .collection:nth-child(odd) { padding-left: 0; }
+    .collection:nth-child(even) { border-right: 0; padding-right: 0; }
+    .collection:nth-child(-n+2) { border-bottom: .5px solid var(--border); }
+    h2 { font-size: 18px; margin: 8px 0; }
+    .collection p { display: none; }
+    .collection-bottom { font-size: 11px; }
+    .footer-mission { display: none; }
+    .landing-footer { min-height: 52px; }
+    .lede { font-size: 14px; }
+    .desktop-break { display: none; }
+  }
+  @media (max-height: 700px) {
+    main { gap: 16px; padding-block: 16px; }
+    .masthead { min-height: 56px; }
+    .eyebrow { margin-bottom: 8px; }
+    .lede { margin: 10px 0 12px; }
+    .collection { padding-top: 12px; padding-bottom: 12px; }
+    .collection p { margin-bottom: 12px; }
+  }
+  @media (max-height: 600px) and (max-width: 599px) {
+    h1 { font-size: 26px; }
+    .collection-top, .collection-bottom { display: none; }
+    .collection { justify-content: center; min-height: 64px; }
+    h2 { font-size: 18px; margin: 0; }
+    .eyebrow { font-size: 11px; letter-spacing: .03em; }
+  }
+  @media (max-height: 500px) and (min-width: 600px) {
+    main { flex-direction: row; align-items: center; gap: 32px; }
+    .introduction { flex: 1; }
+    .collections { flex: 1; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .collection p, .number, .collection-bottom { display: none; }
+    .collection { padding: 10px; border: 0; }
     h2 { font-size: 18px; }
-    .section-number { top: 12px; right: 12px; }
-    .mission-note { flex-direction: column; gap: 12px; }
+    h1 { font-size: 26px; }
+    .lede { font-size: 13px; }
+    .desktop-break { display: none; }
+    .landing-footer { min-height: 44px; }
   }
 </style>
