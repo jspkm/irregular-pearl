@@ -8,6 +8,10 @@ import { mapFuzzyResults } from '../lib/helpers';
 
 const query = Astro.url.searchParams.get('q')?.trim() || '';
 
+// Temporary: the landing page shows the About copy in place of the piece list.
+// Flip to false to restore the browse list; search results (?q=) are unaffected.
+const ABOUT_ON_LANDING = true;
+
 interface ListPiece {
   id: string;
   title: string;
@@ -58,7 +62,7 @@ if (query) {
       )
       .map(toListPiece);
   }
-} else {
+} else if (!ABOUT_ON_LANDING) {
   if (hasSupabase) {
     const { data } = await supabase
       .from('pieces')
@@ -187,6 +191,11 @@ const orgLd = {
           </section>
         )}
 
+        {ABOUT_ON_LANDING ? (
+          <section class="max-w-2xl mx-auto pt-8 md:pt-10 pb-16 md:pb-20">
+            <AboutContent />
+          </section>
+        ) : (
         <section class={`pb-16 ${inFocus ? 'pt-2' : 'pt-8 md:pt-10'}`}>
           <ul class="ip-list">
             {pieces.map((p) => (
@@ -200,11 +209,7 @@ const orgLd = {
             ))}
           </ul>
         </section>
-
-        <section class="max-w-2xl mx-auto pb-16 md:pb-20">
-          <h2 class="text-3xl md:text-4xl font-medium tracking-tight mb-6">About Irregular Pearl</h2>
-          <AboutContent />
-        </section>
+        )}
       </>
     )}
   </main>
