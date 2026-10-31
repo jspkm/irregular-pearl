@@ -29,6 +29,13 @@ describe('E2E: static pages', () => {
   test('terms page returns 200', async () => {
     const res = await fetchOk('/terms');
     expect(res.status).toBe(200);
+    expect(await res.text()).toContain('href="/credits"');
+  });
+
+  test('credits page returns 200', async () => {
+    const res = await fetchOk('/credits');
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain('Bacchanale Revel, Pan and Procession');
   });
 });
 
