@@ -25,7 +25,7 @@ const homeLd = {
 };
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Irregular Pearl', url: Astro.url.origin, description: 'A non-profit reference for working classical musicians.', nonprofitStatus: 'NonprofitType' };
 ---
-<Layout title="Home" description="A place for classical music, shared knowledge, and the people who bring it to life." jsonLd={[homeLd, orgLd]} hideFooter>
+<Layout title="Home" description="A place for classical music, shared knowledge, and the people who bring it to life." jsonLd={[homeLd, orgLd]}>
   <div class:list={['landing', { 'mission-only': !showHomepageFeatures }]}>
     <header class="masthead">
       <div class="home-brand-program"><a class="wordmark" href="/" aria-label="Irregular Pearl home">IrregularPearl</a></div>
@@ -50,10 +50,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
       </div>
 
     </main>
-    <footer class="landing-footer">
-      <span>© {new Date().getFullYear()} Irregular Pearl <span class="footer-mission">· A non-profit for classical music knowledge</span></span>
-      <div><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
-    </footer>
   </div>
 </Layout>
 
@@ -68,7 +64,12 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     pointer-events: none;
   }
   .landing { isolation: isolate; color: #1A1A1A; --ink: #1A1A1A; --color-ink: #1A1A1A; --muted: #4A4A4A; --accent: #6B4E7C; --accent-hover: #4C385C; --border: #CCC9C2; --border-strong: #1A1A1A; }
-  .landing { min-height: 100svh; padding: 0 clamp(20px, 5vw, 72px); display: grid; grid-template-rows: auto 1fr auto; max-width: 1440px; margin: auto; }
+  .landing { padding: 0 clamp(20px, 5vw, 72px); display: grid; grid-template-rows: auto 1fr; max-width: 1440px; margin: auto; }
+  /* The shared site footer sits outside .landing: fill the space above it, keep it light-themed over the image and paint it above the image layer. */
+  :global(body:has(.landing)) { min-height: 100svh; --color-ink: #1A1A1A; --color-muted: #6F6F6F; --color-border: #E5E3DE; }
+  :global(body:has(.landing) > .flex-1) { display: flex; flex-direction: column; }
+  :global(body:has(.landing) > footer) { position: relative; z-index: 1; }
+  .landing { flex: 1; width: 100%; box-sizing: border-box; }
   .masthead { display: flex; justify-content: space-between; align-items: center; min-height: 80px; border-bottom: .5px solid var(--border); }
   a { color: var(--ink); text-decoration: none; }
   a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
@@ -99,25 +100,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   .collection p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
   .collection-bottom { margin-top: auto; }
   .collection-bottom > :last-child { color: var(--accent); font-size: 16px; }
-  .landing-footer { display: flex; justify-content: space-between; gap: 16px; align-items: center; min-height: 60px; border-top: .5px solid var(--border-strong); color: var(--ink); font-size: 11px; }
-  .landing-footer > span, .landing-footer a {
-    position: relative;
-    isolation: isolate;
-    text-shadow: 0 0 5px rgb(218 202 153 / .35);
-  }
-  .landing-footer > span::before, .landing-footer a::before {
-    content: '';
-    position: absolute;
-    inset: 0 -6px;
-    background: rgb(218 202 153 / .4);
-    filter: blur(10px);
-    border-radius: 12px;
-    z-index: -1;
-    pointer-events: none;
-  }
-  .landing-footer { flex-wrap: wrap; column-gap: 16px; row-gap: 4px; padding-block: 8px; }
-  .landing-footer div { display: flex; gap: 20px; }
-  .landing-footer a { color: var(--ink); display: inline-flex; align-items: center; }
   @media (max-width: 767px) {
     .masthead { min-height: 64px; }
     main { gap: 24px; padding-block: 20px; }
@@ -129,8 +111,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     h2 { font-size: 18px; margin: 8px 0; }
     .collection p { display: none; }
     .collection-bottom { font-size: 11px; }
-    .footer-mission { display: none; }
-    .landing-footer { min-height: 52px; }
     .lede { font-size: 14px; }
     .desktop-break { display: none; }
   }
@@ -158,14 +138,11 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     .collection h2 { font-size: 14px; }
     .landing { padding-inline: 16px; }
     .masthead { min-height: 48px; }
-    .landing-footer { min-height: 44px; }
   }
   @media (max-width: 767px) {
     .collection-top, .collection-bottom { display: none; }
     .collection { justify-content: center; min-height: 44px; padding-block: 8px; }
     .collection h2 { font-size: 14px; margin: 0; }
-    .landing-footer > span, .landing-footer a { min-height: 24px; }
-    .landing-footer { padding-block: 6px; }
   }
   @media (max-height: 600px) and (max-width: 599px) {
     .mission-copy { font-size: 12px; line-height: 1.3; }
@@ -184,7 +161,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     h1 { font-size: 26px; }
     .lede { font-size: 13px; }
     .desktop-break { display: none; }
-    .landing-footer { min-height: 44px; }
   }
   .introduction { display: flex; flex-direction: column; gap: 24px; align-items: center; justify-content: center; text-align: center; padding-block: clamp(24px, 6vh, 80px); }
   h1.home-mission { max-width: 1000px; margin: 0 auto; font-family: var(--font-serif); font-size: clamp(37.95px, 5.6925vw, 55px); font-weight: 400; line-height: 1.16; letter-spacing: -.025em; text-wrap: balance; }
@@ -250,7 +226,7 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   .home-mission-group { grid-column: 1; grid-row: 2; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; padding: 32px 0; }
   .home-residency-summary { grid-column: 1; grid-row: 3; justify-self: center; margin: 24px 0 0; }
   @media(max-width:640px) { main { grid-template-rows: auto minmax(300px, 1fr) auto; } .home-residency-summary { margin: 24px 0 0; } }
-  .landing.mission-only { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .landing.mission-only { grid-template-rows: auto minmax(0, 1fr); }
   .mission-only main { display: flex; justify-content: center; align-items: center; padding-block: 0; }
   /* Spacers 1:4 sit the headline and description as one block in the upper part of the screen. */
   .mission-only .home-mission-group { display: grid; grid-template-rows: minmax(24px, 1fr) auto auto minmax(24px, 4fr); justify-items: center; flex: 1; align-self: stretch; gap: 0; padding: 0; }
