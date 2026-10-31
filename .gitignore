@@ -18,6 +18,7 @@ dist-preview/
 .claude/
 .worktrees/
 outreach-emails.csv
+.video_dl/
 
 # Local dev bring-up script — gitignored so it can carry real secrets.
 # The `bun run local` alias in package.json points at this path. Recreate

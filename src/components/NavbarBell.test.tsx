@@ -4,7 +4,8 @@
 
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 if (!globalThis.document) GlobalRegistrator.register();
-import { afterEach, beforeEach, describe, test, expect, mock } from 'bun:test';
+import { afterAll, afterEach, beforeEach, describe, test, expect, mock } from 'bun:test';
+import * as realSupabaseModule from '../lib/supabase';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 
 const BELL_LAST_VIEWED_KEY = 'ip.bell.lastViewedAt';
@@ -36,10 +37,27 @@ const supabaseStub = {
   }),
 };
 
+// Bun's mock.module patches the module registry process-wide and is never
+// rolled back on its own, so a stub installed here leaks into every test file
+// that loads afterwards. This stub only implements from().select().is()
+// .order(), so any later file calling .select().eq() got
+// "eq is not a function" — which is what took out pieces.test.ts,
+// StartContributionButton, RequestContributionDialog and
+// SignedPieceDifficulty in full-suite runs while they all passed standalone.
+//
+// Capture the real module (safe to import: `supabase` is a lazy Proxy that
+// falls back to a placeholder client when env vars are absent) and put it
+// back once this file's tests are done.
+const realSupabase = { ...realSupabaseModule };
+
 mock.module('../lib/supabase', () => ({
   supabase: supabaseStub,
   hasSupabase: true,
 }));
+
+afterAll(() => {
+  mock.module('../lib/supabase', () => realSupabase);
+});
 
 describe('NavbarBell', () => {
   beforeEach(() => {

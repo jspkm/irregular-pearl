@@ -1,37 +1,26 @@
 name: Weekly Digest Email
 
+# Scheduling note: this used to carry a `schedule:` cron trigger. GitHub
+# disables schedule triggers after ~60 days of repository inactivity, which
+# silently killed this workflow between 2026-07-12 and 2026-09-07 — nine
+# weekly digests never sent, with no error anywhere. The schedule now lives in
+# a pg_cron job inside Supabase, which has no repo-activity dependency. This
+# file remains as a manual, preview-capable smoke test.
+
 on:
-  schedule:
-    # Offset from the daily notification-digest (0 13 * * *) so users opted
-    # in to both prefs on a Sunday don't get two concurrent emails.
-    - cron: '30 13 * * 0' # Every Sunday at 13:30 UTC = 09:30 ET (EDT; 08:30 during EST)
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch:
+    inputs:
+      preview_to:
+        description: 'Send only to this address (safe smoke test). Leave blank to send to ALL subscribers.'
+        required: false
+        type: string
+        default: ''
 
 jobs:
-  send-digest:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Trigger weekly digest edge function
-        run: |
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            -X POST "${{ secrets.SUPABASE_URL }}/functions/v1/send-weekly-digest" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{}')
-
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -n -1)
-
-          echo "Response ($HTTP_CODE): $BODY"
-
-          if echo "$BODY" | grep -q "UNSUBSCRIBE_SECRET not set"; then
-            echo "::error::UNSUBSCRIBE_SECRET is not configured on the Supabase project. Set it with: bunx supabase secrets set UNSUBSCRIBE_SECRET=\$(openssl rand -hex 32). The same value must also live in Cloudflare Pages env."
-            exit 1
-          fi
-
-          if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "::error::Weekly digest failed with HTTP $HTTP_CODE"
-            exit 1
-          fi
+  send:
+    uses: ./.github/workflows/digest-send.yml
+    with:
+      function: send-weekly-digest
+      label: Weekly digest
+      preview_to: ${{ inputs.preview_to }}
+    secrets: inherit
