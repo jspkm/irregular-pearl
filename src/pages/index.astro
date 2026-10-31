@@ -4,11 +4,14 @@ import { seedPieces } from '../data/seed';
 import { musicTerms } from '../data/musicTerms';
 import { opportunities } from '../data/opportunities';
 
+// Temporary mission-only landing page; retain the existing features for restoration.
+const showHomepageFeatures = false;
+
 const legacyQuery = Astro.url.searchParams.get('q');
 if (legacyQuery) return Astro.redirect(`/pieces?q=${encodeURIComponent(legacyQuery)}`, 301);
 
 const sections = [
-  { href: '/residency', kicker: 'Program', title: 'Artist Residency', description: 'Supporting emerging artists through a guest concerto opportunity.', count: 'Annual program', link: 'Explore the residency' },
+  { href: '/residency', kicker: 'Program', title: 'Resident Artist Program', description: 'The Irregular Pearl Resident Artist Program champions emerging classical musicians through concert soloist opportunities and career support, free to apply and participate.', count: 'Annual program', link: 'Explore the residency' },
   { href: '/pieces', kicker: 'Repertoire', title: 'Classical music pieces', description: 'Piece pages, performer insights, editions, and recordings.', count: `${seedPieces.length} pieces`, link: 'Explore the pieces' },
   { href: '/opportunities', kicker: 'Career', title: 'Opportunities and Resources', description: 'Competitions, grants, awards, and summer festivals.', count: `${opportunities.length} programs`, link: 'Browse opportunities and resources' },
   { href: '/glossary', kicker: 'Reference', title: 'Music glossary', description: 'Musical terms, styles, and history, explained for musicians.', count: `${musicTerms.length} terms`, link: 'Browse the glossary' },
@@ -23,30 +26,32 @@ const homeLd = {
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Irregular Pearl', url: Astro.url.origin, description: 'A non-profit reference for working classical musicians.', nonprofitStatus: 'NonprofitType' };
 ---
 <Layout title="Home" description="A place for classical music, shared knowledge, and the people who bring it to life." jsonLd={[homeLd, orgLd]} hideFooter>
-  <div class="landing">
+  <div class:list={['landing', { 'mission-only': !showHomepageFeatures }]}>
     <header class="masthead">
-      <a class="wordmark" href="/" aria-label="Irregular Pearl home">IrregularPearl</a>
-      <a class="about-link" href="/who-we-are">Who we are <span aria-hidden="true">↗</span></a>
+      <div class="home-brand-program"><a class="wordmark" href="/" aria-label="Irregular Pearl home">IrregularPearl</a></div>
+
     </header>
     <main>
+      {showHomepageFeatures && <nav class="home-navigation" aria-label="Main navigation">
+        <a href="/pieces">Pieces</a>
+        <a href="/opportunities">Opportunities and Resources</a>
+        <a href="/glossary">Glossary</a>
+      </nav>}
       <div class="introduction">
-        <p class="eyebrow">A shared reference for classical music</p>
-        <h1>Music lives in<br />what we share.</h1>
-        <p class="lede">A place to learn, share what you know, and discover<br class="desktop-break" /> what classical music means to others.</p>
-        <a class="primary-link" href="/pieces">Explore the repertoire <span aria-hidden="true">→</span></a>
+
+        <div class="home-mission-group">
+        <h1 class="home-mission">Enriching the classical music community by supporting artists, sharing knowledge, and bringing people together</h1>
+        <p class="home-mission-description">Irregular Pearl is a nonprofit that supports artists and connects people through classical music. Through open-access knowledge sharing and the Irregular Pearl Residency, we nurture curiosity, community, and opportunity.</p>
+        </div>
+        {showHomepageFeatures && <div class="home-residency-summary"><a class="home-residency-link" href="/residency">Resident Artist Program</a>
+          <p class="home-residency-description">We offer concert soloist opportunities and career support, free to apply and participate.</p>
+        </div>}
+
       </div>
-      <nav class="collections" aria-label="Explore Irregular Pearl">
-        {sections.map((section, index) => (
-          <a class="collection" href={section.href}>
-            <span class="collection-top"><span>{section.kicker}</span><span class="number" aria-hidden="true">0{index + 1}</span></span>
-            <h2>{section.title}</h2>
-            <p>{section.description}</p>
-            <span class="collection-bottom"><span>{section.count}</span><span aria-hidden="true">↗</span></span>
-          </a>
-        ))}
-      </nav>
+
     </main>
     <footer class="landing-footer">
+      <span class="image-credit">Original image: <cite>Bacchanale Revel, Pan and Procession</cite>, Louis Schaettle/ Smithsonian American Art Museum,(CC0); edited by Irregular Pearl</span>
       <span>© {new Date().getFullYear()} Irregular Pearl <span class="footer-mission">· A non-profit for classical music knowledge</span></span>
       <div><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
     </footer>
@@ -54,13 +59,29 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
 </Layout>
 
 <style>
+  .landing::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url('/images/landing-home.png') center center / cover no-repeat;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .landing { isolation: isolate; }
   .landing { min-height: 100svh; padding: 0 clamp(20px, 5vw, 72px); display: grid; grid-template-rows: auto 1fr auto; max-width: 1440px; margin: auto; }
   .masthead { display: flex; justify-content: space-between; align-items: center; min-height: 80px; border-bottom: .5px solid var(--border); }
   a { color: var(--ink); text-decoration: none; }
   a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .wordmark { font-size: 18px; font-weight: 500; letter-spacing: -.5px; display: inline-flex; align-items: center; }
   .about-link { font-size: 13px; display: inline-flex; align-items: center; gap: 20px; }
-  main { display: flex; flex-direction: column; justify-content: center; gap: clamp(24px, 5vh, 64px); padding-block: 24px; }
+  main { display: flex; flex-direction: column; justify-content: center; gap: clamp(16px, 3vh, 40px); padding-block: 16px; }
+  .mission-heading { max-width: 760px; margin-bottom: 16px; }
+  .mission-heading h1, .mission-heading .mission-subtitle { display: inline; margin: 0; }
+  .mission-subtitle { max-width: 760px; font-family: var(--font-serif); font-size: 22px; line-height: 1.4; margin: 12px 0 16px; }
+  .mission-copy { max-width: 760px; font-family: var(--font-serif); font-size: 15px; line-height: 1.5; margin: 0 0 20px; }
+  @media (max-width: 767px) { .mission-subtitle { font-size: 18px; margin: 8px 0 12px; } .mission-copy { font-size: 16px; line-height: 1.4; margin-bottom: 14px; } }
+  @media (max-height: 600px) { .mission-copy { font-size: 15px; line-height: 1.35; margin-bottom: 12px; } }
+  @media (max-height: 500px) and (min-width: 600px) { .mission-copy { font-size: 13px; } .mission-subtitle { font-size: 15px; margin: 6px 0 8px; } }
   .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin: 0 0 16px; }
   h1 { font-family: var(--font-serif); font-size: 34px; line-height: 1.15; font-weight: 400; letter-spacing: -.7px; margin: 0; }
   .lede { font-size: 15px; color: var(--muted); line-height: 1.55; margin: 16px 0 20px; }
@@ -78,9 +99,27 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   .collection p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
   .collection-bottom { margin-top: auto; }
   .collection-bottom > :last-child { color: var(--accent); font-size: 16px; }
-  .landing-footer { display: flex; justify-content: space-between; gap: 16px; align-items: center; min-height: 60px; border-top: .5px solid var(--border); color: var(--muted); font-size: 11px; }
+  .landing-footer { display: flex; justify-content: space-between; gap: 16px; align-items: center; min-height: 60px; border-top: .5px solid var(--border-strong); color: var(--ink); font-size: 11px; }
+  .landing-footer > span, .landing-footer a {
+    position: relative;
+    isolation: isolate;
+    text-shadow: 0 0 5px rgb(218 202 153 / .35);
+  }
+  .landing-footer > span::before, .landing-footer a::before {
+    content: '';
+    position: absolute;
+    inset: 0 -6px;
+    background: rgb(218 202 153 / .4);
+    filter: blur(10px);
+    border-radius: 12px;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .landing-footer { flex-wrap: wrap; column-gap: 16px; row-gap: 4px; padding-block: 8px; }
+  .image-credit { flex-basis: 100%; font-size: 11px; line-height: 1.4; }
+  .image-credit cite { font-style: italic; }
   .landing-footer div { display: flex; gap: 20px; }
-  .landing-footer a { color: var(--muted); display: inline-flex; align-items: center; }
+  .landing-footer a { color: var(--ink); display: inline-flex; align-items: center; }
   @media (max-width: 767px) {
     .masthead { min-height: 64px; }
     main { gap: 24px; padding-block: 20px; }
@@ -105,16 +144,42 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     .collection { padding-top: 12px; padding-bottom: 12px; }
     .collection p { margin-bottom: 12px; }
   }
-  @media (max-height: 600px) and (max-width: 599px) {
+  @media (max-height: 700px) and (max-width: 599px) {
     h1 { font-size: 26px; }
     .collection-top, .collection-bottom { display: none; }
-    .collection { justify-content: center; min-height: 64px; }
+    .collection { justify-content: center; min-height: 44px; padding-block: 8px; }
+    .mission-subtitle { font-size: 15px; line-height: 1.3; margin: 6px 0 8px; }
+    .mission-copy { font-size: 13px; line-height: 1.35; margin-bottom: 8px; }
+    main { padding-block: 10px; gap: 12px; }
     h2 { font-size: 18px; margin: 0; }
     .eyebrow { font-size: 11px; letter-spacing: .03em; }
   }
+  @media (max-height: 600px) and (max-width: 599px) {
+    .mission-heading { margin-bottom: 4px; }
+    .mission-subtitle { font-size: 14px; line-height: 1.3; }
+    .collection h2 { font-size: 14px; }
+    .landing { padding-inline: 16px; }
+    .masthead { min-height: 48px; }
+    .landing-footer { min-height: 44px; }
+  }
+  @media (max-width: 767px) {
+    .collection-top, .collection-bottom { display: none; }
+    .collection { justify-content: center; min-height: 44px; padding-block: 8px; }
+    .collection h2 { font-size: 14px; margin: 0; }
+    .landing-footer > span:not(.image-credit), .landing-footer a { min-height: 24px; }
+    .landing-footer { padding-block: 6px; }
+  }
+  @media (max-height: 600px) and (max-width: 599px) {
+    .mission-copy { font-size: 12px; line-height: 1.3; }
+    main { gap: 8px; padding-block: 6px; }
+    .image-credit { font-size: 11px; line-height: 1.25; }
+  }
   @media (max-height: 500px) and (min-width: 600px) {
-    main { flex-direction: row; align-items: center; gap: 32px; }
-    .introduction { flex: 1; }
+    main { flex-direction: row; align-items: center; gap: 32px; padding-block: 4px; }
+    .introduction { flex: 1.5; }
+    .mission-copy { font-size: 12px; line-height: 1.3; }
+    .mission-subtitle { font-size: 14px; }
+    .mission-heading { margin-bottom: 8px; }
     .collections { flex: 1; grid-template-columns: repeat(2,minmax(0,1fr)); }
     .collection p, .number, .collection-bottom { display: none; }
     .collection { padding: 10px; border: 0; }
@@ -124,4 +189,71 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     .desktop-break { display: none; }
     .landing-footer { min-height: 44px; }
   }
+  .introduction { display: flex; flex-direction: column; gap: 24px; align-items: center; justify-content: center; text-align: center; padding-block: clamp(24px, 6vh, 80px); }
+  h1.home-mission { max-width: 1000px; margin: 0 auto; font-family: var(--font-serif); font-size: clamp(30px, 4.5vw, 58px); font-weight: 400; line-height: 1.16; letter-spacing: -.025em; text-wrap: balance; }
+  @media (max-height: 700px) { .introduction { padding-block: 20px; } h1.home-mission { font-size: clamp(28px, 4vw, 46px); } }
+  .home-mission-description { max-width: 760px; margin: 0; font-family: var(--font-sans); font-size: clamp(15px, 1.5vw, 18px); line-height: 1.65; color: var(--ink); text-wrap: pretty; }
+  .home-about-link { align-self: flex-end; }
+  .home-navigation { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px 28px; }
+  .home-navigation a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+  .home-navigation a:hover { color: var(--accent); }
+  .collections { grid-template-columns: minmax(0, 1fr); width: 100%; max-width: 520px; align-self: center; flex: none; }
+  .collections .collection { padding: 20px 0; border-right: 0; }
+  @media (max-width: 767px) { .masthead { flex-wrap: wrap; gap: 4px 24px; padding-block: 12px; } .home-navigation { justify-content: flex-start; gap: 4px 20px; } .home-navigation a { font-size: 13px; } }
+  .residency-feature { display: grid; grid-template-columns: minmax(180px, .75fr) minmax(0, 1.5fr); align-items: start; gap: 32px; width: 100%; max-width: 960px; box-sizing: border-box; align-self: center; padding: 28px 32px; border-top: .5px solid var(--border-strong); border-bottom: .5px solid var(--border); background: var(--bg-tint); }
+  .residency-feature-kicker { margin: 0 0 8px; color: var(--accent); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .residency-feature h2 { margin: 0; font: 500 26px/1.25 var(--font-serif); }
+  .residency-feature-copy { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink); }
+  .residency-feature-link { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; margin-top: 8px; color: var(--accent); font-size: 13px; }
+  .residency-feature-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  @media(max-width: 640px) { .residency-feature { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 24px; } .residency-feature h2 { font-size: 22px; } }
+  .residency-feature { grid-template-columns: minmax(0, 1fr); max-width: 400px; align-self: flex-start; gap: 10px; padding: 18px 20px; }
+  .residency-feature h2 { font-size: 22px; }
+  .residency-feature-kicker { margin-bottom: 6px; font-size: 10px; }
+  .residency-feature-copy { font-size: 13px; line-height: 1.5; }
+  .residency-feature-link { margin-top: 4px; font-size: 12px; }
+  .residency-feature { background: transparent; border: 0; padding: 0; }
+  .home-navigation a.home-residency-link { font-size: 18px; font-weight: 500; }
+  .home-brand-program { display: flex; align-items: center; flex-wrap: wrap; gap: 16px 24px; }
+  .home-brand-program .home-residency-link { display: inline-flex; align-items: center; min-height: 44px; padding-left: 24px; border-left: 1px solid var(--border-strong); color: var(--accent); font-size: 20px; font-weight: 500; }
+  .home-brand-program .home-residency-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+  @media(max-width:640px) { .home-brand-program { gap: 8px 16px; } .home-brand-program .home-residency-link { padding-left: 16px; font-size: 18px; } }
+  .introduction > .home-residency-link { align-self: center; margin-left: 25%; display: inline-flex; align-items: center; min-height: 44px; color: var(--accent); font-family: var(--font-serif); font-size: 24px; font-weight: 500; }
+  .introduction > .home-residency-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+  @media(max-width:640px) { .introduction > .home-residency-link { margin-left: 12%; font-size: 22px; } }
+  .introduction > .home-residency-link { margin-left: 0; margin-top: 40px; align-self: center; text-align: center; }
+  .masthead { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 24px; }
+  .home-brand-program { grid-column: 1; justify-self: start; }
+  .home-navigation { grid-column: 2; justify-content: center; }
+  @media(max-width: 900px) { .masthead { grid-template-columns: minmax(0, 1fr); row-gap: 4px; } .home-brand-program { grid-column: 1; } .home-navigation { grid-column: 1; justify-self: center; text-align: center; } }
+  .introduction > .home-residency-link { margin-top: 72px; }
+  .home-about-link { margin-right: 48px; }
+  @media(max-width: 640px) { .introduction > .home-residency-link { margin-top: 48px; } .home-about-link { margin-right: 24px; } }
+  .home-residency-description { max-width: 540px; margin: -12px auto 0; color: var(--ink); font-family: var(--font-sans); font-size: 13px; line-height: 1.6; text-align: center; }
+  .home-residency-summary { display: table; width: min-content; max-width: 100%; align-self: center; margin-top: 72px; }
+  .home-residency-summary .home-residency-link { display: block; white-space: nowrap; min-height: 44px; color: var(--accent); font: 500 24px/1.4 var(--font-serif); text-align: center; }
+  .home-residency-summary .home-residency-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .home-residency-summary .home-residency-description { width: 100%; max-width: none; margin: 4px 0 0; }
+  @media(max-width:640px) { .home-residency-summary { margin-top: 48px; } .home-residency-summary .home-residency-link { font-size: 22px; } }
+  .home-residency-summary { align-self: flex-start; margin-left: 15%; }
+  @media(max-width:640px) { .home-residency-summary { margin-left: 4%; } }
+  .masthead > .home-about-link { grid-column: 3; justify-self: end; align-self: center; margin: 0; min-height: 44px; }
+  @media(max-width:900px) { .masthead { grid-template-columns: minmax(0,1fr) auto; } .home-brand-program { grid-column: 1; grid-row: 1; } .masthead > .home-about-link { grid-column: 2; grid-row: 1; } .home-navigation { grid-column: 1 / -1; grid-row: 2; } }
+  .home-residency-summary { align-self: center; margin-left: 0; margin-top: 112px; }
+  @media(max-width:640px) { .home-residency-summary { margin-left: 0; margin-top: 72px; } }
+  .home-navigation a { color: var(--accent); font-size: 16px; font-weight: 500; }
+  @media(max-width:640px) { .home-navigation a { font-size: 15px; } }
+  .introduction > .home-navigation { align-self: center; justify-content: center; margin-bottom: 8px; }
+  main { position: relative; }
+  main > .home-navigation { position: absolute; top: 12px; left: 0; right: 0; justify-content: center; }
+  @media(max-width:640px) { main > .home-navigation { top: 4px; } .introduction { padding-top: 72px; } }
+  main { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(300px, 1fr) auto; gap: 24px; padding-block: 16px 32px; }
+  main > .home-navigation { position: static; grid-column: 1; grid-row: 1; justify-self: center; }
+  .introduction { display: contents; }
+  .home-mission-group { grid-column: 1; grid-row: 2; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; padding: 32px 0; }
+  .home-residency-summary { grid-column: 1; grid-row: 3; justify-self: center; margin: 24px 0 0; }
+  @media(max-width:640px) { main { grid-template-rows: auto minmax(300px, 1fr) auto; } .home-residency-summary { margin: 24px 0 0; } }
+  .landing.mission-only { grid-template-rows: auto minmax(0, 1fr) auto; }
+  .mission-only main { display: flex; justify-content: center; align-items: center; padding-block: 40px; }
+  .mission-only .home-mission-group { padding: 0; }
 </style>
