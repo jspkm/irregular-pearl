@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
+import SiteMasthead from '../components/SiteMasthead.astro';
 
 const messages = [
   { quote: "This page has gone tacet.", note: "Even the rests are part of the music." },
@@ -41,7 +41,7 @@ const pick = messages[Math.floor(Math.random() * messages.length)];
 const symbolIdx = Math.floor(Math.random() * symbols.length);
 ---
 <Layout title="Page Not Found — Irregular Pearl">
-  <Navbar />
+  <SiteMasthead />
 
   <div class="flex flex-col items-center justify-center min-h-[calc(100vh-12rem)] px-4 text-center">
     <div class="w-24 h-24 md:w-36 md:h-36 mb-6 text-accent/15" set:html={symbols[symbolIdx]} />

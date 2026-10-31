@@ -34,12 +34,6 @@ export const GET: APIRoute = async ({ url }) => {
     <lastmod>${now}</lastmod>
   </url>`),
     `  <url>
-    <loc>${origin}/residency/application</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <lastmod>${now}</lastmod>
-  </url>`,
-    `  <url>
     <loc>${origin}/residency</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

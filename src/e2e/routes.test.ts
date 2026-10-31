@@ -32,6 +32,12 @@ describe('E2E: static pages', () => {
     expect(await res.text()).toContain('href="/credits"');
   });
 
+  test('residency page includes application guidelines', async () => {
+    const res = await fetchOk('/residency');
+    expect(res.status).toBe(200);
+    expect(await res.text()).toContain('id="application"');
+  });
+
   test('credits page returns 200', async () => {
     const res = await fetchOk('/credits');
     expect(res.status).toBe(200);
