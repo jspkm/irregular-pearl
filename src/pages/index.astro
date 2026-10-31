@@ -191,7 +191,7 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
     .landing-footer { min-height: 44px; }
   }
   .introduction { display: flex; flex-direction: column; gap: 24px; align-items: center; justify-content: center; text-align: center; padding-block: clamp(24px, 6vh, 80px); }
-  h1.home-mission { max-width: 1000px; margin: 0 auto; font-family: var(--font-serif); font-size: clamp(30px, 4.5vw, 58px); font-weight: 400; line-height: 1.16; letter-spacing: -.025em; text-wrap: balance; }
+  h1.home-mission { max-width: 1000px; margin: 0 auto; font-family: var(--font-serif); font-size: clamp(34.5px, 5.175vw, 66.7px); font-weight: 400; line-height: 1.16; letter-spacing: -.025em; text-wrap: balance; }
   @media (max-height: 700px) { .introduction { padding-block: 20px; } h1.home-mission { font-size: clamp(28px, 4vw, 46px); } }
   .home-mission-description { max-width: 760px; margin: 0; font-family: var(--font-sans); font-size: clamp(15px, 1.5vw, 18px); line-height: 1.65; color: var(--ink); text-wrap: pretty; }
   .home-about-link { align-self: flex-end; }
@@ -258,6 +258,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   .mission-only main { display: flex; justify-content: center; align-items: center; padding-block: 0; }
   /* Spacers 1:1:2 keep the description where vertical centering put it while lifting the headline halfway to the masthead. */
   .mission-only .home-mission-group { display: grid; grid-template-rows: minmax(24px, 1fr) auto minmax(24px, 1fr) auto minmax(24px, 2fr); justify-items: center; flex: 1; gap: 0; padding: 0; }
-  .mission-only .home-mission { grid-row: 2; }
+  .mission-only .home-mission { grid-row: 2; justify-self: start; margin: 0; text-align: left; }
   .mission-only .home-mission-description { grid-row: 4; margin-top: 24px; }
 </style>
