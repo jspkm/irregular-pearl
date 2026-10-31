@@ -1,15 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import SiteMasthead from '../components/SiteMasthead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const description = 'The Irregular Pearl Resident Artist Program supports and spotlights exceptional emerging classical musicians with a guest concerto soloist opportunity. Read about the program and its application guidelines.';
 ---
 <Layout title="Resident Artist Program" description={description}>
   <SiteMasthead />
   <main class="residency-shell">
-    <nav class="breadcrumbs" aria-label="Breadcrumb">
-      <a href="/">Home</a><span aria-hidden="true">/</span><span aria-current="page">Residency</span>
-    </nav>
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Residency' }]} />
     <article aria-labelledby="residency-title">
       <header>
         <h1 id="residency-title">Resident Artist Program</h1>
@@ -74,10 +73,6 @@ const description = 'The Irregular Pearl Resident Artist Program supports and sp
 
 <style>
   .residency-shell { max-width: 960px; margin: 0 auto; padding: 32px 16px 72px; }
-  .breadcrumbs { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; margin-bottom: 48px; color: var(--muted); font-size: 12px; white-space: nowrap; }
-  /* Global touch-target sizing makes links 44px tall on narrow screens; center the text so the trail stays on one line. */
-  .breadcrumbs a { display: inline-flex; align-items: center; min-width: 0; color: var(--muted); text-decoration: none; }
-  .breadcrumbs a:hover { color: var(--ink); }
   article { max-width: 680px; }
   header { margin-bottom: 24px; }
   h1 { margin: 0; font-family: var(--font-serif); font-size: 26px; font-weight: 500; line-height: 1.25; }

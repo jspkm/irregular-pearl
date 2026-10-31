@@ -1,10 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import SiteMasthead from '../components/SiteMasthead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 ---
 <Layout title="Privacy Policy">
   <SiteMasthead />
-  <main class="max-w-180 mx-auto px-4 md:px-6 py-12">
+  <main class="max-w-180 mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-12">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Privacy' }]} />
     <h1 class="font-display text-3xl mb-8">Privacy Policy</h1>
 
     <div class="space-y-6 text-sm text-muted leading-relaxed">
