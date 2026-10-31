@@ -41,7 +41,7 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
 
         <div class="home-mission-group">
         <h1 class="home-mission">Enriching the classical music community</h1>
-        <p class="home-mission-description">Irregular Pearl is a 501(c)(3) nonprofit that supports artists and connects people through classical music. Through open-access knowledge sharing, sponsoring the Irregular Pearl Residency program and concerts, we nurture curiosity, community, and opportunity.</p>
+        <p class="home-mission-description">Irregular Pearl is a 501(c)(3) nonprofit that supports artists and connects people through classical music. Through open-access knowledge sharing, sponsoring the <a href="/residency">Irregular Pearl Residency program</a> and concerts, we nurture curiosity, community, and opportunity.</p>
         </div>
         {showHomepageFeatures && <div class="home-residency-summary"><a class="home-residency-link" href="/residency">Resident Artist Program</a>
           <p class="home-residency-description">We offer concert soloist opportunities and career support, free to apply and participate.</p>
@@ -232,4 +232,6 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   .mission-only .home-mission-group { display: grid; grid-template-rows: minmax(24px, 1fr) auto auto minmax(24px, 4fr); justify-items: center; flex: 1; align-self: stretch; gap: 0; padding: 0; }
   .mission-only .home-mission { grid-row: 2; justify-self: start; margin: 0; text-align: left; text-transform: uppercase; }
   .mission-only .home-mission-description { grid-row: 3; justify-self: start; margin-top: 64px; text-align: left; }
+  .home-mission-description a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .home-mission-description a:hover { color: var(--accent-hover); }
 </style>
