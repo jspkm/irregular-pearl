@@ -215,9 +215,8 @@ const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name:
   @media(max-width:640px) { main { grid-template-rows: auto minmax(300px, 1fr) auto; } .home-residency-summary { margin: 24px 0 0; } }
   .landing.mission-only { grid-template-rows: auto minmax(0, 1fr); }
   .mission-only main { display: flex; justify-content: center; align-items: center; padding-block: 0; }
-  /* Spacers 1:4 sit the headline and description as one block in the upper part of the screen. */
-  .mission-only .home-mission-group { display: grid; grid-template-rows: minmax(24px, 1fr) auto auto minmax(24px, 4fr); justify-items: center; flex: 1; align-self: stretch; gap: 0; padding: 0; }
-  .mission-only .home-mission { grid-row: 2; justify-self: center; margin: 0; text-align: center; text-transform: none; }
+  .mission-only .home-mission-group { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; align-self: stretch; gap: 0; padding: 24px 0; }
+  .mission-only .home-mission { transform: none; grid-row: 2; justify-self: center; margin: 0; text-align: center; text-transform: none; }
   .mission-only .home-mission-description { grid-row: 3; justify-self: center; margin-top: 24px; text-align: center; }
   .home-mission-description a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
   .home-mission-description a:hover { color: var(--accent-hover); }
