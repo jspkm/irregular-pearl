@@ -1,8 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SiteMasthead from '../components/SiteMasthead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 ---
 <Layout title="Terms of Use">
-  <main class="max-w-180 mx-auto px-4 md:px-6 py-12">
+  <SiteMasthead />
+  <main class="max-w-180 mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-12">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Terms' }]} />
     <h1 class="font-display text-3xl mb-8">Terms of Use</h1>
 
     <div class="space-y-6 text-sm text-muted leading-relaxed">
@@ -27,10 +31,13 @@ import Layout from '../layouts/Layout.astro';
       <h2 class="text-base font-semibold text-ink pt-4">6. No warranty</h2>
       <p>Irregular Pearl is provided "as is" without warranty of any kind. We do not guarantee the accuracy of edition information, user reviews, or external links.</p>
 
-      <h2 class="text-base font-semibold text-ink pt-4">7. Changes</h2>
+      <h2 id="credits" class="text-base font-semibold text-ink pt-4">7. Credits</h2>
+      <p>Irregular Pearl uses artwork and other materials shared by artists and institutions, including public-domain images. Attribution for these materials is listed on our <a class="text-accent underline" href="/credits">Credits</a> page.</p>
+
+      <h2 class="text-base font-semibold text-ink pt-4">8. Changes</h2>
       <p>We may update these terms. Continued use after changes constitutes acceptance.</p>
 
-      <h2 class="text-base font-semibold text-ink pt-4">8. Contact</h2>
+      <h2 class="text-base font-semibold text-ink pt-4">9. Contact</h2>
       <p>For questions about these terms, email <a class="text-accent underline" href="mailto:info@irregularpearl.org">info@irregularpearl.org</a>.</p>
       <section aria-labelledby="image-credit-heading" class="pt-4">
         <h2 id="image-credit-heading" class="text-base font-medium text-ink mb-4">Background image credit</h2>

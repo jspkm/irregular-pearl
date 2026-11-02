@@ -1,0 +1,24 @@
+---
+// Single-line breadcrumb trail. Items without href render as the current page.
+interface Props {
+  items: { label: string; href?: string }[];
+}
+
+const { items } = Astro.props;
+---
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  {items.map((item, index) => (
+    <>
+      {index > 0 && <span aria-hidden="true">/</span>}
+      {item.href ? <a href={item.href}>{item.label}</a> : <span aria-current="page">{item.label}</span>}
+    </>
+  ))}
+</nav>
+
+<style>
+  .breadcrumbs { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; margin-bottom: 48px; color: var(--muted); font-size: 12px; line-height: normal; white-space: nowrap; }
+  /* Global touch-target sizing makes links 44px tall on narrow screens; center the text so the trail stays on one line. */
+  .breadcrumbs a { display: inline-flex; align-items: center; min-width: 0; color: var(--muted); text-decoration: none; }
+  .breadcrumbs a:hover { color: var(--ink); }
+  .breadcrumbs a:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+</style>
