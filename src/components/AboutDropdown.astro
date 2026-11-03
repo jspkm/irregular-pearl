@@ -1,0 +1,39 @@
+<details class="about-dropdown">
+  <summary>More About Us</summary>
+  <nav class="about-options" aria-label="About Irregular Pearl">
+    <a href="/letter-from-our-founder">A Letter From Our Founder</a>
+    <a href="/who-we-are">Our Mission</a>
+  </nav>
+</details>
+<style>
+  .about-dropdown { position: relative; flex-shrink: 0; }
+  summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; color: var(--ink); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+  summary::-webkit-details-marker { display: none; }
+  .about-options { position: absolute; right: 0; top: 100%; z-index: 60; display: flex; flex-direction: column; width: max-content; max-width: calc(100vw - 40px); padding: 8px; background: var(--bg); border: .5px solid var(--border); }
+  .about-options a { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; color: var(--ink); font-size: 14px; text-decoration: none; }
+  .about-options a:hover { background: var(--bg-tint); color: var(--accent); }
+  summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+<script>
+  document.querySelectorAll('.about-dropdown').forEach((dropdown) => {
+    dropdown.addEventListener('pointerenter', (event) => {
+      if (event instanceof PointerEvent && event.pointerType === 'mouse') {
+        dropdown.setAttribute('open', '');
+      }
+    });
+    dropdown.addEventListener('pointerleave', (event) => {
+      if (event instanceof PointerEvent && event.pointerType === 'mouse' && !dropdown.contains(document.activeElement)) {
+        dropdown.removeAttribute('open');
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node && !dropdown.contains(event.target)) dropdown.removeAttribute('open');
+    });
+    dropdown.addEventListener('keydown', (event) => {
+      if (event instanceof KeyboardEvent && event.key === 'Escape') {
+        dropdown.removeAttribute('open');
+        dropdown.querySelector('summary')?.focus();
+      }
+    });
+  });
+</script>

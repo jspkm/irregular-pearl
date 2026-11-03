@@ -1,19 +1,30 @@
 ---
+import AboutDropdown from './AboutDropdown.astro';
+interface Props { showAbout?: boolean; }
+const { showAbout = true } = Astro.props;
 // Minimal wordmark masthead shared by the landing page and every page reachable from it.
 // Horizontal padding matches the landing layout so the wordmark lines up across pages.
 ---
 <div class="site-masthead">
   <header>
     <a class="wordmark" href="/" aria-label="Irregular Pearl home">IrregularPearl</a>
+    {showAbout && <nav aria-label="Main navigation"><AboutDropdown /></nav>}
   </header>
 </div>
 
 <style>
   .site-masthead { width: 100%; max-width: 1440px; margin: 0 auto; padding-inline: clamp(20px, 5vw, 72px); box-sizing: border-box; }
-  header { display: flex; align-items: center; min-height: 80px; border-bottom: .5px solid var(--border); }
+  header { display: flex; justify-content: space-between; align-items: center; min-height: 80px; border-bottom: .5px solid var(--border); }
   .wordmark { display: inline-flex; align-items: center; color: var(--ink); font-size: 18px; font-weight: 500; letter-spacing: -.5px; text-decoration: none; }
+  .about-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-size: 14px; text-decoration: none; }
+  .about-link:hover, .about-link[aria-current="page"] { text-decoration: underline; text-underline-offset: 4px; }
+  .about-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   .wordmark:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
   @media (max-width: 767px) { header { min-height: 64px; } }
   @media (max-height: 700px) { header { min-height: 56px; } }
   @media (max-height: 600px) and (max-width: 599px) { .site-masthead { padding-inline: 16px; } header { min-height: 48px; } }
+</style>
+
+<style>
+  .about-link { text-decoration: underline; text-underline-offset: 4px; }
 </style>

@@ -1,25 +1,36 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-const description = 'Irregular Pearl is a nonprofit, open-access classical music knowledge platform connecting performers, musicologists, researchers, educators, and curious audiences.';
-const jsonLd = { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'Who we are', description, url: Astro.url.href };
+import SiteMasthead from '../components/SiteMasthead.astro';
+const description = 'Irregular Pearl is a nonprofit organization dedicated to making classical music knowledge more accessible, supporting emerging artists, and cultivating a connected community around classical music.';
+const jsonLd = { '@context': 'https://schema.org', '@type': 'AboutPage', name: 'About Irregular Pearl', description, url: Astro.url.href };
 ---
-<Layout title="Who we are" description={description} jsonLd={jsonLd}>
-  <Navbar />
+<Layout title="About Irregular Pearl" description={description} jsonLd={jsonLd}>
+  <SiteMasthead showAbout={false} />
   <main class="who-shell">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Who we are</span></nav>
+    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>Our Mission</span></nav>
     <article>
-      <h1>Who we are</h1>
-      <div class="who-copy">
-        <p>Irregular Pearl is a nonprofit classical music platform dedicated to making musical knowledge more accessible while fostering a connected community around classical music. We aim to serve as a free, open-access space where performers, musicologists, researchers, educators, and enthusiasts can share their knowledge, experiences, and individuality. Beyond providing resources, Irregular Pearl seeks to cultivate a culture of curiosity, conversation, and discovery, where individuals can engage with music not only as an art form to study or perform, but also as something to explore, discuss, and enjoy together.</p>
-        <p>In all fields, knowledge is power. However, classical music knowledge can be surprisingly difficult to access. Valuable information is often scattered across academic publications, institutional archives, specialized websites, and conversations, making it challenging to navigate without prior experience or professional connections. Existing resources can feel outdated, fragmented, or overly academic, creating unnecessary barriers between those who possess knowledge and those eager to learn. At the same time, opportunities for meaningful conversation and shared discovery around classical music remain limited.</p>
-        <p>Irregular Pearl seeks to bridge these gaps by providing a centralized online space where knowledge and community can grow alongside one another. Through a combination of community participation and editorial oversight, we aim to create a resource that is both reliable and continually evolving, reflecting the breadth of knowledge and experience within the classical music world.</p>
+      <h1>About Irregular Pearl</h1>
+      <div class="who-copy" id="our-mission">
+        <p>Irregular Pearl is a nonprofit organization dedicated to making classical music knowledge more accessible, supporting emerging artists, and cultivating a connected community around classical music. Through education, artistic opportunities, and community participation, we hope to encourage a culture of curiosity, generosity, and shared discovery.</p>
+        <h2>Making Classical Music Knowledge Accessible</h2>
+        <p>In all fields, knowledge is power. Yet within classical music, valuable information and practical insights can be surprisingly difficult to find. Resources are often scattered across publications, archives, specialized websites, and informal professional networks, making it challenging for those without established connections or prior experience to navigate the field.</p>
+        <p>Irregular Pearl provides a platform to bring this knowledge into a centralized, open-access space where performers, composers, musicologists, researchers, educators, students, and enthusiasts can both learn from and contribute to a shared body of knowledge. By combining community participation with editorial oversight, we aim to develop a reliable, continually evolving resource that reflects the breadth of experience and expertise within the classical music world.</p>
+        <h2>Supporting Emerging Classical Artists</h2>
+        <p>The future of classical music depends, in part, on the opportunities available to its next generation of performers and composers. Yet developing a professional career in music can require significant resources, connections, and opportunities that are not equally accessible to everyone.</p>
+        <p>Through charitable support and dedicated initiatives, Irregular Pearl is working to help emerging artists develop their careers by creating performance opportunities, connecting them with professional resources, and supporting their artistic growth.</p>
+        <p>Our Resident Artist Program is an early step toward this mission, providing selected emerging musicians with opportunities to perform as concerto soloists with established orchestras. As the organization grows, we hope to expand our support for individual musicians and composers while helping bring live classical music to broader audiences.</p>
+        <h2>Cultivating a Community Around Classical Music</h2>
+        <p>Classical music is more than an academic discipline or a professional pursuit. It is also a source of enjoyment, curiosity, conversation, and shared cultural experience.</p>
+        <p>Irregular Pearl aspires to provide a welcoming digital space where people from all backgrounds develop their interests together. Whether someone is a professional musician, a student, or simply curious about classical music, we hope they can find a place in this community.</p>
+        <h2>Our Vision</h2>
+        <p>Ultimately, Irregular Pearl seeks to bring knowledge, opportunity, and community together in one evolving space. We envision a classical music culture in which expertise is generously shared, emerging artists are meaningfully supported, and people from all walks of life feel encouraged to discover and participate. Our hope is that Irregular Pearl will grow not only as a resource for classical music, but as a community shaped by the people who contribute to it.</p>
       </div>
-      <aside class="name-note" aria-label="The story behind our name"><p>The name Irregular Pearl comes from the etymology of the word baroque, an irregularly shaped pearl. Once used as an insult for extravagance, baroque has since become the name of one of the most celebrated periods in music history. We believe that the most beautiful and interesting moments in music are rarely perfect.</p></aside>
     </article>
   </main>
 </Layout>
+
 <style>
+
   .who-shell { max-width: 960px; margin: 0 auto; padding: 32px 16px 72px; }
   .breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 48px; color: var(--muted); font-size: 12px; }
   .breadcrumbs a { color: var(--muted); text-decoration: none; }
@@ -29,8 +40,7 @@ const jsonLd = { '@context': 'https://schema.org', '@type': 'AboutPage', name: '
   .who-copy { padding-top: 24px; border-top: .5px solid var(--border); font-size: 16px; line-height: 1.55; color: var(--ink); }
   .who-copy p { margin: 0 0 24px; }
   .who-copy p:last-child { margin-bottom: 0; }
-  .name-note { margin-top: 32px; padding-top: 24px; border-top: .5px solid var(--border); color: var(--muted); font: italic 400 15px/1.68 var(--font-serif); }
-  .name-note p { margin: 0; }
+  .who-copy h2 { margin: 32px 0 16px; font: 500 22px/1.3 var(--font-serif); }
   @media (min-width: 768px) { .who-shell { padding: 40px 32px 88px; } }
   @media (max-width: 767px) { .who-copy { font-size: 15px; } }
 </style>

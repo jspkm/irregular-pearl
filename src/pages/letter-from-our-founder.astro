@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SiteMasthead from '../components/SiteMasthead.astro';
+---
+<Layout title="A Letter From Our Founder" description="A letter from Hannah Kim, Founder & CEO of Irregular Pearl.">
+  <div class="letter-masthead"><SiteMasthead showAbout={false} /></div>
+  <header class="letter-banner">
+    <div class="banner-content">
+      <nav aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>A Letter From Our Founder</span></nav>
+      <h1 id="letter-title">A Letter From Our Founder</h1>
+    </div>
+  </header>
+  <main>
+    <article aria-labelledby="letter-title">
+      <div class="letter">
+        <p class="salutation">Dear Friends,</p>
+        <p>The idea for Irregular Pearl began in December 2025, as I was approaching my final year of formal studies in cello performance. Looking back on nearly eight years of education across three conservatories, I found myself reflecting on how much more I might have made of my opportunities, training, and career had I simply known more about the classical music world and all it had to offer.</p>
+        <p>When I first entered college at eighteen, I arrived with my cello in hand but with little understanding of how to navigate the path ahead beyond practicing my instrument. Over the years, I gradually learned about the opportunities, resources, and possibilities available to young musicians, often through the generosity and guidance of teachers, friends, and colleagues. Even with the privilege of an excellent education and the support of so many wonderful people, I realized how much valuable knowledge exists beyond formal training, and how difficult it can be to find without knowing where to look. I often wondered how different my journey might have been had I known then what I know now, or at least had a place to begin looking for answers. That reflection became the starting point for Irregular Pearl. I believe that knowledge grows through exchange, rather than remaining within exclusive circles, and I hope to build a space shaped by curiosity, generosity, and a willingness to share what we have learned.</p>
+        <p>One of the most rewarding parts of becoming a classical musician has been discovering the community surrounding it. I feel incredibly fortunate for the friendships I've made and the inspiring colleagues I've met, whose perspectives and experiences continue to enrich my own understanding and appreciation of music. Although classical music is sometimes perceived as formal, inaccessible, or reserved for those already familiar with its traditions, there is so much more to its culture than what happens on the concert stage. I hope Irregular Pearl can help bring that culture beyond professional circles and create a space where anyone, regardless of background or experience, feels welcome to explore, enjoy, discuss, and participate in classical music.</p>
+        <p>I also hope that Irregular Pearl can extend this spirit of generosity into tangible opportunities for the next generation of artists. Our Resident Artist Program grows from this aspiration, offering emerging musicians opportunities to perform and develop their careers. In time, I hope we can expand our efforts to connect artists with existing resources and opportunities, as well as raise support for individual musicians and composers who will continue to shape the future of this field.</p>
+        <p>Ultimately, my dream for Irregular Pearl is twofold: to cultivate a curious, generous, and connected community around classical music, and to support the artists who will carry it forward. I hope this becomes a place where knowledge and experiences are freely exchanged, where curiosity is encouraged, and where people from all walks of life can find something meaningful in music.</p>
+        <p>Thank you for visiting Irregular Pearl and taking an interest in what we hope to build. I look forward to seeing how this community grows through the people who become part of it.</p>
+        <p>Warmly,</p>
+        <img class="founder-signature" src="/images/hannah-kim-signature.png" alt="Hannah Kim’s signature" width="2048" height="947" />
+        <p>Hannah Kim<br />Founder &amp; CEO, Irregular Pearl</p>
+      </div>
+    </article>
+  </main>
+</Layout>
+<style>
+  .letter-masthead { position: relative; z-index: 1; }
+  .letter-banner {
+    width: 100%;
+    margin-top: -80px;
+    height: calc(clamp(120px, 14vw, 180px) + 80px);
+    padding-top: 80px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+
+  }
+
+  .banner-content { width: 100%; max-width: 960px; margin: 0 auto; padding: 24px 16px; color: #1A1A1A; }
+  .banner-content nav { margin-bottom: 16px; }
+  .banner-content nav, .banner-content nav a { color: #1A1A1A; }
+  .banner-content h1 { margin-bottom: 0; }
+  main { max-width: 960px; margin: 0 auto; padding: 0 16px 72px; }
+  nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 48px; color: var(--muted); font-size: 12px; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  article { max-width: 680px; }
+  h1 { margin: 0 0 24px; font: 500 26px/1.25 var(--font-serif); }
+  .letter { padding-top: 24px; border-top: .5px solid var(--border); font: 400 16px/1.68 var(--font-serif); color: var(--ink); }
+  .founder-signature { display: block; width: 220px; max-width: 100%; height: auto; margin: -12px 0 12px; }
+  :global(html[data-theme="dark"]) .founder-signature { filter: invert(1); }
+  .salutation { font-size: 1.4em; }
+  p { margin: 0 0 24px; }
+  p:last-child { margin-bottom: 0; }
+  @media (min-width: 768px) { .banner-content { padding-inline: 32px; } main { padding: 0 32px 88px; } }
+  @media (max-width: 767px) { .letter-banner { margin-top: -64px; height: calc(clamp(120px, 14vw, 180px) + 64px); padding-top: 64px; } }
+  @media (max-height: 700px) { .letter-banner { margin-top: -56px; height: calc(clamp(120px, 14vw, 180px) + 56px); padding-top: 56px; } }
+  @media (max-height: 600px) and (max-width: 599px) { .letter-banner { margin-top: -48px; height: calc(clamp(120px, 14vw, 180px) + 48px); padding-top: 48px; } }
+  @media (max-width: 767px) { .letter { font-size: 15px; } }
+</style>
